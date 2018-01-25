@@ -3,12 +3,18 @@
 (defined('EXT')) OR define('EXT', '.php');
 
 global $CFG;
-
+global $URI;
 /* get module locations from config settings or use the default module location and offset */
 
-is_array(Modules::$locations = $CFG->item('modules_locations')) OR Modules::$locations = array(
-	APPPATH.'modules/' => 'modules/',
-);
+if($CFG->item('modules_locations') == null && $URI->segment(1) == 'estic'){
+    Modules::$locations = array(
+        BASEPATH.'modules/' => 'modules/',
+    );
+} else {
+    is_array(Modules::$locations = $CFG->item('modules_locations')) OR Modules::$locations = array(
+        APPPATH.'modules/' => 'modules/',
+    );
+}
 
 /* PHP5 spl_autoload */
 spl_autoload_register('Modules::autoload');

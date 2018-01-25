@@ -407,13 +407,15 @@ if ( ! is_php('5.4'))
 
 	$method = $RTR->method;
 
-	if (empty($class) OR ! file_exists(APPPATH.$RTR->directory.'/'.$class.'/'.$ctrlClass.'.php'))
+    $framePath = $URI->segment(1) == 'estic' ? BASEPATH : APPPATH;
+
+	if (empty($class) OR ! file_exists($framePath.$RTR->directory.'/'.$class.'/'.$ctrlClass.'.php'))
 	{
 		$e404 = TRUE;
 	}
 	else
 	{
-		require_once(APPPATH.$RTR->directory.'/'.$class.'/'.$ctrlClass.'.php');
+		require_once($framePath.$RTR->directory.'/'.$class.'/'.$ctrlClass.'.php');
 
 		if ( ! class_exists($ctrlClass, FALSE) OR $method[0] === '_' OR method_exists('CI_Controller', $method))
 		{

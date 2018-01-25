@@ -906,16 +906,6 @@ class CI_Session {
 		$this->unmark_temp($key);
 	}
 
-	public function getUser(){
-	    $sess_key = config_item('sess_key');
-	    if($this->has_userdata($sess_key)) {
-            $sess_data = $this->userdata($sess_key);
-            $oUser = CmsUsersQuery::create()
-                ->findOneByIdUser($sess_data['id_user']);
-            return $oUser;
-        }
-        return null;
-    }
     public function getIdUser(){
         $sess_key = config_item('sess_key');
         if($this->has_userdata($sess_key)) {
@@ -931,5 +921,32 @@ class CI_Session {
             return true;
         }
         return false;
+    }
+    public function login(){
+        $user = $this->get_by(array(
+            'email' => $this->input->post('email'),
+            'password' => $this->hash($this->input->post('password')),
+        ), TRUE);
+
+        if(count($user)){
+            // log in user
+            $data = array(
+                'name' => $user->name,
+                'email' => $user->email,
+                'id_user' => $user->id_user,
+                'loggedin' => TRUE
+            );
+            $this->set_userdata('loggedin',$data);
+        }
+    }
+    public function logout(){
+        $this->sess_destroy();
+    }
+    public function loggedin(){
+        return (bool) $this->has_userdata('loggedin');
+    }
+
+    public function hash($string){
+        return hash('sha512', $string . config_item('encryption_key'));
     }
 }

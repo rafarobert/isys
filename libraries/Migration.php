@@ -246,7 +246,7 @@ class CI_Migration
         $this->_migration_path = rtrim($this->_migration_path, '/') . '/';
 
         // If not set, set it - TIC
-        $this->_migration_path_tabs = APPPATH . 'migrations/tables/';
+        $this->_migration_path_tabs = APPPATH . 'migrations/schemas/';
         // Add trailing slash if not set
         $this->_migration_path_tabs = rtrim($this->_migration_path_tabs, '/') . '/';
 
@@ -731,46 +731,54 @@ class CI_Migration
             $this->dbforge->create_table($table_name);
         }
 
-        if(count($settings)){
+        if(count($settings))
+        {
+            if(!$this->db->table_exists(config_item('sys')['admin'].'_modulos')){
+                $this->dbforge->create_table(config_item('sys')['admin'].'_modulos');
+
+            }
+
             if(validate_modulo('admin','modulos')){
                 $this->load->model('admin/model_modulos');
-                $oModulos = $this->db->get('cms_modulos')->result_object();
+                $oModulos = $this->db->get(config_item('sys')['admin'].'_modulos')->result_object();
+            } else {
+                //$this->
+            }
 
-                if(strpos($table_name,'_')){
-                    list($mod,$submod) = explode('_',$table_name);
-                } else {
-                    $mod = $table_name;
-                    $submod = '';
-                }
+            if(strpos($table_name,'_')){
+                list($mod,$submod) = explode('_',$table_name);
+            } else {
+                $mod = $table_name;
+                $submod = '';
+            }
 
-                if(isset($_REQUEST['id_migration'])){
-                    $id_migration = $_REQUEST['id_migration'];
-                } else {
-                    $oMigrations = $this->db->get('migrations')->result();
-                    $id_migration = $oMigrations[0]->version + 1 ;
-                }
-                $data = array(
-                    'titulo' => isset($settings['title']) ? $settings['title'] : ucfirst($submod),
-                    'icon' => isset($settings['icon']) ? $settings['icon'] : '',
-                    'url' => config_item('sys')[$mod]['dir']."$submod",
-                    'descripcion' => isset($settings['description']) ? $settings['descripcion'] : '',
-                    'opt_estado' => isset($settings['status']) ? $settings['status'] : '',
-                    'opt_listado' => isset($settings['listed']) ? $settings['listed'] : ''
-                );
+            if(isset($_REQUEST['id_migration'])){
+                $id_migration = $_REQUEST['id_migration'];
+            } else {
+                $oMigrations = $this->db->get('migrations')->result();
+                $id_migration = $oMigrations[0]->version + 1 ;
+            }
+            $data = array(
+                'titulo' => isset($settings['title']) ? $settings['title'] : ucfirst($submod),
+                'icon' => isset($settings['icon']) ? $settings['icon'] : '',
+                'url' => config_item('sys')[$mod]['dir']."$submod",
+                'descripcion' => isset($settings['description']) ? $settings['descripcion'] : '',
+                'opt_estado' => isset($settings['status']) ? $settings['status'] : '',
+                'opt_listado' => isset($settings['listed']) ? $settings['listed'] : ''
+            );
 
-                foreach ($oModulos as $modulo){
-                    if($modulo->id_modulo == $id_migration){
-                        $exists = true;
-                        break;
-                    }
-                    $exists = false;
+            foreach ($oModulos as $modulo){
+                if($modulo->id_modulo == $id_migration){
+                    $exists = true;
+                    break;
                 }
-                if(!$exists){
-                    $data['id_modulo'] = $id_migration;
-                    $this->model_modulos->save($data);
-                } else {
-                    $this->model_modulos->save($data,$id_migration);
-                }
+                $exists = false;
+            }
+            if(!$exists){
+                $data['id_modulo'] = $id_migration;
+                $this->model_modulos->save($data);
+            } else {
+                $this->model_modulos->save($data,$id_migration);
             }
         }
         $this->set_params($table_name);
