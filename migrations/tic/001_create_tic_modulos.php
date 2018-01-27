@@ -4,7 +4,7 @@
  * Created by herbalife.
  * User: Rafael Gutierrez Gaspar
  * Date: 27/01/2018
- * Time: 5:03 am
+ * Time: 12:36 pm
  */
 
 
@@ -70,7 +70,7 @@ class Migration_Create_tic_modulos extends CI_Migration {
         );
         $fk_keys = array(
             "fk_hbf_sesiones_hbf_club" => array(
-                "table" => "hbf_club",
+                "table" => "hbf_clubs",
                 "id" => "id_club",
             ),
             "fk_hbf_sesiones_hbf_turnos1" => array(
