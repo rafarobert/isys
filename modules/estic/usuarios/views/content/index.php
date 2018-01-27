@@ -1,17 +1,17 @@
 <?php // *** estic - index_file - start ***
         /**
-         * Created by estic.
+         * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
-         * Date: 16/01/2018
-         * Time: 2:45 am
-         * @var Model_users $model_users
-         * @var Model_users $users
-         * @var Model_users $user
+         * Date: 27/01/2018
+         * Time: 3:04 am
+         * @var Model_usuarios $model_usuarios
+         * @var Model_usuarios $usuarios
+         * @var Model_usuarios $usuario
          */
         ?>
         
         <section>
-            <h3>Lista de Users</h3>
+            <h3>Lista de Usuarios</h3>
 
             <?php
             $data_icon = array(
@@ -21,7 +21,7 @@
                 "title" => ""
             );
             $icon = icon($data_icon);
-            echo anchor("estic/users/edit", "Agregar Users", null, $icon)?>
+            echo anchor("estic/usuarios/edit", "Agregar Usuarios", null, $icon)?>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -40,26 +40,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                <?php if (count($oUsers)) { ?>
-                    <?php foreach ($oUsers as $oUser) { ?>
+                <?php if (count($oUsuarios)) { ?>
+                    <?php foreach ($oUsuarios as $oUsuario) { ?>
                     <tr>
                     
                     <!-- *** estic - tables - inicio - 2 *** -->
             
-            <td><?= $oUser->name; ?></td>
-                <td><?= $oUser->email; ?></td>
-                <td><?= $oUser->lastname; ?></td>
+            <td><?= $oUsuario->name; ?></td>
+                <td><?= $oUsuario->email; ?></td>
+                <td><?= $oUsuario->lastname; ?></td>
                 
 
             <!-- *** estic - tables - fin - 2 *** -->
-            <td><?= $oUser->date_created; ?></td>
-            <td><?= btn_edit("estic/users/edit/" . $oUser->id_user)?></td>
-                        <td><?= btn_delete("estic/users/delete/" . $oUser->id_user)?></td>
+            <td><?= $oUsuario->date_created; ?></td>
+            <td><?= btn_edit("estic/usuarios/edit/" . $oUsuario->id_usuario)?></td>
+                        <td><?= btn_delete("estic/usuarios/delete/" . $oUsuario->id_usuario)?></td>
                     </tr>
                     <?php } ?>
                 <?php } else { ?>
                     <tr>
-                        <td colspan="3">No se pudo encontrar users registrados</td>
+                        <td colspan="3">No se pudo encontrar usuarios registrados</td>
                     </tr>
                 <?php }?>
                 </tbody>

@@ -17,13 +17,10 @@ class Ctrl_Migrate extends Estic_Controller
 
     public function run($frame = 0, $method = 0, $funct = 0, $modulo = 0, $submod = 0)
     {
-        $migrations = $this->migration->_migration_files;
         $migrations_errors = array();
         $migration_error = '';
         $it_worked = false;
         $mods = array_keys(config_item('sys'));
-
-
 
         //*************************************************************
         //******* si se hace la reescritura por defecto ***************
@@ -33,6 +30,16 @@ class Ctrl_Migrate extends Estic_Controller
         } else if ($funct == 'rewrite') {
             $_POST['bRewrite'] = true;
         }
+
+        //*************************************************************
+        //******** Sys migrations files path **************************
+        //*************************************************************
+        if ($this->input->get('path') == 'sys') {
+             $this->migration->_base_path = BASEPATH;
+             $this->_migration_path_tabs = BASEPATH.'migrations/';
+        }
+
+        $migrations = $this->migration->_migration_files;
 
         //*******************************************************************************************
         //******* si se hace el migration a un elemento de algun modulo especifico ******************
@@ -121,8 +128,10 @@ class Ctrl_Migrate extends Estic_Controller
             echo "Migration doesn't worked";
         }
     }
+
     public function fromDatabase()
     {
+//        $this->migration->_dir_migrations_files = 'schemas/';
         $xmlfile = file_get_contents(site_url('orm/schema/schema.xml'));
         $ob= simplexml_load_string($xmlfile);
         $json  = json_encode($ob);

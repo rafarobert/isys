@@ -1,16 +1,16 @@
 <?php // *** estic - edit_file - start ***
         /**
-         * Created by estic.
+         * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
-         * Date: 16/01/2018
-         * Time: 2:45 am
-         * @var Model_Users $model_users
-         * @var Model_Users $users
-         * @var Model_Users $user
+         * Date: 27/01/2018
+         * Time: 3:04 am
+         * @var Model_Usuarios $model_usuarios
+         * @var Model_Usuarios $usuarios
+         * @var Model_Usuarios $usuario
          */
         ?>
         
-        <h3><?= empty($oUser->id_user) ? "Agregar Users" : "Actualizando datos, User #" . $oUser->id_user ?></h3>
+        <h3><?= empty($oUsuario->id_usuario) ? "Agregar Usuarios" : "Actualizando datos, Usuario #" . $oUsuario->id_usuario ?></h3>
         
         <?= form_open_multipart() ?>
         <!-- *** estic - tables - inicio *** -->
@@ -24,7 +24,7 @@
                                      "name" => "name",
                                      "id" => "fieldName",
                                      "class" => "form-control ",
-                                     "value" => set_value("name", $oUser->name),
+                                     "value" => set_value("name", $oUsuario->name),
                                      "type" => "text"
                                  );
                                  echo form_input($data,"","") ?>
@@ -41,7 +41,7 @@
                                      "name" => "email",
                                      "id" => "fieldEmail",
                                      "class" => "form-control ",
-                                     "value" => set_value("email", $oUser->email),
+                                     "value" => set_value("email", $oUsuario->email),
                                      "type" => "text"
                                  );
                                  echo form_input($data,"","") ?>
@@ -58,7 +58,7 @@
                                      "name" => "lastname",
                                      "id" => "fieldLastname",
                                      "class" => "form-control ",
-                                     "value" => set_value("lastname", $oUser->lastname),
+                                     "value" => set_value("lastname", $oUsuario->lastname),
                                      "type" => "text"
                                  );
                                  echo form_input($data,"","") ?>
@@ -75,7 +75,7 @@
                                      "name" => "mobile_number_1",
                                      "id" => "fieldMobileNumber1",
                                      "class" => "form-control ",
-                                     "value" => set_value("mobile_number_1", $oUser->mobile_number_1),
+                                     "value" => set_value("mobile_number_1", $oUsuario->mobile_number_1),
                                      "type" => "text"
                                  );
                                  echo form_input($data,"","") ?>
@@ -92,7 +92,7 @@
                                      "name" => "mobile_number_2",
                                      "id" => "fieldMobileNumber2",
                                      "class" => "form-control ",
-                                     "value" => set_value("mobile_number_2", $oUser->mobile_number_2),
+                                     "value" => set_value("mobile_number_2", $oUsuario->mobile_number_2),
                                      "type" => "text"
                                  );
                                  echo form_input($data,"","") ?>
@@ -109,7 +109,7 @@
                                      "name" => "ci",
                                      "id" => "fieldCi",
                                      "class" => "form-control ",
-                                     "value" => set_value("ci", $oUser->ci),
+                                     "value" => set_value("ci", $oUsuario->ci),
                                      "type" => "text"
                                  );
                                  echo form_input($data,"","") ?>
@@ -122,15 +122,15 @@
                                 <label for="fieldImg" class="col-sm-4 col-form-label col-form-label-md">Img  </label>
                                 <div class="col-sm-6">
                                 <div class="two-columns">
-                                <?php if(isset($oUser->imgThumb)){?>
-                                    <img class="img-thumb-1" src="<?=site_url("img/users/thumbs/".$oUser->imgThumb)?>"/>
+                                <?php if(isset($oUsuario->imgThumb)){?>
+                                    <img class="img-thumb-1" src="<?=site_url("img/usuarios/thumbs/".$oUsuario->imgThumb)?>"/>
                                 <?php }?>
                                 <?php
                                 $data = array(
                                      "name" => "img",
                                      "id" => "fieldImg",
                                      "class" => "form-control ",
-                                     "value" => set_value("img", $oUser->img),
+                                     "value" => set_value("img", $oUsuario->img),
                                      "type" => "text"
                                  );
                                  echo form_upload($data,"","") ?>
@@ -139,7 +139,7 @@
                     </div><?php echo form_error("img"); ?>
                     
                     
-                            <?php if(!isset($oUser->id_user)){ ?>
+                            <?php if(!isset($oUsuario->id_usuario)){ ?>
                             <div class="form-group row">
                                 <label for="fieldPassword" class="col-sm-4 col-form-label col-form-label-md">Password  </label>
                                
@@ -148,7 +148,7 @@
                                      "name" => "password",
                                      "id" => "fieldPassword",
                                      "class" => "form-control ",
-                                     "value" => set_value("password", $oUser->password),
+                                     "value" => set_value("password", $oUsuario->password),
                                  );
                                  echo form_password($data, "", ""); ?>
                                  </div>

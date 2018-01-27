@@ -1,23 +1,23 @@
 <?php // *** estic - ctrl_file - start ***
         /**
-         * Created by estic.
+         * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
-         * Date: 16/01/2018
-         * Time: 2:45 am
-         * @property Model_Users $model_users
+         * Date: 27/01/2018
+         * Time: 3:04 am
+         * @property Model_Usuarios $model_usuarios
          */
         
-        Class Ctrl_Users extends Estic_Controller {
+        Class Ctrl_Usuarios extends Estic_Controller {
         
         
             public function __construct()
             {
                 parent::__construct();
-                $this->load->model("model_users");
+                $this->load->model("model_usuarios");
                 
                     // Settings for images
                     
-                $config["upload_path"]          = "img/users/";
+                $config["upload_path"]          = "img/usuarios/";
                 $config["allowed_types"]        = "gif|jpg|png";
                 $config["max_size"]             = 100;
                 $config["max_width"]            = 1024;
@@ -28,44 +28,44 @@
             }
         
             public function index(){
-                // Obtiene a todos los users
+                // Obtiene a todos los usuarios
                 
-                $this->data["oUsers"] = $this->model_users->get();
+                $this->data["oUsuarios"] = $this->model_usuarios->get();
         
                 // Carga la vista
                 
-                $this->data["subview"] = "estic/users/index";
+                $this->data["subview"] = "estic/usuarios/index";
                 $this->load->view("layouts/_layout_estic", $this->data);
             }
         
             public function edit($id = NULL){
-                // Optiene un user o crea uno nuevo
+                // Optiene un usuario o crea uno nuevo
                 // Se construye las reglas de validacion del formulario        
                 if($id){
-                    $oUser = $this->model_users->get($id);
-                    if(!count($oUser)){
-                        $this->data["errors"][] = "El user no pudo ser encontrado";
+                    $oUsuario = $this->model_usuarios->get($id);
+                    if(!count($oUsuario)){
+                        $this->data["errors"][] = "El usuario no pudo ser encontrado";
                     }
-                    $rules_edit = $this->model_users->rules_edit;
+                    $rules_edit = $this->model_usuarios->rules_edit;
                     $this->form_validation->set_rules($rules_edit);
                 } else {
-                    $oUser = $this->model_users->get_new();
-                    $rules = $this->model_users->rules;
+                    $oUsuario = $this->model_usuarios->get_new();
+                    $rules = $this->model_usuarios->rules;
                     $this->form_validation->set_rules($rules);
                 }
                 
-                if(isset($oUser->img)){
-                    $aImg = explode(".",$oUser->img);
+                if(isset($oUsuario->img)){
+                    $aImg = explode(".",$oUsuario->img);
                     if(count($aImg)>1){
-                        $oUser->imgThumb = $aImg[0]."_thumb.".$aImg[1];
+                        $oUsuario->imgThumb = $aImg[0]."_thumb.".$aImg[1];
                     }
                 }
                 
-                $this->data["oUser"] = $oUser;
+                $this->data["oUsuario"] = $oUsuario;
                 // Se procesa el formulario
                 
                 if($this->form_validation->run() == true){
-                    $data = $this->model_users->array_from_post(array(
+                    $data = $this->model_usuarios->array_from_post(array(
                                   
                     // *** estic - tables - inicio ***
         "name",
@@ -88,27 +88,27 @@
                 else
                 {
                     $file_info = $this->upload->data();
-                    $this->_create_thumbnail("users",$file_info["file_name"]);
+                    $this->_create_thumbnail("usuarios",$file_info["file_name"]);
                     $this->data["img"] = array("upload_data" => $file_info);
                     $data["img"] = $file_info["file_name"];
                 }
                 if($id == NULL){
                     $data["password"] = $this->input->post("password");
-                    $data["password"] = $this->model_users->hash($data["password"]);
+                    $data["password"] = $this->model_usuarios->hash($data["password"]);
                 }
                 
-                    $this->model_users->save($data,$id);
-                    redirect("estic/users");
+                    $this->model_usuarios->save($data,$id);
+                    redirect("estic/usuarios");
                 }
         
                 // Se carga la vista
-                $this->data["subview"] = "estic/users/edit";
+                $this->data["subview"] = "estic/usuarios/edit";
                 $this->load->view("layouts/_layout_estic", $this->data);
             }
         
             public function delete($id){
-                $this->model_users->delete($id);
-                redirect("estic/users");
+                $this->model_usuarios->delete($id);
+                redirect("estic/usuarios");
             }
 
             

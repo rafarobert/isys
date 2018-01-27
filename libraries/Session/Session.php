@@ -910,7 +910,7 @@ class CI_Session {
         $sess_key = config_item('sess_key');
         if($this->has_userdata($sess_key)) {
             $aDataSession = $this->userdata($sess_key);
-            return $aDataSession['id_user'];
+            return $aDataSession['id_usuario'];
         }
         return '';
     }
@@ -922,23 +922,23 @@ class CI_Session {
         }
         return false;
     }
-    public function login(){
-        $user = $this->get_by(array(
-            'email' => $this->input->post('email'),
-            'password' => $this->hash($this->input->post('password')),
-        ), TRUE);
-
-        if(count($user)){
-            // log in user
-            $data = array(
-                'name' => $user->name,
-                'email' => $user->email,
-                'id_user' => $user->id_user,
-                'loggedin' => TRUE
-            );
-            $this->set_userdata('loggedin',$data);
-        }
-    }
+//    public function login(){
+//        $usuario = $this->model_usuarios->get_by(array(
+//            'email' => $this->input->post('email'),
+//            'password' => $this->hash($this->input->post('password')),
+//        ), TRUE);
+//
+//        if(count($usuario)){
+//            // log in user
+//            $data = array(
+//                'name' => $usuario->name,
+//                'email' => $usuario->email,
+//                'id_user' => $usuario->id_user,
+//                'loggedin' => TRUE
+//            );
+//            $this->set_userdata('loggedin',$data);
+//        }
+//    }
     public function logout(){
         $this->sess_destroy();
     }

@@ -320,7 +320,9 @@ class CI_Loader {
 			}
 		}
         $model_path = '';
-		$model = ucfirst($model);
+        $type = explode('_',$model)[0];
+        $modModel = explode('_',$model)[1];
+		$model = ucfirst(explode('_',$model)[0]).'_'.ucfirst(explode('_',$model)[1]);
 		if ( ! class_exists($model, FALSE))
 		{
 			foreach ($this->_ci_model_paths as $mod_path)
@@ -332,6 +334,11 @@ class CI_Loader {
                 else
                 {
                     throw new RuntimeException($mod_path."testFrame/".$path.'/'.$model_path.$model.".php exists, but it's name is wrong, example: Model_class, where class is y=the name of the container folder, and the name of the controller, declared class: ".$model);
+                }
+
+                if (file_exists($mod_path.'modules/'.$path.'/'.$modModel.'/'.$model.'.php'))
+                {
+                    require_once($mod_path.'modules/'.$path.'/'.$modModel.'/'.$model.'.php');
                 }
 
 				if ( ! file_exists($mod_path.'testFrame/'.$path.'/'.$model_path.$model.'.php'))

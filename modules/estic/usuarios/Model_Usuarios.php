@@ -2,13 +2,13 @@
         /**
          * Created by Estic.
          * User: RaFaEl Gutierrez Gaspar
-         * Date: 16/01/2018
-         * Time: 2:45 am
+         * Date: 27/01/2018
+         * Time: 3:04 am
          */
         
         defined("BASEPATH") OR exit("No direct script access allowed");
         
-        class Model_Users extends Estic_Model {
+        class Model_Usuarios extends Estic_Model {
 
         // *** estic - tables - inicio - 1 ***
 
@@ -18,7 +18,7 @@
                          * @var        int
                          */
                          
-                public $id_user;
+                public $id_usuario;
                 /**
                          * The value for the title field.
                          *
@@ -93,27 +93,11 @@
             
             // *** estic - tables - fin - 1 ***
             
-            protected $_table_name = "tic_users";
-            protected $_order_by = "id_user desc";
+            protected $_table_name = "tic_usuarios";
+            protected $_order_by = "id_usuario desc";
             protected $_timestaps = true;
-            protected $_primary_key = "id_user";
-
-            public $rules_login = array(
-                // *** estic - tables - inicio - 2 ***
-
-                "email" => array(
-                    "field" => "email",
-                    "label" => "Email",
-                    "rules" => "trim|required|max_length[100]|valid_email"
-                ),
-                "password" => array(
-                    "field" => "password",
-                    "label" => "Password",
-                    "rules" => "trim|required|max_length[128]|matches[password_confirm]"
-                )
-                // *** estic - tables - fin - 2 ***
-            );
-
+            protected $_primary_key = "id_usuario";
+        
             public $rules = array(
             // *** estic - tables - inicio - 2 ***
             
@@ -173,9 +157,9 @@
             // *** estic - tables - inicio - 2 ***
             
             
-                "id_user" => array(
-                    "field" => "id_user",
-                    "label" => "Id_user",
+                "id_usuario" => array(
+                    "field" => "id_usuario",
+                    "label" => "Id_usuario",
                     "rules" => "trim|required|max_length[11]"
                 ),
                 
@@ -231,25 +215,25 @@
             }
 
             public function get_new(){
-                $user = new stdClass();
+                $usuario = new stdClass();
                 
                 // *** estic - tables - inicio - 3 ***
             
-            $user->name = "";
-                    $user->email = "";
-                    $user->lastname = "";
-                    $user->mobile_number_1 = "";
-                    $user->mobile_number_2 = "";
-                    $user->ci = "";
-                    $user->img = "";
-                    $user->password = "";
-                    $user->date_created = date("Y-m-d");
-                    $user->date_modified = date("Y-m-d");
+            $usuario->name = "";
+                    $usuario->email = "";
+                    $usuario->lastname = "";
+                    $usuario->mobile_number_1 = "";
+                    $usuario->mobile_number_2 = "";
+                    $usuario->ci = "";
+                    $usuario->img = "";
+                    $usuario->password = "";
+                    $usuario->date_created = date("Y-m-d");
+                    $usuario->date_modified = date("Y-m-d");
                     
             
             // *** estic - tables - fin - 3 ***
             
-                return $user;
+                return $usuario;
             }
         }
 

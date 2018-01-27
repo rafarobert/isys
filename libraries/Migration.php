@@ -113,6 +113,9 @@ class CI_Migration
 
     public $_dir_root_mod;
     public $_dir_root_store;
+    public $_dir_migrations_files = APPPATH . "migrations/tables/";
+    public $_base_path = APPPATH;
+    public $_dir_migrations = '';
 
     public $_dir_sub_mod;
     public $_dir_sub_mod_views;
@@ -224,6 +227,8 @@ class CI_Migration
      */
     public function __construct($config = array())
     {
+        $this->_dir_migrations_files = $this->input->get('path') === 'sys' ? BASEPATH . "migrations/" :APPPATH . "migrations/tables/" ;
+        $this->_base_path = $this->input->get('path') === 'sys' ? BASEPATH : APPPATH;
         // Only run this constructor on main library load
         if (!in_array(get_class($this), array('CI_Migration', config_item('subclass_prefix') . 'Migration'), TRUE)) {
             return;
@@ -241,12 +246,13 @@ class CI_Migration
         }
 
         // If not set, set it
-        $this->_migration_path !== '' OR $this->_migration_path = APPPATH . 'migrations/';
+        $this->_migration_path !== '' OR $this->_migration_path = $this->_base_path . 'migrations/';
         // Add trailing slash if not set
         $this->_migration_path = rtrim($this->_migration_path, '/') . '/';
 
         // If not set, set it - TIC
-        $this->_migration_path_tabs = APPPATH . 'migrations/schemas/';
+
+        $this->_migration_path_tabs = $this->_dir_migrations_files;
         // Add trailing slash if not set
         $this->_migration_path_tabs = rtrim($this->_migration_path_tabs, '/') . '/';
 
@@ -599,7 +605,8 @@ class CI_Migration
         $migrations = array();
 
         if($bWithSubModules){
-            foreach (config_item('sys') as $mod => $setting){
+            $sys_config = config_item('sys');
+            foreach ($sys_config as $mod => $setting){
 
                 foreach (glob($this->_migration_path_tabs . $mod . '/' . '*_*.php') as $file) {
                     $name = basename($file, '.php');
@@ -733,16 +740,11 @@ class CI_Migration
 
         if(count($settings))
         {
-            if(!$this->db->table_exists(config_item('sys')['admin'].'_modulos')){
-                $this->dbforge->create_table(config_item('sys')['admin'].'_modulos');
-
-            }
-
             if(validate_modulo('admin','modulos')){
                 $this->load->model('admin/model_modulos');
                 $oModulos = $this->db->get(config_item('sys')['admin'].'_modulos')->result_object();
             } else {
-                //$this->
+
             }
 
             if(strpos($table_name,'_')){
@@ -999,9 +1001,9 @@ class CI_Migration
             $this->_fields = $this->dbforge->fields;
             $this->_sub_mod_ctrl = 'Ctrl_' . ucfirst($sub_modulo) . $this->_ext_php;
             $this->_sub_mod_model = 'Model_' . ucfirst($sub_modulo) . $this->_ext_php;
-            $this->_dir_root_mod = APPPATH . config_item('dir_modulos');
+            $this->_dir_root_mod = $this->_base_path. config_item('dir_modulos');
             $this->_dir_root_store = STORAGE_PATH;
-            $this->_dir_sub_mod_migrate_views = APPPATH . config_item('dir_modulos') . 'estic/migrate/views/';
+            $this->_dir_sub_mod_migrate_views = $this->_base_path. config_item('dir_modulos') . 'estic/migrate/views/';
 
             // ************************************************************************
             // ************* Directorios para la carpeta modules dentro de APP ********
@@ -1012,8 +1014,14 @@ class CI_Migration
             $this->_dir_sub_mod_views_content = $this->_dir_sub_mod_views . 'content/';
             $this->_dir_mod = $this->_dir_root_mod . $mod_dir;
             $this->_dir_mod_mac = $this->_dir_root_mod . $mod_name . '/';
-            $this->_dir_migration = APPPATH . 'migrations/schemas/';
-            $this->_dir_mod_migration = APPPATH . 'migrations/schemas/'.$this->_mod_type.'/';
+
+            if($this->_mod == 'base' || $this->_mod == 'estic'){
+                $this->_dir_migration = BASEPATH . 'migrations/';
+                $this->_dir_mod_migration = BASEPATH. 'migrations/'.$this->_mod_type.'/';
+            } else {
+                $this->_dir_migration = APPPATH. 'migrations/tables/';
+                $this->_dir_mod_migration = APPPATH. 'migrations/tables/'.$this->_mod_type.'/';
+            }
 
             $this->_file_sub_mod_ctrl = $this->_dir_sub_mod . 'Ctrl_' . ucfirst($sub_modulo) . $this->_ext_php;
             $this->_file_sub_mod_model = $this->_dir_sub_mod . 'Model_' . ucfirst($sub_modulo) . $this->_ext_php;
@@ -1032,8 +1040,8 @@ class CI_Migration
             $this->_dir_sto_sub_mod_views_content = $this->_dir_sto_sub_mod_views . 'content/';
             $this->_dir_sto_mod = $this->_dir_root_store . $mod_dir;
             $this->_dir_sto_mod_mac = $this->_dir_root_store . $mod_name . '/';
-            $this->_dir_sto_migration = APPPATH . 'migrations/storage/schemas/';
-            $this->_dir_sto_mod_migration = APPPATH . 'migrations/storage/schemas/'.$this->_mod_type.'/';
+            $this->_dir_sto_migration = $this->_base_path . 'migrations/storage/tables/';
+            $this->_dir_sto_mod_migration = $this->_base_path . 'migrations/storage/tables/'.$this->_mod_type.'/';
 
             $this->_file_sto_sub_mod_ctrl = $this->_dir_sto_sub_mod . 'Ctrl_' . ucfirst($sub_modulo) . $this->_ext_txt;
             $this->_file_sto_sub_mod_model = $this->_dir_sto_sub_mod . 'Model_' . ucfirst($sub_modulo) . $this->_ext_txt;
@@ -2178,6 +2186,7 @@ class CI_Migration
         foreach ($this->_fields as $key => $value) {
             if (explode('_', $key)[0] == 'id') {
                 $id = $key;
+                break;
             }
         }
 
@@ -2238,7 +2247,7 @@ class CI_Migration
             $content .= '
             public $rules_edit = array(    
             ';
-            $exepts = ['password'];
+            $exepts = ['id','password'];
             $content .= $this->content_variable_model(2, ['exepts' => $exepts]);
             $content .= '
             );
@@ -2319,7 +2328,10 @@ class CI_Migration
                     $value['type'] == 'varchar' ||
                     $value['type'] == 'text' ||
                     $value['type'] == 'Text' ||
-                    $value['type'] == 'TEXT'
+                    $value['type'] == 'TEXT' ||
+                    $value['type'] == 'LONGVARCHAR' ||
+                    $value['type'] == 'longvarchar' ||
+                    $value['type'] == 'Longvarchar'
                 ) {
                     $content .= '
                          * @var        string';
@@ -2752,7 +2764,7 @@ class CI_Migration
                                  echo form_textarea($data,"' . $in_value . '","' . $extra . '"); ?> 
                                  </div>
                     </div>';
-                    } else if ($value['type'] == 'VARCHAR' || $value['type'] == 'varchar' || $value['type'] == 'Varchar') {
+                    } else if ($value['type'] == 'VARCHAR' || $value['type'] == 'varchar' || $value['type'] == 'Varchar' || $value['type'] == 'LONGVARCHAR' || $value['type'] == 'longvarchar' || $value['type'] == 'Longvarchar') {
                         if (explode('_', $key)[0] == 'has' || explode('_', $key)[0] == 'tiene') {
                             $content .= '
                             <div class="form-group row">
@@ -3372,6 +3384,10 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
     {
         $fields = ';
         $content .= var_export($this->_fields,true);
+        $content = str_replace('INTEGER','INT',$content);
+        $content = str_replace('LONGVARCHAR','TEXT',$content);
+        $content = str_replace('TIMESTAMP','DATETIME',$content);
+
         $content .= ';
 
         $settings = array(
