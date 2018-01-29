@@ -34,6 +34,8 @@
  * @link	https://codeigniter.com
  * @since	Version 2.0.0
  * @filesource
+ * @var CI_DB_query_builder $db              This is the platform-independent base Active Record implementation class.
+ * @property CI_DB_forge $dbforge                 Database Utility Class
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -56,9 +58,11 @@ class CI_Session {
 	public $userdata;
     public $sess_key;
 
+
 	protected $_driver = 'files';
 	protected $_config;
-
+    protected $CI;
+    protected $db;
 	// ------------------------------------------------------------------------
 
 	/**
@@ -69,6 +73,11 @@ class CI_Session {
 	 */
 	public function __construct(array $params = array())
 	{
+        // Load migration language
+        $this->CI = get_instance();
+        // They'll probably be using dbforge
+
+
 		// No sessions under CLI
 		if (is_cli())
 		{
@@ -170,6 +179,8 @@ class CI_Session {
 		}
 
 		$this->_ci_init_vars();
+
+
 
 		log_message('info', "Session: Class initialized using '".$this->_driver."' driver.");
 	}
@@ -922,28 +933,34 @@ class CI_Session {
         }
         return false;
     }
-//    public function login(){
-//        $usuario = $this->model_usuarios->get_by(array(
-//            'email' => $this->input->post('email'),
-//            'password' => $this->hash($this->input->post('password')),
-//        ), TRUE);
-//
-//        if(count($usuario)){
-//            // log in user
-//            $data = array(
-//                'name' => $usuario->name,
-//                'email' => $usuario->email,
-//                'id_user' => $usuario->id_user,
-//                'loggedin' => TRUE
-//            );
-//            $this->set_userdata('loggedin',$data);
-//        }
-//    }
+
+    public function signUp(){
+
+    }
+
+    public function login(){
+        $usuario = $this->CI->model_usuarios->get_by(array(
+            'email' => $this->CI->input->post('email'),
+            'password' => $this->hash($this->CI->input->post('password')),
+        ), TRUE);
+
+        if(count($usuario)){
+            // log in user
+            $data = array(
+                'name' => $usuario->name,
+                'email' => $usuario->email,
+                'id_user' => $usuario->id_user,
+                'loggedin' => TRUE
+            );
+            $this->set_userdata('loggedin',$data);
+        } else {
+            $this->CI->data['subLayout'] = 'start';
+
+        }
+    }
+
     public function logout(){
         $this->sess_destroy();
-    }
-    public function loggedin(){
-        return (bool) $this->has_userdata('loggedin');
     }
 
     public function hash($string){

@@ -522,6 +522,7 @@ if ( ! is_php('5.4'))
  * ------------------------------------------------------
  */
 	call_user_func_array(array(&$CI, $method), $params);
+    $CI->load->view($CI->data['layout'], $CI->data);
 
 	// Mark a benchmark end point
 	$BM->mark('controller_execution_time_( '.$class.' / '.$method.' )_end');
@@ -549,3 +550,4 @@ if ( ! is_php('5.4'))
  * ------------------------------------------------------
  */
 	$EXT->call_hook('post_system');
+

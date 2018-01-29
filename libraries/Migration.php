@@ -2052,7 +2052,6 @@ class CI_Migration
                 // Carga la vista
                 
                 $this->data["subview"] = "' . $this->_mod . '/' . $this->_sub_mod_p . '/index";
-                $this->load->view("layouts/_layout_' . $this->_mod . '", $this->data);
             }
         
             public function edit($id = NULL){
