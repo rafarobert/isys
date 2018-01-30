@@ -10,6 +10,10 @@ if($CFG->item('modules_locations') == null && $URI->segment(1) == 'estic'){
     Modules::$locations = array(
         BASEPATH.'modules/' => 'modules/',
     );
+} else if($CFG->item('modules_locations') == null && $URI->segment(1) == 'base'){
+    Modules::$locations = array(
+        BASEPATH.'modules/' => 'modules/',
+    );
 } else {
     is_array(Modules::$locations = $CFG->item('modules_locations')) OR Modules::$locations = array(
         APPPATH.'modules/' => 'modules/',

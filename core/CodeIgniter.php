@@ -397,7 +397,18 @@ if ( ! is_php('5.4'))
 
 	$e404 = FALSE;
 
-    if ($RTR->directory == null)
+	if(isset($URI->segments[1]))
+	{
+        if($URI->segments[1] == 'base')
+        {
+            $RTR->directory = 'modules/'.$URI->segments[1].'/';
+        }
+        else if($URI->segments[1] == 'estic' )
+        {
+            $RTR->directory = 'modules/'.$URI->segments[1].'/';
+        }
+    }
+    else if ($RTR->directory == null )
     {
         $RTR->directory = 'testFrame/';
     }
@@ -407,7 +418,7 @@ if ( ! is_php('5.4'))
 
 	$method = $RTR->method;
 
-    $framePath = $URI->segment(1) == 'estic' ? BASEPATH : APPPATH;
+    $framePath = $URI->segments[1] == 'estic' || $URI->segments[1] == 'base' ? BASEPATH : APPPATH;
 
 	if (empty($class) OR ! file_exists($framePath.$RTR->directory.'/'.$class.'/'.$ctrlClass.'.php'))
 	{

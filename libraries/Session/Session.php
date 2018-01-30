@@ -933,9 +933,57 @@ class CI_Session {
         }
         return false;
     }
+    public function _unique_email($id = ''){
+        // Do NOT validate if email already exists
+        // Unless it's the email for the current user
+        if($id == ''){
+            $id = $this->uri->segment(4);
+        }
 
-    public function signUp(){
+        $this->db->where('email', $this->input->post('email'));
+        !$id || $this->db->where("id_usuario !=", $id);
+        $user = $this->model_usuarios->get();
+        if(count($user)){
+            $this->form_validation->set_message('_unique_email', 'Ya existe ese %s registrado');
+            return false;
+        }
+        return true;
+    }
 
+    public function signUp($mod = 'usuarios'){
+        // Redirect a user if he's already logged in
+        $dashboard = "model_$mod/dashboard";
+        $this->CI->model_usuarios->loggedin() == FALSE || redirect($dashboard);
+
+        // Set form
+        $rules = $this->CI->model_usuarios->rules_register;
+        $this->CI->form_validation->set_rules($rules);
+
+        // Process form
+        if($this->CI->form_validation->run() == true){
+            // We can login and redirect
+            if($this->_unique_email()){
+                $data = $this->CI->model_usuarios->array_from_post(array(
+
+                    // *** estic - tables - inicio ***
+                    "email",
+                    "password",
+
+                    // *** estic - tables - fin ***
+                ));
+                $data["password"] = $this->CI->input->post("password");
+                $data["password"] = $this->CI->model_usuarios->hash($data["password"]);
+
+                $this->CI->model_usuarios->save($data);
+                $this->login();
+                redirect($dashboard);
+            } else {
+                $this->set_flashdata('error', 'El email introducido ya existe');
+            }
+        }
+
+        // Load view
+        $this->data['subLayout'] = "start";
     }
 
     public function login(){
@@ -955,12 +1003,12 @@ class CI_Session {
             $this->set_userdata('loggedin',$data);
         } else {
             $this->CI->data['subLayout'] = 'start';
-
         }
     }
 
     public function logout(){
         $this->sess_destroy();
+        $this->CI->data['subLayout'] = 'start';
     }
 
     public function hash($string){

@@ -93,6 +93,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class CI_Migration
 {
+    protected $CI;
 
     public $settings;
     public $_ext_php = '.php';
@@ -227,8 +228,8 @@ class CI_Migration
      */
     public function __construct($config = array())
     {
-        $this->_dir_migrations_files = $this->input->get('path') === 'sys' ? BASEPATH . "migrations/" :APPPATH . "migrations/tables/" ;
-        $this->_base_path = $this->input->get('path') === 'sys' ? BASEPATH : APPPATH;
+        $this->CI = get_instance();
+
         // Only run this constructor on main library load
         if (!in_array(get_class($this), array('CI_Migration', config_item('subclass_prefix') . 'Migration'), TRUE)) {
             return;
@@ -236,6 +237,12 @@ class CI_Migration
 
         foreach ($config as $key => $val) {
             $this->{'_' . $key} = $val;
+        }
+
+        if(isset($this->CI->uri->segments[4])){
+            $this->_dir_migrations_files = $this->CI->uri->segments[4] == 'ci' || $this->CI->uri->segments[4] == 'tic' ? BASEPATH . "migrations/tables/" :APPPATH . "migrations/tables/" ;
+            $this->_base_path = $this->CI->uri->segments[4] === 'ci' || $this->CI->uri->segments[4] === 'tic' ? BASEPATH : APPPATH;
+            $this->_migration_path = $this->CI->uri->segments[4] === 'ci' || $this->CI->uri->segments[4] === 'tic' ? BASEPATH : APPPATH;
         }
 
         log_message('info', 'Migrations Class Initialized');
@@ -993,6 +1000,11 @@ class CI_Migration
             }
 
             $this->set_sub_Mod_Plural_singular($sub_modulo);
+            if(isset($this->CI->uri->segments[4])){
+                $this->_base_path = $this->CI->uri->segments[4] == 'ci' || $this->CI->uri->segments[4] == 'tic' ? BASEPATH : APPPATH;
+                $this->_dir_migrations_files = $this->CI->uri->segments[4] == 'ci' || $this->CI->uri->segments[4] == 'tic' ? BASEPATH . "migrations/tables/" :APPPATH . "migrations/tables/" ;
+                $this->_dir_root_store = $this->CI->uri->segments[4] == 'ci' || $this->CI->uri->segments[4] == 'tic' ? BASEPATH . "migrations/storage/" :APPPATH . "migrations/storage/";
+            }
 
             $this->_mod = $mod_name;
             $this->_sub_mod = $sub_modulo;
@@ -1001,8 +1013,8 @@ class CI_Migration
             $this->_fields = $this->dbforge->fields;
             $this->_sub_mod_ctrl = 'Ctrl_' . ucfirst($sub_modulo) . $this->_ext_php;
             $this->_sub_mod_model = 'Model_' . ucfirst($sub_modulo) . $this->_ext_php;
+
             $this->_dir_root_mod = $this->_base_path. config_item('dir_modulos');
-            $this->_dir_root_store = STORAGE_PATH;
             $this->_dir_sub_mod_migrate_views = $this->_base_path. config_item('dir_modulos') . 'estic/migrate/views/';
 
             // ************************************************************************
@@ -1016,8 +1028,8 @@ class CI_Migration
             $this->_dir_mod_mac = $this->_dir_root_mod . $mod_name . '/';
 
             if($this->_mod == 'base' || $this->_mod == 'estic'){
-                $this->_dir_migration = BASEPATH . 'migrations/';
-                $this->_dir_mod_migration = BASEPATH. 'migrations/'.$this->_mod_type.'/';
+                $this->_dir_migration = BASEPATH . 'migrations/tables/';
+                $this->_dir_mod_migration = BASEPATH. 'migrations/tables/'.$this->_mod_type.'/';
             } else {
                 $this->_dir_migration = APPPATH. 'migrations/tables/';
                 $this->_dir_mod_migration = APPPATH. 'migrations/tables/'.$this->_mod_type.'/';
