@@ -281,6 +281,10 @@ class Modules
 
                         if (is_file($fullpath.$file_ext)) return array($fullpath, $file);
 
+                        $fullpath = APPPATH."modules/$subpath/$base";
+
+                        if (is_file($fullpath.$file_ext)) return array($fullpath, $file);
+
                         $fullpath = APPPATH.'testFrame/'.$_ci_controller.'/'.$base;
 
                         if (is_file($fullpath.$file_ext)) return array($fullpath, $file);

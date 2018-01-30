@@ -418,7 +418,12 @@ if ( ! is_php('5.4'))
 
 	$method = $RTR->method;
 
-    $framePath = $URI->segments[1] == 'estic' || $URI->segments[1] == 'base' ? BASEPATH : APPPATH;
+	if(isset($URI->segments[1])){
+
+        $framePath = $URI->segments[1] == 'estic' || $URI->segments[1] == 'base' ? BASEPATH : APPPATH;
+    } else {
+        $framePath = APPPATH;
+    }
 
 	if (empty($class) OR ! file_exists($framePath.$RTR->directory.'/'.$class.'/'.$ctrlClass.'.php'))
 	{

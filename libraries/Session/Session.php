@@ -921,7 +921,7 @@ class CI_Session {
         $sess_key = config_item('sess_key');
         if($this->has_userdata($sess_key)) {
             $aDataSession = $this->userdata($sess_key);
-            return $aDataSession['id_usuario'];
+            return $aDataSession['id_user'];
         }
         return '';
     }
@@ -937,14 +937,14 @@ class CI_Session {
         // Do NOT validate if email already exists
         // Unless it's the email for the current user
         if($id == ''){
-            $id = $this->uri->segment(4);
+            $id = $this->CI->uri->segment(4);
         }
 
-        $this->db->where('email', $this->input->post('email'));
-        !$id || $this->db->where("id_usuario !=", $id);
-        $user = $this->model_usuarios->get();
+        $this->CI->db->where('email', $this->CI->input->post('email'));
+        !$id || $this->CI->db->where("id_usuario !=", $id);
+        $user = $this->CI->model_usuarios->get();
         if(count($user)){
-            $this->form_validation->set_message('_unique_email', 'Ya existe ese %s registrado');
+            $this->CI->form_validation->set_message('_unique_email', 'Ya existe ese %s registrado');
             return false;
         }
         return true;
@@ -952,8 +952,8 @@ class CI_Session {
 
     public function signUp($mod = 'usuarios'){
         // Redirect a user if he's already logged in
-        $dashboard = "model_$mod/dashboard";
-        $this->CI->model_usuarios->loggedin() == FALSE || redirect($dashboard);
+        $dashboard = "admin/dashboard";
+        $this->isLoguedin() == FALSE || redirect($dashboard);
 
         // Set form
         $rules = $this->CI->model_usuarios->rules_register;
@@ -997,18 +997,20 @@ class CI_Session {
             $data = array(
                 'name' => $usuario->name,
                 'email' => $usuario->email,
-                'id_user' => $usuario->id_user,
+                'id_user' => $usuario->id_usuario,
                 'loggedin' => TRUE
             );
             $this->set_userdata('loggedin',$data);
         } else {
-            $this->CI->data['subLayout'] = 'start';
+            $this->CI->data['subview'] = 'start';
         }
     }
 
     public function logout(){
         $this->sess_destroy();
-        $this->CI->data['subLayout'] = 'start';
+        $this->CI->data['subLayout'] = '';
+        $this->CI->data['subview'] = 'admin/start';
+        redirect('admin');
     }
 
     public function hash($string){
