@@ -4,72 +4,75 @@
          * User: Rafael Gutierrez Gaspar
          * Date: 31/01/2018
          * Time: 2:58 am
-         * @property Model_Sessions $model_sessions
+         * @property Model_Modulos $model_modulos
          */
         
-        Class Ctrl_Sessions extends Base_Controller {
+        Class Ctrl_Modulos extends Base_Controller {
         
         
             public function __construct()
             {
                 parent::__construct();
-                $this->load->model("model_sessions");
+                $this->load->model("model_modulos");
                 
             }
         
             public function index(){
-                // Obtiene a todos los sessions
+                // Obtiene a todos los modulos
                 
-                $this->data["oSessions"] = $this->model_sessions->get();
+                $this->data["oModulos"] = $this->model_modulos->get();
         
                 // Carga la vista
                 
-                $this->data["subview"] = "base/sessions/index";
+                $this->data["subview"] = "base/modulos/index";
             }
         
             public function edit($id = NULL){
-                // Optiene un session o crea uno nuevo
+                // Optiene un modulo o crea uno nuevo
                 // Se construye las reglas de validacion del formulario        
                 if($id){
-                    $oSession = $this->model_sessions->get($id);
-                    if(!count($oSession)){
-                        $this->data["errors"][] = "El session no pudo ser encontrado";
+                    $oModulo = $this->model_modulos->get($id);
+                    if(!count($oModulo)){
+                        $this->data["errors"][] = "El modulo no pudo ser encontrado";
                     }
-                    $rules_edit = $this->model_sessions->rules_edit;
+                    $rules_edit = $this->model_modulos->rules_edit;
                     $this->form_validation->set_rules($rules_edit);
                 } else {
-                    $oSession = $this->model_sessions->get_new();
-                    $rules = $this->model_sessions->rules;
+                    $oModulo = $this->model_modulos->get_new();
+                    $rules = $this->model_modulos->rules;
                     $this->form_validation->set_rules($rules);
                 }
                 
-                $this->data["oSession"] = $oSession;
+                $this->data["oModulo"] = $oModulo;
                 // Se procesa el formulario
                 
                 if($this->form_validation->run() == true){
-                    $data = $this->model_sessions->array_from_post(array(
+                    $data = $this->model_modulos->array_from_post(array(
                                   
                     // *** estic - tables - inicio ***
-        "ip_address",
-                "timestamp",
-                "data",
+        "titulo",
+                "url",
+                "descripcion",
+                "icon",
+                "opt_estado",
+                "opt_listado",
                 
         // *** estic - tables - fin ***
         ));
         
         
-                    $this->model_sessions->save($data,$id);
-                    redirect("base/sessions");
+                    $this->model_modulos->save($data,$id);
+                    redirect("base/modulos");
                 }
         
                 // Se carga la vista
-                $this->data["subview"] = "base/sessions/edit";
+                $this->data["subview"] = "base/modulos/edit";
                 $this->load->view("layouts/_layout_base", $this->data);
             }
         
             public function delete($id){
-                $this->model_sessions->delete($id);
-                redirect("base/sessions");
+                $this->model_modulos->delete($id);
+                redirect("base/modulos");
             }
 
             

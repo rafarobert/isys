@@ -7,7 +7,7 @@
          * @property Model_Sessions $model_sessions
          *
          */
-        
+
         Class Ctrl_Sessions extends Base_Controller
         {
 
@@ -32,7 +32,7 @@
             public function edit($id = NULL)
             {
                 // Optiene un session o crea uno nuevo
-                // Se construye las reglas de validacion del formulario        
+                // Se construye las reglas de validacion del formulario
                 if ($id) {
                     $oSession = $this->model_sessions->get($id);
                     if (!count($oSession)) {
@@ -83,6 +83,7 @@
 
             public function signup()
             {
+
                 $this->session->signup();
             }
 

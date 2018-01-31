@@ -56,12 +56,16 @@ class CI_Session {
 	 * Just a reference to $_SESSION, for BC purposes.
 	 */
 	public $userdata;
-    public $sess_key;
+	public $sessTable;
+    public $sessIdTable;
+    public $ci_sessions;
+    public $sessKey;
 
 
 	protected $_driver = 'files';
 	protected $_config;
     protected $CI;
+    protected $MI;
     protected $db;
 	// ------------------------------------------------------------------------
 
@@ -74,7 +78,8 @@ class CI_Session {
 	public function __construct(array $params = array())
 	{
         // Load migration language
-        $this->CI = get_instance();
+        $this->CI = CI_Controller::get_instance();
+        $this->MI = CI_Model::get_instance();
         // They'll probably be using dbforge
 
 
@@ -917,18 +922,39 @@ class CI_Session {
 		$this->unmark_temp($key);
 	}
 
-    public function getIdUser(){
-        $sess_key = config_item('sess_key');
-        if($this->has_userdata($sess_key)) {
-            $aDataSession = $this->userdata($sess_key);
-            return $aDataSession['id_user'];
+	public function create_table_ci_sessions(){
+        $this->ci_sessions = $this->MI->create_ci_sessions();
+    }
+
+	public function getIdFromSessTable($sessTable = ''){
+	    if($sessTable  == '' && $this->sessTable != null){
+            $sessTable = $this->sessTable;
+        }
+
+        if($this->sessIdTable == null)
+        {
+            if($sessTable != null && $sessTable != '')
+            {
+                $this->sessIdTable = $this->MI->get_pk_table($sessTable);
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    public function getId(){
+        if($this->has_userdata($this->sessKey)) {
+            $aDataSession = $this->userdata($this->sessKey);
+            return $aDataSession[$this->sessIdTable];
         }
         return '';
     }
 
     public function isLoguedin(){
-        $sess_key = config_item('sess_key');
-        if($this->has_userdata($sess_key)) {
+
+        if($this->has_userdata($this->sessKey)) {
             return true;
         }
         return false;
@@ -942,7 +968,7 @@ class CI_Session {
 
         $this->CI->db->where('email', $this->CI->input->post('email'));
         !$id || $this->CI->db->where("id_usuario !=", $id);
-        $user = $this->CI->model_usuarios->get();
+        $user = $this->MI->get();
         if(count($user)){
             $this->CI->form_validation->set_message('_unique_email', 'Ya existe ese %s registrado');
             return false;
@@ -956,14 +982,14 @@ class CI_Session {
         $this->isLoguedin() == FALSE || redirect($dashboard);
 
         // Set form
-        $rules = $this->CI->model_usuarios->rules_register;
+        $rules = $this->MI->rules_register;
         $this->CI->form_validation->set_rules($rules);
 
         // Process form
         if($this->CI->form_validation->run() == true){
             // We can login and redirect
             if($this->_unique_email()){
-                $data = $this->CI->model_usuarios->array_from_post(array(
+                $data = $this->MI->array_from_post(array(
 
                     // *** estic - tables - inicio ***
                     "email",
@@ -972,9 +998,9 @@ class CI_Session {
                     // *** estic - tables - fin ***
                 ));
                 $data["password"] = $this->CI->input->post("password");
-                $data["password"] = $this->CI->model_usuarios->hash($data["password"]);
+                $data["password"] = $this->MI->hash($data["password"]);
 
-                $this->CI->model_usuarios->save($data);
+                $this->CI->{'Model_'.ucfirst($mod)}->save($data);
                 $this->login();
                 redirect($dashboard);
             } else {
@@ -987,7 +1013,7 @@ class CI_Session {
     }
 
     public function login(){
-        $usuario = $this->CI->model_usuarios->get_by(array(
+        $usuario = $this->MI->get_by(array(
             'email' => $this->CI->input->post('email'),
             'password' => $this->hash($this->CI->input->post('password')),
         ), TRUE);
@@ -1000,9 +1026,9 @@ class CI_Session {
                 'id_user' => $usuario->id_usuario,
                 'loggedin' => TRUE
             );
-            $this->set_userdata('loggedin',$data);
+            $this->set_userdata($this->sessKey,$data);
         } else {
-            $this->CI->data['subview'] = 'start';
+            $this->CI->data['subLayout'] = 'admin/start';
         }
     }
 

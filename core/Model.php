@@ -48,6 +48,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class CI_Model {
 
+    /**
+     * Reference to the MI singleton
+     *
+     * @var	object
+     */
+    private static $instance;
+
 	/**
 	 * Class constructor
 	 *
@@ -55,7 +62,9 @@ class CI_Model {
 	 */
 	public function __construct()
 	{
-		log_message('info', 'Model Class Initialized');
+        self::$instance =& $this;
+
+        log_message('info', 'Model Class Initialized');
 	}
 
 	// --------------------------------------------------------------------
@@ -76,5 +85,17 @@ class CI_Model {
 		//	most likely a typo in your model code.
 		return get_instance()->$key;
 	}
+
+    /**
+     * Get the MI singleton
+     *
+     * @static
+     * @return	object
+     */
+    public static function &get_instance()
+    {
+        return self::$instance;
+    }
+
 
 }
