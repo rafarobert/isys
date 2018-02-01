@@ -962,13 +962,14 @@ class CI_Session {
     public function _unique_email($id = ''){
         // Do NOT validate if email already exists
         // Unless it's the email for the current user
+
         if($id == ''){
             $id = $this->CI->uri->segment(4);
         }
 
-        $this->CI->db->where('email', $this->CI->input->post('email'));
+        $result = $this->CI->db->where('email', $this->CI->input->post('email'));
         !$id || $this->CI->db->where("id_usuario !=", $id);
-        $user = $this->MI->get();
+        $user = $this->CI->model_usuario->get();
         if(count($user)){
             $this->CI->form_validation->set_message('_unique_email', 'Ya existe ese %s registrado');
             return false;

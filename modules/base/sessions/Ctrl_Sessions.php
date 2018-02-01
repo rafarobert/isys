@@ -14,7 +14,14 @@
             public function __construct()
             {
                 parent::__construct();
+
                 $this->load->model("model_sessions");
+                $this->load->model('model_usuarios');
+                $this->load->library('session');
+                $this->session->sessTable = 'hbf_usuarios';
+                $this->session->sessIdTable = 'id_usuario';
+                $this->session->sessKey= config_item('sess_key_admin');
+
 
             }
 
@@ -60,7 +67,6 @@
                         // *** estic - tables - fin ***
                     ));
 
-
                     $this->model_sessions->save($data, $id);
                     redirect("base/sessions");
                 }
@@ -83,7 +89,6 @@
 
             public function signup()
             {
-
                 $this->session->signup();
             }
 
