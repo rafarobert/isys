@@ -230,8 +230,8 @@ class CI_DB_mysqli_forge extends CI_DB_forge {
                         }
                     } else if(isset($this->keys[$i][$names[0]])){
 
-                        if( ! isset($this->fields[$names[0]])) {
-                            unset($this->keys[$i][$names[0]]);
+                        if( ! isset($this->fields[$this->keys[$i][$names[0]]['id']])) {
+                            unset($this->fields[$names[0]]['id']);
                             continue;
                         }
                     }

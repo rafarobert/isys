@@ -751,7 +751,7 @@ class CI_Migration
                 $this->load->model('admin/model_modulos');
                 $oModulos = $this->db->get(config_item('sys')['admin'].'_modulos')->result_object();
             } else {
-
+                redirect('base/migrate/rewrite/hbf/4');
             }
 
             if(strpos($table_name,'_')){
@@ -3426,6 +3426,12 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
         $content .= '
         $this->dbforge->add_field($fields);
         $this->dbforge->add_key("'.$this->_id_table.'", TRUE);
+        ';
+        if(isset($this->_keys)) {
+            $content .= '
+        $this->dbforge->add_key($fk_keys);';
+        }
+        $content .= '
         $this->create_or_alter_table("'.$this->_table_name.'",$settings);
 
         $this->create_ctrl();
@@ -3452,7 +3458,7 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
 
             if (!mkdir($dir, 0777, true)) {
 
-                die('Fallo al crear el modulo...');
+                die('Fallo al crear el folder '.$dir);
 
                 return false;
             }
