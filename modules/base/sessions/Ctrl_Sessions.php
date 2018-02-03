@@ -16,7 +16,7 @@
                 parent::__construct();
 
                 $this->load->model("model_sessions");
-                $this->load->model('model_usuarios');
+                $this->load->model('admin/model_usuarios');
                 $this->load->library('session');
                 $this->session->sessTable = 'hbf_usuarios';
                 $this->session->sessIdTable = 'id_usuario';

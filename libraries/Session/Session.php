@@ -947,7 +947,7 @@ class CI_Session {
     public function getId(){
         if($this->has_userdata($this->sessKey)) {
             $aDataSession = $this->userdata($this->sessKey);
-            return $aDataSession[$this->sessIdTable];
+            return $aDataSession['id_user'];
         }
         return '';
     }
@@ -967,9 +967,11 @@ class CI_Session {
             $id = $this->CI->uri->segment(4);
         }
 
-        $result = $this->CI->db->where('email', $this->CI->input->post('email'));
-        !$id || $this->CI->db->where("id_usuario !=", $id);
-        $user = $this->CI->model_usuario->get();
+        $this->CI->db->where('email', $this->CI->input->post('email'));
+
+        !$id || $this->CI->db->where("$this->sessIdTable !=", $id);
+
+        $user = $this->MI->get();
         if(count($user)){
             $this->CI->form_validation->set_message('_unique_email', 'Ya existe ese %s registrado');
             return false;
@@ -999,9 +1001,9 @@ class CI_Session {
                     // *** estic - tables - fin ***
                 ));
                 $data["password"] = $this->CI->input->post("password");
-                $data["password"] = $this->MI->hash($data["password"]);
+                $data["password"] = $this->hash($data["password"]);
 
-                $this->CI->{'Model_'.ucfirst($mod)}->save($data);
+                $this->MI->save($data);
                 $this->login();
                 redirect($dashboard);
             } else {

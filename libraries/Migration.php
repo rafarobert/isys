@@ -2146,7 +2146,6 @@ class CI_Migration
         
                 // Se carga la vista
                 $this->data["subview"] = "' . $this->_mod . '/' . $this->_sub_mod_p . '/edit";
-                $this->load->view("layouts/_layout_' . $this->_mod . '", $this->data);
             }
         
             public function delete($id){
