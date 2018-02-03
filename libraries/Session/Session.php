@@ -1020,6 +1020,7 @@ class CI_Session {
             'email' => $this->CI->input->post('email'),
             'password' => $this->hash($this->CI->input->post('password')),
         ), TRUE);
+        $dashboard = "admin/clubs";
 
         if(count($usuario)){
             // log in user
@@ -1030,6 +1031,9 @@ class CI_Session {
                 'loggedin' => TRUE
             );
             $this->set_userdata($this->sessKey,$data);
+
+            redirect($dashboard);
+
         } else {
             $this->CI->data['subLayout'] = 'admin/start';
         }
