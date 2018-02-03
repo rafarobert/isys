@@ -10,64 +10,51 @@
 
 defined("BASEPATH") OR exit("No direct script access allowed");
 
-class Migration_Create_ci_usuarios extends CI_Migration {
+class Migration_Create_ci_modulos extends CI_Migration {
 
     public function up()
     {
         $fields = array (
-  'id_usuario' => 
+  'id_modulo' => 
   array (
     'type' => 'int',
     'auto_increment' => true,
     'unsigned' => true,
     'constraint' => 11,
   ),
-  'name' => 
+  'titulo' => 
   array (
     'type' => 'VARCHAR',
     'constraint' => 100,
     'unsigned' => true,
   ),
-  'email' => 
+  'url' => 
   array (
     'type' => 'VARCHAR',
-    'constraint' => 100,
+    'constraint' => 600,
     'unsigned' => true,
   ),
-  'lastname' => 
+  'descripcion' => 
   array (
-    'type' => 'VARCHAR',
-    'constraint' => 100,
+    'type' => 'TEXT',
     'unsigned' => true,
   ),
-  'mobile_number_1' => 
+  'icon' => 
   array (
     'type' => 'VARCHAR',
-    'constraint' => 12,
+    'constraint' => 200,
     'unsigned' => true,
   ),
-  'mobile_number_2' => 
+  'opt_estado' => 
   array (
     'type' => 'VARCHAR',
-    'constraint' => 12,
+    'constraint' => 15,
     'unsigned' => true,
   ),
-  'ci' => 
+  'opt_listado' => 
   array (
     'type' => 'VARCHAR',
-    'constraint' => 30,
-    'unsigned' => true,
-  ),
-  'img' => 
-  array (
-    'type' => 'VARCHAR',
-    'constraint' => 500,
-    'unsigned' => true,
-  ),
-  'password' => 
-  array (
-    'type' => 'VARCHAR',
-    'constraint' => 128,
+    'constraint' => 15,
     'unsigned' => true,
   ),
   'date_created' => 
@@ -88,9 +75,9 @@ class Migration_Create_ci_usuarios extends CI_Migration {
             "icon" => ""
         );
         $this->dbforge->add_field($fields);
-        $this->dbforge->add_key("id_usuario", TRUE);
+        $this->dbforge->add_key("id_modulo", TRUE);
         
-        $this->create_or_alter_table("ci_usuarios",$settings);
+        $this->create_or_alter_table("ci_modulos",$settings);
 
         $this->create_ctrl();
         $this->create_model();
