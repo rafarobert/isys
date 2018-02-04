@@ -2,8 +2,8 @@
         /**
          * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
-         * Date: 31/01/2018
-         * Time: 2:58 am
+         * Date: 04/02/2018
+         * Time: 4:30 am
          * @property Model_Modulos $model_modulos
          */
         
@@ -67,7 +67,6 @@
         
                 // Se carga la vista
                 $this->data["subview"] = "base/modulos/edit";
-                $this->load->view("layouts/_layout_base", $this->data);
             }
         
             public function delete($id){

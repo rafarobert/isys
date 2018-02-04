@@ -287,8 +287,6 @@ abstract class CI_DB_forge {
             }
         }
 
-
-
 		return $this;
 	}
 
@@ -995,6 +993,8 @@ abstract class CI_DB_forge {
 			$sql .= ",\n\tCONSTRAINT ".$this->db->escape_identifiers('pk_'.$table)
 				.' PRIMARY KEY('.implode(', ', $this->db->escape_identifiers($this->primary_keys)).')';
 		}
+
+        $this->primary_keys = [];
 
 		return $sql;
 	}

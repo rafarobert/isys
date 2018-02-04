@@ -424,6 +424,7 @@ if ( ! is_php('5.4'))
     } else {
         $framePath = APPPATH;
     }
+$RTR->framePath =  $framePath;
 
 	if (empty($class) OR ! file_exists($framePath.$RTR->directory.'/'.$class.'/'.$ctrlClass.'.php'))
 	{

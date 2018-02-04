@@ -266,6 +266,9 @@ class Ctrl_Migrate extends Base_Controller
                     }
                 }
                 $this->migration->_keys = $fk_keys;
+            } else {
+
+                $this->migration->_keys = [];
             }
 
             $_POST['bRewrite'] = true;

@@ -228,7 +228,7 @@ class CI_Migration
      */
     public function __construct($config = array())
     {
-        $this->CI = get_instance();
+        $this->CI = CI_Controller::get_instance();
 
         // Only run this constructor on main library load
         if (!in_array(get_class($this), array('CI_Migration', config_item('subclass_prefix') . 'Migration'), TRUE)) {
@@ -741,17 +741,52 @@ class CI_Migration
             $actual_table = $this->save_or_update_table($table_name);
 
         } else {
+            $this->_fields = $this->dbforge->fields;
+
+            $keys = $this->dbforge->keys;
 
             $this->dbforge->create_table($table_name);
+
+            if(isset($keys)){
+
+                foreach ($keys as $key){
+
+                    foreach ($key as $fk => $settings){
+
+                        $this->_update_indexes_foreignKeys($settings['id'], $keys, $this->_fields, $table_name);
+                    }
+                }
+            }
         }
+        $this->set_params($table_name);
 
         if(count($settings))
         {
-            if(validate_modulo('admin','modulos')){
-                $this->load->model('admin/model_modulos');
-                $oModulos = $this->db->get(config_item('sys')['admin'].'_modulos')->result_object();
+            $nameModelModules = '';
+            $labelOfModule = config_item('sys')[$this->_mod];
+            $nameOfModule = config_item('sys')[$labelOfModule]['name'];
+            $indexMigrationModules = config_item('sys')[$labelOfModule]['migIndexModules'];
+
+            if(isset($_REQUEST['id_migration'])){
+                $id_migration = $_REQUEST['id_migration'];
             } else {
-                redirect('base/migrate/rewrite/hbf/4');
+                $oMigrations = $this->db->get('migrations')->result();
+                $id_migration = $oMigrations[0]->version + 1 ;
+            }
+
+            if (validate_modulo($nameOfModule, 'modulos')) {
+                $this->load->model("$nameOfModule/model_modulos");
+                $oModulos = $this->db->get($labelOfModule . '_modulos')->result_object();
+                foreach ($oModulos as $modulo) {
+                    if ($modulo->id_modulo == $id_migration) {
+                        $exists = true;
+                        break;
+                    }
+                    $exists = false;
+                }
+                $nameModelModules = "model_modulos";
+            } else if ($table_name != $labelOfModule . "_modulos") {
+                redirect("base/migrate/rewrite/$labelOfModule/$indexMigrationModules");
             }
 
             if(strpos($table_name,'_')){
@@ -761,12 +796,6 @@ class CI_Migration
                 $submod = '';
             }
 
-            if(isset($_REQUEST['id_migration'])){
-                $id_migration = $_REQUEST['id_migration'];
-            } else {
-                $oMigrations = $this->db->get('migrations')->result();
-                $id_migration = $oMigrations[0]->version + 1 ;
-            }
             $data = array(
                 'titulo' => isset($settings['title']) ? $settings['title'] : ucfirst($submod),
                 'icon' => isset($settings['icon']) ? $settings['icon'] : '',
@@ -776,21 +805,14 @@ class CI_Migration
                 'opt_listado' => isset($settings['listed']) ? $settings['listed'] : ''
             );
 
-            foreach ($oModulos as $modulo){
-                if($modulo->id_modulo == $id_migration){
-                    $exists = true;
-                    break;
+            if($nameModelModules != '' && $table_name != $labelOfModule."_modulos"){
+                if(!$exists){
+                    $this->{$nameModelModules}->save($data,null,$id_migration);
+                } else {
+                    $this->{$nameModelModules}->save($data,$id_migration);
                 }
-                $exists = false;
-            }
-            if(!$exists){
-                $data['id_modulo'] = $id_migration;
-                $this->model_modulos->save($data);
-            } else {
-                $this->model_modulos->save($data,$id_migration);
             }
         }
-        $this->set_params($table_name);
     }
 
     public function start($id_migration, $bForce_update = false)
@@ -798,7 +820,7 @@ class CI_Migration
         // *************************************************************
         // Crea la tabla migration si no existe en la base de datos
         // *************************************************************
-
+        $this->CI->dbforge->primary_keys = [];
         $_REQUEST['id_migration'] = $id_migration;
         if ($this->db->table_exists('migrations')) {
             $oMigrations = $this->db->get('migrations')->result();
@@ -1010,7 +1032,7 @@ class CI_Migration
             $this->_sub_mod = $sub_modulo;
             $this->_mod_type = $modulo;
             $this->_table_name = $table_name;
-            $this->_fields = $this->dbforge->fields;
+            $this->_fields = $this->dbforge->fields != [] ? $this->dbforge->fields : ($this->_fields == [] ? header("Refresh:0") : $this->_fields);
             $this->_sub_mod_ctrl = 'Ctrl_' . ucfirst($sub_modulo) . $this->_ext_php;
             $this->_sub_mod_model = 'Model_' . ucfirst($sub_modulo) . $this->_ext_php;
 
@@ -2193,6 +2215,7 @@ class CI_Migration
 
     public function getModelContent($objectKey = 'object', $options = [])
     {
+        $id = '';
         foreach ($this->_fields as $key => $value) {
             if (explode('_', $key)[0] == 'id') {
                 $id = $key;
@@ -3406,7 +3429,7 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
             "icon" => ""
         );';
 
-        if(isset($this->_keys)){
+        if(isset($this->_keys) && $this->_keys != []){
             $content .= '
         $fk_keys = array(';
             foreach ($this->_keys as $i => $fk_settings){
@@ -3426,7 +3449,7 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
         $this->dbforge->add_field($fields);
         $this->dbforge->add_key("'.$this->_id_table.'", TRUE);
         ';
-        if(isset($this->_keys)) {
+        if(isset($this->_keys) && $this->_keys != []) {
             $content .= '
         $this->dbforge->add_key($fk_keys);';
         }

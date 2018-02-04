@@ -225,13 +225,13 @@ class CI_DB_mysqli_forge extends CI_DB_forge {
 
                         if ( ! isset($this->fields[$this->keys[$i][$i2]]))
                         {
-                            unset($this->keys[$i][$i2]);
+                            //unset($this->keys[$i][$i2]);
                             continue;
                         }
                     } else if(isset($this->keys[$i][$names[0]])){
 
                         if( ! isset($this->fields[$this->keys[$i][$names[0]]['id']])) {
-                            unset($this->fields[$names[0]]['id']);
+                            //unset($this->fields[$names[0]]['id']);
                             continue;
                         }
                     }
@@ -240,25 +240,25 @@ class CI_DB_mysqli_forge extends CI_DB_forge {
 
 			else if(isset($this->keys[$i])){
 			    if ( ! isset($this->fields[$this->keys[$i]])) {
-                    unset($this->keys[$i]);
+                    //unset($this->keys[$i]);
                     continue;
                 }
 			} else if(isset($this->keys[$i][$names[0]])){
 			    if( ! isset($this->fields[$this->keys[$i][$names[0]]])) {
-                    unset($this->keys[$i][$names[0]]);
+                    //unset($this->keys[$i][$names[0]]);
                     continue;
                 }
             }
 
             if(isset($this->keys[$i][$names[0]]) && is_array($this->keys[$i][$names[0]])){
 
-			    if(isset($this->keys[$i][$names[0]]['table']) && isset($this->keys[$i][$names[0]]['id'])){
-                    $sql .= ",\n\tCONSTRAINT ".$this->db->escape_identifiers($names[0])
-                        .' FOREIGN KEY('.implode(', ', $this->db->escape_identifiers($names)).')'
-                        . "\n\tREFERENCES `". $this->keys[$i][$names[0]]['table'].'`(`'.$this->keys[$i][$names[0]]['id'].'`)';
-                } else {
-			        show_error('Verifica que este correctamente configurado las llaves foraneas de la tabla, ejemplo: array("id" => array("table" => "nombre_tabla", "id" => "id_tabla"))');
-                }
+//			    if(isset($this->keys[$i][$names[0]]['table']) && isset($this->keys[$i][$names[0]]['id'])){
+//                    $sql .= ",\n\tCONSTRAINT ".$this->db->escape_identifiers($names[0])
+//                        .' FOREIGN KEY('.implode(', ', $this->db->escape_identifiers($names)).')'
+//                        . "\n\tREFERENCES `". $this->keys[$i][$names[0]]['table'].'`(`'.$this->keys[$i][$names[0]]['id'].'`)';
+//                } else {
+//			        show_error('Verifica que este correctamente configurado las llaves foraneas de la tabla, ejemplo: array("id" => array("table" => "nombre_tabla", "id" => "id_tabla"))');
+//                }
 
             } else {
 

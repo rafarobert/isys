@@ -3,8 +3,8 @@
 /**
  * Created by herbalife.
  * User: Rafael Gutierrez Gaspar
- * Date: 03/02/2018
- * Time: 12:36 am
+ * Date: 04/02/2018
+ * Time: 1:37 am
  */
 
 
@@ -18,7 +18,6 @@ class Migration_Create_ci_modulos extends CI_Migration {
   'id_modulo' => 
   array (
     'type' => 'int',
-    'auto_increment' => true,
     'unsigned' => true,
     'constraint' => 11,
   ),
