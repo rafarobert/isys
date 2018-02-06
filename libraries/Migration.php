@@ -286,6 +286,7 @@ class CI_Migration
 
         $this->_migration_files = $this->find_migrations();
 
+        $this->CI->migrationFiles = $this->find_migrations();
         // If the migrations table is missing, make it
         if (!$this->db->table_exists($this->_migration_table)) {
             $this->dbforge->add_field(array(
@@ -751,10 +752,9 @@ class CI_Migration
 
                 foreach ($keys as $key){
 
-                    foreach ($key as $fk => $settings){
+                    $name = array_keys($key)[0];
 
-                        $this->_update_indexes_foreignKeys($settings['id'], $keys, $this->_fields, $table_name);
-                    }
+                    $this->_update_indexes_foreignKeys($key[$name]['id'], $keys, $this->_fields, $table_name);
                 }
             }
         }
@@ -786,7 +786,7 @@ class CI_Migration
                 }
                 $nameModelModules = "model_modulos";
             } else if ($table_name != $labelOfModule . "_modulos") {
-                redirect("base/migrate/rewrite/$labelOfModule/$indexMigrationModules");
+                redirect("base/migrate/write/$labelOfModule/$indexMigrationModules");
             }
 
             if(strpos($table_name,'_')){
@@ -3676,7 +3676,7 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
                 {
                     foreach ($key as $name => $settings)
                     {
-                        if(is_array($settings))
+                        if(is_array($settings) && $this->db->table_exists($settings['table']))
                         {
                             $link = $name;
                             $table = $settings['table'];
@@ -3731,6 +3731,18 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
                                     }
                                 }
                             }
+                        } else {
+
+                            $migIndex = $this->getMigrationIndexFromTableName($settings['table']);
+
+                            $mod = '';
+
+                            if(isset(explode('_',$table_name)[1])){
+                                $mod = explode('_',$table_name)[0];
+                            } else {
+                                $mod = $table_name;
+                            }
+                            redirect("base/migrate/write/$mod/$migIndex");
                         }
                     }
                 }
@@ -3738,5 +3750,35 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
 
             }
         }
+    }
+
+    public function getMigrationIndexFromTableName($table_name)
+    {
+
+        $mod = '';
+        $subMod = '';
+
+        if (isset(explode('_', $table_name)[1])) {
+            $mod = explode('_', $table_name)[0];
+            $subMod = explode('_', $table_name)[1];
+
+        } else {
+            $subMod = explode('_', $table_name)[1];
+        }
+        $files = $this->CI->migrationFiles;
+
+        if ($mod == '') {
+            $mod = $subMod;
+        }
+        $migrationTabs = $files[$mod];
+
+        foreach ($migrationTabs as $index => $name) {
+
+            if (strpos($name, $table_name)) {
+
+                return $index;
+            }
+        }
+        return 0;
     }
 }

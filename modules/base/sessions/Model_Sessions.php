@@ -2,8 +2,8 @@
         /**
          * Created by Estic.
          * User: RaFaEl Gutierrez Gaspar
-         * Date: 04/02/2018
-         * Time: 4:30 am
+         * Date: 06/02/2018
+         * Time: 12:55 am
          */
         
         defined("BASEPATH") OR exit("No direct script access allowed");
@@ -77,6 +77,9 @@
             );
             
             public $rules_edit = array(    
+            
+            
+            
             // *** estic - tables - inicio - 2 ***
             
             
@@ -124,3 +127,12 @@
         }
 
         // *** estic - model_file - end ***
+            
+            
+            
+            
+            
+            
+            
+            
+            
