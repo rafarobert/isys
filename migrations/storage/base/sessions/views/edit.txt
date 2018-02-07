@@ -2,8 +2,8 @@
         /**
          * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
-         * Date: 06/02/2018
-         * Time: 12:55 am
+         * Date: 07/02/2018
+         * Time: 2:42 am
          * @var Model_Sessions $model_sessions
          * @var Model_Sessions $sessions
          * @var Model_Sessions $session
@@ -52,6 +52,40 @@
                     <?php echo form_error("data"); ?>
                     
                     
+                            <div class="form-group row">
+                                <label for="fieldCiUsuariosIdUsuario" class="col-sm-4 col-form-label col-form-label-md">Ci Usuarios Id Usuario  </label>
+                                <div class="col-sm-6">
+                                <?php
+                                $data = array(
+                                     "name" => "ci_usuarios_id_usuario",
+                                     "id" => "fieldCiUsuariosIdUsuario",
+                                     "class" => "form-control ",
+                                     "value" => set_value("ci_usuarios_id_usuario", $oSession->ci_usuarios_id_usuario),
+                                     "type" => "number"
+                                 );
+                                 echo form_input($data, "", "") ?>
+                                 </div>
+                                 </div>
+                                 <?php echo form_error("ci_usuarios_id_usuario"); ?>
+                    
+                    
+                            <div class="form-group row">
+                                <label for="fieldHbfUsuariosIdUsuario" class="col-sm-4 col-form-label col-form-label-md">Hbf Usuarios Id Usuario  </label>
+                                <div class="col-sm-6">
+                                <?php
+                                $data = array(
+                                     "name" => "hbf_usuarios_id_usuario",
+                                     "id" => "fieldHbfUsuariosIdUsuario",
+                                     "class" => "form-control ",
+                                     "value" => set_value("hbf_usuarios_id_usuario", $oSession->hbf_usuarios_id_usuario),
+                                     "type" => "number"
+                                 );
+                                 echo form_input($data, "", "") ?>
+                                 </div>
+                                 </div>
+                                 <?php echo form_error("hbf_usuarios_id_usuario"); ?>
+                    
+                    
         
             <!-- *** estic - tables - fin *** -->
         
@@ -71,6 +105,3 @@
         <?= form_close() ?>
 
         <!-- *** estic - edit_file - end *** -->
-        
-        
-        

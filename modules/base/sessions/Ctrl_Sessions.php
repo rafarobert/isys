@@ -2,14 +2,14 @@
         /**
          * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
-         * Date: 06/02/2018
-         * Time: 12:55 am
+         * Date: 07/02/2018
+         * Time: 2:42 am
          * @property Model_Sessions $model_sessions
          */
         
         Class Ctrl_Sessions extends Base_Controller {
-
-
+        
+        
             public function __construct()
             {
                 parent::__construct();
@@ -18,19 +18,20 @@
                 $this->session->sessTable = 'hbf_usuarios';
                 $this->session->sessIdTable = 'id_usuario';
                 $this->session->sessKey= config_item('sess_key_admin');
-
+                $this->load->model("model_sessions");
+                
             }
-
+        
             public function index(){
                 // Obtiene a todos los sessions
-
+                
                 $this->data["oSessions"] = $this->model_sessions->get();
-
+        
                 // Carga la vista
-
+                
                 $this->data["subview"] = "base/sessions/index";
             }
-
+        
             public function edit($id = NULL){
                 // Optiene un session o crea uno nuevo
                 // Se construye las reglas de validacion del formulario        
@@ -46,30 +47,32 @@
                     $rules = $this->model_sessions->rules;
                     $this->form_validation->set_rules($rules);
                 }
-
+                
                 $this->data["oSession"] = $oSession;
                 // Se procesa el formulario
-
+                
                 if($this->form_validation->run() == true){
                     $data = $this->model_sessions->array_from_post(array(
-
+                                  
                     // *** estic - tables - inicio ***
         "ip_address",
                 "timestamp",
                 "data",
+                "ci_usuarios_id_usuario",
+                "hbf_usuarios_id_usuario",
                 
         // *** estic - tables - fin ***
         ));
-
-
+        
+        
                     $this->model_sessions->save($data,$id);
                     redirect("base/sessions");
                 }
-
+        
                 // Se carga la vista
                 $this->data["subview"] = "base/sessions/edit";
             }
-
+        
             public function delete($id){
                 $this->model_sessions->delete($id);
                 redirect("base/sessions");
@@ -85,9 +88,7 @@
                 $this->session->signUp();
             }
 
+            
         }
 
         // *** estic - ctrl_file - end ***
-
-
-        

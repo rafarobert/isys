@@ -2,8 +2,8 @@
         /**
          * Created by Estic.
          * User: RaFaEl Gutierrez Gaspar
-         * Date: 06/02/2018
-         * Time: 12:55 am
+         * Date: 07/02/2018
+         * Time: 2:42 am
          */
         
         defined("BASEPATH") OR exit("No direct script access allowed");
@@ -154,9 +154,6 @@
             );
             
             public $rules_edit = array(    
-            
-            
-            
             // *** estic - tables - inicio - 2 ***
             
             
@@ -196,6 +193,12 @@
                     "rules" => "trim|required|max_length[30]"
                 ),
                 
+                "img" => array(
+                    "field" => "img",
+                    "label" => "Img",
+                    "rules" => "trim|required|max_length[500]"
+                ),
+                
             
             // *** estic - tables - fin - 2 ***
             
@@ -229,12 +232,3 @@
         }
 
         // *** estic - model_file - end ***
-            
-            
-            
-            
-            
-            
-            
-            
-            
