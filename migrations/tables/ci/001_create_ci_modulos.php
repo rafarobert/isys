@@ -3,8 +3,8 @@
 /**
  * Created by herbalife.
  * User: Rafael Gutierrez Gaspar
- * Date: 07/02/2018
- * Time: 2:33 am
+ * Date: 14/02/2018
+ * Time: 2:52 am
  */
 
 
@@ -56,12 +56,28 @@ class Migration_Create_ci_modulos extends CI_Migration {
     'constraint' => 15,
     'unsigned' => true,
   ),
-  'date_created' => 
+  'change_count' => 
+  array (
+    'type' => 'INT',
+  ),
+  'id_user_modified' => 
+  array (
+    'type' => 'int',
+    'unsigned' => true,
+    'constraint' => 11,
+  ),
+  'id_user_created' => 
+  array (
+    'type' => 'int',
+    'unsigned' => true,
+    'constraint' => 11,
+  ),
+  'date_modified' => 
   array (
     'type' => 'DATETIME',
     'unsigned' => true,
   ),
-  'date_modified' => 
+  'date_created' => 
   array (
     'type' => 'DATETIME',
     'unsigned' => true,
@@ -73,9 +89,21 @@ class Migration_Create_ci_modulos extends CI_Migration {
             "status" => "enabled",
             "icon" => ""
         );
+        $fk_keys = array(
+            "ci_modulos_ibfk_1" => array(
+                "table" => "hbf_usuarios",
+                "id" => "id_user_modified",
+            ),
+            "ci_modulos_ibfk_2" => array(
+                "table" => "hbf_usuarios",
+                "id" => "id_user_created",
+            ),
+        );
+        
         $this->dbforge->add_field($fields);
         $this->dbforge->add_key("id_modulo", TRUE);
         
+        $this->dbforge->add_key($fk_keys);
         $this->create_or_alter_table("ci_modulos",$settings);
 
         $this->create_ctrl();

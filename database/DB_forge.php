@@ -1054,4 +1054,80 @@ abstract class CI_DB_forge {
 		$this->fields = $this->keys = $this->primary_keys = array();
 	}
 
+	public function hasRelation($table1, $id1, $table2, $id2, $constraint = false, $database = false){
+
+	    $CI = CI_Controller::get_instance();
+	    if(!$database){
+	        $database = $CI->db->database;
+        }
+
+        $sql = "SELECT TABLE_NAME,COLUMN_NAME, CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE where CONSTRAINT_SCHEMA='$database' and TABLE_NAME='$table1' and COLUMN_NAME='$id1' and REFERENCED_TABLE_NAME='$table2' and REFERENCED_COLUMN_NAME='$id2'";
+
+	    if(!$constraint){
+	        $constraint = '';
+        } else {
+            $sql .= " and CONSTRAINT_NAME='$constraint'";
+        }
+
+        $result = $CI->db->query($sql,false,true)->row();
+
+        if(count($result)){
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getKeyFromTable($table, $database = false){
+        $CI = CI_Controller::get_instance();
+        if(!$database){
+            $database = $CI->db->database;
+        }
+
+        $sql = "Select COLUMN_NAME from information_schema.`COLUMNS` where TABLE_SCHEMA='$database' and TABLE_NAME='$table' and COLUMN_KEY='PRI'";
+
+        $result = $CI->db->query($sql,false,true)->row();
+
+        if(count($result)){
+            return $result->COLUMN_NAME;
+        }
+
+        return false;
+    }
+
+    public function fieldExists($table, $field, $database = false){
+        $CI = CI_Controller::get_instance();
+        if(!$database){
+            $database = $CI->db->database;
+        }
+
+        $sql = "Select * from information_schema.`COLUMNS` where TABLE_SCHEMA='$database' and TABLE_NAME='$table' and COLUMN_NAME='$field'";
+
+        $result = $CI->db->query($sql,false,true)->row();
+
+        if(count($result)){
+            return $result;
+        }
+
+        return false;
+    }
+
+    public function setRelation($table, $id, $tableReferenced, $idReferenced, $idConstraint, $database = false){
+        $CI = CI_Controller::get_instance();
+        if(!$database){
+            $database = $CI->db->database;
+        }
+        $sql = "ALTER TABLE `$table` ADD CONSTRAINT `$idConstraint` FOREIGN KEY (`$id`) REFERENCES `$tableReferenced` (`$idReferenced`) ON UPDATE CASCADE ON DELETE CASCADE";
+
+        $CI->db->query($sql);
+    }
+
+    public function removeRelation($table, $idConstraint, $database = false){
+        $CI = CI_Controller::get_instance();
+        if(!$database){
+            $database = $CI->db->database;
+        }
+
+        $sql = "ALTER TABLE `$table` DROP FOREIGN KEY `$idConstraint`";
+    }
 }
