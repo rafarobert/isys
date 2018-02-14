@@ -2533,11 +2533,18 @@ class CI_Migration
 
     public function getViewIndexContent($objectKey = 'object')
     {
+        $id = '';
+        if(!count($this->_fields)){
+            header("Refresh:0");
+        }
         foreach ($this->_fields as $key => $val) {
             if (explode('_', $key)[0] == 'id') {
                 $id = $key;
                 break;
             }
+        }
+        if($id == ''){
+            echo 'error';
         }
 
         $content = config_item('file_index_start');
@@ -3065,7 +3072,7 @@ class CI_Migration
                                 <div class="col-sm-6">
                                 <div class="two-columns">
                                 <?php if(isset($'.$objectKey.'->imgThumb)){?>
-                                    <img class="img-thumb-1" src="<?=site_url("img/'.$this->_sub_mod_p.'/thumbs/".$'.$objectKey.'->imgThumb)?>"/>
+                                    <img class="img-thumb-1" id="imgThumb" src="<?=site_url("img/'.$this->_sub_mod_p.'/thumbs/".$'.$objectKey.'->imgThumb)?>"/>
                                 <?php }?>
                                 <?php
                                 ';
@@ -3077,6 +3084,7 @@ class CI_Migration
                                      "name" => "' . $name_tag . '",
                                      "id" => "field' . $id_tag . '",
                                      "class" => "form-control ' . $class . '",
+                                     "onchange" => "oImgs.showThisImg(this)",
                                      "value" => set_value("';
 
                                 $content .= $name_tag;
@@ -3250,13 +3258,19 @@ var '.$objectKey.' = {
 
     public function getViewCntContent($objectKey = 'object')
     {
+        $id = '';
+        if(!count($this->_fields)){
+            header("Refresh:0");
+        }
         foreach ($this->_fields as $key => $val) {
             if (explode('_', $key)[0] == 'id') {
                 $id = $key;
                 break;
             }
         }
-
+        if($id==null){
+            echo "error";
+        }
         $content = config_item('file_index_start');
         $content .= '
         /**
