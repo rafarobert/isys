@@ -4,7 +4,7 @@
  * Created by herbalife.
  * User: Rafael Gutierrez Gaspar
  * Date: 16/02/2018
- * Time: 1:23 am
+ * Time: 6:00 pm
  */
 
 
@@ -70,6 +70,10 @@ class Migration_Create_ci_usuarios extends CI_Migration {
     'constraint' => 128,
     'unsigned' => true,
   ),
+  'change_count' => 
+  array (
+    'type' => 'INT',
+  ),
   'date_created' => 
   array (
     'type' => 'DATETIME',
@@ -79,6 +83,11 @@ class Migration_Create_ci_usuarios extends CI_Migration {
   array (
     'type' => 'DATETIME',
     'unsigned' => true,
+  ),
+  'settings' => 
+  array (
+    'type' => 'VARCHAR',
+    'constraint' => 255,
   ),
 );
 

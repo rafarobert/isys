@@ -4,7 +4,7 @@
  * Created by herbalife.
  * User: Rafael Gutierrez Gaspar
  * Date: 16/02/2018
- * Time: 1:23 am
+ * Time: 6:00 pm
  */
 
 
@@ -39,6 +39,27 @@ class Migration_Create_ci_sessions extends CI_Migration {
     'type' => 'BLOB',
     'unsigned' => true,
   ),
+  'last_activity' => 
+  array (
+    'type' => 'DATETIME',
+  ),
+  'id_user' => 
+  array (
+    'type' => 'int',
+    'constraint' => 11,
+    'unsigned' => true,
+  ),
+  'id_club' => 
+  array (
+    'type' => 'int',
+    'constraint' => 11,
+    'unsigned' => true,
+  ),
+  'settings' => 
+  array (
+    'type' => 'VARCHAR',
+    'constraint' => 255,
+  ),
 );
 
         $settings = array(
@@ -46,9 +67,23 @@ class Migration_Create_ci_sessions extends CI_Migration {
             "status" => "enabled",
             "icon" => ""
         );
-        $this->dbforge->add_field($fields);
-        $this->dbforge->add_key("", TRUE);
+        $fk_keys = array(
+            "ci_sessions_ibfk_1" => array(
+                "table" => "ci_usuarios",
+                "idLocal" => "id_user",
+                "idForeign" => "id_usuario",
+            ),
+            "ci_sessions_ibfk_2" => array(
+                "table" => "hbf_clubs",
+                "idLocal" => "id_club",
+                "idForeign" => "id_club",
+            ),
+        );
         
+        $this->dbforge->add_field($fields);
+        $this->dbforge->add_key("id", TRUE);
+        
+        $this->dbforge->add_key($fk_keys);
         $this->create_or_alter_table("ci_sessions",$settings);
 
         $this->create_ctrl();

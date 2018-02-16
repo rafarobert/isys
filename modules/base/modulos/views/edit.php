@@ -3,7 +3,7 @@
          * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
          * Date: 16/02/2018
-         * Time: 3:34 am
+         * Time: 6:16 pm
          * @var Model_Modulos $model_modulos
          * @var Model_Modulos $modulos
          * @var Model_Modulos $modulo
@@ -104,6 +104,23 @@
                                  <?php echo form_error("change_count"); ?>
                     
                     
+                            <div class="form-group row">
+                                <label for="fieldSettings" class="col-sm-4 col-form-label col-form-label-md">Settings  </label>
+                                <div class="col-sm-6">
+                                <?php
+                                $data = array(
+                                     "name" => "settings",
+                                     "id" => "fieldSettings",
+                                     "class" => "form-control ",
+                                     "value" => set_value("settings", $oModulo->settings),
+                                     "type" => "text"
+                                 );
+                                 echo form_input($data,"","") ?>
+                                 </div>
+                    </div>
+                                 <?php echo form_error("settings"); ?>
+                    
+                    
         
             <!-- *** estic - tables - fin *** -->
         
@@ -123,3 +140,4 @@
         <?= form_close() ?>
 
         <!-- *** estic - edit_file - end *** -->
+        

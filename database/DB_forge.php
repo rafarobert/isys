@@ -1083,7 +1083,6 @@ abstract class CI_DB_forge {
         if(!$database){
             $database = $CI->db->database;
         }
-
         $sql = "Select COLUMN_NAME from information_schema.`COLUMNS` where TABLE_SCHEMA='$database' and TABLE_NAME='$table' and COLUMN_KEY='PRI'";
 
         $result = $CI->db->query($sql,false,true)->row();
@@ -1091,7 +1090,6 @@ abstract class CI_DB_forge {
         if(count($result)){
             return $result->COLUMN_NAME;
         }
-
         return false;
     }
 

@@ -750,12 +750,7 @@ class CI_Migration
 
             if(isset($keys)){
 
-                foreach ($keys as $key){
-
-                    $name = array_keys($key)[0];
-
-                    $this->_update_indexes_foreignKeys($key[$name]['idLocal'], $keys, $this->_fields, $table_name);
-                }
+                $this->_update_indexes_foreignKeys($keys, $this->_fields, $table_name);
             }
         }
         $this->set_params($table_name);
@@ -763,9 +758,7 @@ class CI_Migration
         if(count($settings))
         {
             $nameModelModules = '';
-            $labelOfModule = config_item('sys')[$this->_mod];
-            $nameOfModule = config_item('sys')[$labelOfModule]['name'];
-            $indexMigrationModules = config_item('sys')[$labelOfModule]['migIndexModules'];
+            $indexMigrationModules = config_item('sys')['ci']['migIndexModules'];
 
             if(isset($_REQUEST['id_migration'])){
                 $id_migration = $_REQUEST['id_migration'];
@@ -774,9 +767,9 @@ class CI_Migration
                 $id_migration = $oMigrations[0]->version + 1 ;
             }
 
-            if (validate_modulo($nameOfModule, 'modulos')) {
-                $this->load->model("$nameOfModule/model_modulos");
-                $oModulos = $this->db->get($labelOfModule . '_modulos')->result_object();
+            if (validate_modulo('base', 'modulos')) {
+                $this->load->model("base/model_modulos");
+                $oModulos = $this->db->get('ci_modulos')->result_object();
                 foreach ($oModulos as $modulo) {
                     if ($modulo->id_modulo == $id_migration) {
                         $exists = true;
@@ -785,8 +778,8 @@ class CI_Migration
                     $exists = false;
                 }
                 $nameModelModules = "model_modulos";
-            } else if ($table_name != $labelOfModule . "_modulos") {
-                redirect("base/migrate/write/$labelOfModule/$indexMigrationModules");
+            } else if ($table_name != "ci_modulos") {
+                redirect("base/migrate/write/ci/$indexMigrationModules");
             }
 
             if(strpos($table_name,'_')){
@@ -807,7 +800,7 @@ class CI_Migration
                 'id_user_modified' => 1
             );
 
-            if($nameModelModules != '' && $table_name != $labelOfModule."_modulos"){
+            if($nameModelModules != '' && $table_name != "ci_modulos"){
                 if(!$exists){
                     $this->{$nameModelModules}->save($data,null,$id_migration);
                 } else {
@@ -885,9 +878,7 @@ class CI_Migration
             }
             if (!$existe)
             {
-                if(isset($keys[0])){
-                    $this->_update_indexes_foreignKeys($valueA['name'], $keys, $new_table, $table_name);
-                }
+                $this->_update_indexes_foreignKeys($keys, $new_table, $table_name);
                 $this->dbforge->drop_column($table_name, $valueA['name']);
                 array_splice($actual_table, $keyA, 1);
             }
@@ -941,7 +932,7 @@ class CI_Migration
                 $this->_update_primary_key($field, $actual_table, $table_name, $auto_increment);
 
                 if(isset($keys)){
-                    $this->_update_indexes_foreignKeys($field, $keys, $new_table_b, $table_name);
+                    $this->_update_indexes_foreignKeys($keys, $new_table_b, $table_name);
                 }
             }
         }
@@ -1031,7 +1022,7 @@ class CI_Migration
                 $this->_dir_root_store = $this->CI->uri->segments[4] == 'ci' || $this->CI->uri->segments[4] == 'tic' ? BASEPATH . "migrations/storage/" :APPPATH . "migrations/storage/";
             }
 
-            $this->_id_table = $this->dbforge->getKeyFromTable($table_name);
+            $this->_id_table = $this->_id_table == null ? $this->dbforge->getKeyFromTable($table_name) : $this->_id_table;
 
             $this->_mod = $mod_name;
             $this->_sub_mod = $sub_modulo;
@@ -3697,74 +3688,66 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
             }
         }
     }
-    protected function _update_indexes_foreignKeys($field, $keys, $fields, $table_name)
+    protected function _update_indexes_foreignKeys($keys, $fields, $localTable)
     {
+        $localTableId = $this->dbforge->getKeyFromTable($localTable);
         $fields_new_table = array_keys($fields);
 
-        if (explode('_', $field)[0] == 'id')
-        {
-            if(is_array($keys) && count($keys))
-            {
-                foreach ($keys as $i => $key)
-                {
-                    foreach ($key as $constraintName => $settings)
-                    {
-                        if(is_array($settings) && $this->db->table_exists($settings['table']))
-                        {
-                            $table = $settings['table'];
-                            $idForeign = $settings['idForeign'];
-                            $idLocal = $settings['idLocal'];
+        if (is_array($keys) && count($keys)) {
+            foreach ($keys as $i => $key) {
+                foreach ($key as $constraintName => $settings) {
+                    if (is_array($settings) && $this->db->table_exists($settings['table'])) {
+                        $tableForeign = $settings['table'];
+                        $idForeign = $settings['idForeign'];
+                        $idLocal = $settings['idLocal'];
 
-                            if(in_array($idLocal, $fields_new_table))
-                            {
-                                $fk_field = [];
-                                $fk_table = $this->db->field_data($table);
-                                foreach ($fk_table as $i => $set) {
-                                    if($set->name == $idForeign && $set->primary_key){
-                                        $fk_field = $set;
-                                        break;
-                                    }
+                        if (in_array($idLocal, $fields_new_table)) {
+                            $fk_field = [];
+                            $fk_table = $this->db->field_data($tableForeign);
+                            foreach ($fk_table as $i => $set) {
+                                if ($set->name == $idForeign && $set->primary_key) {
+                                    $fk_field = $set;
+                                    break;
                                 }
-                                if(count($fk_field)){
-                                    if ($fields[$idForeign]['type'] == $fk_field->type ||
-                                        $fields[$idForeign]['type'] == strtoupper($fk_field->type) ||
-                                        $fields[$idForeign]['type'] == ucfirst($fk_field->type) &&
-                                        $fields[$idForeign]['default'] == $fk_field->default ||
-                                        $fields[$idForeign]['default'] == strtoupper($fk_field->default) ||
-                                        $fields[$idForeign]['default'] == ucfirst($fk_field->default) &&
-                                        intval($fields[$idForeign]['constraint']) == intval($fk_field->max_length)
-                                    ) {
-                                        if(!$this->dbforge->hasRelation($table_name, $this->_id_table, $table, $idForeign, $constraintName)) {
-                                            if($this->dbforge->fieldExistsInDB($table_name, $idLocal)){
-                                                $this->dbforge->setRelation($table_name, $this->_id_table, $table, $idForeign, $constraintName);
-                                            } else {
-                                                header("Refresh:0");
-                                            }
+                            }
+                            if (count($fk_field)) {
+                                if ($fields[$idForeign]['type'] == $fk_field->type ||
+                                    $fields[$idForeign]['type'] == strtoupper($fk_field->type) ||
+                                    $fields[$idForeign]['type'] == ucfirst($fk_field->type) &&
+                                    $fields[$idForeign]['default'] == $fk_field->default ||
+                                    $fields[$idForeign]['default'] == strtoupper($fk_field->default) ||
+                                    $fields[$idForeign]['default'] == ucfirst($fk_field->default) &&
+                                    intval($fields[$idForeign]['constraint']) == intval($fk_field->max_length)
+                                ) {
+                                    if (!$this->dbforge->hasRelation($localTable, $this->_id_table, $tableForeign, $idForeign, $constraintName)) {
+                                        if ($this->dbforge->fieldExistsInDB($localTable, $idLocal)) {
+                                            $this->dbforge->setRelation($localTable, $localTableId, $tableForeign, $idForeign, $constraintName);
+                                        } else {
+                                            header("Refresh:0");
                                         }
-                                    } else {
-                                        show_error('Verifica que el campo '.$idLocal.' de la actual tabla '.$table_name.' tenga las mismas propiedades en la tabla '.$table);
                                     }
                                 } else {
-                                    show_error('Verifica que el campo '.$idLocal.' ha sido instanciado de la misma manera en la tabla '.$table );
+                                    show_error('Verifica que el campo ' . $idLocal . ' de la actual tabla ' . $localTable . ' tenga las mismas propiedades en la tabla ' . $tableForeign);
                                 }
-                            }
-                            else if($this->db->field_exists($idLocal,$table_name)) {
-                                if($this->dbforge->hasRelation($table_name, $this->_id_table, $table, $idForeign, $constraintName)) {
-                                    if($this->dbforge->fieldExistsInDB($table_name, $idLocal)) {
-                                        $this->dbforge->removeRelation($table_name, $constraintName);
-                                    }
-                                }
-                            }
-                        } else {
-                            $migIndex = $this->getMigrationIndexFromTableName($settings['table']);
-                            $mod = '';
-                            if(isset(explode('_',$table_name)[1])){
-                                $mod = explode('_',$table_name)[0];
                             } else {
-                                $mod = $table_name;
+                                show_error('Verifica que el campo ' . $idLocal . ' ha sido instanciado de la misma manera en la tabla ' . $tableForeign);
                             }
-                            redirect("base/migrate/write/$mod/$migIndex");
+                        } else if ($this->db->field_exists($idLocal, $localTable)) {
+                            if ($this->dbforge->hasRelation($localTable, $localTableId, $tableForeign, $idForeign, $constraintName)) {
+                                if ($this->dbforge->fieldExistsInDB($localTable, $idLocal)) {
+                                    $this->dbforge->removeRelation($localTable, $constraintName);
+                                }
+                            }
                         }
+                    } else {
+                        $migIndex = $this->getMigrationIndexFromTableName($settings['table']);
+                        $mod = '';
+                        if (isset(explode('_', $localTable)[1])) {
+                            $mod = explode('_', $localTable)[0];
+                        } else {
+                            $mod = $localTable;
+                        }
+                        redirect("base/migrate/write/$mod/$migIndex");
                     }
                 }
             }

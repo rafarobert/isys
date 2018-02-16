@@ -3,7 +3,7 @@
          * Created by Estic.
          * User: RaFaEl Gutierrez Gaspar
          * Date: 16/02/2018
-         * Time: 3:34 am
+         * Time: 6:08 pm
          */
         
         defined("BASEPATH") OR exit("No direct script access allowed");
@@ -96,6 +96,13 @@
                          */
                          
                 public $date_created;
+                /**
+                         * The value for the title field.
+                         *
+                         * @var        string
+                         */
+                         
+                public $settings;
                 
             
             // *** estic - tables - fin - 1 ***
@@ -151,12 +158,20 @@
                     "rules" => "trim|required"
                 ),
                 
+                "settings" => array(
+                    "field" => "settings",
+                    "label" => "Settings",
+                    "rules" => "trim|required|max_length[255]"
+                ),
+                
             
             // *** estic - tables - fin - 2 ***
             
             );
             
             public $rules_edit = array(    
+            
+            
             // *** estic - tables - inicio - 2 ***
             
             
@@ -202,6 +217,12 @@
                     "rules" => "trim|required"
                 ),
                 
+                "settings" => array(
+                    "field" => "settings",
+                    "label" => "Settings",
+                    "rules" => "trim|required|max_length[255]"
+                ),
+                
             
             // *** estic - tables - fin - 2 ***
             
@@ -225,6 +246,7 @@
                     $modulo->change_count = "";
                     $modulo->date_modified = date("Y-m-d");
                     $modulo->date_created = date("Y-m-d");
+                    $modulo->settings = "";
                     
             
             // *** estic - tables - fin - 3 ***
@@ -234,3 +256,9 @@
         }
 
         // *** estic - model_file - end ***
+            
+            
+            
+            
+            
+            
