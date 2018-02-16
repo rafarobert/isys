@@ -150,153 +150,107 @@ class Ctrl_Migrate extends Base_Controller
             $modType = explode('_',$tables[0]['@attributes']['name'])[0];
         }
 
-        foreach ($tables as $i => $data)
-        {
+        foreach ($tables as $i => $data) {
             $id_table = '';
-
             $fields = array();
-
             $tableAttributes = $data['@attributes'];
 
-            foreach ($data['column'] as $j => $params)
-            {
-                if(isset($params['@attributes']) && $params['@attributes'] != []){
-
-                    $fieldAttributes = $params['@attributes'];
-
-                    if(isset($fieldAttributes['name']) && $fieldAttributes['name'] != "")
-                    {
-                        if(isset($fieldAttributes['type']) && $fieldAttributes['type'] != null){
-
-                            $fields[$fieldAttributes['name']]['type'] = $fieldAttributes['type'];
-                        }
-
-                        if(isset($fieldAttributes['size']) && $fieldAttributes['size'] != null){
-
-                            $fields[$fieldAttributes['name']]['constraint'] = intval($fieldAttributes['size']);
-                        }
-
-                        if(isset($fieldAttributes['autoIncrement']) && $fieldAttributes['autoIncrement'] != null){
-
-                            $fields[$fieldAttributes['name']]['auto_increment'] = TRUE;
-                        }
-
-                        if(isset($fieldAttributes['required']) && $fieldAttributes['required'] != null){
-
-                            $fields[$fieldAttributes['name']]['unsigned'] = TRUE;
-                        }
-
-                        if(isset($fieldAttributes['defaultValue']) && $fieldAttributes['defaultValue'] != null){
-
-                            $fields[$fieldAttributes['name']]['default'] = $fieldAttributes['defaultValue'];
-                        }
-
-                        if(isset($fieldAttributes['sqlType']) && $fieldAttributes['sqlType'] != null)
-                        {
-                            list($typeConstr, $bUnsigned) = explode(' ', $fieldAttributes['sqlType']);
-
-                            preg_match("/[0-9]{1,11}/", $typeConstr,$aConstraint);
-
-                            preg_match("/[A-Za-z-]+/", $typeConstr,$aType);
-
-                            $constraint = null;
-                            $type = null;
-
-                            if(count($aConstraint))
-                            {
-                                $constraint = $aConstraint[0];
+            if(isset($data['column']) && count($data['column'])){
+                foreach ($data['column'] as $j => $params) {
+                    if(isset($params['@attributes']) && $params['@attributes'] != []){
+                        $fieldAttributes = $params['@attributes'];
+                        if(isset($fieldAttributes['name']) && $fieldAttributes['name'] != "") {
+                            if(isset($fieldAttributes['type']) && $fieldAttributes['type'] != null){
+                                $fields[$fieldAttributes['name']]['type'] = $fieldAttributes['type'];
                             }
-
-                            if(count($aType))
-                            {
-                                $type = $aType[0];
+                            if(isset($fieldAttributes['size']) && $fieldAttributes['size'] != null){
+                                $fields[$fieldAttributes['name']]['constraint'] = intval($fieldAttributes['size']);
                             }
-
-                            $fields[$fieldAttributes['name']]['constraint'] = intval($constraint);
-
-                            $fields[$fieldAttributes['name']]['type'] = $type;
-
-                            $fields[$fieldAttributes['name']]['unsigned'] = isset($bUnsigned) ? true : null;
-                        }
-
-                        if(isset($fieldAttributes['primaryKey']) && $fieldAttributes['primaryKey'])
-                        {
-                            if(isset($fieldAttributes['name']))
+                            if(isset($fieldAttributes['autoIncrement']) && $fieldAttributes['autoIncrement'] != null){
+                                $fields[$fieldAttributes['name']]['auto_increment'] = TRUE;
+                            }
+                            if(isset($fieldAttributes['required']) && $fieldAttributes['required'] != null){
+                                $fields[$fieldAttributes['name']]['unsigned'] = TRUE;
+                            }
+                            if(isset($fieldAttributes['defaultValue']) && $fieldAttributes['defaultValue'] != null){
+                                $fields[$fieldAttributes['name']]['default'] = $fieldAttributes['defaultValue'];
+                            }
+                            if(isset($fieldAttributes['sqlType']) && $fieldAttributes['sqlType'] != null)
                             {
-                                $this->dbforge->keys = $fieldAttributes['name'];
-
-                                $id_table = $fieldAttributes['name'];
+                                list($typeConstr, $bUnsigned) = explode(' ', $fieldAttributes['sqlType']);
+                                preg_match("/[0-9]{1,11}/", $typeConstr,$aConstraint);
+                                preg_match("/[A-Za-z-]+/", $typeConstr,$aType);
+                                $constraint = null;
+                                $type = null;
+                                if(count($aConstraint)) {
+                                    $constraint = $aConstraint[0];
+                                }
+                                if(count($aType)) {
+                                    $type = $aType[0];
+                                }
+                                $fields[$fieldAttributes['name']]['constraint'] = intval($constraint);
+                                $fields[$fieldAttributes['name']]['type'] = $type;
+                                $fields[$fieldAttributes['name']]['unsigned'] = isset($bUnsigned) ? true : null;
+                            }
+                            if(isset($fieldAttributes['primaryKey']) && $fieldAttributes['primaryKey']) {
+                                if(isset($fieldAttributes['name'])) {
+                                    $this->dbforge->keys = $fieldAttributes['name'];
+                                    $id_table = $fieldAttributes['name'];
+                                }
                             }
                         }
                     }
                 }
             }
-            if(isset($data['foreign-key'] )){
 
-                $fk_keys = array();
-
-                if(isset($data['foreign-key']['@attributes']) && isset($data['foreign-key']['reference']['@attributes']))
-                {
-                    $fk_attributes = $data['foreign-key']['@attributes'];
-                    $fk_reference = $data['foreign-key']['reference']['@attributes'];
-                    $fk_keys[] = array(
-                        $fk_attributes['name'] => array(
-                            'table' => $fk_attributes['foreignTable'],
-                            'id' => $fk_reference['local']
-                        )
-                    );
-                } else {
-
-                    foreach ($data['foreign-key'] as $k => $fk_params)
-                    {
-                        if(is_numeric($k))
-                        {
-                            if(isset($fk_params['@attributes']) && isset($fk_params['reference']['@attributes']))
-                            {
+            if(isset($data['foreign-key'])){
+                if(isset($data['foreign-key'][0])){
+                    $fk_keys = array();
+                    foreach ($data['foreign-key'] as $k => $fk_params) {
+                        if(is_numeric($k)) {
+                            if(isset($fk_params['@attributes']) && isset($fk_params['reference']['@attributes'])) {
                                 $fk_attributes = $fk_params['@attributes'];
                                 $fk_reference = $fk_params['reference']['@attributes'];
                                 $fk_keys[] = array(
                                     $fk_attributes['name'] => array(
                                         'table' => $fk_attributes['foreignTable'],
-                                        'id' => $fk_reference['local']
+                                        'idLocal' => $fk_reference['local'],
+                                        'idForeign' => $fk_reference['foreign']
                                     )
                                 );
                             }
                         }
                     }
+                } else {
+                    $fk_attributes = $data['foreign-key']['@attributes'];
+                    $fk_reference = $data['foreign-key']['reference']['@attributes'];
+                    $fk_keys[] = array(
+                        $fk_attributes['name'] => array(
+                            'table' => $fk_attributes['foreignTable'],
+                            'idLocal' => $fk_reference['local'],
+                            'idForeign' => $fk_reference['foreign']
+                        )
+                    );
                 }
                 $this->migration->_keys = $fk_keys;
             } else {
-
                 $this->migration->_keys = [];
             }
 
             $_POST['bRewrite'] = true;
-
             $this->dbforge->fields = $fields;
-
             $this->migration->_id_table = $id_table;
-
             if(substr_count($tableAttributes['name'], '_') == 1) {
-
                 $mod = explode('_', $tableAttributes['name'])[0];
-
                 if($modType != $mod){
-
                     $migIndex = 0;
-
                     $modType = $mod;
                 }
             }
-
             $migIndex++;
-
             $strMigIndex = str_pad("$migIndex", 3, "0", STR_PAD_LEFT);
-
             $this->migration->add_migration_index($strMigIndex);
-
             if($this->migration->set_params($tableAttributes['name'])){
-
                 $this->migration->create_migration();
             }
         }

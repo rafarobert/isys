@@ -2,8 +2,8 @@
         /**
          * Created by Estic.
          * User: RaFaEl Gutierrez Gaspar
-         * Date: 07/02/2018
-         * Time: 2:42 am
+         * Date: 16/02/2018
+         * Time: 3:34 am
          */
         
         defined("BASEPATH") OR exit("No direct script access allowed");
@@ -40,20 +40,6 @@
                          */
                          
                 public $data;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        int
-                         */
-                         
-                public $ci_usuarios_id_usuario;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        int
-                         */
-                         
-                public $hbf_usuarios_id_usuario;
                 
             
             // *** estic - tables - fin - 1 ***
@@ -85,18 +71,6 @@
                     "rules" => "trim|required"
                 ),
                 
-                "ci_usuarios_id_usuario" => array(
-                    "field" => "ci_usuarios_id_usuario",
-                    "label" => "Ci_usuarios_id_usuario",
-                    "rules" => "trim|required|max_length[11]"
-                ),
-                
-                "hbf_usuarios_id_usuario" => array(
-                    "field" => "hbf_usuarios_id_usuario",
-                    "label" => "Hbf_usuarios_id_usuario",
-                    "rules" => "trim|required|max_length[11]"
-                ),
-                
             
             // *** estic - tables - fin - 2 ***
             
@@ -124,18 +98,6 @@
                     "rules" => "trim|required"
                 ),
                 
-                "ci_usuarios_id_usuario" => array(
-                    "field" => "ci_usuarios_id_usuario",
-                    "label" => "Ci_usuarios_id_usuario",
-                    "rules" => "trim|required|max_length[11]"
-                ),
-                
-                "hbf_usuarios_id_usuario" => array(
-                    "field" => "hbf_usuarios_id_usuario",
-                    "label" => "Hbf_usuarios_id_usuario",
-                    "rules" => "trim|required|max_length[11]"
-                ),
-                
             
             // *** estic - tables - fin - 2 ***
             
@@ -153,8 +115,6 @@
             $session->ip_address = "";
                     $session->timestamp = "";
                     $session->data = "";
-                    $session->ci_usuarios_id_usuario = "";
-                    $session->hbf_usuarios_id_usuario = "";
                     
             
             // *** estic - tables - fin - 3 ***

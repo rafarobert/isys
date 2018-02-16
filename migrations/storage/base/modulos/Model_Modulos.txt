@@ -2,8 +2,8 @@
         /**
          * Created by Estic.
          * User: RaFaEl Gutierrez Gaspar
-         * Date: 07/02/2018
-         * Time: 2:42 am
+         * Date: 16/02/2018
+         * Time: 3:34 am
          */
         
         defined("BASEPATH") OR exit("No direct script access allowed");
@@ -64,10 +64,24 @@
                 /**
                          * The value for the title field.
                          *
-                         * @var        datetime
+                         * @var        int
                          */
                          
-                public $date_created;
+                public $change_count;
+                /**
+                         * The value for the title field.
+                         *
+                         * @var        int
+                         */
+                         
+                public $id_user_modified;
+                /**
+                         * The value for the title field.
+                         *
+                         * @var        int
+                         */
+                         
+                public $id_user_created;
                 /**
                          * The value for the title field.
                          *
@@ -75,6 +89,13 @@
                          */
                          
                 public $date_modified;
+                /**
+                         * The value for the title field.
+                         *
+                         * @var        datetime
+                         */
+                         
+                public $date_created;
                 
             
             // *** estic - tables - fin - 1 ***
@@ -124,6 +145,12 @@
                     "rules" => "trim|required|max_length[15]"
                 ),
                 
+                "change_count" => array(
+                    "field" => "change_count",
+                    "label" => "Change_count",
+                    "rules" => "trim|required"
+                ),
+                
             
             // *** estic - tables - fin - 2 ***
             
@@ -169,6 +196,12 @@
                     "rules" => "trim|required|max_length[15]"
                 ),
                 
+                "change_count" => array(
+                    "field" => "change_count",
+                    "label" => "Change_count",
+                    "rules" => "trim|required"
+                ),
+                
             
             // *** estic - tables - fin - 2 ***
             
@@ -189,8 +222,9 @@
                     $modulo->icon = "";
                     $modulo->opt_estado = "";
                     $modulo->opt_listado = "";
-                    $modulo->date_created = date("Y-m-d");
+                    $modulo->change_count = "";
                     $modulo->date_modified = date("Y-m-d");
+                    $modulo->date_created = date("Y-m-d");
                     
             
             // *** estic - tables - fin - 3 ***

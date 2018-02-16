@@ -2,8 +2,8 @@
         /**
          * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
-         * Date: 07/02/2018
-         * Time: 2:42 am
+         * Date: 16/02/2018
+         * Time: 3:33 am
          * @property Model_Modulos $model_modulos
          */
         
@@ -56,6 +56,7 @@
                 "icon",
                 "opt_estado",
                 "opt_listado",
+                "change_count",
                 
         // *** estic - tables - fin ***
         ));
@@ -73,8 +74,6 @@
                 $this->model_modulos->delete($id);
                 redirect("base/modulos");
             }
-
-            
         }
 
         // *** estic - ctrl_file - end ***

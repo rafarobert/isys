@@ -2,8 +2,8 @@
         /**
          * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
-         * Date: 07/02/2018
-         * Time: 2:42 am
+         * Date: 16/02/2018
+         * Time: 3:34 am
          * @var Model_Usuarios $model_usuarios
          * @var Model_Usuarios $usuarios
          * @var Model_Usuarios $usuario
@@ -123,13 +123,14 @@
                                 <div class="col-sm-6">
                                 <div class="two-columns">
                                 <?php if(isset($oUsuario->imgThumb)){?>
-                                    <img class="img-thumb-1" src="<?=site_url("img/usuarios/thumbs/".$oUsuario->imgThumb)?>"/>
+                                    <img class="img-thumb-1" id="imgThumb" src="<?=site_url("img/usuarios/thumbs/".$oUsuario->imgThumb)?>"/>
                                 <?php }?>
                                 <?php
                                 $data = array(
                                      "name" => "img",
                                      "id" => "fieldImg",
                                      "class" => "form-control ",
+                                     "onchange" => "oImgs.showThisImg(this)",
                                      "value" => set_value("img", $oUsuario->img),
                                      "type" => "text"
                                  );

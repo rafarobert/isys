@@ -2,8 +2,8 @@
         /**
          * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
-         * Date: 07/02/2018
-         * Time: 2:42 am
+         * Date: 16/02/2018
+         * Time: 3:34 am
          * @var Model_Modulos $model_modulos
          * @var Model_Modulos $modulos
          * @var Model_Modulos $modulo
@@ -85,6 +85,23 @@
                     <?php echo form_error("opt_estado"); ?>
                     
                     <?php echo form_error("opt_listado"); ?>
+                    
+                    
+                            <div class="form-group row">
+                                <label for="fieldChangeCount" class="col-sm-4 col-form-label col-form-label-md">Change Count  </label>
+                                <div class="col-sm-6">
+                                <?php
+                                $data = array(
+                                     "name" => "change_count",
+                                     "id" => "fieldChangeCount",
+                                     "class" => "form-control ",
+                                     "value" => set_value("change_count", $oModulo->change_count),
+                                     "type" => "number"
+                                 );
+                                 echo form_input($data, "", "") ?>
+                                 </div>
+                                 </div>
+                                 <?php echo form_error("change_count"); ?>
                     
                     
         

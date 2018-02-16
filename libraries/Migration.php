@@ -754,7 +754,7 @@ class CI_Migration
 
                     $name = array_keys($key)[0];
 
-                    $this->_update_indexes_foreignKeys($key[$name]['id'], $keys, $this->_fields, $table_name);
+                    $this->_update_indexes_foreignKeys($key[$name]['idLocal'], $keys, $this->_fields, $table_name);
                 }
             }
         }
@@ -802,7 +802,9 @@ class CI_Migration
                 'url' => config_item('sys')[$mod]['dir']."$submod",
                 'descripcion' => isset($settings['description']) ? $settings['descripcion'] : '',
                 'opt_estado' => isset($settings['status']) ? $settings['status'] : '',
-                'opt_listado' => isset($settings['listed']) ? $settings['listed'] : ''
+                'opt_listado' => isset($settings['listed']) ? $settings['listed'] : '',
+                'id_user_created' => 1,
+                'id_user_modified' => 1
             );
 
             if($nameModelModules != '' && $table_name != $labelOfModule."_modulos"){
@@ -828,6 +830,7 @@ class CI_Migration
                 $this->dbforge->drop_table('migrations');
                 header("Refresh:0");
             } else if (isset($oMigrations[0])) {
+
                 $this->db->query('DELETE FROM `migrations` WHERE `version`=' . $oMigrations[0]->version);
                 $this->db->query('INSERT INTO `migrations`(`version`) VALUES (' . intval($id_migration - 1) . ')');
             } else {
@@ -1027,6 +1030,8 @@ class CI_Migration
                 $this->_dir_migrations_files = $this->CI->uri->segments[4] == 'ci' || $this->CI->uri->segments[4] == 'tic' ? BASEPATH . "migrations/tables/" :APPPATH . "migrations/tables/" ;
                 $this->_dir_root_store = $this->CI->uri->segments[4] == 'ci' || $this->CI->uri->segments[4] == 'tic' ? BASEPATH . "migrations/storage/" :APPPATH . "migrations/storage/";
             }
+
+            $this->_id_table = $this->dbforge->getKeyFromTable($table_name);
 
             $this->_mod = $mod_name;
             $this->_sub_mod = $sub_modulo;
@@ -2173,9 +2178,22 @@ class CI_Migration
             public function delete($id){
                 $this->model_' . $this->_sub_mod_p . '->delete($id);
                 redirect("' . $this->_mod . '/' . $this->_sub_mod_p . '");
-            }
+            }';
 
+        if($this->_sub_mod_p == 'sessions'){
+            $content .= '
+            public function login(){
+                $this->session->login();
+            }
+            public function logout(){
+                $this->session->logout();
+            }
+            public function signup(){
+                $this->session->signUp();
+            }
             ';
+        }
+
         $content .= '
         }
 
@@ -3451,7 +3469,8 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
                 $content .= '
             "'.$name[0].'" => array(
                 "table" => "'.$fk_settings[$name[0]]['table'].'",
-                "id" => "'.$fk_settings[$name[0]]['id'].'",
+                "idLocal" => "'.$fk_settings[$name[0]]['idLocal'].'",
+                "idForeign" => "'.$fk_settings[$name[0]]['idForeign'].'",
             ),';
             }
             $content .= '
@@ -3688,69 +3707,57 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
             {
                 foreach ($keys as $i => $key)
                 {
-                    foreach ($key as $name => $settings)
+                    foreach ($key as $constraintName => $settings)
                     {
                         if(is_array($settings) && $this->db->table_exists($settings['table']))
                         {
-                            $link = $name;
                             $table = $settings['table'];
-                            $id_table = $settings['id'];
-                            $sqlQueryToVerify = "SELECT TABLE_NAME,COLUMN_NAME, CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE CONSTRAINT_SCHEMA='".$this->db->database."' AND TABLE_NAME='$table_name' AND REFERENCED_TABLE_NAME = '$table' AND CONSTRAINT_NAME='$name' AND REFERENCED_COLUMN_NAME='$id_table'";
-                            $sqlQueryFieldExists = "Select COLUMN_NAME from information_schema.`COLUMNS` where TABLE_SCHEMA='".$this->db->database."' and TABLE_NAME='".$table_name."' and COLUMN_NAME='".$id_table."'";
-                            $queryVerifyIfExists = $this->db->query($sqlQueryToVerify,false,true)->row();
-                            $queryVerifyFields = $this->db->query($sqlQueryFieldExists)->row();
-                            if(in_array($id_table, $fields_new_table))
+                            $idForeign = $settings['idForeign'];
+                            $idLocal = $settings['idLocal'];
+
+                            if(in_array($idLocal, $fields_new_table))
                             {
                                 $fk_field = [];
                                 $fk_table = $this->db->field_data($table);
                                 foreach ($fk_table as $i => $set) {
-                                    if($set->name == $id_table && $set->primary_key){
+                                    if($set->name == $idForeign && $set->primary_key){
                                         $fk_field = $set;
                                         break;
                                     }
                                 }
                                 if(count($fk_field)){
-                                    if ($fields[$id_table]['type'] == $fk_field->type ||
-                                        $fields[$id_table]['type'] == strtoupper($fk_field->type) ||
-                                        $fields[$id_table]['type'] == ucfirst($fk_field->type) &&
-                                        $fields[$id_table]['default'] == $fk_field->default ||
-                                        $fields[$id_table]['default'] == strtoupper($fk_field->default) ||
-                                        $fields[$id_table]['default'] == ucfirst($fk_field->default) &&
-                                        intval($fields[$id_table]['constraint']) == intval($fk_field->max_length)
+                                    if ($fields[$idForeign]['type'] == $fk_field->type ||
+                                        $fields[$idForeign]['type'] == strtoupper($fk_field->type) ||
+                                        $fields[$idForeign]['type'] == ucfirst($fk_field->type) &&
+                                        $fields[$idForeign]['default'] == $fk_field->default ||
+                                        $fields[$idForeign]['default'] == strtoupper($fk_field->default) ||
+                                        $fields[$idForeign]['default'] == ucfirst($fk_field->default) &&
+                                        intval($fields[$idForeign]['constraint']) == intval($fk_field->max_length)
                                     ) {
-                                        if(!isset($queryVerifyIfExists->CONSTRAINT_NAME))
-                                        {
-                                            if(isset($queryVerifyFields->COLUMN_NAME)){
-
-                                                $this->db->query('ALTER TABLE `' . $table_name . '` ADD CONSTRAINT `' . $name . '` FOREIGN KEY (`' . $id_table . '`) REFERENCES `' . $table . '` (`' . $id_table . '`) ON UPDATE CASCADE ON DELETE CASCADE');
+                                        if(!$this->dbforge->hasRelation($table_name, $this->_id_table, $table, $idForeign, $constraintName)) {
+                                            if($this->dbforge->fieldExistsInDB($table_name, $idLocal)){
+                                                $this->dbforge->setRelation($table_name, $this->_id_table, $table, $idForeign, $constraintName);
                                             } else {
-
                                                 header("Refresh:0");
                                             }
                                         }
                                     } else {
-                                        show_error('Verifica que el campo '.$link.' de la actual tabla '.$table_name.' tenga las mismas propiedades en la tabla '.$table);
+                                        show_error('Verifica que el campo '.$idLocal.' de la actual tabla '.$table_name.' tenga las mismas propiedades en la tabla '.$table);
                                     }
                                 } else {
-                                    show_error('Verifica que el campo '.$link.' ha sido instanciado de la misma manera en la tabla '.$table );
+                                    show_error('Verifica que el campo '.$idLocal.' ha sido instanciado de la misma manera en la tabla '.$table );
                                 }
                             }
-                            else if($this->db->field_exists($id_table,$table_name))
-                            {
-                                if(isset($queryVerifyIfExists->CONSTRAINT_NAME))
-                                {
-                                    if(isset($queryVerifyFields->COLUMN_NAME))
-                                    {
-                                        $this->db->query('ALTER TABLE `' . $table_name . '` DROP FOREIGN KEY `' . $name . '`');
+                            else if($this->db->field_exists($idLocal,$table_name)) {
+                                if($this->dbforge->hasRelation($table_name, $this->_id_table, $table, $idForeign, $constraintName)) {
+                                    if($this->dbforge->fieldExistsInDB($table_name, $idLocal)) {
+                                        $this->dbforge->removeRelation($table_name, $constraintName);
                                     }
                                 }
                             }
                         } else {
-
                             $migIndex = $this->getMigrationIndexFromTableName($settings['table']);
-
                             $mod = '';
-
                             if(isset(explode('_',$table_name)[1])){
                                 $mod = explode('_',$table_name)[0];
                             } else {
@@ -3760,8 +3767,6 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
                         }
                     }
                 }
-            } else {
-
             }
         }
     }

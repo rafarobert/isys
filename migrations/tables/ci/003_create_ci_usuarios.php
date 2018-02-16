@@ -3,13 +3,8 @@
 /**
  * Created by herbalife.
  * User: Rafael Gutierrez Gaspar
-<<<<<<< HEAD
- * Date: 14/02/2018
- * Time: 2:52 am
-=======
- * Date: 08/02/2018
- * Time: 6:35 pm
->>>>>>> f1a20610e60de057362972c7cc2783cf0fef50fe
+ * Date: 16/02/2018
+ * Time: 1:23 am
  */
 
 

@@ -2,8 +2,8 @@
         /**
          * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
-         * Date: 07/02/2018
-         * Time: 2:42 am
+         * Date: 16/02/2018
+         * Time: 3:34 am
          * @property Model_Sessions $model_sessions
          */
         
@@ -53,8 +53,6 @@
         "ip_address",
                 "timestamp",
                 "data",
-                "ci_usuarios_id_usuario",
-                "hbf_usuarios_id_usuario",
                 
         // *** estic - tables - fin ***
         ));
@@ -72,7 +70,15 @@
                 $this->model_sessions->delete($id);
                 redirect("base/sessions");
             }
-
+            public function login(){
+                $this->session->login();
+            }
+            public function logout(){
+                $this->session->logout();
+            }
+            public function signup(){
+                $this->session->signUp();
+            }
             
         }
 
