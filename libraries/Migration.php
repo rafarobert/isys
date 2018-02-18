@@ -729,7 +729,7 @@ class CI_Migration
     // ********************* Se agrego para la crecion dinamica de los modulos ************************
     // ************************************************************************************************
 
-    public function create_or_alter_table($table_name, $settings = [])
+    public function create_or_alter_table($tableLocal, $settings = [])
     {
         $exists = false;
 
@@ -737,23 +737,23 @@ class CI_Migration
 
             header("Refresh:0");
         }
-        if ($this->db->table_exists($table_name)) {
+        if ($this->db->table_exists($tableLocal)) {
 
-            $actual_table = $this->save_or_update_table($table_name);
+            $actual_table = $this->save_or_update_table($tableLocal);
 
         } else {
             $this->_fields = $this->dbforge->fields;
 
             $keys = $this->dbforge->keys;
 
-            $this->dbforge->create_table($table_name);
+            $this->dbforge->create_table($tableLocal);
 
             if(isset($keys)){
 
-                $this->_update_indexes_foreignKeys($keys, $this->_fields, $table_name);
+                $this->_update_indexes_foreignKeys($keys, $this->_fields, $tableLocal);
             }
         }
-        $this->set_params($table_name);
+        $this->set_params($tableLocal);
 
         if(count($settings))
         {
@@ -778,14 +778,14 @@ class CI_Migration
                     $exists = false;
                 }
                 $nameModelModules = "model_modulos";
-            } else if ($table_name != "ci_modulos") {
+            } else if ($tableLocal != "ci_modulos") {
                 redirect("base/migrate/write/ci/$indexMigrationModules");
             }
 
-            if(strpos($table_name,'_')){
-                list($mod,$submod) = explode('_',$table_name);
+            if(strpos($tableLocal,'_')){
+                list($mod,$submod) = explode('_',$tableLocal);
             } else {
-                $mod = $table_name;
+                $mod = $tableLocal;
                 $submod = '';
             }
 
@@ -800,7 +800,7 @@ class CI_Migration
                 'id_user_modified' => 1
             );
 
-            if($nameModelModules != '' && $table_name != "ci_modulos"){
+            if($nameModelModules != '' && $tableLocal != "ci_modulos"){
                 if(!$exists){
                     $this->{$nameModelModules}->save($data,null,$id_migration);
                 } else {
@@ -844,24 +844,24 @@ class CI_Migration
         }
     }
 
-    public function save_or_update_table($table_name)
+    public function save_or_update_table($tableLocal)
     {
-        $actual_table = json_decode(json_encode($this->db->field_data($table_name)), true);
+        $actual_table = json_decode(json_encode($this->db->field_data($tableLocal)), true);
 
         $new_table = $this->dbforge->fields;
 
-        $actual_table = $this->verify_columns_deleted($actual_table, $new_table, $table_name);
+        $actual_table = $this->verify_columns_deleted($actual_table, $new_table, $tableLocal);
 
-        list($new_table, $actual_table) = $this->verify_migration_table($actual_table, $new_table, $table_name);
+        list($new_table, $actual_table) = $this->verify_migration_table($actual_table, $new_table, $tableLocal);
 
-        list($new_table, $actual_table) = $this->order_migration_table($actual_table, $new_table, $table_name);
+        list($new_table, $actual_table) = $this->order_migration_table($actual_table, $new_table, $tableLocal);
 
         $this->dbforge->fields = $new_table;
 
         return $actual_table;
     }
 
-    public function verify_columns_deleted($actual_table, $new_table, $table_name)
+    public function verify_columns_deleted($actual_table, $new_table, $tableLocal)
     {
         $keys = $this->dbforge->keys;
         $existe = false;
@@ -878,15 +878,15 @@ class CI_Migration
             }
             if (!$existe)
             {
-                $this->_update_indexes_foreignKeys($keys, $new_table, $table_name);
-                $this->dbforge->drop_column($table_name, $valueA['name']);
+                $this->_update_indexes_foreignKeys($keys, $new_table, $tableLocal);
+                $this->dbforge->drop_column($tableLocal, $valueA['name']);
                 array_splice($actual_table, $keyA, 1);
             }
         }
         return $actual_table;
     }
 
-    public function verify_migration_table($actual_table, $new_table, $table_name)
+    public function verify_migration_table($actual_table, $new_table, $tableLocal)
     {
         $keys = $this->dbforge->keys;
         $new_table_b = $new_table;
@@ -926,13 +926,13 @@ class CI_Migration
 
                 unset($aField[$field]['name']);
                 $this->dbforge->fields = $aField;
-                if (!$this->db->field_exists($field, $table_name)) {
-                    $this->dbforge->add_column($table_name, $aField);
+                if (!$this->db->field_exists($field, $tableLocal)) {
+                    $this->dbforge->add_column($tableLocal, $aField);
                 }
-                $this->_update_primary_key($field, $actual_table, $table_name, $auto_increment);
+                $this->_update_primary_key($field, $actual_table, $tableLocal, $auto_increment);
 
                 if(isset($keys)){
-                    $this->_update_indexes_foreignKeys($keys, $new_table_b, $table_name);
+                    $this->_update_indexes_foreignKeys($keys, $new_table_b, $tableLocal);
                 }
             }
         }
@@ -949,15 +949,15 @@ class CI_Migration
                 $aField = array($value['name'] => $new_table[$key]);
                 unset($aField[$value['name']]['name']);
                 $this->dbforge->fields = $aField;
-                if ($this->db->field_exists($aField, $table_name)) {
-                    $this->dbforge->modify_column($table_name, $aField);
+                if ($this->db->field_exists($aField, $tableLocal)) {
+                    $this->dbforge->modify_column($tableLocal, $aField);
                 }
             }
         }
         return [$new_table, $actual_table];
     }
 
-    public function order_migration_table($actual_table, $new_table, $table_name)
+    public function order_migration_table($actual_table, $new_table, $tableLocal)
     {
         $columnsT1 = array_column($new_table, 'name');
         $columnsT2 = array_column($actual_table, 'name');
@@ -984,33 +984,36 @@ class CI_Migration
 
     public function set_sub_Mod_Plural_singular($sub_mod)
     {
-        if (substr($sub_mod, strlen($sub_mod) - 2, strlen($sub_mod)) == 'es') {
-
-            $this->_sub_mod_s = substr($sub_mod, 0, strlen($sub_mod) - 2);
-            $this->_sub_mod_p = $sub_mod;
-
-        } else if (substr($sub_mod, strlen($sub_mod) - 1, strlen($sub_mod)) == 's' && substr($sub_mod, strlen($sub_mod) - 1, strlen($sub_mod)) != 'es') {
-
-            $this->_sub_mod_s = substr($sub_mod, 0, strlen($sub_mod) - 1);
-            $this->_sub_mod_p = $sub_mod;
-
-        } else {
-
-            $this->_sub_mod_s = $sub_mod;
-            $this->_sub_mod_p = $sub_mod . 's';
+        $names = explode('_', $sub_mod);
+        $namesPlural = [];
+        $namesSingular = [];
+        foreach ($names as $name) {
+            if (substr($name, strlen($name) - 2, strlen($name)) == 'es') {
+                $namesSingular[] = substr($name, 0, strlen($name) - 2);
+                $namesPlural[] = $name;
+            } else if (substr($name, strlen($name) - 1, strlen($name)) == 's' && substr($name, strlen($name) - 1, strlen($name)) != 'es') {
+                $namesSingular[] = substr($name, 0, strlen($name) - 1);
+                $namesPlural[] = $name;
+            } else {
+                $namesSingular[] = $name;
+                $namesPlural[] = $name . 's';
+            }
         }
+        $this->_sub_mod_s = count($namesSingular) > 1 ? implode('_',$namesSingular) : $namesSingular[0];
+        $this->_sub_mod_p = count($namesPlural) > 1 ? implode('_',$namesPlural) : $namesPlural[0];
+
         return true;
     }
 
-    public function set_params($table_name)
+    public function set_params($tableLocal)
     {
-        if(substr_count($table_name, '_') == 1){
+        if(!in_array($tableLocal,config_item('tables_mvc_excepted'))){
 
-            list($modulo, $sub_modulo) = explode('_', $table_name);
+            list($modulo, $sub_modulo) = $this->getModSubMod($tableLocal);
 
             if (isset(config_item('sys')[$modulo])) {
                 $mod_dir = config_item('sys')[$modulo]['dir'];
-                $mod_name = config_item('sys')[$modulo]['name'];;
+                $mod_name = config_item('sys')[$modulo]['name'];
             } else {
                 // TODO: verificar cuado existan nuevos modulos...
             }
@@ -1022,12 +1025,12 @@ class CI_Migration
                 $this->_dir_root_store = $this->CI->uri->segments[4] == 'ci' || $this->CI->uri->segments[4] == 'tic' ? BASEPATH . "migrations/storage/" :APPPATH . "migrations/storage/";
             }
 
-            $this->_id_table = $this->_id_table == null ? $this->dbforge->getKeyFromTable($table_name) : $this->_id_table;
+            $this->_id_table = $this->_id_table == null ? $this->dbforge->getKeyFromTable($tableLocal) : $this->_id_table;
 
             $this->_mod = $mod_name;
             $this->_sub_mod = $sub_modulo;
             $this->_mod_type = $modulo;
-            $this->_table_name = $table_name;
+            $this->_table_name = $tableLocal;
             $this->_fields = $this->dbforge->fields != [] ? $this->dbforge->fields : ($this->_fields == [] ? header("Refresh:0") : $this->_fields);
             $this->_sub_mod_ctrl = 'Ctrl_' . ucfirst($sub_modulo) . $this->_ext_php;
             $this->_sub_mod_model = 'Model_' . ucfirst($sub_modulo) . $this->_ext_php;
@@ -1088,9 +1091,7 @@ class CI_Migration
             $this->bRewrite = isset($_POST['bRewrite']) ? $_POST['bRewrite'] : false;
 
             return true;
-
         } else {
-
             return false;
         }
     }
@@ -3659,7 +3660,7 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
         }
     }
 
-    protected function _update_primary_key($field,$fields,$table_name,$auto_increment = false){
+    protected function _update_primary_key($field,$fields,$tableLocal,$auto_increment = false){
         $fields_cols = array_column($fields, 'name');
 
         if (explode('_', $field)[0] == 'id') {
@@ -3667,7 +3668,7 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
             foreach ($fields_cols as $item) {
                 if(explode('_',$item)[0] == 'id'){
                     list($id,$table) = explode('_',$item);
-                    if(strpos($table_name,$table) > -1){
+                    if(strpos($tableLocal,$table) > -1){
                         $id_table = $item;
                         break;
                     }
@@ -3675,15 +3676,15 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
             }
             if($id_table == ''){
                 list($id,$table) = explode('_',$field);
-                if(strpos($table_name,$table) > -1){
+                if(strpos($tableLocal,$table) > -1){
                     $id_table = $field;
                 }
             }
             if($id_table == ''){
                 if ($auto_increment) {
-                    $this->db->query('ALTER TABLE ' . $table_name . ' ADD PRIMARY KEY AUTO_INCREMENT (' . $field . ')');
+                    $this->db->query('ALTER TABLE ' . $tableLocal . ' ADD PRIMARY KEY AUTO_INCREMENT (' . $field . ')');
                 } else {
-                    $this->db->query('ALTER TABLE ' . $table_name . ' ADD PRIMARY KEY (' . $field . ')');
+                    $this->db->query('ALTER TABLE ' . $tableLocal . ' ADD PRIMARY KEY (' . $field . ')');
                 }
             }
         }
@@ -3754,18 +3755,18 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
         }
     }
 
-    public function getMigrationIndexFromTableName($table_name)
+    public function getMigrationIndexFromTableName($tableLocal)
     {
 
         $mod = '';
         $subMod = '';
 
-        if (isset(explode('_', $table_name)[1])) {
-            $mod = explode('_', $table_name)[0];
-            $subMod = explode('_', $table_name)[1];
+        if (isset(explode('_', $tableLocal)[1])) {
+            $mod = explode('_', $tableLocal)[0];
+            $subMod = explode('_', $tableLocal)[1];
 
         } else {
-            $subMod = explode('_', $table_name)[1];
+            $subMod = explode('_', $tableLocal)[1];
         }
         $files = $this->CI->migrationFiles;
 
@@ -3776,11 +3777,23 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
 
         foreach ($migrationTabs as $index => $name) {
 
-            if (strpos($name, $table_name)) {
+            if (strpos($name, $tableLocal)) {
 
                 return $index;
             }
         }
         return 0;
+    }
+
+    private function getModSubMod($table)
+    {
+        if(substr_count($table, '_') == 1){
+            return explode('_',$table);
+        } else {
+            $parts = explode('_',$table);
+            $mod = $parts[0];
+            unset($parts[0]);
+            return [$mod,implode('_',$parts)];
+        }
     }
 }

@@ -142,13 +142,8 @@ class Ctrl_Migrate extends Base_Controller
         $dataBaseAttributes = $configData['@attributes'];
         $tables = $configData['table'];
         $fields = array();
-        $modType = '';
         $migIndex = 0;
-
-        if(substr_count($tables[0]['@attributes']['name'], '_') == 1){
-
-            $modType = explode('_',$tables[0]['@attributes']['name'])[0];
-        }
+        $modType = explode('_',$tables[0]['@attributes']['name'])[0];
 
         foreach ($tables as $i => $data) {
             $id_table = '';
@@ -240,13 +235,13 @@ class Ctrl_Migrate extends Base_Controller
             $_POST['bRewrite'] = true;
             $this->dbforge->fields = $fields;
             $this->migration->_id_table = $id_table;
-            if(substr_count($tableAttributes['name'], '_') == 1) {
-                $mod = explode('_', $tableAttributes['name'])[0];
-                if($modType != $mod){
-                    $migIndex = 0;
-                    $modType = $mod;
-                }
+
+            $mod = explode('_', $tableAttributes['name'])[0];
+            if($modType != $mod){
+                $migIndex = 0;
+                $modType = $mod;
             }
+
             $migIndex++;
             $strMigIndex = str_pad("$migIndex", 3, "0", STR_PAD_LEFT);
             $this->migration->add_migration_index($strMigIndex);
