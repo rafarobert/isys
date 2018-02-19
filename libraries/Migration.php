@@ -155,7 +155,7 @@ class CI_Migration
     public $_file_sto_migration;
 
     public $_migration_files = [];
-    public $bRewrite;
+    public $bReset;
 
     /**
      * Whether the library is enabled
@@ -239,11 +239,7 @@ class CI_Migration
             $this->{'_' . $key} = $val;
         }
 
-        if(isset($this->CI->uri->segments[4])){
-            $this->_dir_migrations_files = $this->CI->uri->segments[4] == 'ci' || $this->CI->uri->segments[4] == 'tic' ? BASEPATH . "migrations/tables/" :APPPATH . "migrations/tables/" ;
-            $this->_base_path = $this->CI->uri->segments[4] === 'ci' || $this->CI->uri->segments[4] === 'tic' ? BASEPATH : APPPATH;
-            $this->_migration_path = $this->CI->uri->segments[4] === 'ci' || $this->CI->uri->segments[4] === 'tic' ? BASEPATH : APPPATH;
-        }
+        $this->verifyAppOrBase();
 
         log_message('info', 'Migrations Class Initialized');
 
@@ -779,7 +775,7 @@ class CI_Migration
                 }
                 $nameModelModules = "model_modulos";
             } else if ($tableLocal != "ci_modulos") {
-                redirect("base/migrate/write/ci/$indexMigrationModules");
+                redirect("migrate/set/ci/$indexMigrationModules");
             }
 
             if(strpos($tableLocal,'_')){
@@ -1019,11 +1015,7 @@ class CI_Migration
             }
 
             $this->set_sub_Mod_Plural_singular($sub_modulo);
-            if(isset($this->CI->uri->segments[4])){
-                $this->_base_path = $this->CI->uri->segments[4] == 'ci' || $this->CI->uri->segments[4] == 'tic' ? BASEPATH : APPPATH;
-                $this->_dir_migrations_files = $this->CI->uri->segments[4] == 'ci' || $this->CI->uri->segments[4] == 'tic' ? BASEPATH . "migrations/tables/" :APPPATH . "migrations/tables/" ;
-                $this->_dir_root_store = $this->CI->uri->segments[4] == 'ci' || $this->CI->uri->segments[4] == 'tic' ? BASEPATH . "migrations/storage/" :APPPATH . "migrations/storage/";
-            }
+            $this->verifyAppOrBase();
 
             $this->_id_table = $this->_id_table == null ? $this->dbforge->getKeyFromTable($tableLocal) : $this->_id_table;
 
@@ -1035,15 +1027,15 @@ class CI_Migration
             $this->_sub_mod_ctrl = 'Ctrl_' . ucfirst($sub_modulo) . $this->_ext_php;
             $this->_sub_mod_model = 'Model_' . ucfirst($sub_modulo) . $this->_ext_php;
 
-            $this->_dir_root_mod = $this->_base_path. config_item('dir_modulos');
-            $this->_dir_sub_mod_migrate_views = $this->_base_path. config_item('dir_modulos') . 'estic/migrate/views/';
+            $this->_dir_root_mod = $this->_base_path. 'modules/';
+            $this->_dir_sub_mod_migrate_views = $this->_base_path. 'modules/estic/migrate/views/';
 
             // ************************************************************************
             // ************* Directorios para la carpeta modules dentro de APP ********
             // ************************************************************************
 
             $this->_dir_sub_mod = $this->_dir_root_mod . $mod_name . '/' . $sub_modulo . '/';
-            $this->_dir_sub_mod_views = $this->_dir_root_mod . $mod_name . '/' . $sub_modulo . '/' . config_item('dir_modulos_views');
+            $this->_dir_sub_mod_views = $this->_dir_root_mod . $mod_name . '/' . $sub_modulo . '/views/';
             $this->_dir_sub_mod_views_content = $this->_dir_sub_mod_views . 'content/';
             $this->_dir_mod = $this->_dir_root_mod . $mod_dir;
             $this->_dir_mod_mac = $this->_dir_root_mod . $mod_name . '/';
@@ -1069,7 +1061,7 @@ class CI_Migration
             // ************************************************************************
 
             $this->_dir_sto_sub_mod = $this->_dir_root_store . $mod_name . '/' . $sub_modulo . '/';
-            $this->_dir_sto_sub_mod_views = $this->_dir_root_store . $mod_name . '/' . $sub_modulo . '/' . config_item('dir_modulos_views');
+            $this->_dir_sto_sub_mod_views = $this->_dir_root_store . $mod_name . '/' . $sub_modulo . '/modules/';
             $this->_dir_sto_sub_mod_views_content = $this->_dir_sto_sub_mod_views . 'content/';
             $this->_dir_sto_mod = $this->_dir_root_store . $mod_dir;
             $this->_dir_sto_mod_mac = $this->_dir_root_store . $mod_name . '/';
@@ -1088,7 +1080,7 @@ class CI_Migration
             // ************* Se verifica que los campos **********
             // ********************************************************************
 
-            $this->bRewrite = isset($_POST['bRewrite']) ? $_POST['bRewrite'] : false;
+            $this->bReset = isset($_POST['bReset']) ? $_POST['bReset'] : false;
 
             return true;
         } else {
@@ -1284,7 +1276,7 @@ class CI_Migration
 
                     $file = $this->_file_sub_mod_ctrl;
 
-                    if (file_exists($file) && !$this->bRewrite) {
+                    if (file_exists($file) && !$this->bReset) {
 
                         $mensaje = "El Archivo " . $file . " ya fue creado";
 
@@ -1320,7 +1312,7 @@ class CI_Migration
 
                     } else {
 
-                        if (file_exists($this->_file_sto_sub_mod_ctrl) && !$this->bRewrite) {
+                        if (file_exists($this->_file_sto_sub_mod_ctrl) && !$this->bReset) {
 
                             $storage_content = $this->read_file($this->_file_sto_sub_mod_ctrl);
 
@@ -1361,7 +1353,7 @@ class CI_Migration
 
                     $file = $this->_file_sub_mod_model;
 
-                    if (file_exists($file) && !$this->bRewrite) {
+                    if (file_exists($file) && !$this->bReset) {
 
                         $mensaje = "El Archivo " . $file . " ya fue creado";
 
@@ -1430,7 +1422,7 @@ class CI_Migration
 
                     } else {
 
-                        if (file_exists($this->_file_sto_sub_mod_model) && !$this->bRewrite) {
+                        if (file_exists($this->_file_sto_sub_mod_model) && !$this->bReset) {
 
                             $storage_content = $this->read_file($this->_file_sto_sub_mod_model);
 
@@ -1470,7 +1462,7 @@ class CI_Migration
 
                     $file = $this->_file_migration;
 
-                    if (file_exists($file) && !$this->bRewrite) {
+                    if (file_exists($file) && !$this->bReset) {
 
                         $mensaje = "El Archivo " . $file . " ya fue creado";
 
@@ -1506,7 +1498,7 @@ class CI_Migration
 
                     } else {
 
-                        if (file_exists($this->_file_sto_migration) && !$this->bRewrite) {
+                        if (file_exists($this->_file_sto_migration) && !$this->bReset) {
 
                             $storage_content = $this->read_file($this->_file_sto_migration);
 
@@ -1566,7 +1558,7 @@ class CI_Migration
 
                         $file_index = $this->_file_sub_mod_view_index;
 
-                        if (file_exists($file_index) && !$this->bRewrite) {
+                        if (file_exists($file_index) && !$this->bReset) {
 
                             $mensaje = "El Archivo " . $file_index . " ya fue creado";
 
@@ -1610,7 +1602,7 @@ class CI_Migration
                             }
                         } else {
 
-                            if (file_exists($this->_file_sto_sub_mod_view_index) && !$this->bRewrite) {
+                            if (file_exists($this->_file_sto_sub_mod_view_index) && !$this->bReset) {
 
                                 $storage_content = $this->read_file($this->_file_sto_sub_mod_view_index);
 
@@ -1655,7 +1647,7 @@ class CI_Migration
 
                         // ********************** Para el archivo Edit.php *********************
 
-                        if (file_exists($file_edit) && !$this->bRewrite) {
+                        if (file_exists($file_edit) && !$this->bReset) {
 
                             $mensaje = "El Archivo " . $file_edit . " ya fue creado";
 
@@ -1691,7 +1683,7 @@ class CI_Migration
 
                         } else {
 
-                            if (file_exists($this->_file_sto_sub_mod_view_edit) && !$this->bRewrite) {
+                            if (file_exists($this->_file_sto_sub_mod_view_edit) && !$this->bReset) {
 
                                 $storage_content = $this->read_file($this->_file_sto_sub_mod_view_edit);
 
@@ -1737,7 +1729,7 @@ class CI_Migration
 
                         // ********************** Para el archivo Edit.php *********************
 
-                        if (file_exists($file_lib) && !$this->bRewrite) {
+                        if (file_exists($file_lib) && !$this->bReset) {
 
                             $mensaje = "El Archivo " . $file_lib . " ya fue creado";
 
@@ -1773,7 +1765,7 @@ class CI_Migration
 
                         } else {
 
-                            if (file_exists($this->_file_sto_sub_mod_view_lib) && !$this->bRewrite) {
+                            if (file_exists($this->_file_sto_sub_mod_view_lib) && !$this->bReset) {
 
                                 $storage_content = $this->read_file($this->_file_sto_sub_mod_view_lib);
 
@@ -1821,7 +1813,7 @@ class CI_Migration
 
                             // ********************** Para el archivo Edit.php *********************
 
-                            if (file_exists($file_cnt) && !$this->bRewrite) {
+                            if (file_exists($file_cnt) && !$this->bReset) {
 
                                 $mensaje = "El Archivo " . $file_cnt . " ya fue creado";
 
@@ -1857,7 +1849,7 @@ class CI_Migration
 
                             } else {
 
-                                if (file_exists($this->_file_sto_sub_mod_view_cnt) && !$this->bRewrite) {
+                                if (file_exists($this->_file_sto_sub_mod_view_cnt) && !$this->bReset) {
 
                                     $storage_content = $this->read_file($this->_file_sto_sub_mod_view_cnt);
 
@@ -3748,7 +3740,7 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
                         } else {
                             $mod = $localTable;
                         }
-                        redirect("base/migrate/write/$mod/$migIndex");
+                        redirect("migrate/set/$mod/$migIndex");
                     }
                 }
             }
@@ -3794,6 +3786,15 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
             $mod = $parts[0];
             unset($parts[0]);
             return [$mod,implode('_',$parts)];
+        }
+    }
+
+    private function verifyAppOrBase()
+    {
+        if(isset($this->CI->uri->segments[3])){
+            $this->_base_path = $this->CI->uri->segments[3] == 'ci' || $this->CI->uri->segments[3] == 'tic' ? BASEPATH : APPPATH;
+            $this->_dir_migrations_files = $this->CI->uri->segments[3] == 'ci' || $this->CI->uri->segments[3] == 'tic' ? BASEPATH . "migrations/tables/" :APPPATH . "migrations/tables/" ;
+            $this->_dir_root_store = $this->CI->uri->segments[3] == 'ci' || $this->CI->uri->segments[3] == 'tic' ? BASEPATH . "migrations/storage/" :APPPATH . "migrations/storage/";
         }
     }
 }

@@ -397,34 +397,37 @@ if ( ! is_php('5.4'))
 
 	$e404 = FALSE;
 
-	if(isset($URI->segments[1]))
-	{
-        if($URI->segments[1] == 'base')
-        {
-            $RTR->directory = 'modules/'.$URI->segments[1].'/';
+    $isysDirs = $URI->isysDirs;
+
+    if(isset($URI->segments[1])) {
+        $iDirs = array_keys($isysDirs);
+        $got = false;
+        foreach ($iDirs as $iDir) {
+            if(in_array($URI->segments[1], $isysDirs[$iDir])) {
+                $RTR->directory = "$iDir/";
+                $framePath = BASEPATH;
+                $got = true;
+            }
         }
-        else if($URI->segments[1] == 'estic' )
-        {
-            $RTR->directory = 'modules/'.$URI->segments[1].'/';
+        if(!$got){
+            $framePath = APPPATH;
         }
+    } else {
+        $framePath = APPPATH;
     }
-    else if ($RTR->directory == null )
+
+    if ($RTR->directory == null )
     {
         $RTR->directory = 'testFrame/';
     }
 
     $ctrlClass =  'Ctrl_'.ucfirst($RTR->class);
-	$class = $RTR->class;
+    $class = $RTR->class;
 
-	$method = $RTR->method;
+    $method = $RTR->method;
 
-	if(isset($URI->segments[1])){
 
-        $framePath = $URI->segments[1] == 'estic' || $URI->segments[1] == 'base' ? BASEPATH : APPPATH;
-    } else {
-        $framePath = APPPATH;
-    }
-$RTR->framePath =  $framePath;
+    $RTR->framePath =  $framePath;
 
 	if (empty($class) OR ! file_exists($framePath.$RTR->directory.'/'.$class.'/'.$ctrlClass.'.php'))
 	{

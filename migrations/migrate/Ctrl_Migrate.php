@@ -15,7 +15,7 @@ class Ctrl_Migrate extends Base_Controller
         $this->load->library('migration');
     }
 
-    public function run($frame = 0, $method = 0, $funct = 0, $modulo = 0, $submod = 0)
+    public function run($frame = 0, $funct = 0, $modulo = 0, $submod = 0)
     {
         $migrations_errors = array();
         $migration_error = '';
@@ -25,10 +25,10 @@ class Ctrl_Migrate extends Base_Controller
         //*************************************************************
         //******* si se hace la reescritura por defecto ***************
         //*************************************************************
-        if ($funct == 'write') {
-            $_POST['bRewrite'] = false;
-        } else if ($funct == 'rewrite') {
-            $_POST['bRewrite'] = true;
+        if ($funct == 'set') {
+            $_POST['bReset'] = false;
+        } else if ($funct == 'reset') {
+            $_POST['bReset'] = true;
         }
 
         //*************************************************************
@@ -232,7 +232,7 @@ class Ctrl_Migrate extends Base_Controller
                 $this->migration->_keys = [];
             }
 
-            $_POST['bRewrite'] = true;
+            $_POST['bReset'] = true;
             $this->dbforge->fields = $fields;
             $this->migration->_id_table = $id_table;
 

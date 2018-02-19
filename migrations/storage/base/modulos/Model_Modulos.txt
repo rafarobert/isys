@@ -2,8 +2,8 @@
         /**
          * Created by Estic.
          * User: RaFaEl Gutierrez Gaspar
-         * Date: 16/02/2018
-         * Time: 6:08 pm
+         * Date: 19/02/2018
+         * Time: 3:17 am
          */
         
         defined("BASEPATH") OR exit("No direct script access allowed");
@@ -64,6 +64,13 @@
                 /**
                          * The value for the title field.
                          *
+                         * @var        string
+                         */
+                         
+                public $status;
+                /**
+                         * The value for the title field.
+                         *
                          * @var        int
                          */
                          
@@ -85,6 +92,13 @@
                 /**
                          * The value for the title field.
                          *
+                         * @var        string
+                         */
+                         
+                public $settings;
+                /**
+                         * The value for the title field.
+                         *
                          * @var        datetime
                          */
                          
@@ -96,13 +110,6 @@
                          */
                          
                 public $date_created;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        string
-                         */
-                         
-                public $settings;
                 
             
             // *** estic - tables - fin - 1 ***
@@ -152,6 +159,12 @@
                     "rules" => "trim|required|max_length[15]"
                 ),
                 
+                "status" => array(
+                    "field" => "status",
+                    "label" => "Status",
+                    "rules" => "trim|required|max_length[255]"
+                ),
+                
                 "change_count" => array(
                     "field" => "change_count",
                     "label" => "Change_count",
@@ -161,7 +174,7 @@
                 "settings" => array(
                     "field" => "settings",
                     "label" => "Settings",
-                    "rules" => "trim|required|max_length[255]"
+                    "rules" => "trim|required|max_length[500]"
                 ),
                 
             
@@ -170,6 +183,16 @@
             );
             
             public $rules_edit = array(    
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             
             
             // *** estic - tables - inicio - 2 ***
@@ -211,6 +234,12 @@
                     "rules" => "trim|required|max_length[15]"
                 ),
                 
+                "status" => array(
+                    "field" => "status",
+                    "label" => "Status",
+                    "rules" => "trim|required|max_length[255]"
+                ),
+                
                 "change_count" => array(
                     "field" => "change_count",
                     "label" => "Change_count",
@@ -220,7 +249,7 @@
                 "settings" => array(
                     "field" => "settings",
                     "label" => "Settings",
-                    "rules" => "trim|required|max_length[255]"
+                    "rules" => "trim|required|max_length[500]"
                 ),
                 
             
@@ -243,10 +272,11 @@
                     $modulo->icon = "";
                     $modulo->opt_estado = "";
                     $modulo->opt_listado = "";
+                    $modulo->status = "";
                     $modulo->change_count = "";
+                    $modulo->settings = "";
                     $modulo->date_modified = date("Y-m-d");
                     $modulo->date_created = date("Y-m-d");
-                    $modulo->settings = "";
                     
             
             // *** estic - tables - fin - 3 ***
@@ -256,6 +286,36 @@
         }
 
         // *** estic - model_file - end ***
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             
             
             

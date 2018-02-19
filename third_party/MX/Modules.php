@@ -5,15 +5,28 @@
 global $CFG;
 global $URI;
 /* get module locations from config settings or use the default module location and offset */
+$URI->isysDirs = array(
+    'migrations' => ['migrate','storage','tables'],
+    'modules' => ['base','estic']
+);
+$isysDirs = $URI->isysDirs;
 
-if($CFG->item('modules_locations') == null && $URI->segment(1) == 'estic'){
-    Modules::$locations = array(
-        BASEPATH.'modules/' => 'modules/',
-    );
-} else if($CFG->item('modules_locations') == null && $URI->segment(1) == 'base'){
-    Modules::$locations = array(
-        BASEPATH.'modules/' => 'modules/',
-    );
+if($CFG->item('modules_locations') == null){
+    $iDirs = array_keys($isysDirs);
+    $got = false;
+    foreach ($iDirs as $dir){
+        if(in_array($URI->segment(1), $isysDirs[$dir])){
+            Modules::$locations = array(
+                BASEPATH."$dir/" => "$dir/",
+            );
+            $got = true;
+        }
+    }
+    if(!$got){
+        is_array(Modules::$locations = $CFG->item('modules_locations')) OR Modules::$locations = array(
+            APPPATH.'modules/' => 'modules/',
+        );
+    }
 } else {
     is_array(Modules::$locations = $CFG->item('modules_locations')) OR Modules::$locations = array(
         APPPATH.'modules/' => 'modules/',
