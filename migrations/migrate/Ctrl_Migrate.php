@@ -31,17 +31,6 @@ class Ctrl_Migrate extends Base_Controller
             $_POST['bReset'] = true;
         }
 
-        //*************************************************************
-        //******** Sys migrations files path **************************
-        //*************************************************************
-//        if ($this->input->get('path') == 'sys') {
-//             $this->migration->_base_path = BASEPATH;
-//             $this->_migration_path_tabs = BASEPATH.'migrations/';
-//        } else if($modulo == 'ci' || $modulo == 'tic' ){
-//            $this->migration->_base_path = BASEPATH;
-//            $this->_migration_path_tabs = BASEPATH.'migrations/';
-//        }
-
         $migrations = $this->migration->_migration_files;
 
         //*******************************************************************************************

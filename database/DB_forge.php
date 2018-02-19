@@ -1129,13 +1129,17 @@ abstract class CI_DB_forge {
         $CI->db->query($sql);
     }
 
-    public function setPrimaryKey($table, $id, $database){
+    public function setPrimaryKey($table, $id, $bAutoIncrement, $database = false){
         $CI = CI_Controller::get_instance();
         if(!$database){
             $database = $CI->db->database;
         }
 
-        $sql = "ALTER TABLE $table ADD PRIMARY KEY AUTO_INCREMENT (`$id`)";
+        if($bAutoIncrement){
+            $sql = "ALTER TABLE $table ADD PRIMARY KEY AUTO_INCREMENT (`$id`)";
+        } else {
+            $sql = "ALTER TABLE $table ADD PRIMARY KEY (`$id`)";
+        }
         $CI->db->query($sql);
     }
 }

@@ -3,7 +3,7 @@
          * Created by Estic.
          * User: RaFaEl Gutierrez Gaspar
          * Date: 19/02/2018
-         * Time: 3:17 am
+         * Time: 6:19 pm
          */
         
         defined("BASEPATH") OR exit("No direct script access allowed");
@@ -188,13 +188,6 @@
             
             
             
-            
-            
-            
-            
-            
-            
-            
             // *** estic - tables - inicio - 2 ***
             
             
@@ -286,27 +279,6 @@
         }
 
         // *** estic - model_file - end ***
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
             
             
             

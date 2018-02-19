@@ -183,7 +183,7 @@ class CI_Migration
      *
      * @var string
      */
-    protected $_migration_path_tabs = NULL;
+    protected $_dir_migration_tables = NULL;
 
     /**
      * Current migration version
@@ -255,9 +255,7 @@ class CI_Migration
 
         // If not set, set it - TIC
 
-        $this->_migration_path_tabs = $this->_dir_migrations_files;
-        // Add trailing slash if not set
-        $this->_migration_path_tabs = rtrim($this->_migration_path_tabs, '/') . '/';
+        $this->_dir_migration_tables = config_item('dirMigrationFiles');
 
         // Load migration language
         $this->lang->load('migration');
@@ -280,9 +278,12 @@ class CI_Migration
             show_error('An invalid migration numbering type was specified: ' . $this->_migration_type);
         }
 
-        $this->_migration_files = $this->find_migrations();
+        if($this->_migration_files == null){
+            $this->_migration_files = $this->find_migrations();
+            $this->CI->migrationFiles = $this->_migration_files;
+        }
 
-        $this->CI->migrationFiles = $this->find_migrations();
+
         // If the migrations table is missing, make it
         if (!$this->db->table_exists($this->_migration_table)) {
             $this->dbforge->add_field(array(
@@ -607,25 +608,29 @@ class CI_Migration
     public function find_migrations($bWithSubModules = true)
     {
         $migrations = array();
+        if($this->_dir_migration_tables == null){
+            $this->_dir_migration_tables = config_item('dirMigrationTables');
+        }
 
         if($bWithSubModules){
             $sys_config = config_item('sys');
             foreach ($sys_config as $mod => $setting){
+                foreach ($this->_dir_migration_tables as $dir){
+                    foreach (glob($dir . $mod . '/' . '*_*.php') as $file) {
+                        $name = basename($file, '.php');
 
-                foreach (glob($this->_migration_path_tabs . $mod . '/' . '*_*.php') as $file) {
-                    $name = basename($file, '.php');
+                        // Filter out non-migration files
+                        if (preg_match($this->_migration_regex, $name)) {
+                            $number = $this->_get_migration_number($name);
 
-                    // Filter out non-migration files
-                    if (preg_match($this->_migration_regex, $name)) {
-                        $number = $this->_get_migration_number($name);
+                            // There cannot be duplicate migration numbers
+                            if (isset($migrations[$mod][$number])) {
+                                $this->_error_string = sprintf($this->lang->line('migration_multiple_version'), $number);
+                                show_error($this->_error_string);
+                            }
 
-                        // There cannot be duplicate migration numbers
-                        if (isset($migrations[$mod][$number])) {
-                            $this->_error_string = sprintf($this->lang->line('migration_multiple_version'), $number);
-                            show_error($this->_error_string);
+                            $migrations[$mod][$number] = $file;
                         }
-
-                        $migrations[$mod][$number] = $file;
                     }
                 }
             }
@@ -730,24 +735,20 @@ class CI_Migration
         $exists = false;
 
         if(count($this->dbforge->fields) < 1){
-
             header("Refresh:0");
         }
+        // =========================== La Construccion de keys y fields debe estar al inicio ======================
+        $this->_keys = $this->dbforge->keys;
+        $this->_fields = $this->dbforge->fields;
+        // ================================================= o =================================================
         if ($this->db->table_exists($tableLocal)) {
-
             $actual_table = $this->save_or_update_table($tableLocal);
-
         } else {
-            $this->_fields = $this->dbforge->fields;
-
-            $keys = $this->dbforge->keys;
-
             $this->dbforge->create_table($tableLocal);
+        }
 
-            if(isset($keys)){
-
-                $this->_update_indexes_foreignKeys($keys, $this->_fields, $tableLocal);
-            }
+        if(isset($this->_keys)){
+            $this->_update_indexes_foreignKeys($this->_keys, $this->_fields, $tableLocal);
         }
         $this->set_params($tableLocal);
 
@@ -1028,7 +1029,7 @@ class CI_Migration
             $this->_sub_mod_model = 'Model_' . ucfirst($sub_modulo) . $this->_ext_php;
 
             $this->_dir_root_mod = $this->_base_path. 'modules/';
-            $this->_dir_sub_mod_migrate_views = $this->_base_path. 'modules/estic/migrate/views/';
+            $this->_dir_sub_mod_migrate_views = $this->_base_path. 'migrations/migrate/views/';
 
             // ************************************************************************
             // ************* Directorios para la carpeta modules dentro de APP ********
@@ -3673,11 +3674,7 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
                 }
             }
             if($id_table == ''){
-                if ($auto_increment) {
-                    $this->db->query('ALTER TABLE ' . $tableLocal . ' ADD PRIMARY KEY AUTO_INCREMENT (' . $field . ')');
-                } else {
-                    $this->db->query('ALTER TABLE ' . $tableLocal . ' ADD PRIMARY KEY (' . $field . ')');
-                }
+                $this->dbforge->setPrimaryKey($tableLocal, $field, $auto_increment);
             }
         }
     }
@@ -3704,17 +3701,17 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
                                 }
                             }
                             if (count($fk_field)) {
-                                if ($fields[$idForeign]['type'] == $fk_field->type ||
-                                    $fields[$idForeign]['type'] == strtoupper($fk_field->type) ||
-                                    $fields[$idForeign]['type'] == ucfirst($fk_field->type) &&
-                                    $fields[$idForeign]['default'] == $fk_field->default ||
-                                    $fields[$idForeign]['default'] == strtoupper($fk_field->default) ||
-                                    $fields[$idForeign]['default'] == ucfirst($fk_field->default) &&
-                                    intval($fields[$idForeign]['constraint']) == intval($fk_field->max_length)
+                                if ($fields[$idLocal]['type'] == $fk_field->type ||
+                                    $fields[$idLocal]['type'] == strtoupper($fk_field->type) ||
+                                    $fields[$idLocal]['type'] == ucfirst($fk_field->type) &&
+                                    $fields[$idLocal]['default'] == $fk_field->default ||
+                                    $fields[$idLocal]['default'] == strtoupper($fk_field->default) ||
+                                    $fields[$idLocal]['default'] == ucfirst($fk_field->default) &&
+                                    intval($fields[$idLocal]['constraint']) == intval($fk_field->max_length)
                                 ) {
-                                    if (!$this->dbforge->hasRelation($localTable, $this->_id_table, $tableForeign, $idForeign, $constraintName)) {
+                                    if (!$this->dbforge->hasRelation($localTable, $idLocal, $tableForeign, $idForeign, $constraintName)) {
                                         if ($this->dbforge->fieldExistsInDB($localTable, $idLocal)) {
-                                            $this->dbforge->setRelation($localTable, $localTableId, $tableForeign, $idForeign, $constraintName);
+                                            $this->dbforge->setRelation($localTable, $idLocal, $tableForeign, $idForeign, $constraintName);
                                         } else {
                                             header("Refresh:0");
                                         }
@@ -3726,7 +3723,7 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
                                 show_error('Verifica que el campo ' . $idLocal . ' ha sido instanciado de la misma manera en la tabla ' . $tableForeign);
                             }
                         } else if ($this->db->field_exists($idLocal, $localTable)) {
-                            if ($this->dbforge->hasRelation($localTable, $localTableId, $tableForeign, $idForeign, $constraintName)) {
+                            if ($this->dbforge->hasRelation($localTable, $idLocal, $tableForeign, $idForeign, $constraintName)) {
                                 if ($this->dbforge->fieldExistsInDB($localTable, $idLocal)) {
                                     $this->dbforge->removeRelation($localTable, $constraintName);
                                 }
@@ -3734,12 +3731,7 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
                         }
                     } else {
                         $migIndex = $this->getMigrationIndexFromTableName($settings['table']);
-                        $mod = '';
-                        if (isset(explode('_', $localTable)[1])) {
-                            $mod = explode('_', $localTable)[0];
-                        } else {
-                            $mod = $localTable;
-                        }
+                        list($mod, $submod) = $this->getModSubMod($settings['table']);
                         redirect("migrate/set/$mod/$migIndex");
                     }
                 }
@@ -3753,13 +3745,8 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
         $mod = '';
         $subMod = '';
 
-        if (isset(explode('_', $tableLocal)[1])) {
-            $mod = explode('_', $tableLocal)[0];
-            $subMod = explode('_', $tableLocal)[1];
+        list($mod, $subMod) = $this->getModSubMod($tableLocal);
 
-        } else {
-            $subMod = explode('_', $tableLocal)[1];
-        }
         $files = $this->CI->migrationFiles;
 
         if ($mod == '') {

@@ -6,27 +6,19 @@ global $CFG;
 global $URI;
 /* get module locations from config settings or use the default module location and offset */
 $URI->isysDirs = array(
-    'migrations' => ['migrate','storage','tables'],
-    'modules' => ['base','estic']
+    'modules' => ['base','estic'],
+    'migrations' => ['migrate','storage','tables']
 );
+
 $isysDirs = $URI->isysDirs;
 
 if($CFG->item('modules_locations') == null){
     $iDirs = array_keys($isysDirs);
     $got = false;
     foreach ($iDirs as $dir){
-        if(in_array($URI->segment(1), $isysDirs[$dir])){
-            Modules::$locations = array(
-                BASEPATH."$dir/" => "$dir/",
-            );
-            $got = true;
-        }
+        Modules::$locations[BASEPATH."$dir/"] = "$dir/";
     }
-    if(!$got){
-        is_array(Modules::$locations = $CFG->item('modules_locations')) OR Modules::$locations = array(
-            APPPATH.'modules/' => 'modules/',
-        );
-    }
+    Modules::$locations[APPPATH.'modules/'] = 'modules/';
 } else {
     is_array(Modules::$locations = $CFG->item('modules_locations')) OR Modules::$locations = array(
         APPPATH.'modules/' => 'modules/',
@@ -225,7 +217,6 @@ class Modules
 
 		$path = ltrim(implode('/', $segments).'/', '/');
 
-
 		$module ? $modules[$module] = $path : $modules = array();
 		
 		if ( ! empty($segments)) 
@@ -233,6 +224,7 @@ class Modules
 			$modules[array_shift($segments)] = ltrim(implode('/', $segments).'/','/');
 		}
 
+		$locate = Modules::$locations;
 		foreach (Modules::$locations as $location => $offset) 
 		{					
 			foreach($modules as $module => $subpath) 
