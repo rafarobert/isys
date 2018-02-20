@@ -153,8 +153,8 @@ class Ctrl_Migrate extends Base_Controller
                             if(isset($fieldAttributes['autoIncrement']) && $fieldAttributes['autoIncrement'] != null){
                                 $fields[$fieldAttributes['name']]['auto_increment'] = TRUE;
                             }
-                            if(isset($fieldAttributes['required']) && $fieldAttributes['required'] != null){
-                                $fields[$fieldAttributes['name']]['unsigned'] = TRUE;
+                            if(isset($fieldAttributes['required']) && $fieldAttributes['required']){
+                                $fields[$fieldAttributes['name']]['required'] = TRUE;
                             }
                             if(isset($fieldAttributes['defaultValue']) && $fieldAttributes['defaultValue'] != null){
                                 $fields[$fieldAttributes['name']]['default'] = $fieldAttributes['defaultValue'];

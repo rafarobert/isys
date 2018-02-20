@@ -2,13 +2,13 @@
         /**
          * Created by Estic.
          * User: RaFaEl Gutierrez Gaspar
-         * Date: 19/02/2018
-         * Time: 6:19 pm
+         * Date: 20/02/2018
+         * Time: 12:42 am
          */
         
         defined("BASEPATH") OR exit("No direct script access allowed");
         
-        class Model_Modulos extends Base_Model {
+        class Model_Usuarios extends Base_Model {
 
         // *** estic - tables - inicio - 1 ***
 
@@ -18,49 +18,63 @@
                          * @var        int
                          */
                          
-                public $id_modulo;
+                public $id_usuario;
                 /**
                          * The value for the title field.
                          *
                          * @var        string
                          */
                          
-                public $titulo;
+                public $name;
                 /**
                          * The value for the title field.
                          *
                          * @var        string
                          */
                          
-                public $url;
+                public $email;
                 /**
                          * The value for the title field.
                          *
                          * @var        string
                          */
                          
-                public $descripcion;
+                public $lastname;
                 /**
                          * The value for the title field.
                          *
                          * @var        string
                          */
                          
-                public $icon;
+                public $mobile_number_1;
                 /**
                          * The value for the title field.
                          *
                          * @var        string
                          */
                          
-                public $opt_estado;
+                public $mobile_number_2;
                 /**
                          * The value for the title field.
                          *
                          * @var        string
                          */
                          
-                public $opt_listado;
+                public $ci;
+                /**
+                         * The value for the title field.
+                         *
+                         * @var        string
+                         */
+                         
+                public $img;
+                /**
+                         * The value for the title field.
+                         *
+                         * @var        string
+                         */
+                         
+                public $password;
                 /**
                          * The value for the title field.
                          *
@@ -78,20 +92,6 @@
                 /**
                          * The value for the title field.
                          *
-                         * @var        int
-                         */
-                         
-                public $id_user_modified;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        int
-                         */
-                         
-                public $id_user_created;
-                /**
-                         * The value for the title field.
-                         *
                          * @var        string
                          */
                          
@@ -102,61 +102,71 @@
                          * @var        datetime
                          */
                          
-                public $date_modified;
+                public $date_created;
                 /**
                          * The value for the title field.
                          *
                          * @var        datetime
                          */
                          
-                public $date_created;
+                public $date_modified;
                 
             
             // *** estic - tables - fin - 1 ***
             
-            protected $_table_name = "ci_modulos";
-            protected $_order_by = "id_modulo desc";
+            protected $_table_name = "ci_usuarios";
+            protected $_order_by = "id_usuario desc";
             protected $_timestaps = true;
-            protected $_primary_key = "id_modulo";
+            protected $_primary_key = "id_usuario";
         
             public $rules = array(
             // *** estic - tables - inicio - 2 ***
             
             
-                "titulo" => array(
-                    "field" => "titulo",
-                    "label" => "Titulo",
+                "name" => array(
+                    "field" => "name",
+                    "label" => "Name",
                     "rules" => "trim|required|max_length[100]"
                 ),
                 
-                "url" => array(
-                    "field" => "url",
-                    "label" => "Url",
-                    "rules" => "trim|required|max_length[600]|valid_url"
+                "email" => array(
+                    "field" => "email",
+                    "label" => "Email",
+                    "rules" => "trim|required|max_length[100]|valid_email"
                 ),
                 
-                "descripcion" => array(
-                    "field" => "descripcion",
-                    "label" => "Descripcion",
-                    "rules" => "trim|required"
+                "lastname" => array(
+                    "field" => "lastname",
+                    "label" => "Lastname",
+                    "rules" => "trim|required|max_length[100]"
                 ),
                 
-                "icon" => array(
-                    "field" => "icon",
-                    "label" => "Icon",
-                    "rules" => "trim|required|max_length[200]"
+                "mobile_number_1" => array(
+                    "field" => "mobile_number_1",
+                    "label" => "Mobile_number_1",
+                    "rules" => "trim|required|max_length[12]|numeric"
                 ),
                 
-                "opt_estado" => array(
-                    "field" => "opt_estado",
-                    "label" => "Opt_estado",
-                    "rules" => "trim|required|max_length[15]"
+                "mobile_number_2" => array(
+                    "field" => "mobile_number_2",
+                    "label" => "Mobile_number_2",
+                    "rules" => "trim|required|max_length[12]|numeric"
                 ),
                 
-                "opt_listado" => array(
-                    "field" => "opt_listado",
-                    "label" => "Opt_listado",
-                    "rules" => "trim|required|max_length[15]"
+                "ci" => array(
+                    "field" => "ci",
+                    "label" => "Ci",
+                    "rules" => "trim|required|max_length[30]"
+                ),
+                
+                "password" => array(
+                    "field" => "password",
+                    "label" => "Password",
+                    "rules" => "trim|required|max_length[128]|matches[password_confirm]"),
+        "password_confirm" => array(
+            "field" => "password_confirm",
+            "label" => "Confirm password",
+            "rules" => "trim|matches[password]"
                 ),
                 
                 "status" => array(
@@ -174,7 +184,7 @@
                 "settings" => array(
                     "field" => "settings",
                     "label" => "Settings",
-                    "rules" => "trim|required|max_length[500]"
+                    "rules" => "trim|required|max_length[255]"
                 ),
                 
             
@@ -183,50 +193,49 @@
             );
             
             public $rules_edit = array(    
-            
-            
-            
-            
-            
-            
-            
             // *** estic - tables - inicio - 2 ***
             
             
-                "titulo" => array(
-                    "field" => "titulo",
-                    "label" => "Titulo",
+                "name" => array(
+                    "field" => "name",
+                    "label" => "Name",
                     "rules" => "trim|required|max_length[100]"
                 ),
                 
-                "url" => array(
-                    "field" => "url",
-                    "label" => "Url",
-                    "rules" => "trim|required|max_length[600]|valid_url"
+                "email" => array(
+                    "field" => "email",
+                    "label" => "Email",
+                    "rules" => "trim|required|max_length[100]|valid_email"
                 ),
                 
-                "descripcion" => array(
-                    "field" => "descripcion",
-                    "label" => "Descripcion",
-                    "rules" => "trim|required"
+                "lastname" => array(
+                    "field" => "lastname",
+                    "label" => "Lastname",
+                    "rules" => "trim|required|max_length[100]"
                 ),
                 
-                "icon" => array(
-                    "field" => "icon",
-                    "label" => "Icon",
-                    "rules" => "trim|required|max_length[200]"
+                "mobile_number_1" => array(
+                    "field" => "mobile_number_1",
+                    "label" => "Mobile_number_1",
+                    "rules" => "trim|required|max_length[12]|numeric"
                 ),
                 
-                "opt_estado" => array(
-                    "field" => "opt_estado",
-                    "label" => "Opt_estado",
-                    "rules" => "trim|required|max_length[15]"
+                "mobile_number_2" => array(
+                    "field" => "mobile_number_2",
+                    "label" => "Mobile_number_2",
+                    "rules" => "trim|required|max_length[12]|numeric"
                 ),
                 
-                "opt_listado" => array(
-                    "field" => "opt_listado",
-                    "label" => "Opt_listado",
-                    "rules" => "trim|required|max_length[15]"
+                "ci" => array(
+                    "field" => "ci",
+                    "label" => "Ci",
+                    "rules" => "trim|required|max_length[30]"
+                ),
+                
+                "img" => array(
+                    "field" => "img",
+                    "label" => "Img",
+                    "rules" => "trim|required|max_length[500]"
                 ),
                 
                 "status" => array(
@@ -244,7 +253,7 @@
                 "settings" => array(
                     "field" => "settings",
                     "label" => "Settings",
-                    "rules" => "trim|required|max_length[500]"
+                    "rules" => "trim|required|max_length[255]"
                 ),
                 
             
@@ -257,48 +266,29 @@
             }
 
             public function get_new(){
-                $modulo = new stdClass();
+                $usuario = new stdClass();
                 
                 // *** estic - tables - inicio - 3 ***
             
-            $modulo->titulo = "";
-                    $modulo->url = "";
-                    $modulo->descripcion = "";
-                    $modulo->icon = "";
-                    $modulo->opt_estado = "";
-                    $modulo->opt_listado = "";
-                    $modulo->status = "";
-                    $modulo->change_count = "";
-                    $modulo->settings = "";
-                    $modulo->date_modified = date("Y-m-d");
-                    $modulo->date_created = date("Y-m-d");
+            $usuario->name = "";
+                    $usuario->email = "";
+                    $usuario->lastname = "";
+                    $usuario->mobile_number_1 = "";
+                    $usuario->mobile_number_2 = "";
+                    $usuario->ci = "";
+                    $usuario->img = "";
+                    $usuario->password = "";
+                    $usuario->status = "";
+                    $usuario->change_count = "";
+                    $usuario->settings = "";
+                    $usuario->date_created = date("Y-m-d");
+                    $usuario->date_modified = date("Y-m-d");
                     
             
             // *** estic - tables - fin - 3 ***
             
-                return $modulo;
+                return $usuario;
             }
         }
 
         // *** estic - model_file - end ***
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            

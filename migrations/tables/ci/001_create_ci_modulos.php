@@ -3,8 +3,8 @@
 /**
  * Created by herbalife.
  * User: Rafael Gutierrez Gaspar
- * Date: 18/02/2018
- * Time: 4:34 am
+ * Date: 20/02/2018
+ * Time: 2:23 am
  */
 
 
@@ -18,43 +18,44 @@ class Migration_Create_ci_modulos extends CI_Migration {
   'id_modulo' => 
   array (
     'type' => 'int',
-    'unsigned' => true,
+    'required' => true,
     'constraint' => 11,
+    'unsigned' => true,
   ),
   'titulo' => 
   array (
     'type' => 'VARCHAR',
     'constraint' => 100,
-    'unsigned' => true,
+    'required' => true,
   ),
   'url' => 
   array (
     'type' => 'VARCHAR',
     'constraint' => 600,
-    'unsigned' => true,
+    'required' => true,
   ),
   'descripcion' => 
   array (
     'type' => 'TEXT',
-    'unsigned' => true,
+    'required' => true,
   ),
   'icon' => 
   array (
     'type' => 'VARCHAR',
     'constraint' => 200,
-    'unsigned' => true,
+    'required' => true,
   ),
   'opt_estado' => 
   array (
     'type' => 'VARCHAR',
     'constraint' => 15,
-    'unsigned' => true,
+    'required' => true,
   ),
   'opt_listado' => 
   array (
     'type' => 'VARCHAR',
     'constraint' => 15,
-    'unsigned' => true,
+    'required' => true,
   ),
   'status' => 
   array (
@@ -68,14 +69,14 @@ class Migration_Create_ci_modulos extends CI_Migration {
   'id_user_modified' => 
   array (
     'type' => 'int',
-    'unsigned' => true,
     'constraint' => 11,
+    'unsigned' => true,
   ),
   'id_user_created' => 
   array (
     'type' => 'int',
-    'unsigned' => true,
     'constraint' => 11,
+    'unsigned' => true,
   ),
   'settings' => 
   array (
@@ -85,12 +86,12 @@ class Migration_Create_ci_modulos extends CI_Migration {
   'date_modified' => 
   array (
     'type' => 'DATETIME',
-    'unsigned' => true,
+    'required' => true,
   ),
   'date_created' => 
   array (
     'type' => 'DATETIME',
-    'unsigned' => true,
+    'required' => true,
   ),
 );
 

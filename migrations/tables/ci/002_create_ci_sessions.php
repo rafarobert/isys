@@ -3,8 +3,8 @@
 /**
  * Created by herbalife.
  * User: Rafael Gutierrez Gaspar
- * Date: 18/02/2018
- * Time: 4:34 am
+ * Date: 20/02/2018
+ * Time: 2:23 am
  */
 
 
@@ -19,25 +19,26 @@ class Migration_Create_ci_sessions extends CI_Migration {
   array (
     'type' => 'VARCHAR',
     'constraint' => 128,
-    'unsigned' => true,
+    'required' => true,
   ),
   'ip_address' => 
   array (
     'type' => 'VARCHAR',
     'constraint' => 45,
-    'unsigned' => true,
+    'required' => true,
   ),
   'timestamp' => 
   array (
     'type' => 'int',
     'constraint' => 10,
-    'unsigned' => true,
+    'required' => true,
     'default' => '0',
+    'unsigned' => true,
   ),
   'data' => 
   array (
     'type' => 'BLOB',
-    'unsigned' => true,
+    'required' => true,
   ),
   'last_activity' => 
   array (

@@ -3,7 +3,7 @@
  * Created by herbalife on 20/02/2018.
  */
 
-var oModulo = {
+var oUsuario = {
 
     init: function(){
 

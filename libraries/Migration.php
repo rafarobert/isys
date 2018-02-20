@@ -775,6 +775,10 @@ class CI_Migration
                     $exists = false;
                 }
                 $nameModelModules = "model_modulos";
+
+                if($this->db->table_exists('ci_usuarios')){
+
+                }
             } else if ($tableLocal != "ci_modulos") {
                 redirect("migrate/set/ci/$indexMigrationModules");
             }
@@ -793,8 +797,8 @@ class CI_Migration
                 'descripcion' => isset($settings['description']) ? $settings['descripcion'] : '',
                 'opt_estado' => isset($settings['status']) ? $settings['status'] : '',
                 'opt_listado' => isset($settings['listed']) ? $settings['listed'] : '',
-                'id_user_created' => 1,
-                'id_user_modified' => 1
+                'id_user_created' => NULL,
+                'id_user_modified' => NULL
             );
 
             if($nameModelModules != '' && $tableLocal != "ci_modulos"){
