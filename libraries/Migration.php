@@ -797,8 +797,8 @@ class CI_Migration
                 'descripcion' => isset($settings['description']) ? $settings['descripcion'] : '',
                 'opt_estado' => isset($settings['status']) ? $settings['status'] : '',
                 'opt_listado' => isset($settings['listed']) ? $settings['listed'] : '',
-                'id_user_created' => NULL,
-                'id_user_modified' => NULL
+                'id_user_created' => $this->getIdUserDefault(),
+                'id_user_modified' => $this->getIdUserDefault()
             );
 
             if($nameModelModules != '' && $tableLocal != "ci_modulos"){
@@ -819,7 +819,12 @@ class CI_Migration
         $this->CI->dbforge->primary_keys = [];
         $_REQUEST['id_migration'] = $id_migration;
         if ($this->db->table_exists('migrations')) {
-            $oMigrations = $this->db->get('migrations')->result();
+            if($this->db->table_exists('migrations')){
+                $oMigrations = $this->db->get('migrations')->result();
+            } else {
+                header("Refresh:0");
+            }
+
             if (count($oMigrations) > 1) {
                 $this->dbforge->drop_table('migrations');
                 header("Refresh:0");
@@ -3786,6 +3791,36 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
             $this->_base_path = $this->CI->uri->segments[3] == 'ci' || $this->CI->uri->segments[3] == 'tic' ? BASEPATH : APPPATH;
             $this->_dir_migrations_files = $this->CI->uri->segments[3] == 'ci' || $this->CI->uri->segments[3] == 'tic' ? BASEPATH . "migrations/tables/" :APPPATH . "migrations/tables/" ;
             $this->_dir_root_store = $this->CI->uri->segments[3] == 'ci' || $this->CI->uri->segments[3] == 'tic' ? BASEPATH . "migrations/storage/" :APPPATH . "migrations/storage/";
+        }
+    }
+
+    private function getIdUserDefault()
+    {
+        if($this->db->table_exists('ci_usuarios')){
+            $this->db->where('id_usuario', 1);
+            $oUser = $this->db->get('ci_usuarios')->row();
+
+            if(is_object($oUser)){
+                return $oUser->id_usuario;
+            } else {
+                $data = array(
+                    'id_usuario' => 1,
+                    'name' => 'Rafael',
+                    'lastname' => 'Gutierrez',
+                    'email' => 'rafael@herbalife.com.bo',
+                    'mobile_number_1' => '3213231',
+                    'mobile_number_2' => '3213231',
+                    'ci' => '3213231',
+                    'img' => 'rafo.jpg',
+                    'password' => '123',
+                    'date_created' => date('Y-m-d H:i:s'),
+                    'date_modified' => date('Y-m-d H:i:s')
+                );
+                $this->db->set($data);
+                if($this->db->insert('ci_usuarios')){
+                    return $data['id_usuario'];
+                };
+            }
         }
     }
 }

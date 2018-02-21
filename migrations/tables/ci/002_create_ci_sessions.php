@@ -49,17 +49,20 @@ class Migration_Create_ci_sessions extends CI_Migration {
     'type' => 'int',
     'constraint' => 11,
     'unsigned' => true,
+      'default' => null
   ),
   'id_hbf_sesion' => 
   array (
     'type' => 'int',
     'constraint' => 10,
     'unsigned' => true,
+      'default' => null
   ),
   'settings' => 
   array (
     'type' => 'VARCHAR',
     'constraint' => 500,
+      'default' => null
   ),
 );
 
