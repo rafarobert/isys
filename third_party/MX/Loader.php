@@ -232,7 +232,7 @@ class MX_Loader extends CI_Loader
 				$this->database($connect, FALSE, TRUE);
 			}
 
-            list($_model, $_controller) = explode('_', $_model);
+            list($_model, $_controller) = getModSubMod($_model);
 
             if(isset($_controller)){
 

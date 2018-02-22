@@ -400,16 +400,24 @@ if ( ! is_php('5.4'))
     $isysDirs = $URI->isysDirs;
 
     if(isset($URI->segments[1])) {
-        $iDirs = array_keys($isysDirs);
-        $got = false;
-        foreach ($iDirs as $iDir) {
-            if(in_array($URI->segments[1], $isysDirs[$iDir])) {
-                $RTR->directory = "$iDir/";
-                $framePath = BASEPATH;
-                $got = true;
+        $rDirs = array_keys($isysDirs);
+        $isBasePath = false;
+        foreach ($rDirs as $rDir) {
+            $baseMods = array_keys($isysDirs[$rDir]);
+            if(in_array($URI->segments[1], $baseMods)) {
+                $mods = $isysDirs[$rDir];
+                foreach ($mods as $mod => $type){
+                    if(is_dir(BASEPATH."$rDir/$mod/")){
+                        $dir = $type == 'HMVC' ? "$rDir/$mod/" : ($type == 'MVC' ? "$rDir/" : null);
+                        $RTR->directory = $dir;
+                        $framePath = BASEPATH;
+                        $isBasePath = true;
+                        break;
+                    }
+                }
             }
         }
-        if(!$got){
+        if(!$isBasePath){
             $framePath = APPPATH;
         }
     } else {
@@ -423,13 +431,14 @@ if ( ! is_php('5.4'))
 
     $ctrlClass =  'Ctrl_'.ucfirst($RTR->class);
     $class = $RTR->class;
-
+    $directory = $RTR->directory;
     $method = $RTR->method;
 
 
     $RTR->framePath =  $framePath;
+    $file = "$framePath"."$directory/$class/$ctrlClass.php";
 
-	if (empty($class) OR ! file_exists($framePath.$RTR->directory.'/'.$class.'/'.$ctrlClass.'.php'))
+	if (empty($class) OR ! file_exists($file))
 	{
 		$e404 = TRUE;
 	}

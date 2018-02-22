@@ -6,8 +6,15 @@ global $CFG;
 global $URI;
 /* get module locations from config settings or use the default module location and offset */
 $URI->isysDirs = array(
-    'modules' => ['base','estic'],
-    'migrations' => ['migrate','storage','tables']
+    'modules' => [
+        'base' => 'HMVC',
+        'estic' => 'HMVC'
+    ],
+    'migrations' => [
+        'migrate' => 'MVC',
+        'storage' => 'STO',
+        'tables' => 'TAB'
+    ]
 );
 
 $isysDirs = $URI->isysDirs;
@@ -245,7 +252,7 @@ class Modules
 
                         if (is_file($fullpath . ucfirst($file_ext))) return array($fullpath, $file);
 
-                        list($_ci_base, $_ci_controller) = explode('_',$file);
+                        list($_ci_base, $_ci_controller) = getModSubMod($file);
 
                         if($_ci_base == "model")
                         {

@@ -20,7 +20,7 @@ class Ctrl_Migrate extends Base_Controller
         $migrations_errors = array();
         $migration_error = '';
         $it_worked = false;
-        $mods = array_keys(config_item('sys'));
+        $sys = array_keys(config_item('sys'));
 
         //*************************************************************
         //******* si se hace la reescritura por defecto ***************
@@ -36,7 +36,7 @@ class Ctrl_Migrate extends Base_Controller
         //*******************************************************************************************
         //******* si se hace el migration a un elemento de algun modulo especifico ******************
         //*******************************************************************************************
-        if (self::validate($modulo, self::STRING && self::validate($submod, self::NUMERIC))) {
+        if (validate_var($modulo, self::STRING && validate_var($submod, self::NUMERIC))) {
             foreach ($migrations as $mod => $migration_keys) {
                 if ($mod == $modulo && !$it_worked) {
                     $this->dbforge->fields = array();
@@ -56,7 +56,7 @@ class Ctrl_Migrate extends Base_Controller
         //****************************************************************************************
         //******* si se hace el migration de todos los submodulos de un modulo especifico *******
         //****************************************************************************************
-        else if (self::validate($modulo, self::STRING) && !self::validate($submod, self::NUMERIC)) {
+        else if (validate_var($modulo, self::STRING) && !validate_var($submod, self::NUMERIC)) {
             foreach ($migrations as $mod => $migration_keys) {
                 if ($mod == $modulo && !$it_worked) {
                     foreach ($migration_keys as $submod => $dir) {
@@ -78,7 +78,7 @@ class Ctrl_Migrate extends Base_Controller
         //**************************************************************************************
         //******* si se hace el migration de un modulo especifico, ojo: no tiene submodulos *******
         //**************************************************************************************
-        else if (self::validate($modulo, self::NUMERIC) && self::validate($submod, self::NUMERIC)) {
+        else if (validate_var($modulo, self::NUMERIC) && validate_var($submod, self::NUMERIC)) {
             $this->dbforge->fields = array();
             $this->dbforge->keys = array();
             $this->migration->start($submod);
@@ -92,7 +92,7 @@ class Ctrl_Migrate extends Base_Controller
         //***************************************************************************************
         //******* si se hace el migration de todos los modulos, ojo: no tienen submodulos *******
         //***************************************************************************************
-        else if (!self::validate($modulo) && !self::validate($submod)) {
+        else if (!validate_var($modulo) && !validate_var($submod)) {
             foreach ($this->migration->find_migrations(false) as $submod => $dir) {
                 $this->dbforge->fields = array();
                 $this->dbforge->keys = array();

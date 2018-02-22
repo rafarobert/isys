@@ -745,11 +745,11 @@ class CI_Migration
             $actual_table = $this->save_or_update_table($tableLocal);
         } else {
             $this->dbforge->create_table($tableLocal);
+            if(isset($this->_keys)){
+                $this->_update_indexes_foreignKeys($this->_keys, $this->_fields, $tableLocal);
+            }
         }
 
-        if(isset($this->_keys)){
-            $this->_update_indexes_foreignKeys($this->_keys, $this->_fields, $tableLocal);
-        }
         $this->set_params($tableLocal);
 
         if(count($settings))
@@ -783,12 +783,7 @@ class CI_Migration
                 redirect("migrate/set/ci/$indexMigrationModules");
             }
 
-            if(strpos($tableLocal,'_')){
-                list($mod,$submod) = explode('_',$tableLocal);
-            } else {
-                $mod = $tableLocal;
-                $submod = '';
-            }
+            list($mod,$submod) = getModSubMod($tableLocal);
 
             $data = array(
                 'titulo' => isset($settings['title']) ? $settings['title'] : ucfirst($submod),
@@ -988,7 +983,7 @@ class CI_Migration
         return [$new_table, $actual_table];
     }
 
-    public function set_sub_Mod_Plural_singular($sub_mod)
+    public function set_SubMod_Plural_Singular($sub_mod)
     {
         $names = explode('_', $sub_mod);
         $namesPlural = [];
@@ -1015,7 +1010,7 @@ class CI_Migration
     {
         if(!in_array($tableLocal,config_item('tables_mvc_excepted'))){
 
-            list($modulo, $sub_modulo) = $this->getModSubMod($tableLocal);
+            list($modulo, $sub_modulo) = getModSubMod($tableLocal);
 
             if (isset(config_item('sys')[$modulo])) {
                 $mod_dir = config_item('sys')[$modulo]['dir'];
@@ -1024,7 +1019,7 @@ class CI_Migration
                 // TODO: verificar cuado existan nuevos modulos...
             }
 
-            $this->set_sub_Mod_Plural_singular($sub_modulo);
+            $this->set_SubMod_Plural_Singular($sub_modulo);
             $this->verifyAppOrBase();
 
             $this->_id_table = $this->_id_table == null ? $this->dbforge->getKeyFromTable($tableLocal) : $this->_id_table;
@@ -3740,7 +3735,7 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
                         }
                     } else {
                         $migIndex = $this->getMigrationIndexFromTableName($settings['table']);
-                        list($mod, $submod) = $this->getModSubMod($settings['table']);
+                        list($mod, $submod) = getModSubMod($settings['table']);
                         redirect("migrate/set/$mod/$migIndex");
                     }
                 }
@@ -3754,7 +3749,7 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
         $mod = '';
         $subMod = '';
 
-        list($mod, $subMod) = $this->getModSubMod($tableLocal);
+        list($mod, $subMod) = getModSubMod($tableLocal);
 
         $files = $this->CI->migrationFiles;
 
@@ -3771,18 +3766,6 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
             }
         }
         return 0;
-    }
-
-    private function getModSubMod($table)
-    {
-        if(substr_count($table, '_') == 1){
-            return explode('_',$table);
-        } else {
-            $parts = explode('_',$table);
-            $mod = $parts[0];
-            unset($parts[0]);
-            return [$mod,implode('_',$parts)];
-        }
     }
 
     private function verifyAppOrBase()

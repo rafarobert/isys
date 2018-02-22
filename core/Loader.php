@@ -320,16 +320,17 @@ class CI_Loader {
 			}
 		}
         $model_path = '';
-        $type = explode('_',$model)[0];
-        $modModel = explode('_',$model)[1];
-		$model = ucfirst(explode('_',$model)[0]).'_'.ucfirst(explode('_',$model)[1]);
+		list($type, $modModel) = getModSubMod($model);
+
+
+		$model = ucfirst($type).'_'.ucfirst($modModel);
 		if ( ! class_exists($model, FALSE))
 		{
 			foreach ($this->_ci_model_paths as $mod_path)
 			{
-			    if(isset(explode('_',$model)[1]))
+			    if(isset($modModel))
 			    {
-                    $model_path .= explode('_',$model)[1].'/';
+                    $model_path .= $modModel.'/';
                 }
                 else
                 {

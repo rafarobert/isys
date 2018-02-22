@@ -56,8 +56,8 @@ class CI_Session {
 	 * Just a reference to $_SESSION, for BC purposes.
 	 */
 	public $userdata;
-	public $sessTable;
-    public $sessIdTable;
+	public $userTable;
+    public $userIdTable;
     public $ci_sessions;
     public $sessKey;
 
@@ -926,24 +926,6 @@ class CI_Session {
         $this->ci_sessions = $this->MI->create_ci_sessions();
     }
 
-	public function getIdFromSessTable($sessTable = ''){
-	    if($sessTable  == '' && $this->sessTable != null){
-            $sessTable = $this->sessTable;
-        }
-
-        if($this->sessIdTable == null)
-        {
-            if($sessTable != null && $sessTable != '')
-            {
-                $this->sessIdTable = $this->MI->get_pk_table($sessTable);
-            }
-            else
-            {
-                return false;
-            }
-        }
-    }
-
     public function getId(){
         if($this->has_userdata($this->sessKey)) {
             $aDataSession = $this->userdata($this->sessKey);
@@ -953,12 +935,12 @@ class CI_Session {
     }
 
     public function isLoguedin(){
-
         if($this->has_userdata($this->sessKey)) {
             return true;
         }
         return false;
     }
+
     public function _unique_email($id = ''){
         // Do NOT validate if email already exists
         // Unless it's the email for the current user
@@ -969,7 +951,7 @@ class CI_Session {
 
         $this->CI->db->where('email', $this->CI->input->post('email'));
 
-        !$id || $this->CI->db->where("$this->sessIdTable !=", $id);
+        !$id || $this->CI->db->where("$this->userIdTable !=", $id);
 
         $user = $this->MI->get();
         if(count($user)){
