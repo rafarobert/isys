@@ -790,8 +790,8 @@ class CI_Migration
                 'icon' => isset($settings['icon']) ? $settings['icon'] : '',
                 'url' => config_item('sys')[$mod]['dir']."$submod",
                 'descripcion' => isset($settings['description']) ? $settings['descripcion'] : '',
-                'opt_estado' => isset($settings['status']) ? $settings['status'] : '',
-                'opt_listado' => isset($settings['listed']) ? $settings['listed'] : '',
+                'status' => isset($settings['status']) ? $settings['status'] : '',
+                'listed' => isset($settings['listed']) ? $settings['listed'] : '',
                 'id_user_created' => $this->getIdUserDefault(),
                 'id_user_modified' => $this->getIdUserDefault()
             );
@@ -2755,11 +2755,11 @@ class CI_Migration
         $content .= '
         
         ';
-        $exepts = array('id');
+        $exepts = [$this->_id_table,'date_created','date_modified'];
 
         foreach ($this->_fields as $key => $value) {
 
-            if (!in_array(explode('_', $key)[0], $exepts) && $key != 'date_created' && $key != 'date_modified') {
+            if (!in_array($key, $exepts)) {
                 $words = explode('_', $key);
                 $js = isset($value['js']) ? $value['js'] : '';
                 $class = isset($value['class']) ? $value['class'] : '';
@@ -2779,12 +2779,15 @@ class CI_Migration
                 $label = isset($value['label']) ? $value['label'] : $label;
                 if (isset($value['type'])) {
 
-                    if (explode('_', $key)[0] == 'password') {
+                    if (strhas($key,'password_')) {
                         $content .= '
                             <?php if(!isset($' . $objectKey . '->id_' . $this->_sub_mod_s . ')){ ?>';
                     }
 
-                    if ($value['type'] == 'TEXT' || $value['type'] == 'text' || $value['type'] == 'Text') {
+                    // ***********************************************************************************************
+                    // ******************************* Para campos de tipo texto *************************************
+                    // ***********************************************************************************************
+                    if (strCompare($value,'type','text') || strCompare($value,'input','text')) {
                         $content .= '
                             <div class="form-group row">
                                 <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
@@ -2802,53 +2805,22 @@ class CI_Migration
                                      "class" => "form-control textTinymce ' . $class . '",';
                         $content .= '
                                      "value" => set_value("';
-
                         $content .= $name_tag;
-
                         $content .= '", $' . $objectKey . '->' . $key . '),
                                      "type" => "text"
                                  );
                                  echo form_textarea($data,"' . $in_value . '","' . $extra . '"); ?> 
                                  </div>
                     </div>';
-                    } else if ($value['type'] == 'VARCHAR' || $value['type'] == 'varchar' || $value['type'] == 'Varchar' || $value['type'] == 'LONGVARCHAR' || $value['type'] == 'longvarchar' || $value['type'] == 'Longvarchar') {
-                        if (explode('_', $key)[0] == 'has' || explode('_', $key)[0] == 'tiene') {
-                            $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
-                            $content .= '
-                                <div class="col-sm-6">
-                                <?php
-                                ';
-                            $content .= '$data = array(';
-                            $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                            $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                            $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                            $content.= '
-                                     "name" => "' . $name_tag . '",
-                                     "id" => "field' . $id_tag . '",
-                                     "class" => "' . $class . '",
-                                     "checked" => TRUE,
-                                     "value" => "SI",
-                                     "style" => "margin:10px"
-                                 );
-                                 echo "<label>".form_radio($data, "'.$in_value.'", "", "'.$extra.'") . " SI</label>"; ';
-                            $content .= '$data = array(';
-                            $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                            $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                            $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                            $content .= '
-                                     "name" => "' . $name_tag . '",
-                                     "id" => "field' . $id_tag . '",
-                                     "class" => " ' . $class . '",
-                                     "value" => "NO",
-                                     "style" => "margin:10px"
-                                 );
-                                 echo "<label>".form_radio($data ,"'.$in_value.'", "", "'.$extra.'") . " NO</label>" ?> 
-                                 </div>
-                    </div>';
 
-                        } else if (explode('_', $key)[0] == 'password') {
+                        // ***********************************************************************************************
+                        // ******************************* Para campos de tipo varchar ***********************************
+                        // ***********************************************************************************************
+                    } else if (strCompare($value,'type','varchar') || strCompare($value,'type','longvarchar')) {
+
+                        // ******************************* input de tipo password **********************************
+                        // *****************************************************************************************
+                        if (strhas($key,'password_') || strCompare($value['input'],'password' )) {
                             $content .= '
                             <div class="form-group row">
                                 <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>
@@ -2884,26 +2856,28 @@ class CI_Migration
                                  echo form_password($data, "'.$in_value.'", "'.$extra.'") ?>
                                 </div>
                     </div>';
-                        } else if (isset($value['hidden'])) {
+
+                            // ******************************* input de tipo hidden ************************************
+                            // *****************************************************************************************
+                        } else if (strCompare($value,'input','hidden')) {
                             $content .= '
                             <div class="form-group row">';
                             $content .= '
                                 <div class="col-sm-6">
                                 <?php
                                 ';
-                            if($value['hidden']){
-                                $content .= 'echo form_hidden("'.$name_tag.'","' . $in_value . '","' . $extra . '") ?>
+                            $content .= 'echo form_hidden("'.$name_tag.'","' . $in_value . '","' . $extra . '") ?>
                                 </div>
                     </div>';
-                            }
-                        } else if (isset($value['optional']) || explode('_', $key)[0] == 'opt') {
-                            $analized = false;
-                            if(explode('_', $key)[0] == 'opt' && count($options)){
+
+                            // ******************************* input de tipo radio ************************************
+                            // ****************************************************************************************
+                        } else if (strCompare($value,'input','radio') || strhas($key,'opt_')) {
+
+                            if(strhas($key,'opt_') && count($options)){
                                 $analized = true;
-                            } else if(isset($value['optional'])){
-                                if($value['optional'] && count($options)){
-                                    $analized = true;
-                                }
+                            } else if(strCompare($value,'input','radio') && count($options)){
+                                $analized = true;
                             } else {
                                 $analized = false;
                             }
@@ -2933,14 +2907,15 @@ class CI_Migration
                     </div>
                                 ';
                             }
-                        } else if (isset($value['checkboxes']) || explode('_', $key)[0] == 'chk') {
-                            $analized = false;
-                            if(explode('_', $key)[0] == 'chk' && count($options)){
+
+                            // ******************************* input de tipo checkbox **********************************
+                            // *****************************************************************************************
+                        } else if (strhas($key,'chk_') || strCompare($value,'input','checkbox')) {
+
+                            if(strhas($key,'chk_')  && count($options)){
                                 $analized = true;
-                            } else if(isset($value['checkboxes'])){
-                                if($value['checkboxes'] && count($options)){
-                                    $analized = true;
-                                }
+                            } else if(strCompare($value,'input','checkbox') && count($options)){
+                                $analized = true;
                             } else {
                                 $analized = false;
                             }
@@ -2971,17 +2946,19 @@ class CI_Migration
                     </div>
                                 ';
                             }
-                        } else if (isset($value['dropdown']) || explode('_', $key)[0] == 'drop') {
-                            $analized = false;
-                            if(explode('_', $key)[0] == 'drop' && count($options)){
+
+                            // ******************************* input de tipo dropdown **********************************
+                            // *****************************************************************************************
+                        } else if (strhas($key,'drop_') || strCompare($value,'input','dropdown')) {
+
+                            if(strhas($key,'drop_') && count($options)){
                                 $analized = true;
-                            } else if(isset($value['dropdown'])){
-                                if($value['dropdown'] && count($options)){
-                                    $analized = true;
-                                }
+                            } else if(strCompare($value,'input','dropdown') && count($options)){
+                                $analized = true;
                             } else {
                                 $analized = false;
                             }
+
                             if($analized){
                                 $content .= '
                             <div class="form-group row">
@@ -3020,18 +2997,19 @@ class CI_Migration
                     </div>';
                                 }
                             }
-                        } else if (isset($value['multiselect']) || explode('_', $key)[0] == 'ndrop') {
 
-                            $analized = false;
-                            if(explode('_', $key)[0] == 'ndrop' && count($options)){
+                            // ******************************* input de tipo multiselect *******************************
+                            // *****************************************************************************************
+                        } else if (strhas($key,'ndrop_') || strCompare($value,'input','multiselect')) {
+
+                            if(strhas($key,'ndrop_') && count($options)){
                                 $analized = true;
-                            }else if(isset($value['multiselect'])){
-                                if($value['multiselect'] && count($options)){
-                                    $analized = true;
-                                }
+                            }else if(strCompare($value,'input','multiselect') && count($options)){
+                                $analized = true;
                             } else {
                                 $analized = false;
                             }
+
                             if($analized){
                                 $content .= '
                             <div class="form-group row">
@@ -3059,18 +3037,19 @@ class CI_Migration
                                 </div>
                     </div>';
                             }
-                        } else if (explode('_', $key)[0] == 'img') {
 
-                            $analized = false;
-                            if(explode('_', $key)[0] == 'img'){
+                            // ******************************* input de tipo imagen *******************************
+                            // ************************************************************************************
+                        } else if (strhas($key,'img_') || strCompare($value,'input','image')) {
+
+                            if(strhas($key,'img_')){
                                 $analized = true;
-                            }else if(isset($value['image'])){
-                                if($value['image']){
-                                    $analized = true;
-                                }
+                            }else if(strCompare($value,'input','image')){
+                                $analized = true;
                             } else {
                                 $analized = false;
                             }
+
                             if($analized) {
                                 $content .= '
                             <div class="form-group row">
@@ -3105,6 +3084,9 @@ class CI_Migration
                     </div>';
                             }
                         } else {
+
+                            // ******************************* Input por defecto *******************************
+                            // *********************************************************************************
                             $content .= '
                             <div class="form-group row">
                                 <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
@@ -3132,7 +3114,11 @@ class CI_Migration
                     </div>
                                  ';
                         }
-                    } else if ($value['type'] == 'INT' || $value['type'] == 'int' || $value['type'] == 'Int') {
+
+                        // ***********************************************************************************************
+                        // ******************************* Para campos de tipo int ***************************************
+                        // ***********************************************************************************************
+                    } else if (strCompare($value,'type','int')) {
                         $content .= '
                             <div class="form-group row">
                                 <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
@@ -3158,7 +3144,11 @@ class CI_Migration
                                  </div>
                                  </div>
                                  ';
-                    } else if ($value['type'] == 'DATE' || $value['type'] == 'date' || $value['type'] == 'Date') {
+
+                        // ***********************************************************************************************
+                        // ******************************* Para campos de tipo date **************************************
+                        // ***********************************************************************************************
+                    } else if (strCompare($value,'type','date')) {
 
                         $content .= '
                             <div class="form-group row">
@@ -3184,7 +3174,11 @@ class CI_Migration
                                  echo form_input($data, "'.$in_value.'", "'.$extra.'") ?>
                                  </div>
                                  </div>';
-                    } else if ($value['type'] == 'DATETIME' || $value['type'] == 'datetime' || $value['type'] == 'Datetime' || $value['type'] == 'TIMESTAMP' || $value['type'] == 'timestamp') {
+
+                        // ***********************************************************************************************
+                        // ******************************* Para campos de tipo datetime **********************************
+                        // ***********************************************************************************************
+                    } else if (strCompare($value,'type','datetime') || strCompare($value,'type','timestamp')) {
                         $content .= '
                             <div class="form-group row">
                                 <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
@@ -3211,15 +3205,17 @@ class CI_Migration
                     </div>
                                  ';
                     }
-                    $validate = (isset($value['validate']) ? ($value['validate'] ? true : false) : true);
 
+                    // ******************************* Para validar el campo **********************************
+                    // ****************************************************************************************
+                    $validate = (isset($value['validate']) ? ($value['validate'] ? true : false) : true);
                     $content .= $validate? '<?php echo form_error("'.$name_tag.'"); ?>
-                    
                     ' : '';
-                    if (explode('_', $key)[0] == 'password') {
+                    if (strhas($key,'password_')) {
                         $content .= '
                             <?php } ?>';
                     }
+
                 } else {
                     return '';
                 }

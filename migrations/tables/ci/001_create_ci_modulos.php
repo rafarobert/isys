@@ -3,8 +3,8 @@
 /**
  * Created by herbalife.
  * User: Rafael Gutierrez Gaspar
- * Date: 20/02/2018
- * Time: 6:47 pm
+ * Date: 23/02/2018
+ * Time: 3:34 am
  */
 
 
@@ -45,17 +45,12 @@ class Migration_Create_ci_modulos extends CI_Migration {
     'constraint' => 200,
     'required' => true,
   ),
-  'opt_estado' => 
+  'listed' => 
   array (
     'type' => 'VARCHAR',
     'constraint' => 15,
     'required' => true,
-  ),
-  'opt_listado' => 
-  array (
-    'type' => 'VARCHAR',
-    'constraint' => 15,
-    'required' => true,
+    'default' => 'ENABLED',
   ),
   'status' => 
   array (
@@ -67,24 +62,22 @@ class Migration_Create_ci_modulos extends CI_Migration {
   'change_count' => 
   array (
     'type' => 'INT',
+    'required' => true,
     'default' => '0',
   ),
   'id_user_modified' => 
   array (
     'type' => 'int',
+    'required' => true,
     'constraint' => 11,
     'unsigned' => true,
   ),
   'id_user_created' => 
   array (
     'type' => 'int',
+    'required' => true,
     'constraint' => 11,
     'unsigned' => true,
-  ),
-  'settings' => 
-  array (
-    'type' => 'VARCHAR',
-    'constraint' => 500,
   ),
   'date_modified' => 
   array (

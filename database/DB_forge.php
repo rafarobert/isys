@@ -1142,4 +1142,14 @@ abstract class CI_DB_forge {
         }
         $CI->db->query($sql);
     }
+
+    public function getCommentTable($table, $database = false){
+        $CI = CI_Controller::get_instance();
+        if(!$database){
+            $database = $CI->db->database;
+        }
+
+        $sql = "SELECT table_comment FROM information_schema.tables WHERE table_schema = '$database' AND table_name = '$table'";
+        return $CI->db->query($sql);
+    }
 }
