@@ -1143,13 +1143,67 @@ abstract class CI_DB_forge {
         $CI->db->query($sql);
     }
 
-    public function getCommentTable($table, $database = false){
+    public function getTableCommentsFromDB($table, $database = false){
         $CI = CI_Controller::get_instance();
         if(!$database){
             $database = $CI->db->database;
         }
 
         $sql = "SELECT table_comment FROM information_schema.tables WHERE table_schema = '$database' AND table_name = '$table'";
-        return $CI->db->query($sql);
+        return $CI->db->query($sql)->result();
+    }
+
+    public function getFieldCommentsFromDB($field, $table, $database = false){
+        $CI = CI_Controller::get_instance();
+        if(!$database){
+            $database = $CI->db->database;
+        }
+
+        $sql = "SELECT COLUMN_COMMENT FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$database' AND TABLE_NAME = '$table' AND COLUMN_NAME = '$field'";
+        return $CI->db->query($sql)->row();
+
+    }
+
+    public function getArrayTableFieldsFromDB($table = '', $database = false){
+        $CI = CI_Controller::get_instance();
+        $tables = array();
+        $aTables = array();
+        if(!$database){
+            $database = $CI->db->database;
+        }
+        if($table == ''){
+            $tables = array_column(json_decode(json_encode($this->getArrayTableNamesFromDB()),true), "TABLE_NAME");
+        } else {
+            $tables[] = $table;
+        }
+
+        foreach ($tables as $tab){
+            $sql = "SHOW COLUMNS FROM `$tab` FROM `$database`";
+            $data = json_decode(json_encode($CI->db->query($sql)->result()),true);
+            $callback = function($field){
+                return [$field['Field'] => $field];
+            };
+            $aTable = array_map($callback,$data);
+            foreach ($aTable as $key => $aFields){
+                $colName = array_keys($aFields)[0];
+                $comment = $this->getFieldCommentsFromDB($colName,$tab);
+                $stdComment = json_decode($comment->COLUMN_COMMENT);
+                $aExtras = $stdComment != null ? json_decode(json_encode($stdComment),true) : [];
+                $aFields = array_merge($aFields[$colName],$aExtras);
+                $aTables[$tab][$colName] = $aFields;
+            }
+        }
+        return $aTables;
+    }
+
+    public function getArrayTableNamesFromDB($database = false){
+        $CI = CI_Controller::get_instance();
+        if(!$database){
+            $database = $CI->db->database;
+        }
+
+        $sql = "SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA LIKE '$database'";
+        return $CI->db->query($sql)->result();
+
     }
 }

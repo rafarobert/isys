@@ -121,7 +121,7 @@ class Ctrl_Migrate extends Base_Controller
         }
     }
 
-    public function fromDatabase()
+    public function frompropelxml()
     {
 //        $this->migration->_dir_migrations_files = 'schemas/';
         $xmlfile = file_get_contents(site_url('orm/schema/schema.xml'));
@@ -238,5 +238,10 @@ class Ctrl_Migrate extends Base_Controller
                 $this->migration->create_migration();
             }
         }
+    }
+
+    public function fromdatabase(){
+
+        $tables = $this->dbforge->getArrayTableFieldsFromDB();
     }
 }
