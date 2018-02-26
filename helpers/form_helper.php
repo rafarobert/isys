@@ -1030,3 +1030,69 @@ if ( ! function_exists('_get_validation_object'))
 		return $return;
 	}
 }
+
+
+if ( ! function_exists('form_select'))
+{
+    function form_select($data, $options = array(), $selected = '', $extra = '')
+    {
+        $html = '';
+        $name = '';
+        $id = '';
+        $class = '';
+        $optionsVerified = false;
+        if(is_array($extra) && count($extra)){
+            $name = isset($extra['name']) ? $extra['name'] : '';
+            $id = isset($extra['id']) ? $extra['id'] : '';
+            $class = isset($extra['class']) ? $extra['class'] : '';
+        } else if(is_string($extra)){
+            $html = $extra;
+        }
+
+        if (is_array($data)){
+            $name = $data['name'];
+            $id = $data['id'];
+            $class = $data['class'];
+        } else if(is_string($data)){
+            $name = $data;
+        }
+
+        if(is_array($options) && count($options)){
+            $optionsVerified = true;
+        }
+
+        if ($name != '' && ($name != '' || $id != '' || $class != '' || $html != '') && $optionsVerified) {
+
+            if($html!=''){
+                $html = '<select ' . ($id != '' ? 'id="' . $id . '"' : '') . ' name=' . $name . ' ' . ($class != '' ? 'class="'.$class. '"' : '') . '>
+            ';
+            } else {
+                $html = "<select name=$name $html";
+            }
+
+            foreach ($options as $key => $value) {
+                if($selected == $key){
+                    $html .= '<option value="' . $key . '" ' . set_select($name, $key) . ' selected>' . (isset($value) ? $value : '') . '</option>
+            ';
+                } else {
+                    $html .= '<option value="' . $key . '" ' . set_select($name, $key) . '>' . (isset($value) ? $value : '') . '</option>
+            ';
+                }
+            }
+
+            $html .= '
+            </select>
+            ';
+
+            return $html;
+
+        } else {
+
+            $error = 'Para imprimir select se necesita un array con name y options!';
+
+            $this->data['errors'][] = $error;
+
+            return dump($error);
+        }
+    }
+}
