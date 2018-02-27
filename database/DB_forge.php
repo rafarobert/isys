@@ -1191,7 +1191,28 @@ abstract class CI_DB_forge {
             $sql = "SHOW COLUMNS FROM `$tab` FROM `$database`";
             $data = json_decode(json_encode($CI->db->query($sql)->result()),true);
             $callback = function($field){
-                return [$field['Field'] => $field];
+                $fieldName = $field['Field'];
+                preg_match("/[A-Za-z-]+/", $field['Type'],$fieldType);
+                preg_match("/[0-9]{1,11}/", $field['Type'],$fieldConstraint);
+                $fieldUnsigned = strpos($field['Type'],'unsigned') > -1 ? TRUE : FALSE;
+                $fieldNull = $field['Null'] ? TRUE : FALSE;
+                $fieldAutoIncrement = $field['Extra'] == 'auto_increment' || strpos($field['Extra'],'auto_increment') > -1 ? TRUE : FALSE;
+                $field['type'] = $fieldType;
+                $field['constraint'] = $fieldConstraint;
+                $field['unsigned'] = $fieldUnsigned;
+                $field['null'] = $fieldNull;
+                $field['key'] = $field['Key'];
+                $field['default'] = $field['Default'];
+                $field['auto_increment'] = $fieldAutoIncrement;
+                $field['extra'] = $field['Extra'];
+                unset($field['Field']);
+                unset($field['Type']);
+                unset($field['Null']);
+                unset($field['Key']);
+                unset($field['Default']);
+                unset($field['Extra']);
+                dump($field);
+                return [$fieldName => $field];
             };
             $aTable = array_map($callback,$data);
             foreach ($aTable as $key => $aFields){

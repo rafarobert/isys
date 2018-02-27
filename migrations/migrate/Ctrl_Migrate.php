@@ -243,5 +243,7 @@ class Ctrl_Migrate extends Base_Controller
     public function fromdatabase(){
 
         $tables = $this->dbforge->getArrayTablesFieldsFromDB();
+        $this->migration->create_migration_tables($tables);
+
     }
 }
