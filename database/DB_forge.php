@@ -1161,10 +1161,20 @@ abstract class CI_DB_forge {
 
         $sql = "SELECT COLUMN_COMMENT FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$database' AND TABLE_NAME = '$table' AND COLUMN_NAME = '$field'";
         return $CI->db->query($sql)->row();
+    }
+
+    public function getArrayTableNamesFromDB($database = false){
+        $CI = CI_Controller::get_instance();
+        if(!$database){
+            $database = $CI->db->database;
+        }
+
+        $sql = "SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA LIKE '$database'";
+        return $CI->db->query($sql)->result();
 
     }
 
-    public function getArrayTableFieldsFromDB($table = '', $database = false){
+    public function getArrayTablesFieldsFromDB($table = '', $database = false){
         $CI = CI_Controller::get_instance();
         $tables = array();
         $aTables = array();
@@ -1194,16 +1204,5 @@ abstract class CI_DB_forge {
             }
         }
         return $aTables;
-    }
-
-    public function getArrayTableNamesFromDB($database = false){
-        $CI = CI_Controller::get_instance();
-        if(!$database){
-            $database = $CI->db->database;
-        }
-
-        $sql = "SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA LIKE '$database'";
-        return $CI->db->query($sql)->result();
-
     }
 }
