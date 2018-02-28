@@ -1054,87 +1054,79 @@ abstract class CI_DB_forge {
 		$this->fields = $this->keys = $this->primary_keys = array();
 	}
 
-	public function hasRelation($table1, $id1, $table2, $id2, $constraint = '', $database = ''){
-
+	public function hasRelation($table1, $id1, $table2, $id2, $constraint = '', $database = '')
+    {
 	    $CI = CI_Controller::get_instance();
 	    if($database == ''){
 	        $database = $CI->db->database;
         }
-
         $sql = "SELECT TABLE_NAME,COLUMN_NAME, CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE where CONSTRAINT_SCHEMA='$database' and TABLE_NAME='$table1' and COLUMN_NAME='$id1' and REFERENCED_TABLE_NAME='$table2' and REFERENCED_COLUMN_NAME='$id2'";
-
 	    if($constraint == ''){
 	        $constraint = '';
         } else {
             $sql .= " and CONSTRAINT_NAME='$constraint'";
         }
-
         $result = $CI->db->query($sql,false,true)->row();
-
         if(count($result)){
             return true;
         }
-
         return false;
     }
 
-    public function getPrimaryKeyFromTable($table, $database = ''){
+    public function getPrimaryKeyFromTable($table, $database = '')
+    {
         $CI = CI_Controller::get_instance();
         if($database == ''){
             $database = $CI->db->database;
         }
         $sql = "Select COLUMN_NAME from information_schema.`COLUMNS` where TABLE_SCHEMA='$database' and TABLE_NAME='$table' and COLUMN_KEY='PRI'";
-
         $result = $CI->db->query($sql,false,true)->row();
-
         if(count($result)){
             return $result->COLUMN_NAME;
         }
         return false;
     }
 
-    public function fieldExistsInDB($table, $field, $database = ''){
+    public function fieldExistsInDB($table, $field, $database = '')
+    {
         $CI = CI_Controller::get_instance();
         if($database == ''){
             $database = $CI->db->database;
         }
-
         $sql = "Select * from information_schema.`COLUMNS` where TABLE_SCHEMA='$database' and TABLE_NAME='$table' and COLUMN_NAME='$field'";
-
         $result = $CI->db->query($sql,false,true)->row();
-
         if(count($result)){
             return $result;
         }
         return false;
     }
 
-    public function setRelation($table, $id, $tableReferenced, $idReferenced, $idConstraint, $database = ''){
+    public function setRelation($table, $id, $tableReferenced, $idReferenced, $idConstraint, $database = '')
+    {
         $CI = CI_Controller::get_instance();
         if($database == ''){
             $database = $CI->db->database;
         }
         $sql = "ALTER TABLE `$table` ADD CONSTRAINT `$idConstraint` FOREIGN KEY (`$id`) REFERENCES `$tableReferenced` (`$idReferenced`) ON UPDATE CASCADE ON DELETE CASCADE";
-
         $CI->db->query($sql);
     }
 
-    public function removeRelation($table, $idConstraint, $database = ''){
+    public function removeRelation($table, $idConstraint, $database = '')
+    {
         $CI = CI_Controller::get_instance();
         if($database == ''){
             $database = $CI->db->database;
         }
-
         $sql = "ALTER TABLE `$table` DROP FOREIGN KEY `$idConstraint`";
         $CI->db->query($sql);
     }
 
-    public function setPrimaryKey($table, $id, $bAutoIncrement, $database = ''){
+    public function setPrimaryKey($table, $id, $bAutoIncrement, $database = '')
+    {
         $CI = CI_Controller::get_instance();
         if($database == ''){
             $database = $CI->db->database;
         }
-
         if($bAutoIncrement){
             $sql = "ALTER TABLE $table ADD PRIMARY KEY AUTO_INCREMENT (`$id`)";
         } else {
@@ -1143,38 +1135,62 @@ abstract class CI_DB_forge {
         $CI->db->query($sql);
     }
 
-    public function getTableCommentsFromDB($table, $database = ''){
+    public function getTableCommentsFromDB($table, $database = '')
+    {
         $CI = CI_Controller::get_instance();
         if($database == ''){
             $database = $CI->db->database;
         }
-
         $sql = "SELECT table_comment FROM information_schema.tables WHERE table_schema = '$database' AND table_name = '$table'";
         return $CI->db->query($sql)->row();
     }
 
-    public function getFieldCommentsFromDB($field, $table, $database = ''){
+    public function getFieldCommentsFromDB($field, $table, $database = '')
+    {
         $CI = CI_Controller::get_instance();
         if($database == ''){
             $database = $CI->db->database;
         }
-
         $sql = "SELECT COLUMN_COMMENT FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$database' AND TABLE_NAME = '$table' AND COLUMN_NAME = '$field'";
         return $CI->db->query($sql)->row();
     }
 
-    public function getArrayTableNamesFromDB($database = ''){
+    public function getArrayTableNamesFromDB($database = '')
+    {
         $CI = CI_Controller::get_instance();
         if($database == ''){
             $database = $CI->db->database;
         }
-
         $sql = "SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA LIKE '$database'";
         return $CI->db->query($sql)->result();
-
     }
 
-    public function getArrayFieldsFromTables($table = '', $database = ''){
+    public function getTableRelations($table, $database = '')
+    {
+        $CI = CI_Controller::get_instance();
+        if($database == ''){
+            $database = $CI->db->database;
+        }
+        $sql = "SELECT CONSTRAINT_NAME, COLUMN_NAME,REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME  FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE table_schema = '$database' AND table_name = '$table' AND CONSTRAINT_NAME NOT LIKE 'PRIMARY'";
+        $stdResult = $CI->db->query($sql)->result();
+        $aResult = json_decode(json_encode($stdResult),true);
+        if(count($aResult)){
+            $aRelations = [];
+            foreach ($aResult as $relation){
+                $aRelations[$relation['CONSTRAINT_NAME']] = array(
+                    'table' => $relation['REFERENCED_TABLE_NAME'],
+                    'idLocal' => $relation['COLUMN_NAME'],
+                    'idForeign' => $relation['REFERENCED_COLUMN_NAME']
+                );
+            }
+            return $aRelations;
+        } else {
+            return [];
+        }
+    }
+
+    public function getArrayFieldsFromTables($table = '', $database = '')
+    {
         $CI = CI_Controller::get_instance();
         $tables = array();
         $aTables = array();
@@ -1186,7 +1202,6 @@ abstract class CI_DB_forge {
         } else {
             $tables[] = $table;
         }
-
         foreach ($tables as $tab){
             $sql = "SHOW COLUMNS FROM `$tab` FROM `$database`";
             $data = json_decode(json_encode($CI->db->query($sql)->result()),true);
@@ -1197,8 +1212,8 @@ abstract class CI_DB_forge {
                 $fieldUnsigned = strpos($field['Type'],'unsigned') > -1 ? TRUE : FALSE;
                 $fieldNull = $field['Null'] ? TRUE : FALSE;
                 $fieldAutoIncrement = $field['Extra'] == 'auto_increment' || strpos($field['Extra'],'auto_increment') > -1 ? TRUE : FALSE;
-                $field['type'] = $fieldType;
-                $field['constraint'] = $fieldConstraint;
+                $field['type'] = isset($fieldType[0]) ? $fieldType[0] : "";
+                $field['constraint'] = isset($fieldConstraint[0])?$fieldConstraint[0]:"";
                 $field['unsigned'] = $fieldUnsigned;
                 $field['null'] = $fieldNull;
                 $field['key'] = $field['Key'];

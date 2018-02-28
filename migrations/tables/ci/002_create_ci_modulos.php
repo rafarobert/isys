@@ -9,12 +9,12 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Migration_Create_ci_files extends CI_Migration
+class Migration_Create_ci_modulos extends CI_Migration
 {
     public function up()
     {
         $fields = array (
-  'id_file' => 
+  'id_modulo' => 
   array (
     'type' => 'int',
     'constraint' => '11',
@@ -22,10 +22,32 @@ class Migration_Create_ci_files extends CI_Migration
     'null' => true,
     'key' => 'PRI',
     'default' => NULL,
-    'auto_increment' => true,
-    'extra' => 'auto_increment',
+    'auto_increment' => false,
+    'extra' => '',
   ),
-  'path' => 
+  'titulo' => 
+  array (
+    'type' => 'varchar',
+    'constraint' => '100',
+    'unsigned' => false,
+    'null' => true,
+    'key' => '',
+    'default' => NULL,
+    'auto_increment' => false,
+    'extra' => '',
+  ),
+  'url' => 
+  array (
+    'type' => 'varchar',
+    'constraint' => '600',
+    'unsigned' => false,
+    'null' => true,
+    'key' => '',
+    'default' => NULL,
+    'auto_increment' => false,
+    'extra' => '',
+  ),
+  'descripcion' => 
   array (
     'type' => 'text',
     'constraint' => '',
@@ -36,10 +58,10 @@ class Migration_Create_ci_files extends CI_Migration
     'auto_increment' => false,
     'extra' => '',
   ),
-  'type' => 
+  'icon' => 
   array (
     'type' => 'varchar',
-    'constraint' => '256',
+    'constraint' => '200',
     'unsigned' => false,
     'null' => true,
     'key' => '',
@@ -47,76 +69,7 @@ class Migration_Create_ci_files extends CI_Migration
     'auto_increment' => false,
     'extra' => '',
   ),
-  'size' => 
-  array (
-    'type' => 'int',
-    'constraint' => '11',
-    'unsigned' => false,
-    'null' => true,
-    'key' => '',
-    'default' => NULL,
-    'auto_increment' => false,
-    'extra' => '',
-  ),
-  'width' => 
-  array (
-    'type' => 'int',
-    'constraint' => '11',
-    'unsigned' => false,
-    'null' => true,
-    'key' => '',
-    'default' => NULL,
-    'auto_increment' => false,
-    'extra' => '',
-  ),
-  'height' => 
-  array (
-    'type' => 'int',
-    'constraint' => '11',
-    'unsigned' => false,
-    'null' => true,
-    'key' => '',
-    'default' => NULL,
-    'auto_increment' => false,
-    'extra' => '',
-  ),
-  'id_file_parent' => 
-  array (
-    'type' => 'int',
-    'constraint' => '11',
-    'unsigned' => true,
-    'null' => true,
-    'key' => 'MUL',
-    'default' => NULL,
-    'auto_increment' => false,
-    'extra' => '',
-    'label' => 'Archivo padre',
-  ),
-  'num_thumbs' => 
-  array (
-    'type' => 'int',
-    'constraint' => '11',
-    'unsigned' => false,
-    'null' => true,
-    'key' => '',
-    'default' => NULL,
-    'auto_increment' => false,
-    'extra' => '',
-    'label' => 'Numero de thumbs',
-  ),
-  'thumbnail_tag' => 
-  array (
-    'type' => 'int',
-    'constraint' => '11',
-    'unsigned' => false,
-    'null' => true,
-    'key' => '',
-    'default' => NULL,
-    'auto_increment' => false,
-    'extra' => '',
-    'label' => 'Etiqueta del thumb',
-  ),
-  'estado' => 
+  'listed' => 
   array (
     'type' => 'varchar',
     'constraint' => '15',
@@ -126,6 +79,12 @@ class Migration_Create_ci_files extends CI_Migration
     'default' => 'ENABLED',
     'auto_increment' => false,
     'extra' => '',
+    'input' => 'radio',
+    'options' => 
+    array (
+      0 => 'ENABLED',
+      1 => 'DISABLED',
+    ),
   ),
   'change_count' => 
   array (
@@ -162,8 +121,8 @@ class Migration_Create_ci_files extends CI_Migration
   ),
   'date_modified' => 
   array (
-    'type' => 'int',
-    'constraint' => '11',
+    'type' => 'datetime',
+    'constraint' => '',
     'unsigned' => false,
     'null' => true,
     'key' => '',
@@ -173,8 +132,8 @@ class Migration_Create_ci_files extends CI_Migration
   ),
   'date_created' => 
   array (
-    'type' => 'int',
-    'constraint' => '11',
+    'type' => 'datetime',
+    'constraint' => '',
     'unsigned' => false,
     'null' => true,
     'key' => '',
@@ -182,21 +141,26 @@ class Migration_Create_ci_files extends CI_Migration
     'auto_increment' => false,
     'extra' => '',
   ),
+  'status' => 
+  array (
+    'type' => 'varchar',
+    'constraint' => '255',
+    'unsigned' => false,
+    'null' => true,
+    'key' => '',
+    'default' => 'ENABLED',
+    'auto_increment' => false,
+    'extra' => '',
+  ),
 );
         $fk_keys = array (
-  'ci_files_ibfk_1' => 
-  array (
-    'table' => 'ci_files',
-    'idLocal' => 'id_file_parent',
-    'idForeign' => 'id_file',
-  ),
-  'ci_files_ibfk_2' => 
+  'ci_modulos_ibfk_1' => 
   array (
     'table' => 'ci_usuarios',
     'idLocal' => 'id_user_modified',
     'idForeign' => 'id_usuario',
   ),
-  'ci_files_ibfk_3' => 
+  'ci_modulos_ibfk_2' => 
   array (
     'table' => 'ci_usuarios',
     'idLocal' => 'id_user_created',
@@ -204,13 +168,10 @@ class Migration_Create_ci_files extends CI_Migration
   ),
 );
         $this->dbforge->add_field($fields);
-        $this->dbforge->add_key('id_file', TRUE);
+        $this->dbforge->add_key('id_modulo', TRUE);
         $this->dbforge->add_key($fk_keys);
-        $this->create_or_alter_table('ci_files', '$settings');
+        $this->create_or_alter_table('ci_modulos', '$settings');
         $settings = array (
-  'listed' => 'ENABLED',
-  'status' => 'ENABLED',
-  'icon' => 'fa fa-files',
   'ctrl' => true,
   'model' => true,
   'views' => true,

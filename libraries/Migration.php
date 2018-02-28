@@ -749,8 +749,7 @@ class CI_Migration
                 $this->_update_indexes_foreignKeys($this->_keys, $this->_fields, $tableLocal);
             }
         }
-
-        $this->set_params($tableLocal);
+        $this->_table_name = $tableLocal;
     }
 
     public function start($id_migration, $bForce_update = false)
@@ -953,8 +952,10 @@ class CI_Migration
         return true;
     }
 
-    public function set_settings($settings){
+    public function set_settings($settings,$tableLocal = ''){
 
+        $tableLocal = $this->_table_name;
+        $this->set_params($tableLocal);
         if(count($settings)) {
             $nameModelModules = '';
             $indexMigrationModules = config_item('sys')['ci']['migIndexModules'];
@@ -985,6 +986,7 @@ class CI_Migration
             // ******************************************************************************************
 
             if (validate_modulo('base', 'modulos')) {
+                $exists = false;
                 $this->load->model("base/model_modulos");
                 $oModulos = $this->db->get('ci_modulos')->result_object();
                 foreach ($oModulos as $modulo) {
@@ -3899,13 +3901,9 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
             } else {
                 $data = array(
                     'id_usuario' => 1,
-                    'name' => 'Rafael',
-                    'lastname' => 'Gutierrez',
+                    'nombre' => 'Rafael',
+                    'apellido' => 'Gutierrez',
                     'email' => 'rafael@herbalife.com.bo',
-                    'mobile_number_1' => '3213231',
-                    'mobile_number_2' => '3213231',
-                    'ci' => '3213231',
-                    'img' => 'rafo.jpg',
                     'password' => '123',
                     'date_created' => date('Y-m-d H:i:s'),
                     'date_modified' => date('Y-m-d H:i:s')

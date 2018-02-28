@@ -132,13 +132,12 @@ class Ctrl_Migrate extends Base_Controller
         $tables = $configData['table'];
         $fields = array();
         $migIndex = 0;
-        $modType = explode('_',$tables[0]['@attributes']['name'])[0];
+        list($modInit,$submodInit) = getModSubMod($tables[0]['@attributes']['name']);
 
         foreach ($tables as $i => $data) {
             $id_table = '';
             $fields = array();
             $tableAttributes = $data['@attributes'];
-
             if(isset($data['column']) && count($data['column'])){
                 foreach ($data['column'] as $j => $params) {
                     if(isset($params['@attributes']) && $params['@attributes'] != []){
@@ -225,10 +224,10 @@ class Ctrl_Migrate extends Base_Controller
             $this->dbforge->fields = $fields;
             $this->migration->_id_table = $id_table;
 
-            $mod = explode('_', $tableAttributes['name'])[0];
-            if($modType != $mod){
+            list($mod,$submod) = getModSubMod($tableAttributes['name']);
+            if($modInit != $mod){
                 $migIndex = 0;
-                $modType = $mod;
+                $modInit = $mod;
             }
 
             $migIndex++;
@@ -240,31 +239,46 @@ class Ctrl_Migrate extends Base_Controller
         }
     }
 
-    public function fromdatabase(){
-
-        $table = $this->dbforge->getArrayFieldsFromTables("ci_files");
-        $tableSettings = $this->dbforge->getArrayTablesSettingsFromDB("ci_files");
-        $tablePrimaryKey = $this->dbforge->getPrimaryKeyFromTable("ci_files");
-        $tableName = array_keys($table)[0];
-        $tableFields = array_values($table)[0];
-        list($mod,$submod) = getModSubMod($tableName);
+    public function fromdatabase()
+    {
+        $tables = $this->dbforge->getArrayFieldsFromTables();
         $migIndex = 1;
-        $strMigIndex = str_pad("$migIndex", 3, "0", STR_PAD_LEFT);
-        $fileName = $strMigIndex."_create_$tableName.php";
-        $tableSettings['ctrl'] = isset($tableSettings['ctrl']) ? $tableSettings['ctrl'] : TRUE;
-        $tableSettings['model'] = isset($tableSettings['model']) ? $tableSettings['model'] : TRUE;
-        $tableSettings['views'] = isset($tableSettings['views']) ? $tableSettings['views'] : TRUE;
-        $this->data["userCreated"] = config_item('soft_user');
-        $this->data["dateCreated"] = date('d/m/Y');
-        $this->data["timeCreated"] = date("g:i a");
-        $this->data["tablePrimaryKey"] = $tablePrimaryKey;
-        $this->data["tableName"] = $tableName;
-        $this->data["tableFields"] = var_export($tableFields,true);
-        $this->data["tableSettings"] = var_export($tableSettings,true);
-
-        $phpContent = $this->load->view("template_migrations",$this->data, true, true);
-
-        $framePath = $mod == "ci" ? BASEPATH : APPPATH;
-        $this->migration->write_file($framePath."migrations/tables/$mod/$fileName",$phpContent);
+        $modInit = '';
+        $submodInit = '';
+        foreach ($tables as $name => $fields){
+            $tableSettings = $this->dbforge->getArrayTablesSettingsFromDB($name);
+            $tablePrimaryKey = $this->dbforge->getPrimaryKeyFromTable($name);
+            $tableName = $name;
+            $tableFields = $fields;
+            list($mod,$submod) = getModSubMod($tableName);
+            if($modInit != $mod){
+                $migIndex = 1;
+                $modInit = $mod;
+            }
+            $strMigIndex = str_pad("$migIndex", 3, "0", STR_PAD_LEFT);
+            $fileName = $strMigIndex."_create_$tableName.php";
+            $tableRelations = $this->dbforge->getTableRelations($name);
+            $tableSettings['ctrl'] = isset($tableSettings['ctrl']) ? $tableSettings['ctrl'] : TRUE;
+            $tableSettings['model'] = isset($tableSettings['model']) ? $tableSettings['model'] : TRUE;
+            $tableSettings['views'] = isset($tableSettings['views']) ? $tableSettings['views'] : TRUE;
+            $this->data["userCreated"] = config_item('soft_user');
+            $this->data["dateCreated"] = date('d/m/Y');
+            $this->data["timeCreated"] = date("g:i a");
+            $this->data["tablePrimaryKey"] = $tablePrimaryKey;
+            $this->data["tableName"] = $tableName;
+            $this->data["tableFields"] = var_export($tableFields,true);
+            $this->data["tableRelations"] = var_export($tableRelations,true);
+            $this->data["tableSettings"] = var_export($tableSettings,true);
+            $phpContent = $this->load->view("template_migrations",$this->data, true, true);
+            $framePath = ($mod == "ci" ? BASEPATH : APPPATH)."migrations/";
+            if ($this->migration->create_folder($framePath)) {
+                if ($this->migration->create_folder($framePath."tables/")) {
+                    if ($this->migration->create_folder($framePath."tables/$mod")) {
+                        $this->migration->write_file($framePath."tables/$mod/$fileName",$phpContent);
+                    }
+                }
+            }
+            $migIndex++;
+        }
     }
 }

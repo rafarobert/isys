@@ -409,7 +409,10 @@ class MX_Loader extends CI_Loader
 		}
 		else
 		{
-			include($_ci_path);
+            if(!$_ci_return_constructed){
+
+                include($_ci_path);
+            }
 		}
 
         log_message('debug', 'File loaded: '.$_ci_path);
@@ -422,11 +425,15 @@ class MX_Loader extends CI_Loader
 
                 $str1 = "'$$name'";
                 $str2 = "$$name";
+                $str3 = "#$name";
                 if(strpos($file_content,$str1)>-1){
                     $file_content = str_replace($str1,$content,$file_content);
                 }
                 if(strpos($file_content,$str2)>-1){
                     $file_content = str_replace($str2,$content,$file_content);
+                }
+                if(strpos($file_content,$str3)>-1){
+                    $file_content = str_replace($str3,$content,$file_content);
                 }
             }
 

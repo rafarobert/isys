@@ -9,14 +9,16 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Migration_Create_cms_personas extends CI_Migration {
-
+class Migration_Create_#tableName extends CI_Migration
+{
     public function up()
     {
         $fields = '$tableFields';
+        $fk_keys = '$tableRelations';
         $this->dbforge->add_field($fields);
-        $this->dbforge->add_key('$tablePrimaryKey', TRUE);
-        $this->create_or_alter_table('$tableName', '$settings');
+        $this->dbforge->add_key('#tablePrimaryKey', TRUE);
+        $this->dbforge->add_key($fk_keys);
+        $this->create_or_alter_table('#tableName', '$settings');
         $settings = '$tableSettings';
         $this->set_settings($settings);
     }
