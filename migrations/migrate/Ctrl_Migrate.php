@@ -36,7 +36,7 @@ class Ctrl_Migrate extends Base_Controller
         //*******************************************************************************************
         //******* si se hace el migration a un elemento de algun modulo especifico ******************
         //*******************************************************************************************
-        if (validate_var($modulo, self::STRING && validate_var($submod, self::NUMERIC))) {
+        if (validateVar($modulo, self::STRING && validateVar($submod, self::NUMERIC))) {
             foreach ($migrations as $mod => $migration_keys) {
                 if ($mod == $modulo && !$it_worked) {
                     $this->dbforge->fields = array();
@@ -56,7 +56,7 @@ class Ctrl_Migrate extends Base_Controller
         //****************************************************************************************
         //******* si se hace el migration de todos los submodulos de un modulo especifico *******
         //****************************************************************************************
-        else if (validate_var($modulo, self::STRING) && !validate_var($submod, self::NUMERIC)) {
+        else if (validateVar($modulo, self::STRING) && !validateVar($submod, self::NUMERIC)) {
             foreach ($migrations as $mod => $migration_keys) {
                 if ($mod == $modulo && !$it_worked) {
                     foreach ($migration_keys as $submod => $dir) {
@@ -78,7 +78,7 @@ class Ctrl_Migrate extends Base_Controller
         //**************************************************************************************
         //******* si se hace el migration de un modulo especifico, ojo: no tiene submodulos *******
         //**************************************************************************************
-        else if (validate_var($modulo, self::NUMERIC) && validate_var($submod, self::NUMERIC)) {
+        else if (validateVar($modulo, self::NUMERIC) && validateVar($submod, self::NUMERIC)) {
             $this->dbforge->fields = array();
             $this->dbforge->keys = array();
             $this->migration->start($submod);
@@ -92,7 +92,7 @@ class Ctrl_Migrate extends Base_Controller
         //***************************************************************************************
         //******* si se hace el migration de todos los modulos, ojo: no tienen submodulos *******
         //***************************************************************************************
-        else if (!validate_var($modulo) && !validate_var($submod)) {
+        else if (!validateVar($modulo) && !validateVar($submod)) {
             foreach ($this->migration->find_migrations(false) as $submod => $dir) {
                 $this->dbforge->fields = array();
                 $this->dbforge->keys = array();
@@ -242,8 +242,29 @@ class Ctrl_Migrate extends Base_Controller
 
     public function fromdatabase(){
 
-        $tables = $this->dbforge->getArrayTablesFieldsFromDB();
-        $this->migration->create_migration_tables($tables);
+        $table = $this->dbforge->getArrayFieldsFromTables("ci_files");
+        $tableSettings = $this->dbforge->getArrayTablesSettingsFromDB("ci_files");
+        $tablePrimaryKey = $this->dbforge->getPrimaryKeyFromTable("ci_files");
+        $tableName = array_keys($table)[0];
+        $tableFields = array_values($table)[0];
+        list($mod,$submod) = getModSubMod($tableName);
+        $migIndex = 1;
+        $strMigIndex = str_pad("$migIndex", 3, "0", STR_PAD_LEFT);
+        $fileName = $strMigIndex."_create_$tableName.php";
+        $tableSettings['ctrl'] = isset($tableSettings['ctrl']) ? $tableSettings['ctrl'] : TRUE;
+        $tableSettings['model'] = isset($tableSettings['model']) ? $tableSettings['model'] : TRUE;
+        $tableSettings['views'] = isset($tableSettings['views']) ? $tableSettings['views'] : TRUE;
+        $this->data["userCreated"] = config_item('soft_user');
+        $this->data["dateCreated"] = date('d/m/Y');
+        $this->data["timeCreated"] = date("g:i a");
+        $this->data["tablePrimaryKey"] = $tablePrimaryKey;
+        $this->data["tableName"] = $tableName;
+        $this->data["tableFields"] = var_export($tableFields,true);
+        $this->data["tableSettings"] = var_export($tableSettings,true);
 
+        $phpContent = $this->load->view("template_migrations",$this->data, true, true);
+
+        $framePath = $mod == "ci" ? BASEPATH : APPPATH;
+        $this->migration->write_file($framePath."migrations/tables/$mod/$fileName",$phpContent);
     }
 }

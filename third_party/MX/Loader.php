@@ -311,7 +311,7 @@ class MX_Loader extends CI_Loader
 	}
 
 	/** Load a module view **/
-	public function view($view, $vars = array(), $return = FALSE)
+	public function view($view, $vars = array(), $return = FALSE, $bReturnAny = FALSE)
 	{
 		list($path, $_view) = Modules::find($view, $this->_module, 'views/');
 
@@ -321,7 +321,7 @@ class MX_Loader extends CI_Loader
 			$view = $_view;
 		}
 
-        return $this->_ci_load(array('_ci_view' => $view, '_ci_vars' => $this->_ci_object_to_array($vars), '_ci_return' => $return));
+        return $this->_ci_load(array('_ci_view' => $view, '_ci_vars' => $this->_ci_object_to_array($vars), '_ci_return' => $return), $bReturnAny);
 	}
 
 	protected function &_ci_get_component($component)
@@ -334,7 +334,7 @@ class MX_Loader extends CI_Loader
 		return (isset($this->controller)) ? $this->controller->$class : CI::$APP->$class;
 	}
 
-	public function _ci_load($_ci_data)
+	public function _ci_load($_ci_data, $_ci_return_constructed = false)
 	{
 		extract($_ci_data);
 
@@ -412,9 +412,28 @@ class MX_Loader extends CI_Loader
 			include($_ci_path);
 		}
 
-		log_message('debug', 'File loaded: '.$_ci_path);
+        log_message('debug', 'File loaded: '.$_ci_path);
 
-		if ($_ci_return == TRUE) return ob_get_clean();
+		if($_ci_return_constructed == TRUE) {
+
+            $file_content = file_get_contents($_ci_path);
+
+            foreach ($_ci_vars as $name => $content){
+
+                $str1 = "'$$name'";
+                $str2 = "$$name";
+                if(strpos($file_content,$str1)>-1){
+                    $file_content = str_replace($str1,$content,$file_content);
+                }
+                if(strpos($file_content,$str2)>-1){
+                    $file_content = str_replace($str2,$content,$file_content);
+                }
+            }
+
+            return $file_content;
+        }
+
+        if ($_ci_return == TRUE) return ob_get_clean();
 
 		if (ob_get_level() > $this->_ci_ob_level + 1)
 		{

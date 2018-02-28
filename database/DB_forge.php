@@ -1054,16 +1054,16 @@ abstract class CI_DB_forge {
 		$this->fields = $this->keys = $this->primary_keys = array();
 	}
 
-	public function hasRelation($table1, $id1, $table2, $id2, $constraint = false, $database = false){
+	public function hasRelation($table1, $id1, $table2, $id2, $constraint = '', $database = ''){
 
 	    $CI = CI_Controller::get_instance();
-	    if(!$database){
+	    if($database == ''){
 	        $database = $CI->db->database;
         }
 
         $sql = "SELECT TABLE_NAME,COLUMN_NAME, CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE where CONSTRAINT_SCHEMA='$database' and TABLE_NAME='$table1' and COLUMN_NAME='$id1' and REFERENCED_TABLE_NAME='$table2' and REFERENCED_COLUMN_NAME='$id2'";
 
-	    if(!$constraint){
+	    if($constraint == ''){
 	        $constraint = '';
         } else {
             $sql .= " and CONSTRAINT_NAME='$constraint'";
@@ -1078,9 +1078,9 @@ abstract class CI_DB_forge {
         return false;
     }
 
-    public function getKeyFromTable($table, $database = false){
+    public function getPrimaryKeyFromTable($table, $database = ''){
         $CI = CI_Controller::get_instance();
-        if(!$database){
+        if($database == ''){
             $database = $CI->db->database;
         }
         $sql = "Select COLUMN_NAME from information_schema.`COLUMNS` where TABLE_SCHEMA='$database' and TABLE_NAME='$table' and COLUMN_KEY='PRI'";
@@ -1093,9 +1093,9 @@ abstract class CI_DB_forge {
         return false;
     }
 
-    public function fieldExistsInDB($table, $field, $database = false){
+    public function fieldExistsInDB($table, $field, $database = ''){
         $CI = CI_Controller::get_instance();
-        if(!$database){
+        if($database == ''){
             $database = $CI->db->database;
         }
 
@@ -1109,9 +1109,9 @@ abstract class CI_DB_forge {
         return false;
     }
 
-    public function setRelation($table, $id, $tableReferenced, $idReferenced, $idConstraint, $database = false){
+    public function setRelation($table, $id, $tableReferenced, $idReferenced, $idConstraint, $database = ''){
         $CI = CI_Controller::get_instance();
-        if(!$database){
+        if($database == ''){
             $database = $CI->db->database;
         }
         $sql = "ALTER TABLE `$table` ADD CONSTRAINT `$idConstraint` FOREIGN KEY (`$id`) REFERENCES `$tableReferenced` (`$idReferenced`) ON UPDATE CASCADE ON DELETE CASCADE";
@@ -1119,9 +1119,9 @@ abstract class CI_DB_forge {
         $CI->db->query($sql);
     }
 
-    public function removeRelation($table, $idConstraint, $database = false){
+    public function removeRelation($table, $idConstraint, $database = ''){
         $CI = CI_Controller::get_instance();
-        if(!$database){
+        if($database == ''){
             $database = $CI->db->database;
         }
 
@@ -1129,9 +1129,9 @@ abstract class CI_DB_forge {
         $CI->db->query($sql);
     }
 
-    public function setPrimaryKey($table, $id, $bAutoIncrement, $database = false){
+    public function setPrimaryKey($table, $id, $bAutoIncrement, $database = ''){
         $CI = CI_Controller::get_instance();
-        if(!$database){
+        if($database == ''){
             $database = $CI->db->database;
         }
 
@@ -1143,19 +1143,19 @@ abstract class CI_DB_forge {
         $CI->db->query($sql);
     }
 
-    public function getTableCommentsFromDB($table, $database = false){
+    public function getTableCommentsFromDB($table, $database = ''){
         $CI = CI_Controller::get_instance();
-        if(!$database){
+        if($database == ''){
             $database = $CI->db->database;
         }
 
         $sql = "SELECT table_comment FROM information_schema.tables WHERE table_schema = '$database' AND table_name = '$table'";
-        return $CI->db->query($sql)->result();
+        return $CI->db->query($sql)->row();
     }
 
-    public function getFieldCommentsFromDB($field, $table, $database = false){
+    public function getFieldCommentsFromDB($field, $table, $database = ''){
         $CI = CI_Controller::get_instance();
-        if(!$database){
+        if($database == ''){
             $database = $CI->db->database;
         }
 
@@ -1163,9 +1163,9 @@ abstract class CI_DB_forge {
         return $CI->db->query($sql)->row();
     }
 
-    public function getArrayTableNamesFromDB($database = false){
+    public function getArrayTableNamesFromDB($database = ''){
         $CI = CI_Controller::get_instance();
-        if(!$database){
+        if($database == ''){
             $database = $CI->db->database;
         }
 
@@ -1174,11 +1174,11 @@ abstract class CI_DB_forge {
 
     }
 
-    public function getArrayTablesFieldsFromDB($table = '', $database = false){
+    public function getArrayFieldsFromTables($table = '', $database = ''){
         $CI = CI_Controller::get_instance();
         $tables = array();
         $aTables = array();
-        if(!$database){
+        if($database == ''){
             $database = $CI->db->database;
         }
         if($table == ''){
@@ -1211,7 +1211,6 @@ abstract class CI_DB_forge {
                 unset($field['Key']);
                 unset($field['Default']);
                 unset($field['Extra']);
-                dump($field);
                 return [$fieldName => $field];
             };
             $aTable = array_map($callback,$data);
@@ -1225,5 +1224,19 @@ abstract class CI_DB_forge {
             }
         }
         return $aTables;
+    }
+
+    public function getArrayTablesSettingsFromDB($table = '', $database = '')
+    {
+        $CI = CI_Controller::get_instance();
+        $tables = array();
+        $aTables = array();
+        if($database == ''){
+            $database = $CI->db->database;
+        }
+        $comment = $this->getTableCommentsFromDB($table);
+        $stdComment = json_decode($comment->table_comment);
+        $aSettings = $stdComment != null ? json_decode(json_encode($stdComment),true) : [];
+        return $aSettings;
     }
 }

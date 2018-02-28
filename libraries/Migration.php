@@ -730,7 +730,7 @@ class CI_Migration
     // ********************* Se agrego para la crecion dinamica de los modulos ************************
     // ************************************************************************************************
 
-    public function create_or_alter_table($tableLocal, $settings = [])
+    public function create_or_alter_table($tableLocal)
     {
         $exists = false;
 
@@ -751,59 +751,6 @@ class CI_Migration
         }
 
         $this->set_params($tableLocal);
-
-        if(count($settings))
-        {
-            $nameModelModules = '';
-            $indexMigrationModules = config_item('sys')['ci']['migIndexModules'];
-
-            if(isset($_REQUEST['id_migration'])){
-                $id_migration = $_REQUEST['id_migration'];
-            } else {
-                $oMigrations = $this->db->get('migrations')->result();
-                $id_migration = $oMigrations[0]->version + 1 ;
-            }
-
-            if (validate_modulo('base', 'modulos')) {
-                $this->load->model("base/model_modulos");
-                $oModulos = $this->db->get('ci_modulos')->result_object();
-                foreach ($oModulos as $modulo) {
-                    if ($modulo->id_modulo == $id_migration) {
-                        $exists = true;
-                        break;
-                    }
-                    $exists = false;
-                }
-                $nameModelModules = "model_modulos";
-
-                if($this->db->table_exists('ci_usuarios')){
-
-                }
-            } else if ($tableLocal != "ci_modulos") {
-                redirect("migrate/set/ci/$indexMigrationModules");
-            }
-
-            list($mod,$submod) = getModSubMod($tableLocal);
-
-            $data = array(
-                'titulo' => isset($settings['title']) ? $settings['title'] : ucfirst($submod),
-                'icon' => isset($settings['icon']) ? $settings['icon'] : '',
-                'url' => config_item('sys')[$mod]['dir']."$submod",
-                'descripcion' => isset($settings['description']) ? $settings['descripcion'] : '',
-                'status' => isset($settings['status']) ? $settings['status'] : '',
-                'listed' => isset($settings['listed']) ? $settings['listed'] : '',
-                'id_user_created' => $this->getIdUserDefault(),
-                'id_user_modified' => $this->getIdUserDefault()
-            );
-
-            if($nameModelModules != '' && $tableLocal != "ci_modulos"){
-                if(!$exists){
-                    $this->{$nameModelModules}->save($data,null,$id_migration);
-                } else {
-                    $this->{$nameModelModules}->save($data,$id_migration);
-                }
-            }
-        }
     }
 
     public function start($id_migration, $bForce_update = false)
@@ -1006,6 +953,73 @@ class CI_Migration
         return true;
     }
 
+    public function set_settings($settings){
+
+        if(count($settings)) {
+            $nameModelModules = '';
+            $indexMigrationModules = config_item('sys')['ci']['migIndexModules'];
+
+            if(isset($_REQUEST['id_migration'])){
+                $id_migration = $_REQUEST['id_migration'];
+            } else {
+                $oMigrations = $this->db->get('migrations')->result();
+                $id_migration = $oMigrations[0]->version + 1 ;
+            }
+
+            // *****************************************************************************************
+            // ************************* Se crea el Modelo, Vista Controlador **************************
+            // *****************************************************************************************
+            if(validateArrayVar($settings,'ctrl','array') || validateArrayVar($settings,'ctrl','bool')){
+                $this->createCtrl($settings['ctrl']);
+            }
+            if(validateArrayVar($settings,'model','array') || validateArrayVar($settings,'model','bool')){
+                $this->createModel($settings['model']);
+            }
+            if(validateArrayVar($settings,'views','array') || validateArrayVar($settings,'views','bool')){
+                $this->createViewFiles($settings['views']);
+            }
+
+            // ******************************************************************************************
+            // *********************** Si la tabla modulos existe se agrega el modulo actual*************
+            // *********** de lo contrario se redirecciona a la creacion de latabla modulos *************
+            // ******************************************************************************************
+
+            if (validate_modulo('base', 'modulos')) {
+                $this->load->model("base/model_modulos");
+                $oModulos = $this->db->get('ci_modulos')->result_object();
+                foreach ($oModulos as $modulo) {
+                    if ($modulo->id_modulo == $id_migration) {
+                        $exists = true;
+                        break;
+                    }
+                    $exists = false;
+                }
+                $nameModelModules = "model_modulos";
+                list($mod,$submod) = getModSubMod($this->_table_name);
+                $data = array(
+                    'titulo' => isset($settings['title']) ? $settings['title'] : ucfirst($submod),
+                    'icon' => isset($settings['icon']) ? $settings['icon'] : '',
+                    'url' => config_item('sys')[$mod]['dir']."$submod",
+                    'descripcion' => isset($settings['description']) ? $settings['descripcion'] : '',
+                    'status' => isset($settings['status']) ? $settings['status'] : '',
+                    'listed' => isset($settings['listed']) ? $settings['listed'] : '',
+                    'id_user_created' => $this->getIdUserDefault(),
+                    'id_user_modified' => $this->getIdUserDefault()
+                );
+                if($nameModelModules != '' && $this->_table_name != "ci_modulos"){
+                    if(!$exists){
+                        $this->{$nameModelModules}->save($data,null,$id_migration);
+                    } else {
+                        $this->{$nameModelModules}->save($data,$id_migration);
+                    }
+                }
+
+            } else if ($this->_table_name != "ci_modulos") {
+                $redirect = "migrate/set/ci/$indexMigrationModules";
+            }
+        }
+    }
+
     public function set_params($tableLocal)
     {
         if(!in_array($tableLocal,config_item('tables_mvc_excepted'))){
@@ -1022,7 +1036,7 @@ class CI_Migration
             $this->set_SubMod_Plural_Singular($sub_modulo);
             $this->verifyAppOrBase();
 
-            $this->_id_table = $this->_id_table == null ? $this->dbforge->getKeyFromTable($tableLocal) : $this->_id_table;
+            $this->_id_table = $this->_id_table == null ? $this->dbforge->getPrimaryKeyFromTable($tableLocal) : $this->_id_table;
 
             $this->_mod = $mod_name;
             $this->_sub_mod = $sub_modulo;
@@ -1271,7 +1285,7 @@ class CI_Migration
         }
     }
 
-    public function create_ctrl()
+    public function createCtrl($options = [])
     {
         if (is_array($this->_fields)) {
 
@@ -1348,7 +1362,7 @@ class CI_Migration
         return false;
     }
 
-    public function create_model($options = [])
+    public function createModel($options = [])
     {
         if (is_array($this->_fields)) {
 
@@ -1535,7 +1549,7 @@ class CI_Migration
     }
 
 
-    public function create_views($views)
+    public function createViews($views)
     {
         if ($this->create_folder($this->_dir_mod_view)) {
 
@@ -1992,9 +2006,9 @@ class CI_Migration
         return false;
     }
 
-    public function create_view_files($aFiles = [], $defaults = true)
+    public function createViewFiles($aFiles = [], $defaults = true)
     {
-        if (count($aFiles) > 0) {
+        if (validateVar($aFiles,'array')) {
 
             $filesMigrateViews = $this->get_files_from($this->_dir_sub_mod_migrate_views);
 
@@ -3575,9 +3589,9 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
         $content .= '
         $this->create_or_alter_table("'.$this->_table_name.'",$settings);
 
-        $this->create_ctrl();
-        $this->create_model();
-        $this->create_view_files();
+        $this->createCtrl();
+        $this->createModel();
+        $this->createViewFiles();
 
     }
 }
@@ -3781,7 +3795,7 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
     }
     protected function _update_indexes_foreignKeys($keys, $fields, $localTable)
     {
-        $localTableId = $this->dbforge->getKeyFromTable($localTable);
+        $localTableId = $this->dbforge->getPrimaryKeyFromTable($localTable);
         $fields_new_table = array_keys($fields);
 
         if (is_array($keys) && count($keys)) {
@@ -3903,4 +3917,17 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
             }
         }
     }
+
+    public function create_migration_tables()
+    {
+        $tables = $this->dbforge->getArrayTablesFieldsFromDB();
+
+
+
+        foreach ($tables as $table){
+            $content = var_export($table,true);
+        }
+    }
+
+
 }

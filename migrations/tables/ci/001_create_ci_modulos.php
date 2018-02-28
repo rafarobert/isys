@@ -1,5 +1,4 @@
-
-        <?php
+<?php
 /**
  * Created by herbalife.
  * User: Rafael Gutierrez Gaspar
@@ -10,86 +9,87 @@
 
 defined("BASEPATH") OR exit("No direct script access allowed");
 
-class Migration_Create_ci_modulos extends CI_Migration {
+class Migration_Create_ci_modulos extends CI_Migration
+{
 
     public function up()
     {
-        $fields = array (
-  'id_modulo' => 
-  array (
-    'type' => 'int',
-    'required' => true,
-    'constraint' => 11,
-    'unsigned' => true,
-  ),
-  'titulo' => 
-  array (
-    'type' => 'VARCHAR',
-    'constraint' => 100,
-    'required' => true,
-  ),
-  'url' => 
-  array (
-    'type' => 'VARCHAR',
-    'constraint' => 600,
-    'required' => true,
-  ),
-  'descripcion' => 
-  array (
-    'type' => 'TEXT',
-    'required' => true,
-  ),
-  'icon' => 
-  array (
-    'type' => 'VARCHAR',
-    'constraint' => 200,
-    'required' => true,
-  ),
-  'listed' => 
-  array (
-    'type' => 'VARCHAR',
-    'constraint' => 15,
-    'required' => true,
-    'default' => 'ENABLED',
-  ),
-  'status' => 
-  array (
-    'type' => 'VARCHAR',
-    'constraint' => 255,
-    'required' => true,
-    'default' => 'ENABLED',
-  ),
-  'change_count' => 
-  array (
-    'type' => 'INT',
-    'required' => true,
-    'default' => '0',
-  ),
-  'id_user_modified' => 
-  array (
-    'type' => 'int',
-    'required' => true,
-    'constraint' => 11,
-    'unsigned' => true,
-  ),
-  'id_user_created' => 
-  array (
-    'type' => 'int',
-    'required' => true,
-    'constraint' => 11,
-    'unsigned' => true,
-  ),
-  'date_modified' => 
-  array (
-    'type' => 'DATETIME',
-    'required' => true,
-  ),
-  'date_created' => 
-  array (
-    'type' => 'DATETIME',
-    'required' => true,
-  ),
-);
+        $fields = array(
+            'id_modulo' =>
+                array(
+                    'type' => 'int',
+                    'required' => true,
+                    'constraint' => 11,
+                    'unsigned' => true,
+                ),
+            'titulo' =>
+                array(
+                    'type' => 'VARCHAR',
+                    'constraint' => 100,
+                    'required' => true,
+                ),
+            'url' =>
+                array(
+                    'type' => 'VARCHAR',
+                    'constraint' => 600,
+                    'required' => true,
+                ),
+            'descripcion' =>
+                array(
+                    'type' => 'TEXT',
+                    'required' => true,
+                ),
+            'icon' =>
+                array(
+                    'type' => 'VARCHAR',
+                    'constraint' => 200,
+                    'required' => true,
+                ),
+            'listed' =>
+                array(
+                    'type' => 'VARCHAR',
+                    'constraint' => 15,
+                    'required' => true,
+                    'default' => 'ENABLED',
+                ),
+            'status' =>
+                array(
+                    'type' => 'VARCHAR',
+                    'constraint' => 255,
+                    'required' => true,
+                    'default' => 'ENABLED',
+                ),
+            'change_count' =>
+                array(
+                    'type' => 'INT',
+                    'required' => true,
+                    'default' => '0',
+                ),
+            'id_user_modified' =>
+                array(
+                    'type' => 'int',
+                    'required' => true,
+                    'constraint' => 11,
+                    'unsigned' => true,
+                ),
+            'id_user_created' =>
+                array(
+                    'type' => 'int',
+                    'required' => true,
+                    'constraint' => 11,
+                    'unsigned' => true,
+                ),
+            'date_modified' =>
+                array(
+                    'type' => 'DATETIME',
+                    'required' => true,
+                ),
+            'date_created' =>
+                array(
+                    'type' => 'DATETIME',
+                    'required' => true,
+                ),
+        );
 
         $settings = array(
             "listed" => "enabled",
@@ -108,12 +108,12 @@ class Migration_Create_ci_modulos extends CI_Migration {
                 "idForeign" => "id_usuario",
             ),
         );
-        
+
         $this->dbforge->add_field($fields);
         $this->dbforge->add_key("id_modulo", TRUE);
-        
+
         $this->dbforge->add_key($fk_keys);
-        $this->create_or_alter_table("ci_modulos",$settings);
+        $this->create_or_alter_table("ci_modulos", $settings);
 
         $this->create_ctrl();
         $this->create_model();

@@ -64,6 +64,13 @@ class CI_Router {
 	 */
 	public $routes =	array();
 
+    /**
+     * Main Source Path
+     *
+     * @var	string
+     */
+    public $framePath =	array();
+
 	/**
 	 * Current class name
 	 *
