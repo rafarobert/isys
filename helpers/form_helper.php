@@ -1096,3 +1096,19 @@ if ( ! function_exists('form_select'))
         }
     }
 }
+
+if (!function_exists('setTitleFromWordWithDashes')) {
+    function strhas($string, $obj)
+    {
+        $strCase1 = ucfirst($obj);
+        $strCase2 = strtoupper($obj);
+        $strCase3 = strtolower($obj);
+
+        if(strpos($strCase1, $string) > -1 || strpos($strCase2, $string) > -1 || strpos($strCase3, $string) > -1){
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
