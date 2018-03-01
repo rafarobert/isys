@@ -3,7 +3,7 @@
          * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
          * Date: 01/03/2018
-         * Time: 12:23 am
+         * Time: 1:04 am
          * @var Model_modulos $model_modulos
          * @var Model_modulos $modulos
          * @var Model_modulos $modulo
@@ -28,9 +28,9 @@
                     
                     <!-- *** estic - tables - inicio - 1 *** -->
 
-            <th>Titulo</th>
+            <th>Id Modulo</th>
+                <th>Titulo</th>
                 <th>Url</th>
-                <th>Descripcion</th>
                 
 
             <!-- *** estic - tables - fin - 1 *** -->
@@ -46,9 +46,9 @@
                     
                     <!-- *** estic - tables - inicio - 2 *** -->
             
-            <td><?= $oModulo->titulo; ?></td>
+            <td><?= $oModulo->id_modulo; ?></td>
+                <td><?= $oModulo->titulo; ?></td>
                 <td><?= $oModulo->url; ?></td>
-                <td><?= $oModulo->descripcion; ?></td>
                 
 
             <!-- *** estic - tables - fin - 2 *** -->
@@ -67,3 +67,11 @@
         </section>
 
         <!-- *** estic - index_file - end *** -->
+            
+            
+            
+            
+            
+            
+            
+            

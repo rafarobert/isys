@@ -3,7 +3,7 @@
          * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
          * Date: 01/03/2018
-         * Time: 12:23 am
+         * Time: 1:04 am
          * @var Model_files $model_files
          * @var Model_files $files
          * @var Model_files $fil
@@ -28,9 +28,9 @@
                     
                     <!-- *** estic - tables - inicio - 1 *** -->
 
-            <th>Path</th>
+            <th>Id File</th>
+                <th>Path</th>
                 <th>Type</th>
-                <th>Size</th>
                 
 
             <!-- *** estic - tables - fin - 1 *** -->
@@ -46,9 +46,9 @@
                     
                     <!-- *** estic - tables - inicio - 2 *** -->
             
-            <td><?= $oFil->path; ?></td>
+            <td><?= $oFil->id_file; ?></td>
+                <td><?= $oFil->path; ?></td>
                 <td><?= $oFil->type; ?></td>
-                <td><?= $oFil->size; ?></td>
                 
 
             <!-- *** estic - tables - fin - 2 *** -->
@@ -67,3 +67,17 @@
         </section>
 
         <!-- *** estic - index_file - end *** -->
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            

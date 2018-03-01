@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: rafaelgutierrez
  * Date: 01/03/2018
- * Time: 12:22 am
+ * Time: 3:43 am
  */
 
 
@@ -20,7 +20,6 @@ class Migration_Create_ci_modulos extends CI_Migration
     'constraint' => '11',
     'unsigned' => true,
     'null' => true,
-    'key' => 'PRI',
     'default' => NULL,
     'auto_increment' => false,
     'extra' => '',
@@ -31,9 +30,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'constraint' => '100',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'url' => 
@@ -42,9 +39,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'constraint' => '600',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'descripcion' => 
@@ -53,9 +48,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'constraint' => '',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'icon' => 
@@ -64,9 +57,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'constraint' => '200',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'listed' => 
@@ -75,9 +66,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'constraint' => '15',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => 'ENABLED',
-    'auto_increment' => false,
     'extra' => '',
     'input' => 'radio',
     'options' => 
@@ -92,9 +81,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'constraint' => '11',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => '0',
-    'auto_increment' => false,
     'extra' => '',
   ),
   'id_user_modified' => 
@@ -103,10 +90,10 @@ class Migration_Create_ci_modulos extends CI_Migration
     'constraint' => '11',
     'unsigned' => true,
     'null' => true,
-    'key' => 'MUL',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
+    'idForeign' => 'id_usuario',
+    'table' => 'ci_usuarios',
   ),
   'id_user_created' => 
   array (
@@ -114,10 +101,10 @@ class Migration_Create_ci_modulos extends CI_Migration
     'constraint' => '11',
     'unsigned' => true,
     'null' => true,
-    'key' => 'MUL',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
+    'idForeign' => 'id_usuario',
+    'table' => 'ci_usuarios',
   ),
   'date_modified' => 
   array (
@@ -125,9 +112,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'constraint' => '',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'date_created' => 
@@ -136,9 +121,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'constraint' => '',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'status' => 
@@ -147,9 +130,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'constraint' => '255',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => 'ENABLED',
-    'auto_increment' => false,
     'extra' => '',
   ),
   'id_file' => 
@@ -158,9 +139,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'constraint' => '11',
     'unsigned' => true,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
 );
@@ -192,6 +171,6 @@ class Migration_Create_ci_modulos extends CI_Migration
 
     public function down()
     {
-        $this->dbforge->drop_table('ci_modulos');
+        //$this->dbforge->drop_table('ci_modulos');
     }
 }

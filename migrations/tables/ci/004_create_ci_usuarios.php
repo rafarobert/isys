@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: rafaelgutierrez
  * Date: 01/03/2018
- * Time: 12:22 am
+ * Time: 3:43 am
  */
 
 
@@ -20,7 +20,6 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '11',
     'unsigned' => true,
     'null' => true,
-    'key' => 'PRI',
     'default' => NULL,
     'auto_increment' => true,
     'extra' => 'auto_increment',
@@ -31,9 +30,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '256',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'apellido' => 
@@ -42,9 +39,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '256',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'username' => 
@@ -53,9 +48,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '11',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'email' => 
@@ -64,9 +57,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '100',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'password' => 
@@ -75,9 +66,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '128',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'fec_nacimiento' => 
@@ -86,9 +75,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'sexo' => 
@@ -97,9 +84,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '15',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'input' => 'radio',
     'options' => 
@@ -114,12 +99,12 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '10',
     'unsigned' => true,
     'null' => true,
-    'key' => 'MUL',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'label' => 'Invitado por',
     'input' => 'default',
+    'idForeign' => 'id_usuario',
+    'table' => 'ci_usuarios',
   ),
   'phone_number_1' => 
   array (
@@ -127,9 +112,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '20',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'label' => 'Telefono 1',
   ),
@@ -139,9 +122,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '20',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'labe' => 'Telefono 2',
   ),
@@ -151,9 +132,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '20',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'label' => 'Celular 1',
   ),
@@ -163,9 +142,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '20',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'label' => 'Celular 2',
   ),
@@ -175,9 +152,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '50',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'label' => 'Codigo de acceso',
   ),
@@ -187,12 +162,11 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '10',
     'unsigned' => true,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'label' => 'Tipo de asociado',
     'input' => 'dropdown',
+    'fieldRef' => 'nombre',
   ),
   'id_nivel_asociado' => 
   array (
@@ -200,12 +174,11 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '10',
     'unsigned' => true,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'label' => 'Nivel de asociado',
     'input' => 'dropdown',
+    'fieldRef' => 'nombre',
   ),
   'id_turno' => 
   array (
@@ -213,12 +186,13 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '10',
     'unsigned' => true,
     'null' => true,
-    'key' => 'MUL',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'label' => 'Turno de',
     'input' => 'dropdown',
+    'fieldRef' => 'id_asociado',
+    'idForeign' => 'id_turno',
+    'table' => 'hbf_turnos',
   ),
   'id_role' => 
   array (
@@ -226,10 +200,10 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '10',
     'unsigned' => true,
     'null' => true,
-    'key' => 'MUL',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
+    'idForeign' => 'id_role',
+    'table' => 'hbf_roles',
   ),
   'id_picture' => 
   array (
@@ -237,12 +211,13 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '11',
     'unsigned' => true,
     'null' => true,
-    'key' => 'MUL',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'label' => 'Foto de perfil',
     'input' => 'image',
+    'fieldRef' => 'nombre',
+    'idForeign' => 'id_file',
+    'table' => 'ci_files',
   ),
   'app_monitor' => 
   array (
@@ -250,9 +225,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '50',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'label' => 'Permitir app monitoreo',
     'input' => 'radio',
@@ -268,9 +241,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '50',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'label' => 'Permitir app ordenes',
     'input' => 'radio',
@@ -286,9 +257,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '50',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'label' => 'Permitir app administrador',
     'input' => 'radio',
@@ -304,9 +273,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '256',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'estado' => 
@@ -315,9 +282,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '15',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => 'ENABLED',
-    'auto_increment' => false,
     'extra' => '',
   ),
   'change_count' => 
@@ -326,9 +291,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '11',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => '0',
-    'auto_increment' => false,
     'extra' => '',
   ),
   'date_created' => 
@@ -337,9 +300,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'date_modified' => 
@@ -348,9 +309,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
 );
@@ -394,6 +353,6 @@ class Migration_Create_ci_usuarios extends CI_Migration
 
     public function down()
     {
-        $this->dbforge->drop_table('ci_usuarios');
+        //$this->dbforge->drop_table('ci_usuarios');
     }
 }

@@ -2646,7 +2646,8 @@ class CI_Migration
     {
         $content = '';
         $max = 3;
-        $exepts = array('id', 'password');
+        $exepts = config_item("controlFields");
+        $exepts = array_merge($exepts,array($this->_id_table, 'password'));
 
         if ($index == 1) {
 
@@ -2656,7 +2657,7 @@ class CI_Migration
             ';
             $n = $max;
             foreach ($this->_fields as $key => $val) {
-                if (!in_array(explode('_', $key)[0], $exepts) && $n > 0 && $key != 'date_created' && $key != 'date_modified') {
+                if (!in_array($key,$exepts) && $n > 0) {
                     $content .= '<th>' . (isset(explode('_', $key)[1]) ? ucfirst(explode('_', $key)[0]) . ' ' . ucfirst(explode('_', $key)[1]) : ucfirst(explode('_', $key)[0])) . '</th>
                 ';
                     $n--;
@@ -2680,7 +2681,7 @@ class CI_Migration
 
             $n = $max;
             foreach ($this->_fields as $key => $val) {
-                if (!in_array(explode('_', $key)[0], $exepts) && $n > 0 && $key != 'date_created' && $key != 'date_modified') {
+                if (!in_array($key, $exepts) && $n > 0) {
                     $content .= '<td><?= $' . $foreachKey . '->' . $key . '; ?></td>
                 ';
                     $n--;
@@ -2771,7 +2772,8 @@ class CI_Migration
         $content .= '
         
         ';
-        $exepts = [$this->_id_table,'date_created','date_modified'];
+        $exepts = config_item('controlFields');
+        array_push($exepts,$this->_id_table);
 
         foreach ($this->_fields as $key => $value) {
 

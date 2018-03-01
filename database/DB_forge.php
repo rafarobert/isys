@@ -1229,12 +1229,28 @@ abstract class CI_DB_forge {
                 return [$fieldName => $field];
             };
             $aTable = array_map($callback,$data);
+            $aRelations = $this->getTableRelations($tab);
             foreach ($aTable as $key => $aFields){
                 $colName = array_keys($aFields)[0];
                 $comment = $this->getFieldCommentsFromDB($colName,$tab);
                 $stdComment = json_decode($comment->COLUMN_COMMENT);
                 $aExtras = $stdComment != null ? json_decode(json_encode($stdComment),true) : [];
                 $aFields = array_merge($aFields[$colName],$aExtras);
+                if(validateVar($aRelations,'array')){
+                    $constraintName = array_keys($aRelations)[0];
+                    $aOptionsRelated = array_values($aRelations);
+                    foreach ($aOptionsRelated as $i => $options){
+                        if($options['idLocal'] == $colName){
+                            $aFields = array_merge($aFields,['idForeign'=>$options['idForeign'],'table'=>$options['table']]);
+                        }
+                    }
+                }
+                if($aFields['key'] != "PRI"){
+                    unset($aFields['key']);
+                    unset($aFields['auto_increment']);
+                } else {
+                    unset($aFields['key']);
+                }
                 $aTables[$tab][$colName] = $aFields;
             }
         }

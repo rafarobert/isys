@@ -338,6 +338,8 @@
             );
             
             public $rules_edit = array(    
+            
+            
             // *** estic - tables - inicio - 2 ***
             
             
@@ -493,3 +495,9 @@
         }
 
         // *** estic - model_file - end ***
+            
+            
+            
+            
+            
+            

@@ -25,6 +25,6 @@ class Migration_Create_#tableName extends CI_Migration
 
     public function down()
     {
-        $this->dbforge->drop_table('#tableName');
+        //$this->dbforge->drop_table('#tableName');
     }
 }

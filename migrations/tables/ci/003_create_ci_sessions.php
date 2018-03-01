@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: rafaelgutierrez
  * Date: 01/03/2018
- * Time: 12:22 am
+ * Time: 3:43 am
  */
 
 
@@ -20,7 +20,6 @@ class Migration_Create_ci_sessions extends CI_Migration
     'constraint' => '128',
     'unsigned' => false,
     'null' => true,
-    'key' => 'PRI',
     'default' => NULL,
     'auto_increment' => false,
     'extra' => '',
@@ -31,9 +30,7 @@ class Migration_Create_ci_sessions extends CI_Migration
     'constraint' => '45',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'timestamp' => 
@@ -42,9 +39,7 @@ class Migration_Create_ci_sessions extends CI_Migration
     'constraint' => '10',
     'unsigned' => true,
     'null' => true,
-    'key' => '',
     'default' => '0',
-    'auto_increment' => false,
     'extra' => '',
   ),
   'data' => 
@@ -53,9 +48,7 @@ class Migration_Create_ci_sessions extends CI_Migration
     'constraint' => '',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'last_activity' => 
@@ -64,9 +57,7 @@ class Migration_Create_ci_sessions extends CI_Migration
     'constraint' => '',
     'unsigned' => false,
     'null' => true,
-    'key' => '',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
   ),
   'id_user' => 
@@ -75,11 +66,16 @@ class Migration_Create_ci_sessions extends CI_Migration
     'constraint' => '11',
     'unsigned' => true,
     'null' => true,
-    'key' => 'MUL',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'label' => 'Nombre del Usuario',
+    'fieldRef' => 
+    array (
+      0 => 'nombre',
+      1 => 'apellido',
+    ),
+    'idForeign' => 'id_usuario',
+    'table' => 'ci_usuarios',
   ),
   'id_hbf_sesion' => 
   array (
@@ -87,11 +83,12 @@ class Migration_Create_ci_sessions extends CI_Migration
     'constraint' => '10',
     'unsigned' => true,
     'null' => true,
-    'key' => 'MUL',
     'default' => NULL,
-    'auto_increment' => false,
     'extra' => '',
     'label' => 'Sesion de',
+    'fieldRef' => 'id_encargado',
+    'idForeign' => 'id_sesion',
+    'table' => 'hbf_sesiones',
   ),
 );
         $fk_keys = array (
@@ -122,6 +119,6 @@ class Migration_Create_ci_sessions extends CI_Migration
 
     public function down()
     {
-        $this->dbforge->drop_table('ci_sessions');
+        //$this->dbforge->drop_table('ci_sessions');
     }
 }
