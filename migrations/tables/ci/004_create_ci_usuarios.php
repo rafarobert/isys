@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: rafaelgutierrez
  * Date: 01/03/2018
- * Time: 3:43 am
+ * Time: 5:06 pm
  */
 
 
@@ -23,6 +23,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'default' => NULL,
     'auto_increment' => true,
     'extra' => 'auto_increment',
+    'validate' => 'required',
   ),
   'nombre' => 
   array (
@@ -32,6 +33,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'apellido' => 
   array (
@@ -41,6 +43,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'username' => 
   array (
@@ -50,6 +53,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'email' => 
   array (
@@ -57,8 +61,9 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '100',
     'unsigned' => false,
     'null' => true,
-    'default' => NULL,
+    'default' => '',
     'extra' => '',
+    'validate' => 'email',
   ),
   'password' => 
   array (
@@ -68,6 +73,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'fec_nacimiento' => 
   array (
@@ -77,6 +83,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'sexo' => 
   array (
@@ -92,6 +99,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
       0 => 'Masculino',
       1 => 'Femenino',
     ),
+    'validate' => 'required',
   ),
   'invitado_por' => 
   array (
@@ -103,6 +111,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'extra' => '',
     'label' => 'Invitado por',
     'input' => 'default',
+    'validate' => 'required',
     'idForeign' => 'id_usuario',
     'table' => 'ci_usuarios',
   ),
@@ -115,6 +124,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'default' => NULL,
     'extra' => '',
     'label' => 'Telefono 1',
+    'validate' => 'required',
   ),
   'phone_number_2' => 
   array (
@@ -125,6 +135,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'default' => NULL,
     'extra' => '',
     'labe' => 'Telefono 2',
+    'validate' => 'required',
   ),
   'cellphone_number_1' => 
   array (
@@ -135,6 +146,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'default' => NULL,
     'extra' => '',
     'label' => 'Celular 1',
+    'validate' => 'required',
   ),
   'cellphone_number_2' => 
   array (
@@ -145,6 +157,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'default' => NULL,
     'extra' => '',
     'label' => 'Celular 2',
+    'validate' => 'required',
   ),
   'cod_acceso' => 
   array (
@@ -155,6 +168,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'default' => NULL,
     'extra' => '',
     'label' => 'Codigo de acceso',
+    'validate' => 'required',
   ),
   'id_tipo_asociado' => 
   array (
@@ -167,6 +181,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'label' => 'Tipo de asociado',
     'input' => 'dropdown',
     'fieldRef' => 'nombre',
+    'validate' => 'required',
   ),
   'id_nivel_asociado' => 
   array (
@@ -179,6 +194,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'label' => 'Nivel de asociado',
     'input' => 'dropdown',
     'fieldRef' => 'nombre',
+    'validate' => 'required',
   ),
   'id_turno' => 
   array (
@@ -191,6 +207,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'label' => 'Turno de',
     'input' => 'dropdown',
     'fieldRef' => 'id_asociado',
+    'validate' => 'required',
     'idForeign' => 'id_turno',
     'table' => 'hbf_turnos',
   ),
@@ -202,6 +219,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
     'idForeign' => 'id_role',
     'table' => 'hbf_roles',
   ),
@@ -216,6 +234,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'label' => 'Foto de perfil',
     'input' => 'image',
     'fieldRef' => 'nombre',
+    'validate' => 'required',
     'idForeign' => 'id_file',
     'table' => 'ci_files',
   ),
@@ -234,6 +253,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
       0 => 'SI',
       1 => 'NO',
     ),
+    'validate' => 'required',
   ),
   'app_orders' => 
   array (
@@ -250,6 +270,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
       0 => 'SI',
       1 => 'NO',
     ),
+    'validate' => 'required',
   ),
   'app_admin' => 
   array (
@@ -266,6 +287,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
       0 => 'SI',
       1 => 'NO',
     ),
+    'validate' => 'required',
   ),
   'herbalife_key' => 
   array (
@@ -275,6 +297,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'estado' => 
   array (
@@ -348,7 +371,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
   'model' => true,
   'views' => true,
 );
-        $this->set_settings($settings);
+        $this->set_settings($settings,'ci_usuarios');
     }
 
     public function down()

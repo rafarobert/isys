@@ -426,6 +426,8 @@ class MX_Loader extends CI_Loader
                 $str1 = "'$$name'";
                 $str2 = "$$name";
                 $str3 = "#$name";
+                $str4 = "//$name";
+                $str5 = "$name";
                 if(strpos($file_content,$str1)>-1){
                     $file_content = str_replace($str1,$content,$file_content);
                 }
@@ -434,6 +436,12 @@ class MX_Loader extends CI_Loader
                 }
                 if(strpos($file_content,$str3)>-1){
                     $file_content = str_replace($str3,$content,$file_content);
+                }
+                if(strpos($file_content,$str4)>-1){
+                    $file_content = str_replace($str4,$content,$file_content);
+                }
+                if(strpos($file_content,$str5)>-1){
+                    $file_content = str_replace($str5,$content,$file_content);
                 }
             }
 

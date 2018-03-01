@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: rafaelgutierrez
  * Date: 01/03/2018
- * Time: 3:43 am
+ * Time: 5:06 pm
  */
 
 
@@ -23,6 +23,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'default' => NULL,
     'auto_increment' => false,
     'extra' => '',
+    'validate' => 'required',
   ),
   'titulo' => 
   array (
@@ -32,6 +33,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'url' => 
   array (
@@ -41,6 +43,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'descripcion' => 
   array (
@@ -50,6 +53,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'icon' => 
   array (
@@ -59,6 +63,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'listed' => 
   array (
@@ -74,6 +79,7 @@ class Migration_Create_ci_modulos extends CI_Migration
       0 => 'ENABLED',
       1 => 'DISABLED',
     ),
+    'validate' => 'required',
   ),
   'change_count' => 
   array (
@@ -132,6 +138,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'null' => true,
     'default' => 'ENABLED',
     'extra' => '',
+    'validate' => 'required',
   ),
   'id_file' => 
   array (
@@ -141,6 +148,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
 );
         $fk_keys = array (
@@ -166,7 +174,7 @@ class Migration_Create_ci_modulos extends CI_Migration
   'model' => true,
   'views' => true,
 );
-        $this->set_settings($settings);
+        $this->set_settings($settings,'ci_modulos');
     }
 
     public function down()

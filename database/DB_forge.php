@@ -1192,6 +1192,7 @@ abstract class CI_DB_forge {
     public function getArrayFieldsFromTables($table = '', $database = '')
     {
         $CI = CI_Controller::get_instance();
+        $excepts = config_item('controlFields');
         $tables = array();
         $aTables = array();
         if($database == ''){
@@ -1236,6 +1237,9 @@ abstract class CI_DB_forge {
                 $stdComment = json_decode($comment->COLUMN_COMMENT);
                 $aExtras = $stdComment != null ? json_decode(json_encode($stdComment),true) : [];
                 $aFields = array_merge($aFields[$colName],$aExtras);
+                if(!validateArray($aFields,'validate') && !in_array($colName,$excepts)){
+                    $aFields['validate'] = 'required';
+                }
                 if(validateVar($aRelations,'array')){
                     $constraintName = array_keys($aRelations)[0];
                     $aOptionsRelated = array_values($aRelations);
@@ -1269,5 +1273,33 @@ abstract class CI_DB_forge {
         $stdComment = json_decode($comment->table_comment);
         $aSettings = $stdComment != null ? json_decode(json_encode($stdComment),true) : [];
         return $aSettings;
+    }
+
+    public function updateMigrationTable($idMigration)
+    {
+        $CI = CI_Controller::get_instance();
+
+        if ($CI->db->table_exists('migrations')) {
+            $oMigrations = $CI->db->get('migrations')->result();
+            if (count($oMigrations) > 1) {
+                $this->drop_table('migrations');
+                $this->updateMigrationTable($idMigration);
+            } else if (isset($oMigrations[0])) {
+                $CI->db->query('DELETE FROM `migrations` WHERE `version`=' . $oMigrations[0]->version);
+                $CI->db->query('INSERT INTO `migrations`(`version`) VALUES (' . intval($idMigration - 1) . ')');
+            } else {
+                $CI->db->query('INSERT INTO `migrations`(`version`) VALUES (' . intval($idMigration - 1) . ')');
+            }
+        } else {
+            $fields = array(
+                'version' => array(
+                    'type' => 'bigint',
+                    'constraint' => '20',
+                ),
+            );
+            $this->add_field($fields);
+            $this->create_table('migrations');
+            $this->updateMigrationTable($idMigration);
+        }
     }
 }

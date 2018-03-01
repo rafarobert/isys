@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: rafaelgutierrez
  * Date: 01/03/2018
- * Time: 3:43 am
+ * Time: 5:06 pm
  */
 
 
@@ -23,6 +23,7 @@ class Migration_Create_ci_files extends CI_Migration
     'default' => NULL,
     'auto_increment' => true,
     'extra' => 'auto_increment',
+    'validate' => 'required',
   ),
   'nombre' => 
   array (
@@ -32,6 +33,7 @@ class Migration_Create_ci_files extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'path' => 
   array (
@@ -41,6 +43,7 @@ class Migration_Create_ci_files extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'type' => 
   array (
@@ -50,6 +53,7 @@ class Migration_Create_ci_files extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'size' => 
   array (
@@ -59,6 +63,7 @@ class Migration_Create_ci_files extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'width' => 
   array (
@@ -68,6 +73,7 @@ class Migration_Create_ci_files extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'height' => 
   array (
@@ -77,6 +83,7 @@ class Migration_Create_ci_files extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'id_file_parent' => 
   array (
@@ -88,6 +95,7 @@ class Migration_Create_ci_files extends CI_Migration
     'extra' => '',
     'label' => 'Archivo padre',
     'fieldRef' => 'nombre',
+    'validate' => 'required',
     'idForeign' => 'id_file',
     'table' => 'ci_files',
   ),
@@ -100,6 +108,7 @@ class Migration_Create_ci_files extends CI_Migration
     'default' => NULL,
     'extra' => '',
     'label' => 'Numero de thumbs',
+    'validate' => 'required',
   ),
   'thumbnail_tag' => 
   array (
@@ -110,6 +119,7 @@ class Migration_Create_ci_files extends CI_Migration
     'default' => NULL,
     'extra' => '',
     'label' => 'Etiqueta del thumb',
+    'validate' => 'required',
   ),
   'estado' => 
   array (
@@ -202,7 +212,7 @@ class Migration_Create_ci_files extends CI_Migration
   'model' => true,
   'views' => true,
 );
-        $this->set_settings($settings);
+        $this->set_settings($settings,'ci_files');
     }
 
     public function down()

@@ -4,20 +4,11 @@
 
 global $CFG;
 global $URI;
-/* get module locations from config settings or use the default module location and offset */
-$URI->isysDirs = array(
-    'modules' => [
-        'base' => 'HMVC',
-        'estic' => 'HMVC'
-    ],
-    'migrations' => [
-        'migrate' => 'MVC',
-        'storage' => 'STO',
-        'tables' => 'TAB'
-    ]
-);
+$CONF =& get_config();
 
-$isysDirs = $URI->isysDirs;
+/* get module locations from config settings or use the default module location and offset */
+
+$isysDirs = $CONF['isysDirs'];
 
 if($CFG->item('modules_locations') == null){
     $iDirs = array_keys($isysDirs);

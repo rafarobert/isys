@@ -374,6 +374,66 @@ if ( ! is_php('5.4'))
 	// Set a mark point for benchmarking
 	$BM->mark('loading_time:_base_classes_end');
 
+
+
+    function getframePath($modType = ''){
+        $URI =& load_class('URI', 'core');
+        $RTR =& load_class('Router', 'core', isset($routing) ? $routing : NULL);
+        $CONF =& get_config();
+        $sys = $CONF['sys'];
+        if($modType != ''){
+            if(is_array($sys[$modType])){
+                $modType = $sys[$modType]['name'];
+            }
+        }
+
+        $isysDirs = $CONF['isysDirs'];
+        $rDirs = array_keys($isysDirs);
+        $isBasePath = false;
+        $framePath = APPPATH;
+        foreach ($rDirs as $rDir) {
+            $baseMods = array_keys($isysDirs[$rDir]);
+            if($modType == ''){
+                $segment = $URI->segments[1];
+            } else {
+                $segment = $modType;
+            }
+            if(in_array($segment, $baseMods)) {
+                $mods = $isysDirs[$rDir];
+                foreach ($mods as $mod => $type){
+                    if(is_dir(BASEPATH."$rDir/$mod/")){
+                        $dir = $type == 'HMVC' ? "$rDir/$mod/" : ($type == 'MVC' ? "$rDir/" : null);
+                        $RTR->directory = $dir;
+                        if($modType != ''){
+                            $framePath = BASEPATH."$rDir/$modType/";
+                            if(is_dir($framePath)){
+                                return $framePath;
+                            }
+                        } else {
+                            $framePath = BASEPATH;;
+                        }
+                        $isBasePath = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if(!$isBasePath){
+            $framePath = APPPATH;
+            if ($modType != '') {
+                $appDirs = $CONF['appDirs'];
+                $rDirs = array_keys($appDirs);
+                foreach ($rDirs as $rDir) {
+                    $path = $framePath."$rDir/$modType/";
+                    if(is_dir($path)){
+                        return $path;
+                    }
+                }
+            }
+        }
+        return $framePath;
+    }
+
 /*
  * ------------------------------------------------------
  *  Sanity checks
@@ -397,29 +457,9 @@ if ( ! is_php('5.4'))
 
 	$e404 = FALSE;
 
-    $isysDirs = $URI->isysDirs;
 
     if(isset($URI->segments[1])) {
-        $rDirs = array_keys($isysDirs);
-        $isBasePath = false;
-        foreach ($rDirs as $rDir) {
-            $baseMods = array_keys($isysDirs[$rDir]);
-            if(in_array($URI->segments[1], $baseMods)) {
-                $mods = $isysDirs[$rDir];
-                foreach ($mods as $mod => $type){
-                    if(is_dir(BASEPATH."$rDir/$mod/")){
-                        $dir = $type == 'HMVC' ? "$rDir/$mod/" : ($type == 'MVC' ? "$rDir/" : null);
-                        $RTR->directory = $dir;
-                        $framePath = BASEPATH;
-                        $isBasePath = true;
-                        break;
-                    }
-                }
-            }
-        }
-        if(!$isBasePath){
-            $framePath = APPPATH;
-        }
+        $framePath = getframePath();
     } else {
         $framePath = APPPATH;
     }

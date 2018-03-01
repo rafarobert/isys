@@ -757,38 +757,9 @@ class CI_Migration
         // *************************************************************
         // Crea la tabla migration si no existe en la base de datos
         // *************************************************************
-        $this->CI->dbforge->primary_keys = [];
+
         $_REQUEST['id_migration'] = $id_migration;
-        if ($this->db->table_exists('migrations')) {
-            if($this->db->table_exists('migrations')){
-                $oMigrations = $this->db->get('migrations')->result();
-            } else {
-                header("Refresh:0");
-            }
-
-            if (count($oMigrations) > 1) {
-                $this->dbforge->drop_table('migrations');
-                header("Refresh:0");
-            } else if (isset($oMigrations[0])) {
-
-                $this->db->query('DELETE FROM `migrations` WHERE `version`=' . $oMigrations[0]->version);
-                $this->db->query('INSERT INTO `migrations`(`version`) VALUES (' . intval($id_migration - 1) . ')');
-            } else {
-                $this->db->query('INSERT INTO `migrations`(`version`) VALUES (' . intval($id_migration - 1) . ')');
-            }
-        } else {
-
-            $fields = array(
-                'version' => array(
-                    'type' => 'bigint',
-                    'constraint' => '20',
-                ),
-            );
-            if (method_exists($this, 'add_field')) {
-                $this->dbforge->add_field($fields);
-                $this->dbforge->create_table('migrations');
-            }
-        }
+        $this->dbforge->updateMigrationTable($id_migration);
     }
 
     public function save_or_update_table($tableLocal)
@@ -929,7 +900,7 @@ class CI_Migration
         return [$new_table, $actual_table];
     }
 
-    public function set_SubMod_Plural_Singular($sub_mod)
+    public function setSubModSingularPlural($sub_mod)
     {
         $names = explode('_', $sub_mod);
         $namesPlural = [];
@@ -946,20 +917,17 @@ class CI_Migration
                 $namesPlural[] = $name . 's';
             }
         }
-        $this->_sub_mod_s = count($namesSingular) > 1 ? implode('_',$namesSingular) : $namesSingular[0];
-        $this->_sub_mod_p = count($namesPlural) > 1 ? implode('_',$namesPlural) : $namesPlural[0];
-
-        return true;
+        $_sub_mod_s = count($namesSingular) > 1 ? implode('_',$namesSingular) : $namesSingular[0];
+        $_sub_mod_p = count($namesPlural) > 1 ? implode('_',$namesPlural) : $namesPlural[0];
+        
+        return [$_sub_mod_s, $_sub_mod_p];
     }
 
-    public function set_settings($settings,$tableLocal = ''){
-
-        $tableLocal = $this->_table_name;
-        $this->set_params($tableLocal);
+    public function set_settings($settings,$tableName){
+        $sys = config_item('sys');
+        $this->set_params($tableName);
         if(count($settings)) {
-            $nameModelModules = '';
-            $indexMigrationModules = config_item('sys')['ci']['migIndexModules'];
-
+            $indexMigrationModules = $sys['ci']['migIndexModules'];
             if(isset($_REQUEST['id_migration'])){
                 $id_migration = $_REQUEST['id_migration'];
             } else {
@@ -967,22 +935,25 @@ class CI_Migration
                 $id_migration = $oMigrations[0]->version + 1 ;
             }
 
+            $fields = $this->dbforge->fields != [] ? $this->dbforge->fields : ($this->_fields == [] ? header("Refresh:0") : $this->_fields);
+            $idTable = $this->dbforge->getPrimaryKeyFromTable($tableName);
+
             // *****************************************************************************************
             // ************************* Se crea el Modelo, Vista Controlador **************************
             // *****************************************************************************************
-            if(validateArrayVar($settings,'ctrl','array') || validateArrayVar($settings,'ctrl','bool')){
-                $this->createCtrl($settings['ctrl']);
+            if(validateArray($settings,'ctrl') || validateVar($settings['ctrl'],'bool')){
+                $this->createCtrl2($tableName, $idTable, $fields, $settings['ctrl']);
             }
-            if(validateArrayVar($settings,'model','array') || validateArrayVar($settings,'model','bool')){
-                $this->createModel($settings['model']);
+            if(validateArray($settings,'model') || validateVar($settings['model'],'bool')){
+                $this->createModel2($tableName, $idTable, $fields, $settings['ctrl']);
             }
-            if(validateArrayVar($settings,'views','array') || validateArrayVar($settings,'views','bool')){
+            if(validateArray($settings,'views') || validateVar($settings['views'],'bool')){
                 $this->createViewFiles($settings['views']);
             }
 
             // ******************************************************************************************
             // *********************** Si la tabla modulos existe se agrega el modulo actual*************
-            // *********** de lo contrario se redirecciona a la creacion de latabla modulos *************
+            // *********** de lo contrario se redirecciona a la creacion de la tabla modulos ************
             // ******************************************************************************************
 
             if (validate_modulo('base', 'modulos')) {
@@ -997,9 +968,11 @@ class CI_Migration
                     $exists = false;
                 }
                 $nameModelModules = "model_modulos";
+
                 list($mod,$submod) = getModSubMod($this->_table_name);
+
                 $data = array(
-                    'titulo' => isset($settings['title']) ? $settings['title'] : ucfirst($submod),
+                    'titulo' => isset($settings['title']) ? $settings['title'] : ucfirst(setTitleFromWordWithDashes($submod)),
                     'icon' => isset($settings['icon']) ? $settings['icon'] : '',
                     'url' => config_item('sys')[$mod]['dir']."$submod",
                     'descripcion' => isset($settings['description']) ? $settings['descripcion'] : '',
@@ -1008,6 +981,7 @@ class CI_Migration
                     'id_user_created' => $this->getIdUserDefault(),
                     'id_user_modified' => $this->getIdUserDefault()
                 );
+
                 if($nameModelModules != '' && $this->_table_name != "ci_modulos"){
                     if(!$exists){
                         $this->{$nameModelModules}->save($data,null,$id_migration);
@@ -1022,87 +996,172 @@ class CI_Migration
         }
     }
 
+    private function getIdUserDefault()
+    {
+        if($this->db->table_exists('ci_usuarios')){
+            $this->db->where('id_usuario', 1);
+            $oUser = $this->db->get('ci_usuarios')->row();
+
+            if(is_object($oUser)){
+                return $oUser->id_usuario;
+            } else {
+                $data = array(
+                    'id_usuario' => 1,
+                    'nombre' => 'Rafael',
+                    'apellido' => 'Gutierrez',
+                    'email' => 'rafael@herbalife.com.bo',
+                    'password' => '123',
+                    'date_created' => date('Y-m-d H:i:s'),
+                    'date_modified' => date('Y-m-d H:i:s')
+                );
+                $this->db->set($data);
+                if($this->db->insert('ci_usuarios')){
+                    return $data['id_usuario'];
+                };
+            }
+        }
+    }
+
+    public function setDataDefault($tableName){
+        list($mod,$submod) = getModSubMod($tableName);
+        list($subModS, $subModP) = $this->setSubModSingularPlural($submod);
+        $data = array();
+        $data["userCreated"] = config_item('soft_user');
+        $data["dateCreated"] = date('d/m/Y');
+        $data["timeCreated"] = date("g:i a");
+        $data["ucTableP"] = ucfirst($subModP);
+        $data["ucTableS"] = ucfirst($subModS);
+        $data["lcTableP"] = lcfirst($subModP);
+        $data["lcTableS"] = lcfirst($subModS);
+        return $data;
+    }
+
+    public function createCtrl2($tableName,$idTable,$fields,$settings = []){
+        $excepts = array_merge(config_item('controlFields'),[$idTable]);
+        $allFields = array_keys($fields);
+        $validatedFieldsNames = array_diff($allFields,$excepts);
+        list($mod,$submod) = getModSubMod($tableName);
+        $data = $this->setDataDefault($tableName);
+        $data["validatedFieldsNames"] = var_export($validatedFieldsNames,true);
+        $phpContent = $this->load->view("template_controller",$data, true, true);
+
+        $framePath = getframePath($mod);
+        if ($this->migration->create_folder($framePath)) {
+            if ($this->migration->create_folder($framePath."$submod/")) {
+                $this->migration->write_file($framePath."$submod/Ctrl_".ucfirst($submod).$this->_ext_php,$phpContent);
+            }
+        }
+    }
+
+    public function createModel2($tableName,$idTable,$fields,$settings = []){
+        $excepts = array_merge(config_item('controlFields'),[$idTable]);
+        $allFields = array_keys($fields);
+        $validatedFieldsNames = array_diff($allFields,$excepts);
+        list($mod,$submod) = getModSubMod($tableName);
+        $fieldsProperties = $this->getPhpFieldsProperties($fields);
+        $tableRules = $this->getPhpFieldsRules($fields);
+        $tableRulesEdit = $this->getPhpFieldsRulesEdit($fields);
+        $stdFields = $this->getPhpStdFields($fields);
+        $data = $this->setDataDefault($tableName);
+        $data["fieldsProperties"] = $fieldsProperties;
+        $data["tableRules"] = var_export($tableRules,true);
+        $data["tableRulesEdit"] = $tableRulesEdit;
+        $data["stdFields"] = $stdFields;
+        $phpContent = $this->load->view("template_controller",$data, true, true);
+        $framePath = getframePath($mod);
+        if ($this->migration->create_folder($framePath)) {
+            if ($this->migration->create_folder($framePath."$submod/")) {
+                $this->migration->write_file($framePath."$submod/Ctrl_".ucfirst($submod).$this->_ext_php,$phpContent);
+            }
+        }
+    }
+    
     public function set_params($tableLocal)
     {
-        if(!in_array($tableLocal,config_item('tables_mvc_excepted'))){
+        $tables_mvc_excepted = config_item('tables_mvc_excepted');
+        $sys = config_item('sys');
+
+        if(!in_array($tableLocal,$tables_mvc_excepted)){
 
             list($modulo, $sub_modulo) = getModSubMod($tableLocal);
-
-            if (isset(config_item('sys')[$modulo])) {
-                $mod_dir = config_item('sys')[$modulo]['dir'];
-                $mod_name = config_item('sys')[$modulo]['name'];
+            $mod_dir = '';
+            $mod_name = '';
+            if (isset($sys[$modulo])) {
+                $mod_dir = $sys[$modulo]['dir'];
+                $mod_name = $sys[$modulo]['name'];
             } else {
                 // TODO: verificar cuado existan nuevos modulos...
             }
 
-            $this->set_SubMod_Plural_Singular($sub_modulo);
-            $this->verifyAppOrBase();
+            if($mod_name != '' && $mod_dir != ''){
 
-            $this->_id_table = $this->_id_table == null ? $this->dbforge->getPrimaryKeyFromTable($tableLocal) : $this->_id_table;
+                list($this->_sub_mod_s, $this->_sub_mod_p) = $this->setSubModSingularPlural($sub_modulo);
+                $this->verifyAppOrBase();
 
-            $this->_mod = $mod_name;
-            $this->_sub_mod = $sub_modulo;
-            $this->_mod_type = $modulo;
-            $this->_table_name = $tableLocal;
-            $this->_fields = $this->dbforge->fields != [] ? $this->dbforge->fields : ($this->_fields == [] ? header("Refresh:0") : $this->_fields);
-            $this->_sub_mod_ctrl = 'Ctrl_' . ucfirst($sub_modulo) . $this->_ext_php;
-            $this->_sub_mod_model = 'Model_' . ucfirst($sub_modulo) . $this->_ext_php;
+                $this->_id_table = $this->_id_table == null ? $this->dbforge->getPrimaryKeyFromTable($tableLocal) : $this->_id_table;
+                $this->_mod = $mod_name;
+                $this->_sub_mod = $sub_modulo;
+                $this->_mod_type = $modulo;
+                $this->_table_name = $tableLocal;
+                $this->_fields = $this->dbforge->fields != [] ? $this->dbforge->fields : ($this->_fields == [] ? header("Refresh:0") : $this->_fields);
+                $this->_sub_mod_ctrl = 'Ctrl_' . ucfirst($sub_modulo) . $this->_ext_php;
+                $this->_sub_mod_model = 'Model_' . ucfirst($sub_modulo) . $this->_ext_php;
 
-            $this->_dir_root_mod = $this->_base_path. 'modules/';
-            $this->_dir_sub_mod_migrate_views = $this->_base_path. 'migrations/migrate/views/';
+                $this->_dir_root_mod = $this->_base_path. 'modules/';
+                $this->_dir_sub_mod_migrate_views = $this->_base_path. 'migrations/migrate/views/';
 
-            // ************************************************************************
-            // ************* Directorios para la carpeta modules dentro de APP ********
-            // ************************************************************************
+                // ************************************************************************
+                // ************* Directorios para la carpeta modules dentro de APP ********
+                // ************************************************************************
 
-            $this->_dir_sub_mod = $this->_dir_root_mod . $mod_name . '/' . $sub_modulo . '/';
-            $this->_dir_sub_mod_views = $this->_dir_root_mod . $mod_name . '/' . $sub_modulo . '/views/';
-            $this->_dir_sub_mod_views_content = $this->_dir_sub_mod_views . 'content/';
-            $this->_dir_mod = $this->_dir_root_mod . $mod_dir;
-            $this->_dir_mod_mac = $this->_dir_root_mod . $mod_name . '/';
+                $this->_dir_sub_mod = $this->_dir_root_mod . $mod_name . '/' . $sub_modulo . '/';
+                $this->_dir_sub_mod_views = $this->_dir_root_mod . $mod_name . '/' . $sub_modulo . '/views/';
+                $this->_dir_sub_mod_views_content = $this->_dir_sub_mod_views . 'content/';
+                $this->_dir_mod = $this->_dir_root_mod . $mod_dir;
+                $this->_dir_mod_mac = $this->_dir_root_mod . $mod_name . '/';
 
-            if($this->_mod == 'base' || $this->_mod == 'estic'){
-                $this->_dir_migration = BASEPATH . 'migrations/tables/';
-                $this->_dir_mod_migration = BASEPATH. 'migrations/tables/'.$this->_mod_type.'/';
-            } else {
-                $this->_dir_migration = APPPATH. 'migrations/tables/';
-                $this->_dir_mod_migration = APPPATH. 'migrations/tables/'.$this->_mod_type.'/';
+                if($this->_mod == 'base' || $this->_mod == 'estic'){
+                    $this->_dir_migration = BASEPATH . 'migrations/tables/';
+                    $this->_dir_mod_migration = BASEPATH. 'migrations/tables/'.$this->_mod_type.'/';
+                } else {
+                    $this->_dir_migration = APPPATH. 'migrations/tables/';
+                    $this->_dir_mod_migration = APPPATH. 'migrations/tables/'.$this->_mod_type.'/';
+                }
+
+                $this->_file_sub_mod_ctrl = $this->_dir_sub_mod . 'Ctrl_' . ucfirst($sub_modulo) . $this->_ext_php;
+                $this->_file_sub_mod_model = $this->_dir_sub_mod . 'Model_' . ucfirst($sub_modulo) . $this->_ext_php;
+                $this->_file_sub_mod_view_index = $this->_dir_sub_mod_views . 'index' . $this->_ext_php;
+                $this->_file_sub_mod_view_edit = $this->_dir_sub_mod_views . 'edit' . $this->_ext_php;
+                $this->_file_sub_mod_view_lib = $this->_dir_sub_mod_views . 'lib' . $this->_ext_js;
+                $this->_file_sub_mod_view_cnt = $this->_dir_sub_mod_views_content . 'index' . $this->_ext_php;
+                $this->_file_migration = $this->_dir_mod_migration . $this->_file_migration_index.'_create_'.$this->_mod_type.'_'.$this->_sub_mod_p.$this->_ext_php;
+
+                // ************************************************************************
+                // ************* Directorios para la carpeta store de migrations **********
+                // ************************************************************************
+
+                $this->_dir_sto_sub_mod = $this->_dir_root_store . $mod_name . '/' . $sub_modulo . '/';
+                $this->_dir_sto_sub_mod_views = $this->_dir_root_store . $mod_name . '/' . $sub_modulo . '/modules/';
+                $this->_dir_sto_sub_mod_views_content = $this->_dir_sto_sub_mod_views . 'content/';
+                $this->_dir_sto_mod = $this->_dir_root_store . $mod_dir;
+                $this->_dir_sto_mod_mac = $this->_dir_root_store . $mod_name . '/';
+                $this->_dir_sto_migration = $this->_base_path . 'migrations/storage/tables/';
+                $this->_dir_sto_mod_migration = $this->_base_path . 'migrations/storage/tables/'.$this->_mod_type.'/';
+
+                $this->_file_sto_sub_mod_ctrl = $this->_dir_sto_sub_mod . 'Ctrl_' . ucfirst($sub_modulo) . $this->_ext_txt;
+                $this->_file_sto_sub_mod_model = $this->_dir_sto_sub_mod . 'Model_' . ucfirst($sub_modulo) . $this->_ext_txt;
+                $this->_file_sto_sub_mod_view_index = $this->_dir_sto_sub_mod_views . 'index' . $this->_ext_txt;
+                $this->_file_sto_sub_mod_view_edit = $this->_dir_sto_sub_mod_views . 'edit' . $this->_ext_txt;
+                $this->_file_sto_sub_mod_view_lib = $this->_dir_sto_sub_mod_views . 'lib' . $this->_ext_txt;
+                $this->_file_sto_sub_mod_view_cnt = $this->_dir_sto_sub_mod_views_content . 'index' . $this->_ext_txt;
+                $this->_file_sto_migration = $this->_dir_sto_mod_migration . $this->_file_migration_index.'_create_'.$this->_mod_type.'_'.$this->_sub_mod_p.$this->_ext_txt;
+
+                // ********************************************************************
+                // ************* Se verifica que los campos **********
+                // ********************************************************************
+
+                $this->bReset = isset($_POST['bReset']) ? $_POST['bReset'] : false;
             }
-
-            $this->_file_sub_mod_ctrl = $this->_dir_sub_mod . 'Ctrl_' . ucfirst($sub_modulo) . $this->_ext_php;
-            $this->_file_sub_mod_model = $this->_dir_sub_mod . 'Model_' . ucfirst($sub_modulo) . $this->_ext_php;
-            $this->_file_sub_mod_view_index = $this->_dir_sub_mod_views . 'index' . $this->_ext_php;
-            $this->_file_sub_mod_view_edit = $this->_dir_sub_mod_views . 'edit' . $this->_ext_php;
-            $this->_file_sub_mod_view_lib = $this->_dir_sub_mod_views . 'lib' . $this->_ext_js;
-            $this->_file_sub_mod_view_cnt = $this->_dir_sub_mod_views_content . 'index' . $this->_ext_php;
-            $this->_file_migration = $this->_dir_mod_migration . $this->_file_migration_index.'_create_'.$this->_mod_type.'_'.$this->_sub_mod_p.$this->_ext_php;
-
-            // ************************************************************************
-            // ************* Directorios para la carpeta store de migrations **********
-            // ************************************************************************
-
-            $this->_dir_sto_sub_mod = $this->_dir_root_store . $mod_name . '/' . $sub_modulo . '/';
-            $this->_dir_sto_sub_mod_views = $this->_dir_root_store . $mod_name . '/' . $sub_modulo . '/modules/';
-            $this->_dir_sto_sub_mod_views_content = $this->_dir_sto_sub_mod_views . 'content/';
-            $this->_dir_sto_mod = $this->_dir_root_store . $mod_dir;
-            $this->_dir_sto_mod_mac = $this->_dir_root_store . $mod_name . '/';
-            $this->_dir_sto_migration = $this->_base_path . 'migrations/storage/tables/';
-            $this->_dir_sto_mod_migration = $this->_base_path . 'migrations/storage/tables/'.$this->_mod_type.'/';
-
-            $this->_file_sto_sub_mod_ctrl = $this->_dir_sto_sub_mod . 'Ctrl_' . ucfirst($sub_modulo) . $this->_ext_txt;
-            $this->_file_sto_sub_mod_model = $this->_dir_sto_sub_mod . 'Model_' . ucfirst($sub_modulo) . $this->_ext_txt;
-            $this->_file_sto_sub_mod_view_index = $this->_dir_sto_sub_mod_views . 'index' . $this->_ext_txt;
-            $this->_file_sto_sub_mod_view_edit = $this->_dir_sto_sub_mod_views . 'edit' . $this->_ext_txt;
-            $this->_file_sto_sub_mod_view_lib = $this->_dir_sto_sub_mod_views . 'lib' . $this->_ext_txt;
-            $this->_file_sto_sub_mod_view_cnt = $this->_dir_sto_sub_mod_views_content . 'index' . $this->_ext_txt;
-            $this->_file_sto_migration = $this->_dir_sto_mod_migration . $this->_file_migration_index.'_create_'.$this->_mod_type.'_'.$this->_sub_mod_p.$this->_ext_txt;
-
-            // ********************************************************************
-            // ************* Se verifica que los campos **********
-            // ********************************************************************
-
-            $this->bReset = isset($_POST['bReset']) ? $_POST['bReset'] : false;
-
             return true;
         } else {
             return false;
@@ -3892,32 +3951,6 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
         }
     }
 
-    private function getIdUserDefault()
-    {
-        if($this->db->table_exists('ci_usuarios')){
-            $this->db->where('id_usuario', 1);
-            $oUser = $this->db->get('ci_usuarios')->row();
-
-            if(is_object($oUser)){
-                return $oUser->id_usuario;
-            } else {
-                $data = array(
-                    'id_usuario' => 1,
-                    'nombre' => 'Rafael',
-                    'apellido' => 'Gutierrez',
-                    'email' => 'rafael@herbalife.com.bo',
-                    'password' => '123',
-                    'date_created' => date('Y-m-d H:i:s'),
-                    'date_modified' => date('Y-m-d H:i:s')
-                );
-                $this->db->set($data);
-                if($this->db->insert('ci_usuarios')){
-                    return $data['id_usuario'];
-                };
-            }
-        }
-    }
-
     public function create_migration_tables()
     {
         $tables = $this->dbforge->getArrayTablesFieldsFromDB();
@@ -3927,6 +3960,91 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
         foreach ($tables as $table){
             $content = var_export($table,true);
         }
+    }
+
+    private function getPhpFieldsProperties($fields)
+    {
+        $content = "";
+        foreach ($fields as $name => $field){
+            $type =
+                compareStrStr($field['type'],'datetime') ||
+                compareStrStr($field['type'],'date') ||
+                compareStrStr($field['type'],'text') ||
+                compareStrStr($field['type'],'varchar') ? "string" :
+                    (compareStrStr($field['type'],'int') ? "int" : "");
+            $content .= "
+             /**
+                * The value for the $name field.
+                *
+                * @var        $type
+                */             
+             public $name;
+        ";
+        }
+        return $content;
+    }
+
+    private function getPhpFieldsRules($fields)
+    {
+        $rules = array();
+        $excepts = config_item('controlFields');
+        foreach ($fields as $name => $field){
+            if(!in_array($name,$excepts)){
+                if(strhas($name,'password')){
+                    $rules[$name] = array(
+                        "field" => $name,
+                        "label" => validateArray($field,'label') ? $field['label'] : ucfirst($name),
+                        "rules" => $this->getRulesByField($field),
+                        "password_confirm" => array(
+                            "field" => "password_confirm",
+                            "label" => setTitleFromWordWithDashes("password_confirm"),
+                            "rules" => "trim|matches[$name]",
+                        )
+                    );
+                } else {
+                    $rules[$name] = array(
+                        "field" => $name,
+                        "label" => validateArray($field,'label') ? $field['label'] : ucfirst($name),
+                        "rules" => $this->getRulesByField($field)
+                    );
+                }
+            }
+        }
+        return $rules;
+    }
+
+    private function getPhpFieldsRulesEdit($fields)
+    {
+
+    }
+
+    private function getPhpStdFields($fields)
+    {
+
+    }
+
+    private function getRulesByField($field)
+    {
+        $rules = "trim|";
+
+        if(validateArray($field,'constraint')){
+            $size = $field['constraint'];
+            $rules .= "max_length[$size]|";
+        }
+        if(validateArray($field,'password')){
+            $confirm = $field['password'];
+            $rules .= "matches[$confirm]|";
+        }
+        if(validateArray($field,'validate')){
+            if(validateVar($field['validate'],'array')){
+                foreach ($field['validate'] as $rule){
+                    $rules .= "$rule|";
+                }
+            } else if(validateVar($field['validate'],'string')){
+                $rules .= $field['validate']."|";
+            }
+        }
+        return $rules;
     }
 
 

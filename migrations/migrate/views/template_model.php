@@ -10,7 +10,7 @@ defined("BASEPATH") OR exit("No direct script access allowed");
 
 class Model_ucTableP extends Admin_Model {
 
-    //$fieldsProperties
+    //fieldsProperties
 
     protected $_table_name = "hbf_lcTableP";
     protected $_order_by = "id_lcTableS desc";

@@ -242,10 +242,10 @@
                     "field" => "password",
                     "label" => "Password",
                     "rules" => "trim|required|max_length[128]|matches[password_confirm]"),
-        "password_confirm" => array(
-            "field" => "password_confirm",
-            "label" => "Confirm password",
-            "rules" => "trim|matches[password]"
+                "password_confirm" => array(
+                    "field" => "password_confirm",
+                    "label" => "Confirm password",
+                    "rules" => "trim|matches[password]"
                 ),
                 
                 "fec_nacimiento" => array(

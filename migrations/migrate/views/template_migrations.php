@@ -20,7 +20,7 @@ class Migration_Create_#tableName extends CI_Migration
         $this->dbforge->add_key($fk_keys);
         $this->create_or_alter_table('#tableName');
         $settings = '$tableSettings';
-        $this->set_settings($settings);
+        $this->set_settings($settings,'#tableName');
     }
 
     public function down()

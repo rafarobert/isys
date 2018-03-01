@@ -931,11 +931,11 @@ if (!function_exists('validateVar')) {
         return false;
     }
 }
-if (!function_exists('validateArrayVar')) {
-    function validateArrayVar($array, $index, $type = 'array' )
+if (!function_exists('validateArray')) {
+    function validateArray($array, $index)
     {
         if(is_array($array) && (is_string($index) || is_numeric($index))){
-            if(count($array) && isset($array[$index])){
+            if(count($array) && isset($array[$index]) && $array[$index] != "" && $array[$index] != []){
                 return true;
             } else {
                 return false;

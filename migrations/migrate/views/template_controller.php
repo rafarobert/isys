@@ -31,35 +31,25 @@ Class Ctrl_ucTableP extends Admin_Controller {
         // Optiene un lcTableS o crea uno nuevo
         // Se construye las reglas de validacion del formulario
         if($id){
-            $oClub = $this->model_lcTableP->get($id);
-            if(!count($oClub)){
+            $oucTableS = $this->model_lcTableP->get($id);
+            if(!count($oucTableS)){
                 $this->data["errors"][] = "El lcTableS no pudo ser encontrado";
             }
             $rules_edit = $this->model_lcTableP->rules_edit;
             $this->form_validation->set_rules($rules_edit);
         } else {
-            $oClub = $this->model_lcTableP->get_new();
+            $oucTableS = $this->model_lcTableP->get_new();
             $rules = $this->model_lcTableP->rules;
             $this->form_validation->set_rules($rules);
         }
 
-        $this->data["oClub"] = $oClub;
+        $this->data["oucTableS"] = $oucTableS;
         // Se procesa el formulario
 
         if($this->form_validation->run() == true){
-            $data = $this->model_lcTableP->array_from_post(array(
-
-                // *** estic - tables - inicio ***
-                "nombre",
-                "email",
-                "direccion",
-                "licencia",
-                "estado",
-                "change_count",
-
-                // *** estic - tables - fin ***
-            ));
-
+            $data = $this->model_lcTableP->array_from_post(
+                //validatedFieldsNames
+            );
 
             $this->model_lcTableP->save($data,$id);
             redirect("admin/lcTableP");

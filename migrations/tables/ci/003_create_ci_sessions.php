@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: rafaelgutierrez
  * Date: 01/03/2018
- * Time: 3:43 am
+ * Time: 5:06 pm
  */
 
 
@@ -23,6 +23,7 @@ class Migration_Create_ci_sessions extends CI_Migration
     'default' => NULL,
     'auto_increment' => false,
     'extra' => '',
+    'validate' => 'required',
   ),
   'ip_address' => 
   array (
@@ -32,6 +33,7 @@ class Migration_Create_ci_sessions extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'timestamp' => 
   array (
@@ -41,6 +43,7 @@ class Migration_Create_ci_sessions extends CI_Migration
     'null' => true,
     'default' => '0',
     'extra' => '',
+    'validate' => 'required',
   ),
   'data' => 
   array (
@@ -50,6 +53,7 @@ class Migration_Create_ci_sessions extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'last_activity' => 
   array (
@@ -59,6 +63,7 @@ class Migration_Create_ci_sessions extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'validate' => 'required',
   ),
   'id_user' => 
   array (
@@ -74,6 +79,7 @@ class Migration_Create_ci_sessions extends CI_Migration
       0 => 'nombre',
       1 => 'apellido',
     ),
+    'validate' => 'required',
     'idForeign' => 'id_usuario',
     'table' => 'ci_usuarios',
   ),
@@ -87,6 +93,7 @@ class Migration_Create_ci_sessions extends CI_Migration
     'extra' => '',
     'label' => 'Sesion de',
     'fieldRef' => 'id_encargado',
+    'validate' => 'required',
     'idForeign' => 'id_sesion',
     'table' => 'hbf_sesiones',
   ),
@@ -114,7 +121,7 @@ class Migration_Create_ci_sessions extends CI_Migration
   'model' => true,
   'views' => true,
 );
-        $this->set_settings($settings);
+        $this->set_settings($settings,'ci_sessions');
     }
 
     public function down()
