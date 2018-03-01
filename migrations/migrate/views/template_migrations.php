@@ -18,8 +18,13 @@ class Migration_Create_#tableName extends CI_Migration
         $this->dbforge->add_field($fields);
         $this->dbforge->add_key('#tablePrimaryKey', TRUE);
         $this->dbforge->add_key($fk_keys);
-        $this->create_or_alter_table('#tableName', '$settings');
+        $this->create_or_alter_table('#tableName');
         $settings = '$tableSettings';
         $this->set_settings($settings);
+    }
+
+    public function down()
+    {
+        $this->dbforge->drop_table('#tableName');
     }
 }

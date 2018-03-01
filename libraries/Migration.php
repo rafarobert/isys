@@ -1017,7 +1017,7 @@ class CI_Migration
                 }
 
             } else if ($this->_table_name != "ci_modulos") {
-                $redirect = "migrate/set/ci/$indexMigrationModules";
+                redirect("migrate/set/ci/$indexMigrationModules");
             }
         }
     }

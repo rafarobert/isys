@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: rafaelgutierrez
- * Date: 28/02/2018
- * Time: 6:29 pm
+ * Date: 01/03/2018
+ * Time: 12:22 am
  */
 
 
@@ -111,12 +111,17 @@ class Migration_Create_ci_sessions extends CI_Migration
         $this->dbforge->add_field($fields);
         $this->dbforge->add_key('id', TRUE);
         $this->dbforge->add_key($fk_keys);
-        $this->create_or_alter_table('ci_sessions', '$settings');
+        $this->create_or_alter_table('ci_sessions');
         $settings = array (
   'ctrl' => true,
   'model' => true,
   'views' => true,
 );
         $this->set_settings($settings);
+    }
+
+    public function down()
+    {
+        $this->dbforge->drop_table('ci_sessions');
     }
 }

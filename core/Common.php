@@ -849,3 +849,141 @@ if ( ! function_exists('function_usable'))
 		return FALSE;
 	}
 }
+
+if (!function_exists('setTitleFromWordWithDashes')) {
+    function strhas($string, $obj)
+    {
+        $strCase1 = ucfirst($obj);
+        $strCase2 = strtoupper($obj);
+        $strCase3 = strtolower($obj);
+
+        if(strpos($strCase1, $string) > -1 || strpos($strCase2, $string) > -1 || strpos($strCase3, $string) > -1){
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+if (!function_exists('compareStrStr')) {
+    function compareStrStr($string1, $string2, $anyway = true)
+    {
+        if($anyway){
+            if($string1 == $string2 || $string1 == ucfirst($string2) || $string1 == strtoupper($string2)){
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return $string1 == $string2 ? true : false;
+        }
+    }
+}
+
+if (!function_exists('compareArrayStr')) {
+    function compareArrayStr($array, $index, $string2, $anyway = true)
+    {
+        $string1 = '';
+        if(is_array($array) && (is_string($index) || is_numeric($index))){
+            if(isset($array[$index])){
+                $string1 = $array[$index];
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+        return compareStrStr($string1,$string2,$anyway);
+    }
+}
+
+if (!function_exists('validateVar')) {
+    function validateVar($val, $type = 'string')
+    {
+        switch ($type) {
+            case 'string':
+                if (is_string($val) && !is_numeric($val)) {
+                    if ($val != '') {
+                        return true;
+                    }
+                }
+                break;
+            case 'numeric':
+                if (is_numeric($val)) {
+                    if ($val != 0) {
+                        return true;
+                    }
+                }
+                break;
+            case 'bool':
+                if (is_bool($val)) {
+                    return $val;
+                }
+                break;
+            case 'array':
+                if (is_array($val)) {
+                    if (count($val) > 0) {
+                        return true;
+                    }
+                }
+                break;
+        }
+        return false;
+    }
+}
+if (!function_exists('validateArrayVar')) {
+    function validateArrayVar($array, $index, $type = 'array' )
+    {
+        if(is_array($array) && (is_string($index) || is_numeric($index))){
+            if(count($array) && isset($array[$index])){
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+}
+
+
+if (!function_exists('dump')) {
+
+    function dump ($var, $label = 'Dump', $echo = TRUE)
+    {
+        // Store dump in variable
+
+        ob_start();
+
+        var_dump($var);
+
+        $output = ob_get_clean();
+
+        // Add formatting
+
+        $output = preg_replace("/\]\=\>\n(\s+)/m", "] => ", $output);
+
+        $output = '<pre style="background: #FFFEEF; color: #000; border: 1px dotted #000; padding: 10px; margin: 10px 0; text-align: left;">' . $label . ' => ' . $output . '</pre>';
+
+        // Output
+
+        if ($echo == TRUE) {
+
+            echo $output;
+        }
+        else {
+
+            return $output;
+        }
+    }
+}
+
+if (!function_exists('dump_exit')) {
+
+    function dump_exit($var, $label = 'Dump', $echo = TRUE) {
+
+        dump ($var, $label, $echo);
+
+        exit;
+    }
+}

@@ -2,16 +2,16 @@
         /**
          * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
-         * Date: 21/02/2018
-         * Time: 12:04 pm
-         * @var Model_usuarios $model_usuarios
-         * @var Model_usuarios $usuarios
-         * @var Model_usuarios $usuario
+         * Date: 01/03/2018
+         * Time: 12:23 am
+         * @var Model_sessions $model_sessions
+         * @var Model_sessions $sessions
+         * @var Model_sessions $session
          */
         ?>
         
         <section>
-            <h3>Lista de Usuarios</h3>
+            <h3>Lista de Sessions</h3>
 
             <?php
             $data_icon = array(
@@ -21,45 +21,44 @@
                 "title" => ""
             );
             $icon = icon($data_icon);
-            echo anchor("base/usuarios/edit", "Agregar Usuarios", null, $icon)?>
+            echo anchor("base/sessions/edit", "Agregar Sessions", null, $icon)?>
             <table class="table table-striped">
                 <thead>
                     <tr>
                     
                     <!-- *** estic - tables - inicio - 1 *** -->
 
-            <th>Name</th>
-                <th>Email</th>
-                <th>Lastname</th>
+            <th>Ip Address</th>
+                <th>Timestamp</th>
+                <th>Data</th>
                 
 
             <!-- *** estic - tables - fin - 1 *** -->
-            <th>Fecha de Creacion</th>
+            
                         <th>Editar</th>
                         <th>Borrar</th>
                     </tr>
                 </thead>
                 <tbody>
-                <?php if (count($oUsuarios)) { ?>
-                    <?php foreach ($oUsuarios as $oUsuario) { ?>
+                <?php if (count($oSessions)) { ?>
+                    <?php foreach ($oSessions as $oSession) { ?>
                     <tr>
                     
                     <!-- *** estic - tables - inicio - 2 *** -->
             
-            <td><?= $oUsuario->name; ?></td>
-                <td><?= $oUsuario->email; ?></td>
-                <td><?= $oUsuario->lastname; ?></td>
+            <td><?= $oSession->ip_address; ?></td>
+                <td><?= $oSession->timestamp; ?></td>
+                <td><?= $oSession->data; ?></td>
                 
 
             <!-- *** estic - tables - fin - 2 *** -->
-            <td><?= $oUsuario->date_created; ?></td>
-            <td><?= btn_edit("base/usuarios/edit/" . $oUsuario->id_usuario)?></td>
-                        <td><?= btn_delete("base/usuarios/delete/" . $oUsuario->id_usuario)?></td>
+            <td><?= btn_edit("base/sessions/edit/" . $oSession->id)?></td>
+                        <td><?= btn_delete("base/sessions/delete/" . $oSession->id)?></td>
                     </tr>
                     <?php } ?>
                 <?php } else { ?>
                     <tr>
-                        <td colspan="3">No se pudo encontrar usuarios registrados</td>
+                        <td colspan="3">No se pudo encontrar sessions registrados</td>
                     </tr>
                 <?php }?>
                 </tbody>
@@ -67,11 +66,3 @@
         </section>
 
         <!-- *** estic - index_file - end *** -->
-            
-            
-            
-            
-            
-            
-            
-            

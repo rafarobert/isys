@@ -2,8 +2,8 @@
         /**
          * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
-         * Date: 21/02/2018
-         * Time: 12:04 pm
+         * Date: 01/03/2018
+         * Time: 12:23 am
          * @var Model_sessions $model_sessions
          * @var Model_sessions $sessions
          * @var Model_sessions $session
@@ -66,13 +66,3 @@
         </section>
 
         <!-- *** estic - index_file - end *** -->
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
