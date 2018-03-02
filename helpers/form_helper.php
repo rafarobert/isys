@@ -479,6 +479,107 @@ if ( ! function_exists('form_radio'))
 		return form_checkbox($data, $value, $checked, $extra);
 	}
 }
+if ( ! function_exists('form_radios'))
+{
+	/**
+	 * Radio Button
+	 *
+	 * @param	mixed
+	 * @param	string
+	 * @param	bool
+	 * @param	mixed
+	 * @return	array
+	 */
+    function form_radios($data = '', $options = '', $checked = FALSE, $extra = '')
+    {
+        is_array($data) OR $data = array('name' => $data);
+        $data['type'] = 'radio';
+        $htmlOptions = '';
+        if(validateArray($data,'options')){
+            $options = $data['options'];
+        }
+
+        if(validateVar($options,'array')){
+            foreach ($options as $option){
+                $checkeds = [];
+                if(validateArray($data,'checked')){
+                    $checkeds = $data['checked'];
+                } else if(validateVar($checked,'array')){
+                    $checkeds = $checked;
+                }
+
+                if(validateVar($checkeds,'array')){
+                    foreach ($checkeds as $check){
+                        if($option == $check){
+                            $htmlOptions .= "<label>" . form_checkbox($data, $option, true, $extra).ucfirst($option)."</label><br>
+                            ";
+                        } else {
+                            $htmlOptions .= "<label>" . form_checkbox($data, $option, false, $extra).ucfirst($option)."</label><br>
+                            ";
+                        }
+                    }
+                } else {
+                    $htmlOptions .= "<label>" . form_checkbox($data, $option, $checked, $extra).ucfirst($option)."</label><br>
+                    ";
+                }
+            }
+            return $htmlOptions;
+        } else {
+            return 'Options not Registered';
+        }
+    }
+}
+
+if ( ! function_exists('form_checkboxes'))
+{
+    /**
+     * Radio Button
+     *
+     * @param	mixed
+     * @param	string
+     * @param	bool
+     * @param	mixed
+     * @return	array
+     */
+    function form_checkboxes($data = '', $options = '', $checked = FALSE, $extra = '')
+    {
+        is_array($data) OR $data = array('name' => $data);
+        $htmlOptions = '';
+        if(validateArray($data,'options')){
+            $options = $data['options'];
+        }
+
+        if(validateVar($options,'array')){
+            foreach ($options as $option){
+                $checkeds = [];
+                if(validateArray($data,'checked')){
+                    $checkeds = $data['checked'];
+                } else if(validateVar($checked,'array')){
+                    $checkeds = $checked;
+                }
+
+                if(validateVar($checkeds,'array')){
+                    $checkeds = $data['checked'];
+                    foreach ($checkeds as $check){
+                        if($option == $check){
+                            $htmlOptions .= "<label>" . form_checkbox($data, $option, true, $extra).ucfirst($option)."</label><br>
+                            ";
+                        } else {
+                            $htmlOptions .= "<label>" . form_checkbox($data, $option, false, $extra).ucfirst($option)."</label><br>
+                            ";
+                        }
+                    }
+                } else {
+                    $htmlOptions .= "<label>" . form_checkbox($data, $option, $checked, $extra).ucfirst($option)."</label><br>
+                    ";
+                }
+            }
+            return $htmlOptions;
+        } else {
+            return 'Options not Registered';
+        }
+    }
+}
 
 // ------------------------------------------------------------------------
 
@@ -1034,66 +1135,9 @@ if ( ! function_exists('_get_validation_object'))
 
 if ( ! function_exists('form_select'))
 {
-    function form_select($data, $options = array(), $selected = '', $extra = '')
+    function form_select($data = '', $options = array(), $selected = array(), $extra = '')
     {
-        $html = '';
-        $name = '';
-        $id = '';
-        $class = '';
-        $optionsVerified = false;
-        if(is_array($extra) && count($extra)){
-            $name = isset($extra['name']) ? $extra['name'] : '';
-            $id = isset($extra['id']) ? $extra['id'] : '';
-            $class = isset($extra['class']) ? $extra['class'] : '';
-        } else if(is_string($extra)){
-            $html = $extra;
-        }
-
-        if (is_array($data)){
-            $name = $data['name'];
-            $id = $data['id'];
-            $class = $data['class'];
-        } else if(is_string($data)){
-            $name = $data;
-        }
-
-        if(is_array($options) && count($options)){
-            $optionsVerified = true;
-        }
-
-        if ($name != '' && ($name != '' || $id != '' || $class != '' || $html != '') && $optionsVerified) {
-
-            if($html!=''){
-                $html = '<select ' . ($id != '' ? 'id="' . $id . '"' : '') . ' name=' . $name . ' ' . ($class != '' ? 'class="'.$class. '"' : '') . '>
-            ';
-            } else {
-                $html = "<select name=$name $html";
-            }
-
-            foreach ($options as $key => $value) {
-                if($selected == $key){
-                    $html .= '<option value="' . $key . '" ' . set_select($name, $key) . ' selected>' . (isset($value) ? $value : '') . '</option>
-            ';
-                } else {
-                    $html .= '<option value="' . $key . '" ' . set_select($name, $key) . '>' . (isset($value) ? $value : '') . '</option>
-            ';
-                }
-            }
-
-            $html .= '
-            </select>
-            ';
-
-            return $html;
-
-        } else {
-
-            $error = 'Para imprimir select se necesita un array con name y options!';
-
-            $this->data['errors'][] = $error;
-
-            return dump($error);
-        }
+        echo form_dropdown($data, $options, $selected, $extra);
     }
 }
 

@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: $rafaelgutierrez
  * Date: $02/03/2018
- * Time: $2:57 am
+ * Time: $11:48 am
  */
 
 
@@ -87,6 +87,70 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'validate' => 'required',
   ),
   'sexo' => 
+  array (
+    'type' => 'varchar',
+    'constraint' => '15',
+    'unsigned' => false,
+    'null' => true,
+    'default' => NULL,
+    'extra' => '',
+    'input' => 'select',
+    'options' => 
+    array (
+      0 => 'Masculino',
+      1 => 'Femenino',
+    ),
+    'validate' => 'required',
+  ),
+  'sexoCopy' => 
+  array (
+    'type' => 'varchar',
+    'constraint' => '15',
+    'unsigned' => false,
+    'null' => true,
+    'default' => NULL,
+    'extra' => '',
+    'input' => 'dropdown',
+    'options' => 
+    array (
+      0 => 'Masculino',
+      1 => 'Femenino',
+    ),
+    'validate' => 'required',
+  ),
+  'sexoCopyCopy' => 
+  array (
+    'type' => 'varchar',
+    'constraint' => '15',
+    'unsigned' => false,
+    'null' => true,
+    'default' => NULL,
+    'extra' => '',
+    'input' => 'multiselect',
+    'options' => 
+    array (
+      0 => 'Masculino',
+      1 => 'Femenino',
+    ),
+    'validate' => 'required',
+  ),
+  'sexoCopyCopyCopy' => 
+  array (
+    'type' => 'varchar',
+    'constraint' => '15',
+    'unsigned' => false,
+    'null' => true,
+    'default' => NULL,
+    'extra' => '',
+    'input' => 'checkbox',
+    'options' => 
+    array (
+      0 => 'Masculino',
+      1 => 'Femenino',
+    ),
+    'validate' => 'required',
+  ),
+  'sexoCopyCopyCopyCopy' => 
   array (
     'type' => 'varchar',
     'constraint' => '15',
@@ -183,8 +247,6 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'input' => 'dropdown',
     'fieldRef' => 'nombre',
     'validate' => 'required',
-    'idForeign' => 'id_tipo_asociado',
-    'table' => 'hbf_tipos_asociados',
   ),
   'id_nivel_asociado' => 
   array (
@@ -198,8 +260,6 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'input' => 'dropdown',
     'fieldRef' => 'nombre',
     'validate' => 'required',
-    'idForeign' => 'id_nivel_asociado',
-    'table' => 'hbf_niveles_asociados',
   ),
   'id_turno' => 
   array (
@@ -360,23 +420,11 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'idLocal' => 'invitado_por',
     'idForeign' => 'id_usuario',
   ),
-  'ci_usuarios_ibfk_4' => 
-  array (
-    'table' => 'hbf_tipos_asociados',
-    'idLocal' => 'id_tipo_asociado',
-    'idForeign' => 'id_tipo_asociado',
-  ),
   'ci_usuarios_ibfk_5' => 
   array (
     'table' => 'hbf_turnos',
     'idLocal' => 'id_turno',
     'idForeign' => 'id_turno',
-  ),
-  'ci_usuarios_ibfk_6' => 
-  array (
-    'table' => 'hbf_niveles_asociados',
-    'idLocal' => 'id_nivel_asociado',
-    'idForeign' => 'id_nivel_asociado',
   ),
 );
         $this->dbforge->add_field($fields);

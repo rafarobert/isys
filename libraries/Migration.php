@@ -941,7 +941,7 @@ class CI_Migration
     public function createViewEdit($tableName,$idTable,$fields,$settings = []){
         list($mod,$submod,$subModS,$subModP,$data) = $this->setDataDefault($tableName,$idTable,$fields);
         $fieldNames = array_keys($fields);
-        $data['htmlFieldsEditForm'] = $this->content_variable_view_edit("o".ucfirst($subModS));;
+        $data['htmlFieldsEditForm'] = $this->setHtmlFormEdit("o".ucfirst($subModS));;
         $phpContent = $this->load->view("template_edit",$data, true, true);
         $framePath = getframePath($mod);
         if ($this->migration->create_folder($framePath)) {
@@ -1059,6 +1059,26 @@ class CI_Migration
             ';
             return $content;
         }
+    }
+
+    private function setHtmlFormEdit($string)
+    {
+        $content = "
+        <div class=\"form-group row\">
+            <label for=\"fieldNombre\" class=\"col-sm-4 col-form-label col-form-label-md\">Nombre  </label>
+            <div class=\"col-sm-6\">
+            <?php
+                $data = array(
+                \"name\" => \"nombre\",
+                \"id\" => \"fieldNombre\",
+                \"class\" => \"form-control \",
+                \"value\" => set_value(\"nombre\", $oClub->nombre),
+                \"type\" => \"text\"
+            );
+            echo form_input($data,\"\",\"\") ?>
+            </div>
+        </div>
+        ";
     }
 
     public function content_variable_view_edit($objectKey = "object")
@@ -1358,7 +1378,7 @@ class CI_Migration
                                     "class" => "' . $class . '"
                                 );
                                 $options = '. var_export($options,true).';
-                                echo form_dropdown($data, $options, "$'.$objectKey.'->'.$name_tag.'","'.$extra.'") ?> 
+                                echo form_dropdown($data, $options, $'.$objectKey.'->'.$name_tag.',"'.$extra.'") ?> 
                                 </div>
                     </div>';
                                     }
@@ -1407,8 +1427,7 @@ class CI_Migration
                                     "class" => "' . $class . '"
                                 );
                                 $options = '. var_export($options,true) . ';
-                                $options_selected = json_decode($'.$objectKey.'->'.$name_tag.');
-                                echo form_select($data, $options, "$'.$objectKey.'->'.$name_tag.'", "'.$extra.'") ?>
+                                echo form_select($data, $options, $'.$objectKey.'->'.$name_tag.', "'.$extra.'") ?>
                                 </div>
                     </div>';
                             }
@@ -2755,7 +2774,7 @@ class CI_Migration
 
             $this->create_view_index();
 
-            $this->createViewEdit($tableName, $idTable, $fields);
+            $this->create_view_edit($tableName, $idTable, $fields);
 
             $this->create_view_cnt();
 
@@ -4044,8 +4063,4 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
             $content = var_export($table,true);
         }
     }
-
-
-
-
 }

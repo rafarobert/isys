@@ -3,7 +3,7 @@
  * Created by Estic.
  * User: rafaelgutierrez
  * Date: 02/03/2018
- * Time: 3:42 am
+ * Time: 11:51 am
  */
 
 defined("BASEPATH") OR exit("No direct script access allowed");
@@ -66,6 +66,34 @@ class Model_Usuarios extends Base_Model {
                 * @var        string
                 */             
              public $sexo;
+        
+             /**
+                * The value for the sexoCopy field.
+                *
+                * @var        string
+                */             
+             public $sexoCopy;
+        
+             /**
+                * The value for the sexoCopyCopy field.
+                *
+                * @var        string
+                */             
+             public $sexoCopyCopy;
+        
+             /**
+                * The value for the sexoCopyCopyCopy field.
+                *
+                * @var        string
+                */             
+             public $sexoCopyCopyCopy;
+        
+             /**
+                * The value for the sexoCopyCopyCopyCopy field.
+                *
+                * @var        string
+                */             
+             public $sexoCopyCopyCopyCopy;
         
              /**
                 * The value for the invitado_por field.
@@ -261,6 +289,30 @@ class Model_Usuarios extends Base_Model {
     'label' => 'Sexo',
     'rules' => 'trim|max_length[15]|required|',
   ),
+  'sexoCopy' => 
+  array (
+    'field' => 'sexoCopy',
+    'label' => 'SexoCopy',
+    'rules' => 'trim|max_length[15]|required|',
+  ),
+  'sexoCopyCopy' => 
+  array (
+    'field' => 'sexoCopyCopy',
+    'label' => 'SexoCopyCopy',
+    'rules' => 'trim|max_length[15]|required|',
+  ),
+  'sexoCopyCopyCopy' => 
+  array (
+    'field' => 'sexoCopyCopyCopy',
+    'label' => 'SexoCopyCopyCopy',
+    'rules' => 'trim|max_length[15]|required|',
+  ),
+  'sexoCopyCopyCopyCopy' => 
+  array (
+    'field' => 'sexoCopyCopyCopyCopy',
+    'label' => 'SexoCopyCopyCopyCopy',
+    'rules' => 'trim|max_length[15]|required|',
+  ),
   'invitado_por' => 
   array (
     'field' => 'invitado_por',
@@ -401,6 +453,30 @@ class Model_Usuarios extends Base_Model {
     'label' => 'Sexo',
     'rules' => 'trim|max_length[15]|required|',
   ),
+  'sexoCopy' => 
+  array (
+    'field' => 'sexoCopy',
+    'label' => 'SexoCopy',
+    'rules' => 'trim|max_length[15]|required|',
+  ),
+  'sexoCopyCopy' => 
+  array (
+    'field' => 'sexoCopyCopy',
+    'label' => 'SexoCopyCopy',
+    'rules' => 'trim|max_length[15]|required|',
+  ),
+  'sexoCopyCopyCopy' => 
+  array (
+    'field' => 'sexoCopyCopyCopy',
+    'label' => 'SexoCopyCopyCopy',
+    'rules' => 'trim|max_length[15]|required|',
+  ),
+  'sexoCopyCopyCopyCopy' => 
+  array (
+    'field' => 'sexoCopyCopyCopyCopy',
+    'label' => 'SexoCopyCopyCopyCopy',
+    'rules' => 'trim|max_length[15]|required|',
+  ),
   'invitado_por' => 
   array (
     'field' => 'invitado_por',
@@ -508,6 +584,10 @@ class Model_Usuarios extends Base_Model {
             $usuario->password = '';
             $usuario->fec_nacimiento = '';
             $usuario->sexo = '';
+            $usuario->sexoCopy = '';
+            $usuario->sexoCopyCopy = '';
+            $usuario->sexoCopyCopyCopy = '';
+            $usuario->sexoCopyCopyCopyCopy = '';
             $usuario->invitado_por = '';
             $usuario->phone_number_1 = '';
             $usuario->phone_number_2 = '';

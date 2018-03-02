@@ -3,7 +3,7 @@
  * Created by herbalife.
  * User: rafaelgutierrez
  * Date: 02/03/2018
- * Time: 3:42 am
+ * Time: 11:51 am
  * @property Model_Usuarios $model_usuarios
  */
 
@@ -56,21 +56,25 @@ Class Ctrl_Usuarios extends Base_Controller {
   5 => 'password',
   6 => 'fec_nacimiento',
   7 => 'sexo',
-  8 => 'invitado_por',
-  9 => 'phone_number_1',
-  10 => 'phone_number_2',
-  11 => 'cellphone_number_1',
-  12 => 'cellphone_number_2',
-  13 => 'cod_acceso',
-  14 => 'id_tipo_asociado',
-  15 => 'id_nivel_asociado',
-  16 => 'id_turno',
-  17 => 'id_role',
-  18 => 'id_picture',
-  19 => 'app_monitor',
-  20 => 'app_orders',
-  21 => 'app_admin',
-  22 => 'herbalife_key',
+  8 => 'sexoCopy',
+  9 => 'sexoCopyCopy',
+  10 => 'sexoCopyCopyCopy',
+  11 => 'sexoCopyCopyCopyCopy',
+  12 => 'invitado_por',
+  13 => 'phone_number_1',
+  14 => 'phone_number_2',
+  15 => 'cellphone_number_1',
+  16 => 'cellphone_number_2',
+  17 => 'cod_acceso',
+  18 => 'id_tipo_asociado',
+  19 => 'id_nivel_asociado',
+  20 => 'id_turno',
+  21 => 'id_role',
+  22 => 'id_picture',
+  23 => 'app_monitor',
+  24 => 'app_orders',
+  25 => 'app_admin',
+  26 => 'herbalife_key',
 )
             );
 
