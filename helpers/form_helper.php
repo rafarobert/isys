@@ -497,11 +497,12 @@ if ( ! function_exists('form_radios'))
         $htmlOptions = '';
         if(validateArray($data,'options')){
             $options = $data['options'];
+            unset($data['options']);
         }
 
         if(validateVar($options,'array')){
             foreach ($options as $option){
-                $checkeds = [];
+                $checkeds = array();
                 if(validateArray($data,'checked')){
                     $checkeds = $data['checked'];
                 } else if(validateVar($checked,'array')){
@@ -511,16 +512,13 @@ if ( ! function_exists('form_radios'))
                 if(validateVar($checkeds,'array')){
                     foreach ($checkeds as $check){
                         if($option == $check){
-                            $htmlOptions .= "<label>" . form_checkbox($data, $option, true, $extra).ucfirst($option)."</label><br>
-                            ";
+                            $htmlOptions .= "<label>" . form_checkbox($data, $option, true, $extra).ucfirst($option)."</label>";
                         } else {
-                            $htmlOptions .= "<label>" . form_checkbox($data, $option, false, $extra).ucfirst($option)."</label><br>
-                            ";
+                            $htmlOptions .= "<label>" . form_checkbox($data, $option, false, $extra).ucfirst($option)."</label>";
                         }
                     }
                 } else {
-                    $htmlOptions .= "<label>" . form_checkbox($data, $option, $checked, $extra).ucfirst($option)."</label><br>
-                    ";
+                    $htmlOptions .= "<label>" . form_checkbox($data, $option, $checked, $extra).ucfirst($option)."</label>";
                 }
             }
             return $htmlOptions;
@@ -547,6 +545,7 @@ if ( ! function_exists('form_checkboxes'))
         $htmlOptions = '';
         if(validateArray($data,'options')){
             $options = $data['options'];
+            unset($data['options']);
         }
 
         if(validateVar($options,'array')){
@@ -559,19 +558,15 @@ if ( ! function_exists('form_checkboxes'))
                 }
 
                 if(validateVar($checkeds,'array')){
-                    $checkeds = $data['checked'];
                     foreach ($checkeds as $check){
                         if($option == $check){
-                            $htmlOptions .= "<label>" . form_checkbox($data, $option, true, $extra).ucfirst($option)."</label><br>
-                            ";
+                            $htmlOptions .= "<label>" . form_checkbox($data, $option, true, $extra).ucfirst($option)."</label>";
                         } else {
-                            $htmlOptions .= "<label>" . form_checkbox($data, $option, false, $extra).ucfirst($option)."</label><br>
-                            ";
+                            $htmlOptions .= "<label>" . form_checkbox($data, $option, false, $extra).ucfirst($option)."</label>";
                         }
                     }
                 } else {
-                    $htmlOptions .= "<label>" . form_checkbox($data, $option, $checked, $extra).ucfirst($option)."</label><br>
-                    ";
+                    $htmlOptions .= "<label>" . form_checkbox($data, $option, $checked, $extra).ucfirst($option)."</label>";
                 }
             }
             return $htmlOptions;

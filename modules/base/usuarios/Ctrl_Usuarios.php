@@ -3,7 +3,7 @@
  * Created by herbalife.
  * User: rafaelgutierrez
  * Date: 02/03/2018
- * Time: 11:51 am
+ * Time: 7:08 pm
  * @property Model_Usuarios $model_usuarios
  */
 
@@ -49,32 +49,32 @@ Class Ctrl_Usuarios extends Base_Controller {
         if($this->form_validation->run() == true){
             $data = $this->model_usuarios->array_from_post(
                 array (
-  1 => 'nombre',
-  2 => 'apellido',
-  3 => 'username',
-  4 => 'email',
-  5 => 'password',
-  6 => 'fec_nacimiento',
-  7 => 'sexo',
-  8 => 'sexoCopy',
-  9 => 'sexoCopyCopy',
-  10 => 'sexoCopyCopyCopy',
-  11 => 'sexoCopyCopyCopyCopy',
-  12 => 'invitado_por',
-  13 => 'phone_number_1',
-  14 => 'phone_number_2',
-  15 => 'cellphone_number_1',
-  16 => 'cellphone_number_2',
-  17 => 'cod_acceso',
-  18 => 'id_tipo_asociado',
-  19 => 'id_nivel_asociado',
-  20 => 'id_turno',
-  21 => 'id_role',
-  22 => 'id_picture',
-  23 => 'app_monitor',
-  24 => 'app_orders',
-  25 => 'app_admin',
-  26 => 'herbalife_key',
+  0 => 'nombre',
+  1 => 'apellido',
+  2 => 'username',
+  3 => 'email',
+  4 => 'password',
+  5 => 'fec_nacimiento',
+  6 => 'sexo',
+  7 => 'sexoCopy',
+  8 => 'sexoCopyCopy',
+  9 => 'sexoCopyCopyCopy',
+  10 => 'sexoCopyCopyCopyCopy',
+  11 => 'invitado_por',
+  12 => 'phone_number_1',
+  13 => 'phone_number_2',
+  14 => 'cellphone_number_1',
+  15 => 'cellphone_number_2',
+  16 => 'cod_acceso',
+  17 => 'id_tipo_asociado',
+  18 => 'id_nivel_asociado',
+  19 => 'id_turno',
+  20 => 'id_role',
+  21 => 'id_picture',
+  22 => 'app_monitor',
+  23 => 'app_orders',
+  24 => 'app_admin',
+  25 => 'herbalife_key',
 )
             );
 

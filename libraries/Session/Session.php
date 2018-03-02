@@ -994,7 +994,7 @@ class CI_Session {
         }
 
         // Load view
-        $this->data['subLayout'] = "start";
+        $this->CI->data['subLayout'] = "start";
     }
 
     public function login(){

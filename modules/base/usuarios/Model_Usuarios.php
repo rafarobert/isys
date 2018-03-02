@@ -3,7 +3,7 @@
  * Created by Estic.
  * User: rafaelgutierrez
  * Date: 02/03/2018
- * Time: 11:51 am
+ * Time: 7:08 pm
  */
 
 defined("BASEPATH") OR exit("No direct script access allowed");
@@ -239,37 +239,37 @@ class Model_Usuarios extends Base_Model {
   array (
     'field' => 'id_usuario',
     'label' => 'Id_usuario',
-    'rules' => 'trim|max_length[11]|required|',
+    'rules' => 'trim|max_length[11]|required',
   ),
   'nombre' => 
   array (
     'field' => 'nombre',
     'label' => 'Nombre',
-    'rules' => 'trim|max_length[256]|required|',
+    'rules' => 'trim|max_length[256]|required',
   ),
   'apellido' => 
   array (
     'field' => 'apellido',
     'label' => 'Apellido',
-    'rules' => 'trim|max_length[256]|required|',
+    'rules' => 'trim|max_length[256]|required',
   ),
   'username' => 
   array (
     'field' => 'username',
     'label' => 'Username',
-    'rules' => 'trim|max_length[11]|required|',
+    'rules' => 'trim|max_length[11]|required',
   ),
   'email' => 
   array (
     'field' => 'email',
     'label' => 'Email',
-    'rules' => 'trim|max_length[100]|email|',
+    'rules' => 'trim|max_length[100]|valid_email',
   ),
   'password' => 
   array (
     'field' => 'password',
     'label' => 'Password',
-    'rules' => 'trim|max_length[128]|matches[1]|required|',
+    'rules' => 'trim|max_length[128]|matches[1]|required',
     'password_confirm' => 
     array (
       'field' => 'password_confirm',
@@ -281,127 +281,127 @@ class Model_Usuarios extends Base_Model {
   array (
     'field' => 'fec_nacimiento',
     'label' => 'Fec_nacimiento',
-    'rules' => 'trim|required|',
+    'rules' => 'trim|required',
   ),
   'sexo' => 
   array (
     'field' => 'sexo',
     'label' => 'Sexo',
-    'rules' => 'trim|max_length[15]|required|',
+    'rules' => 'trim|max_length[15]|required',
   ),
   'sexoCopy' => 
   array (
     'field' => 'sexoCopy',
     'label' => 'SexoCopy',
-    'rules' => 'trim|max_length[15]|required|',
+    'rules' => 'trim|max_length[15]|required',
   ),
   'sexoCopyCopy' => 
   array (
     'field' => 'sexoCopyCopy',
     'label' => 'SexoCopyCopy',
-    'rules' => 'trim|max_length[15]|required|',
+    'rules' => 'trim|max_length[15]|required',
   ),
   'sexoCopyCopyCopy' => 
   array (
     'field' => 'sexoCopyCopyCopy',
     'label' => 'SexoCopyCopyCopy',
-    'rules' => 'trim|max_length[15]|required|',
+    'rules' => 'trim|max_length[15]|required',
   ),
   'sexoCopyCopyCopyCopy' => 
   array (
     'field' => 'sexoCopyCopyCopyCopy',
     'label' => 'SexoCopyCopyCopyCopy',
-    'rules' => 'trim|max_length[15]|required|',
+    'rules' => 'trim|max_length[15]|required',
   ),
   'invitado_por' => 
   array (
     'field' => 'invitado_por',
     'label' => 'Invitado por',
-    'rules' => 'trim|max_length[10]|required|',
+    'rules' => 'trim|max_length[10]|required',
   ),
   'phone_number_1' => 
   array (
     'field' => 'phone_number_1',
     'label' => 'Telefono 1',
-    'rules' => 'trim|max_length[20]|required|',
+    'rules' => 'trim|max_length[20]|required',
   ),
   'phone_number_2' => 
   array (
     'field' => 'phone_number_2',
     'label' => 'Phone_number_2',
-    'rules' => 'trim|max_length[20]|required|',
+    'rules' => 'trim|max_length[20]|required',
   ),
   'cellphone_number_1' => 
   array (
     'field' => 'cellphone_number_1',
     'label' => 'Celular 1',
-    'rules' => 'trim|max_length[20]|required|',
+    'rules' => 'trim|max_length[20]|required',
   ),
   'cellphone_number_2' => 
   array (
     'field' => 'cellphone_number_2',
     'label' => 'Celular 2',
-    'rules' => 'trim|max_length[20]|required|',
+    'rules' => 'trim|max_length[20]|required',
   ),
   'cod_acceso' => 
   array (
     'field' => 'cod_acceso',
     'label' => 'Codigo de acceso',
-    'rules' => 'trim|max_length[50]|required|',
+    'rules' => 'trim|max_length[50]|required',
   ),
   'id_tipo_asociado' => 
   array (
     'field' => 'id_tipo_asociado',
     'label' => 'Tipo de asociado',
-    'rules' => 'trim|max_length[10]|required|',
+    'rules' => 'trim|max_length[10]|required',
   ),
   'id_nivel_asociado' => 
   array (
     'field' => 'id_nivel_asociado',
     'label' => 'Nivel de asociado',
-    'rules' => 'trim|max_length[10]|required|',
+    'rules' => 'trim|max_length[10]|required',
   ),
   'id_turno' => 
   array (
     'field' => 'id_turno',
     'label' => 'Turno de',
-    'rules' => 'trim|max_length[10]|required|',
+    'rules' => 'trim|max_length[10]|required',
   ),
   'id_role' => 
   array (
     'field' => 'id_role',
     'label' => 'Id_role',
-    'rules' => 'trim|max_length[10]|required|',
+    'rules' => 'trim|max_length[10]|required',
   ),
   'id_picture' => 
   array (
     'field' => 'id_picture',
     'label' => 'Foto de perfil',
-    'rules' => 'trim|max_length[11]|required|',
+    'rules' => 'trim|max_length[11]|required',
   ),
   'app_monitor' => 
   array (
     'field' => 'app_monitor',
     'label' => 'Permitir app monitoreo',
-    'rules' => 'trim|max_length[50]|required|',
+    'rules' => 'trim|max_length[50]|required',
   ),
   'app_orders' => 
   array (
     'field' => 'app_orders',
     'label' => 'Permitir app ordenes',
-    'rules' => 'trim|max_length[50]|required|',
+    'rules' => 'trim|max_length[50]|required',
   ),
   'app_admin' => 
   array (
     'field' => 'app_admin',
     'label' => 'Permitir app administrador',
-    'rules' => 'trim|max_length[50]|required|',
+    'rules' => 'trim|max_length[50]|required',
   ),
   'herbalife_key' => 
   array (
     'field' => 'herbalife_key',
     'label' => 'Herbalife_key',
-    'rules' => 'trim|max_length[256]|required|',
+    'rules' => 'trim|max_length[256]|required',
   ),
 );
     public $rules_edit = array (
@@ -409,163 +409,163 @@ class Model_Usuarios extends Base_Model {
   array (
     'field' => 'id_usuario',
     'label' => 'Id_usuario',
-    'rules' => 'trim|max_length[11]|required|',
+    'rules' => 'trim|max_length[11]|required',
   ),
   'nombre' => 
   array (
     'field' => 'nombre',
     'label' => 'Nombre',
-    'rules' => 'trim|max_length[256]|required|',
+    'rules' => 'trim|max_length[256]|required',
   ),
   'apellido' => 
   array (
     'field' => 'apellido',
     'label' => 'Apellido',
-    'rules' => 'trim|max_length[256]|required|',
+    'rules' => 'trim|max_length[256]|required',
   ),
   'username' => 
   array (
     'field' => 'username',
     'label' => 'Username',
-    'rules' => 'trim|max_length[11]|required|',
+    'rules' => 'trim|max_length[11]|required',
   ),
   'email' => 
   array (
     'field' => 'email',
     'label' => 'Email',
-    'rules' => 'trim|max_length[100]|email|',
+    'rules' => 'trim|max_length[100]|valid_email',
   ),
   'password' => 
   array (
     'field' => 'password',
     'label' => 'Password',
-    'rules' => 'trim|max_length[128]|matches[1]|required|',
+    'rules' => 'trim|max_length[128]|matches[1]|required',
   ),
   'fec_nacimiento' => 
   array (
     'field' => 'fec_nacimiento',
     'label' => 'Fec_nacimiento',
-    'rules' => 'trim|required|',
+    'rules' => 'trim|required',
   ),
   'sexo' => 
   array (
     'field' => 'sexo',
     'label' => 'Sexo',
-    'rules' => 'trim|max_length[15]|required|',
+    'rules' => 'trim|max_length[15]|required',
   ),
   'sexoCopy' => 
   array (
     'field' => 'sexoCopy',
     'label' => 'SexoCopy',
-    'rules' => 'trim|max_length[15]|required|',
+    'rules' => 'trim|max_length[15]|required',
   ),
   'sexoCopyCopy' => 
   array (
     'field' => 'sexoCopyCopy',
     'label' => 'SexoCopyCopy',
-    'rules' => 'trim|max_length[15]|required|',
+    'rules' => 'trim|max_length[15]|required',
   ),
   'sexoCopyCopyCopy' => 
   array (
     'field' => 'sexoCopyCopyCopy',
     'label' => 'SexoCopyCopyCopy',
-    'rules' => 'trim|max_length[15]|required|',
+    'rules' => 'trim|max_length[15]|required',
   ),
   'sexoCopyCopyCopyCopy' => 
   array (
     'field' => 'sexoCopyCopyCopyCopy',
     'label' => 'SexoCopyCopyCopyCopy',
-    'rules' => 'trim|max_length[15]|required|',
+    'rules' => 'trim|max_length[15]|required',
   ),
   'invitado_por' => 
   array (
     'field' => 'invitado_por',
     'label' => 'Invitado por',
-    'rules' => 'trim|max_length[10]|required|',
+    'rules' => 'trim|max_length[10]|required',
   ),
   'phone_number_1' => 
   array (
     'field' => 'phone_number_1',
     'label' => 'Telefono 1',
-    'rules' => 'trim|max_length[20]|required|',
+    'rules' => 'trim|max_length[20]|required',
   ),
   'phone_number_2' => 
   array (
     'field' => 'phone_number_2',
     'label' => 'Phone_number_2',
-    'rules' => 'trim|max_length[20]|required|',
+    'rules' => 'trim|max_length[20]|required',
   ),
   'cellphone_number_1' => 
   array (
     'field' => 'cellphone_number_1',
     'label' => 'Celular 1',
-    'rules' => 'trim|max_length[20]|required|',
+    'rules' => 'trim|max_length[20]|required',
   ),
   'cellphone_number_2' => 
   array (
     'field' => 'cellphone_number_2',
     'label' => 'Celular 2',
-    'rules' => 'trim|max_length[20]|required|',
+    'rules' => 'trim|max_length[20]|required',
   ),
   'cod_acceso' => 
   array (
     'field' => 'cod_acceso',
     'label' => 'Codigo de acceso',
-    'rules' => 'trim|max_length[50]|required|',
+    'rules' => 'trim|max_length[50]|required',
   ),
   'id_tipo_asociado' => 
   array (
     'field' => 'id_tipo_asociado',
     'label' => 'Tipo de asociado',
-    'rules' => 'trim|max_length[10]|required|',
+    'rules' => 'trim|max_length[10]|required',
   ),
   'id_nivel_asociado' => 
   array (
     'field' => 'id_nivel_asociado',
     'label' => 'Nivel de asociado',
-    'rules' => 'trim|max_length[10]|required|',
+    'rules' => 'trim|max_length[10]|required',
   ),
   'id_turno' => 
   array (
     'field' => 'id_turno',
     'label' => 'Turno de',
-    'rules' => 'trim|max_length[10]|required|',
+    'rules' => 'trim|max_length[10]|required',
   ),
   'id_role' => 
   array (
     'field' => 'id_role',
     'label' => 'Id_role',
-    'rules' => 'trim|max_length[10]|required|',
+    'rules' => 'trim|max_length[10]|required',
   ),
   'id_picture' => 
   array (
     'field' => 'id_picture',
     'label' => 'Foto de perfil',
-    'rules' => 'trim|max_length[11]|required|',
+    'rules' => 'trim|max_length[11]|required',
   ),
   'app_monitor' => 
   array (
     'field' => 'app_monitor',
     'label' => 'Permitir app monitoreo',
-    'rules' => 'trim|max_length[50]|required|',
+    'rules' => 'trim|max_length[50]|required',
   ),
   'app_orders' => 
   array (
     'field' => 'app_orders',
     'label' => 'Permitir app ordenes',
-    'rules' => 'trim|max_length[50]|required|',
+    'rules' => 'trim|max_length[50]|required',
   ),
   'app_admin' => 
   array (
     'field' => 'app_admin',
     'label' => 'Permitir app administrador',
-    'rules' => 'trim|max_length[50]|required|',
+    'rules' => 'trim|max_length[50]|required',
   ),
   'herbalife_key' => 
   array (
     'field' => 'herbalife_key',
     'label' => 'Herbalife_key',
-    'rules' => 'trim|max_length[256]|required|',
+    'rules' => 'trim|max_length[256]|required',
   ),
 );
 

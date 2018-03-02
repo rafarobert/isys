@@ -922,7 +922,7 @@ if (!function_exists('validateVar')) {
                 break;
             case 'array':
                 if (is_array($val)) {
-                    if (count($val) > 0) {
+                    if (count($val) > 0 && $val != []) {
                         return true;
                     }
                 }

@@ -3,7 +3,7 @@
  * Created by herbalife.
  * User: rafaelgutierrez
  * Date: 02/03/2018
- * Time: 11:39 am
+ * Time: 5:31 pm
  * @property Model_Sessions $model_sessions
  */
 
@@ -49,12 +49,12 @@ Class Ctrl_Sessions extends Base_Controller {
         if($this->form_validation->run() == true){
             $data = $this->model_sessions->array_from_post(
                 array (
-  1 => 'ip_address',
-  2 => 'timestamp',
-  3 => 'data',
-  4 => 'last_activity',
-  5 => 'id_user',
-  6 => 'id_hbf_sesion',
+  0 => 'ip_address',
+  1 => 'timestamp',
+  2 => 'data',
+  3 => 'last_activity',
+  4 => 'id_user',
+  5 => 'id_hbf_sesion',
 )
             );
 

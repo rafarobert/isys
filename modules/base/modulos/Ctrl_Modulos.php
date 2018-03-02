@@ -3,7 +3,7 @@
  * Created by herbalife.
  * User: rafaelgutierrez
  * Date: 02/03/2018
- * Time: 11:39 am
+ * Time: 5:31 pm
  * @property Model_Modulos $model_modulos
  */
 
@@ -49,13 +49,13 @@ Class Ctrl_Modulos extends Base_Controller {
         if($this->form_validation->run() == true){
             $data = $this->model_modulos->array_from_post(
                 array (
-  1 => 'titulo',
-  2 => 'url',
-  3 => 'descripcion',
-  4 => 'icon',
-  5 => 'listed',
-  11 => 'status',
-  12 => 'id_file',
+  0 => 'titulo',
+  1 => 'url',
+  2 => 'descripcion',
+  3 => 'icon',
+  4 => 'listed',
+  5 => 'status',
+  6 => 'id_file',
 )
             );
 

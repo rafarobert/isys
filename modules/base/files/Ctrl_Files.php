@@ -3,7 +3,7 @@
  * Created by herbalife.
  * User: rafaelgutierrez
  * Date: 02/03/2018
- * Time: 11:39 am
+ * Time: 5:31 pm
  * @property Model_Files $model_files
  */
 
@@ -49,15 +49,15 @@ Class Ctrl_Files extends Base_Controller {
         if($this->form_validation->run() == true){
             $data = $this->model_files->array_from_post(
                 array (
-  1 => 'nombre',
-  2 => 'path',
-  3 => 'type',
-  4 => 'size',
-  5 => 'width',
-  6 => 'height',
-  7 => 'id_file_parent',
-  8 => 'num_thumbs',
-  9 => 'thumbnail_tag',
+  0 => 'nombre',
+  1 => 'path',
+  2 => 'type',
+  3 => 'size',
+  4 => 'width',
+  5 => 'height',
+  6 => 'id_file_parent',
+  7 => 'num_thumbs',
+  8 => 'thumbnail_tag',
 )
             );
 

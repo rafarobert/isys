@@ -1,19 +1,22 @@
-<?php if (!isset($lcFieldObj->lcTableId)) { ?>
+
+<?php if (!isset($oucTableS->lcTableId)) { ?>
     <div class="form-group row">
-        <label for="lcInputIdS" class="col-sm-4 col-form-label col-form-label-md">ucInputLabel </label>
-        <div class="col-sm-6"><?php
+        <label for="lcInputId" class="col-sm-4 col-form-label col-form-label-md">ucInputLabel </label>
+        <div class="col-sm-6">
+            <?php
             $data = '$inputData';
-            echo form_password($data, set_value("lcInputNameS", $lcFieldObj->lcField)); ?>
+            echo form_password($data, set_value("lcInputName", $ooucTableS->lcField));
+            ?>
         </div>
     </div>
     <div class="form-group row">
-        <label for="lcInputPassConfIdS" class="col-sm-4 col-form-label col-form-label-md">ucInputPassConfLabel</label>
+        <label for="lcInputPassConfId" class="col-sm-4 col-form-label col-form-label-md">ucInputPassConfLabel</label>
         <div class="col-sm-6">
             <?php
             $data = array(
                 "placeholder" => "ucInputPassConfPlaceholder",
                 "name" => "password_confirm",
-                "id" => "lcInputPassConfIdS",
+                "id" => "lcInputPassConfId",
                 "class" => "form-control "
             );
             echo form_password($data, "", "") ?>
@@ -21,3 +24,4 @@
     </div>
     <?php echo form_error("lcField"); ?>
 <?php } ?>
+

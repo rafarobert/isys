@@ -888,7 +888,11 @@ class CI_Migration
     public function setDataDefault($tableName, $idTable, $fields){
         $excepts = array_merge(config_item('controlFields'),[$idTable]);
         $allFields = array_keys($fields);
-        $validatedFieldsNames = array_diff($allFields,$excepts);
+        $vFieldsNames = array_diff($allFields,$excepts);
+        $vFields = [];
+        foreach ($vFieldsNames as $name){
+            $vFields[$name] = $fields[$name];
+        }
         $sys = config_item('sys');
         list($mod,$submod) = getModSubMod($tableName);
         list($subModS, $subModP) = setSubModSingularPlural($submod);
@@ -903,12 +907,13 @@ class CI_Migration
         $data["ucModS"] = ucfirst($sys[$mod]['name']);
         $data["lcModS"] = ucfirst($sys[$mod]['name']);
         $data["lcmodType"] = strtolower($mod);
-        return [$mod,$submod,$subModS,$subModP,$data,$validatedFieldsNames];
+        return [$mod,$submod,$subModS,$subModP,$data,$vFields];
     }
 
     public function createCtrl2($tableName,$idTable,$fields,$settings = []){
-        list($mod,$submod,$subModS,$subModP,$data,$validatedFieldsNames) = $this->setDataDefault($tableName,$idTable,$fields);
-        $data["validatedFieldsNames"] = var_export($validatedFieldsNames,true);
+        list($mod,$submod,$subModS,$subModP,$data,$vFields) = $this->setDataDefault($tableName,$idTable,$fields);
+        $aFieldsNames = array_keys($vFields);
+        $data["validatedFieldsNames"] = var_export($aFieldsNames,true);
         $data["extraFunctions"] = $this->getExtraFunctions($tableName);
         $phpContent = $this->load->view("template_controller",$data, true, true);
         $framePath = getframePath($mod);
@@ -939,9 +944,8 @@ class CI_Migration
     }
 
     public function createViewEdit($tableName,$idTable,$fields,$settings = []){
-        list($mod,$submod,$subModS,$subModP,$data) = $this->setDataDefault($tableName,$idTable,$fields);
-        $fieldNames = array_keys($fields);
-        $data['htmlFieldsEditForm'] = $this->setHtmlFormEdit("o".ucfirst($subModS));;
+        list($mod,$submod,$subModS,$subModP,$data,$vFields) = $this->setDataDefault($tableName,$idTable,$fields);
+        $data['htmlFieldsEditForm'] = $this->setHtmlFormEdit($mod,$submod,$subModS,$subModP,$data,$vFields,$idTable);
         $phpContent = $this->load->view("template_edit",$data, true, true);
         $framePath = getframePath($mod);
         if ($this->migration->create_folder($framePath)) {
@@ -951,6 +955,67 @@ class CI_Migration
                 }
             }
         }
+    }
+
+    private function setHtmlFormEdit($mod, $submod, $subModS, $subModP, $data, $fields, $idTable)
+    {
+        $htmlFormContent = '';
+        foreach ($fields as $name => $settings){
+            $inputData = array(
+                "name" => validateArray($settings,'name') ? $settings['name'] : "$name",
+                "id" => validateArray($settings,'id') ? $settings['id'] : "field".ucfirst($name),
+                "class" => "form-control ".(validateArray($settings,'class') ? $settings['class'] : ""),
+                "onclick" => validateArray($settings,'onclick') ? $settings['onclick'] : '',
+                "onchange" => validateArray($settings,'onchange') ? $settings['onchange'] : '',
+                "placeholder" => validateArray($settings,'placeholder') ? $settings['placeholder'] : '',
+            );
+
+            $typeForm = validateArray($settings,'input') ? $settings['input'] : 'default';
+
+            if(compareArrayStr($settings,'type','text')){
+                $typeForm = 'textarea';
+                $inputData["class"] .= "textTinymce ";
+            } else if(compareArrayStr($settings, 'type' ,'varchar' ) || compareArrayStr($settings, 'type' ,'longvarchar' )){
+                if(validateArray($settings, 'password')){
+                    $typeForm = 'password';
+                } else if(compareArrayStr($settings, 'input','hidden')){
+                    $typeForm = 'hidden';
+                } else if(compareArrayStr($settings, 'input','radio') || compareArrayStr($settings, 'input','checkbox') || compareArrayStr($settings, 'input','select') || compareArrayStr($settings, 'input','dropdown') || compareArrayStr($settings, 'input','multiselect')){
+                    $typeForm = compareArrayStr($settings, 'input','radio') ? 'radios' : (compareArrayStr($settings, 'input','checkbox') ? 'checkboxes' : (compareArrayStr($settings, 'input','select') ? 'select' : (compareArrayStr($settings, 'input','multiselect') ? 'multiselect' : (compareArrayStr($settings, 'input','dropdown') ? 'dropdown' : 'input'))));
+                    if(!validateArray($settings, 'options')){
+                        $options = ['prueba'];
+                    }
+                    $inputData['options'] = $settings['options'];
+                }
+            } else if(compareArrayStr($settings, 'type' ,'int' )){
+                $typeForm = 'input';
+            } else if(compareArrayStr($settings, 'type' ,'date' )){
+                $typeForm = 'input';
+                $inputData["class"] .= "datepicker ";
+            } else if(compareArrayStr($settings, 'type' ,'datetime' )){
+                $typeForm = 'input';
+                $inputData["class"] .= "datepicker ";
+            }
+            $data['lcInputFormType'] = $typeForm;
+            $data['lcInputId'] = "field".ucfirst($name);
+            $data['lcInputName'] = lcfirst($name);
+            $data['lcField'] = lcfirst($name);
+            $data['ucFieldObjS'] = ucfirst($subModS);
+            $data['ucInputLabel'] = setTitleFromWordWithDashes(ucfirst($name));
+            $data['inputData'] = var_export($inputData,true);
+            if(validateArray($settings ,'password')){
+                $data['lcTableId'] = $idTable;
+                $data['lcInputPassConfId'] = "fieldConfirm".ucfirst($name);
+                $data['ucInputPassConfLabel'] = "Confirmar ".ucfirst($name);
+                $data['ucInputPassConfPlaceholder'] = "Confirmar contraseña";
+                $htmlFormContent .= $this->load->view("template_form_password",$data, true, true);
+            } else if(validateArray($settings, 'options')){
+                $htmlFormContent .= $this->load->view("template_form_with_options",$data, true, true);
+            } else {
+                $htmlFormContent .= $this->load->view("template_form_default",$data, true, true);
+            }
+        }
+        return $htmlFormContent;
     }
 
     private function getPhpFieldsProperties($fields)
@@ -1034,12 +1099,16 @@ class CI_Migration
         if(validateArray($field,'validate')){
             if(validateVar($field['validate'],'array')){
                 foreach ($field['validate'] as $rule){
+                    if(compareStrStr($rule,'email')){
+                        $rule = 'valid_email';
+                    }
                     $rules .= "$rule|";
                 }
             } else if(validateVar($field['validate'],'string')){
                 $rules .= $field['validate']."|";
             }
         }
+        $rules = substr($rules,0,strlen($rules)-1);
         return $rules;
     }
 
@@ -1059,26 +1128,6 @@ class CI_Migration
             ';
             return $content;
         }
-    }
-
-    private function setHtmlFormEdit($string)
-    {
-        $content = "
-        <div class=\"form-group row\">
-            <label for=\"fieldNombre\" class=\"col-sm-4 col-form-label col-form-label-md\">Nombre  </label>
-            <div class=\"col-sm-6\">
-            <?php
-                $data = array(
-                \"name\" => \"nombre\",
-                \"id\" => \"fieldNombre\",
-                \"class\" => \"form-control \",
-                \"value\" => set_value(\"nombre\", $oClub->nombre),
-                \"type\" => \"text\"
-            );
-            echo form_input($data,\"\",\"\") ?>
-            </div>
-        </div>
-        ";
     }
 
     public function content_variable_view_edit($objectKey = "object")
@@ -2774,7 +2823,7 @@ class CI_Migration
 
             $this->create_view_index();
 
-            $this->create_view_edit($tableName, $idTable, $fields);
+            $this->createViewEdit($tableName, $idTable, $fields);
 
             $this->create_view_cnt();
 
@@ -4063,4 +4112,6 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
             $content = var_export($table,true);
         }
     }
+
+
 }

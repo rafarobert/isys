@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: $rafaelgutierrez
  * Date: $02/03/2018
- * Time: $11:48 am
+ * Time: $7:08 pm
  */
 
 
@@ -63,7 +63,10 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'null' => true,
     'default' => '',
     'extra' => '',
-    'validate' => 'email',
+    'validate' => 
+    array (
+      0 => 'email',
+    ),
   ),
   'password' => 
   array (
