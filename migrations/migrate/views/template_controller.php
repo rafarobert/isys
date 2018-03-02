@@ -7,7 +7,7 @@
  * @property Model_ucTableP $model_lcTableP
  */
 
-Class Ctrl_ucTableP extends Admin_Controller {
+Class Ctrl_ucTableP extends ucModS_Controller {
 
 
     public function __construct()
@@ -24,7 +24,7 @@ Class Ctrl_ucTableP extends Admin_Controller {
 
         // Carga la vista
 
-        $this->data["subview"] = "admin/lcTableP/index";
+        $this->data["subview"] = "lcModS/lcTableP/index";
     }
 
     public function edit($id = NULL){
@@ -52,15 +52,17 @@ Class Ctrl_ucTableP extends Admin_Controller {
             );
 
             $this->model_lcTableP->save($data,$id);
-            redirect("admin/lcTableP");
+            redirect("lcModS/lcTableP");
         }
 
         // Se carga la vista
-        $this->data["subview"] = "admin/lcTableP/edit";
+        $this->data["subview"] = "lcModS/lcTableP/edit";
     }
 
     public function delete($id){
         $this->model_lcTableP->delete($id);
-        redirect("admin/lcTableP");
+        redirect("lcModS/lcTableP");
     }
+
+    //extraFunctions
 }

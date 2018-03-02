@@ -12,7 +12,7 @@
 
 <h3><?= empty($oucTableS->id_lcTableS) ? "Agregar ucTableP" : "Actualizando datos, ucTableS #" . $oucTableS->id_lcTableS ?></h3>
 
-#htmlOpenForm
+<?= form_open_multipart() ?>
 
 #htmlFieldsEditForm
 
@@ -29,4 +29,4 @@
     </div>
 </div>
 
-#htmlCloseForm
+<?= form_close() ?>

@@ -1066,7 +1066,7 @@ abstract class CI_DB_forge {
         } else {
             $sql .= " and CONSTRAINT_NAME='$constraint'";
         }
-        $result = $CI->db->query($sql,false,true)->row();
+        $result = $CI->db->query($sql)->row();
         if(count($result)){
             return true;
         }
@@ -1080,9 +1080,23 @@ abstract class CI_DB_forge {
             $database = $CI->db->database;
         }
         $sql = "Select COLUMN_NAME from information_schema.`COLUMNS` where TABLE_SCHEMA='$database' and TABLE_NAME='$table' and COLUMN_KEY='PRI'";
-        $result = $CI->db->query($sql,false,true)->row();
+        $result = $CI->db->query($sql)->row();
         if(count($result)){
             return $result->COLUMN_NAME;
+        }
+        return false;
+    }
+
+    public function getTableFields($table, $database = ''){
+        $CI = CI_Controller::get_instance();
+
+        if($database == ''){
+            $database = $CI->db->database;
+        }
+        $sql = "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$database' AND TABLE_NAME = '$table'";
+        $result = $CI->db->query($sql)->result();
+        if(count($result)){
+            return $result;
         }
         return false;
     }

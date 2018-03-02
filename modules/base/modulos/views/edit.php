@@ -1,20 +1,20 @@
-<?php // *** estic - edit_file - start ***
-        /**
-         * Created by herbalife.
-         * User: Rafael Gutierrez Gaspar
-         * Date: 01/03/2018
-         * Time: 1:04 am
-         * @var Model_Modulos $model_modulos
-         * @var Model_Modulos $modulos
-         * @var Model_Modulos $modulo
-         */
-        ?>
-        
-        <h3><?= empty($oModulo->id_modulo) ? "Agregar Modulos" : "Actualizando datos, Modulo #" . $oModulo->id_modulo ?></h3>
-        
-        <?= form_open_multipart() ?>
-        <!-- *** estic - tables - inicio *** -->
-        
+<?php
+/**
+ * Created by herbalife.
+ * User: rafaelgutierrez
+ * Date: 02/03/2018
+ * Time: 3:42 am
+ * @var Model_Modulos $model_modulos
+ * @var Model_Modulos $modulos
+ * @var Model_Modulos $modulo
+ */
+?>
+
+<h3><?= empty($oModulo->id_modulo) ? "Agregar Modulos" : "Actualizando datos, Modulo #" . $oModulo->id_modulo ?></h3>
+
+<?= form_open_multipart() ?>
+
+<!-- *** estic - tables - inicio *** -->    
         
                             <div class="form-group row">
                                 <label for="fieldTitulo" class="col-sm-4 col-form-label col-form-label-md">Titulo  </label>
@@ -84,8 +84,8 @@
                                 <div class="col-sm-6">
                                 <?php
                                 echo "<label>" . form_radio("listed", "ENABLED", $oModulo->listed == "ENABLED" ? true : false, "") . " ENABLED</label><br>";
-                                echo "<label>" . form_radio("listed", "DISABLED", $oModulo->listed == "DISABLED" ? true : false, "") . " DISABLED</label><br>";
-                                
+                                    echo "<label>" . form_radio("listed", "DISABLED", $oModulo->listed == "DISABLED" ? true : false, "") . " DISABLED</label><br>";
+                                    
                                 ?>
                                 </div>
                     </div>
@@ -126,23 +126,18 @@
         
             <!-- *** estic - tables - fin *** -->
         
-        <div class="form-group row">
-            <!-- Button -->
-            <div class="col-sm-12 controls">
-                <?php
-                 $data = array(
-                    "name" => "save",
-                    "value" => "Guardar",
-                    "id" => "btnSave",
-                    "class" => "btn btn-success"
-                 );
-                 echo form_submit($data) ?>
-            </div>
-        </div>
-        <?= form_close() ?>
 
-        <!-- *** estic - edit_file - end *** -->
-        
-        
-        
-        
+<div class="form-group row">
+    <div class="col-sm-12 controls">
+        <?php
+        $data = array(
+            "name" => "save",
+            "value" => "Guardar",
+            "id" => "btnSave",
+            "class" => "btn btn-success"
+        );
+        echo form_submit($data) ?>
+    </div>
+</div>
+
+<?= form_close() ?>

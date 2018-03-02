@@ -437,120 +437,6 @@ class CI_Migration
         return $current_version;
     }
 
-//    /**
-//     * Migrate to a schema version
-//     *
-//     * Calls each migration step required to get to the schema version of
-//     * choice
-//     *
-//     * @param    string $target_version Target schema version
-//     * @return    mixed    TRUE if no migrations are found, current version string on success, FALSE on failure
-//     */
-//    public function version($target_version)
-//    {
-//        // Note: We use strings, so that timestamp versions work on 32-bit systems
-//        $current_version = $this->_get_version();
-//
-//        if ($this->_migration_type === 'sequential') {
-//            $target_version = sprintf('%03d', $target_version);
-//        } else {
-//            $target_version = (string)$target_version;
-//        }
-//
-//        $migrations = $this->find_migrations();
-//
-//        if ($target_version > 0 && !isset($migrations[$target_version])) {
-//            $this->_error_string = sprintf($this->lang->line('migration_not_found'), $target_version);
-//            return FALSE;
-//        }
-//
-//        if ($target_version > $current_version) {
-//            $method = 'up';
-//        } elseif ($target_version < $current_version) {
-//            $method = 'down';
-//            // We need this so that migrations are applied in reverse order
-//            krsort($migrations);
-//        } else {
-//            // Well, there's nothing to migrate then ...
-//            return TRUE;
-//        }
-//
-//        // Validate all available migrations within our target range.
-//        //
-//        // Unfortunately, we'll have to use another loop to run them
-//        // in order to avoid leaving the procedure in a broken state.
-//        //
-//        // See https://github.com/bcit-ci/CodeIgniter/issues/4539
-//        $pending = array();
-//        foreach ($migrations as $number => $file) {
-//            // Ignore versions out of our range.
-//            //
-//            // Because we've previously sorted the $migrations array depending on the direction,
-//            // we can safely break the loop once we reach $target_version ...
-//            if ($method === 'up') {
-//                if ($number <= $current_version) {
-//                    continue;
-//                } elseif ($number > $target_version) {
-//                    break;
-//                }
-//            } else {
-//                if ($number > $current_version) {
-//                    continue;
-//                } elseif ($number <= $target_version) {
-//                    break;
-//                }
-//            }
-//
-//            // Check for sequence gaps
-//            if ($this->_migration_type === 'sequential') {
-//                if (isset($previous) && abs($number - $previous) > 1) {
-//                    $this->_error_string = sprintf($this->lang->line('migration_sequence_gap'), $number);
-//                    return FALSE;
-//                }
-//
-//                $previous = $number;
-//            }
-//
-//            include_once($file);
-//            $class = 'Migration_' . ucfirst(strtolower($this->_get_migration_name(basename($file, '.php'))));
-//
-//            // Validate the migration file structure
-//            if (!class_exists($class, FALSE)) {
-//                $this->_error_string = sprintf($this->lang->line('migration_class_doesnt_exist'), $class);
-//                return FALSE;
-//            }
-//            // method_exists() returns true for non-public methods,
-//            // while is_callable() can't be used without instantiating.
-//            // Only get_class_methods() satisfies both conditions.
-//            elseif (!in_array($method, array_map('strtolower', get_class_methods($class)))) {
-//                $this->_error_string = sprintf($this->lang->line('migration_missing_' . $method . '_method'), $class);
-//                return FALSE;
-//            }
-//
-//            $pending[$number] = array($class, $method);
-//        }
-//
-//        // Now just run the necessary migrations
-//        foreach ($pending as $number => $migration) {
-//            log_message('debug', 'Migrating ' . $method . ' from version ' . $current_version . ' to version ' . $number);
-//
-//            $migration[0] = new $migration[0];
-//            call_user_func($migration);
-//            $current_version = $number;
-//            $this->_update_version($current_version);
-//        }
-//
-//        // This is necessary when moving down, since the the last migration applied
-//        // will be the down() method for the next migration up from the target
-//        if ($current_version <> $target_version) {
-//            $current_version = $target_version;
-//            $this->_update_version($current_version);
-//        }
-//
-//        log_message('debug', 'Finished migrating to ' . $current_version);
-//        return $current_version;
-//    }
-
     // --------------------------------------------------------------------
 
     /**
@@ -900,29 +786,6 @@ class CI_Migration
         return [$new_table, $actual_table];
     }
 
-    public function setSubModSingularPlural($sub_mod)
-    {
-        $names = explode('_', $sub_mod);
-        $namesPlural = [];
-        $namesSingular = [];
-        foreach ($names as $name) {
-            if (substr($name, strlen($name) - 2, strlen($name)) == 'es') {
-                $namesSingular[] = substr($name, 0, strlen($name) - 2);
-                $namesPlural[] = $name;
-            } else if (substr($name, strlen($name) - 1, strlen($name)) == 's' && substr($name, strlen($name) - 1, strlen($name)) != 'es') {
-                $namesSingular[] = substr($name, 0, strlen($name) - 1);
-                $namesPlural[] = $name;
-            } else {
-                $namesSingular[] = $name;
-                $namesPlural[] = $name . 's';
-            }
-        }
-        $_sub_mod_s = count($namesSingular) > 1 ? implode('_',$namesSingular) : $namesSingular[0];
-        $_sub_mod_p = count($namesPlural) > 1 ? implode('_',$namesPlural) : $namesPlural[0];
-        
-        return [$_sub_mod_s, $_sub_mod_p];
-    }
-
     public function set_settings($settings,$tableName){
         $sys = config_item('sys');
         $this->set_params($tableName);
@@ -948,7 +811,7 @@ class CI_Migration
                 $this->createModel2($tableName, $idTable, $fields, $settings['ctrl']);
             }
             if(validateArray($settings,'views') || validateVar($settings['views'],'bool')){
-                $this->createViewFiles($settings['views']);
+                $this->createViewFiles($tableName, $idTable, $fields, $settings['views']);
             }
 
             // ******************************************************************************************
@@ -1022,9 +885,13 @@ class CI_Migration
         }
     }
 
-    public function setDataDefault($tableName){
+    public function setDataDefault($tableName, $idTable, $fields){
+        $excepts = array_merge(config_item('controlFields'),[$idTable]);
+        $allFields = array_keys($fields);
+        $validatedFieldsNames = array_diff($allFields,$excepts);
+        $sys = config_item('sys');
         list($mod,$submod) = getModSubMod($tableName);
-        list($subModS, $subModP) = $this->setSubModSingularPlural($submod);
+        list($subModS, $subModP) = setSubModSingularPlural($submod);
         $data = array();
         $data["userCreated"] = config_item('soft_user');
         $data["dateCreated"] = date('d/m/Y');
@@ -1033,18 +900,17 @@ class CI_Migration
         $data["ucTableS"] = ucfirst($subModS);
         $data["lcTableP"] = lcfirst($subModP);
         $data["lcTableS"] = lcfirst($subModS);
-        return $data;
+        $data["ucModS"] = ucfirst($sys[$mod]['name']);
+        $data["lcModS"] = ucfirst($sys[$mod]['name']);
+        $data["lcmodType"] = strtolower($mod);
+        return [$mod,$submod,$subModS,$subModP,$data,$validatedFieldsNames];
     }
 
     public function createCtrl2($tableName,$idTable,$fields,$settings = []){
-        $excepts = array_merge(config_item('controlFields'),[$idTable]);
-        $allFields = array_keys($fields);
-        $validatedFieldsNames = array_diff($allFields,$excepts);
-        list($mod,$submod) = getModSubMod($tableName);
-        $data = $this->setDataDefault($tableName);
+        list($mod,$submod,$subModS,$subModP,$data,$validatedFieldsNames) = $this->setDataDefault($tableName,$idTable,$fields);
         $data["validatedFieldsNames"] = var_export($validatedFieldsNames,true);
+        $data["extraFunctions"] = $this->getExtraFunctions($tableName);
         $phpContent = $this->load->view("template_controller",$data, true, true);
-
         $framePath = getframePath($mod);
         if ($this->migration->create_folder($framePath)) {
             if ($this->migration->create_folder($framePath."$submod/")) {
@@ -1054,27 +920,827 @@ class CI_Migration
     }
 
     public function createModel2($tableName,$idTable,$fields,$settings = []){
-        $excepts = array_merge(config_item('controlFields'),[$idTable]);
-        $allFields = array_keys($fields);
-        $validatedFieldsNames = array_diff($allFields,$excepts);
-        list($mod,$submod) = getModSubMod($tableName);
+        list($mod,$submod,$subModS,$subModP,$data) = $this->setDataDefault($tableName,$idTable,$fields);
         $fieldsProperties = $this->getPhpFieldsProperties($fields);
         $tableRules = $this->getPhpFieldsRules($fields);
-        $tableRulesEdit = $this->getPhpFieldsRulesEdit($fields);
-        $stdFields = $this->getPhpStdFields($fields);
-        $data = $this->setDataDefault($tableName);
+        $tableRulesEdit = $this->getPhpFieldsRules($fields, true);
+        $stdFields = $this->getPhpStdFields($tableName);
         $data["fieldsProperties"] = $fieldsProperties;
         $data["tableRules"] = var_export($tableRules,true);
-        $data["tableRulesEdit"] = $tableRulesEdit;
+        $data["tableRulesEdit"] = var_export($tableRulesEdit,true);
         $data["stdFields"] = $stdFields;
-        $phpContent = $this->load->view("template_controller",$data, true, true);
+        $phpContent = $this->load->view("template_model",$data, true, true);
         $framePath = getframePath($mod);
-        if ($this->migration->create_folder($framePath)) {
-            if ($this->migration->create_folder($framePath."$submod/")) {
-                $this->migration->write_file($framePath."$submod/Ctrl_".ucfirst($submod).$this->_ext_php,$phpContent);
+        if ($this->create_folder($framePath)) {
+            if ($this->create_folder($framePath."$submod/")) {
+                $this->write_file($framePath."$submod/Model_".ucfirst($submod).$this->_ext_php,$phpContent);
             }
         }
     }
+
+    public function createViewEdit($tableName,$idTable,$fields,$settings = []){
+        list($mod,$submod,$subModS,$subModP,$data) = $this->setDataDefault($tableName,$idTable,$fields);
+        $fieldNames = array_keys($fields);
+        $data['htmlFieldsEditForm'] = $this->content_variable_view_edit("o".ucfirst($subModS));;
+        $phpContent = $this->load->view("template_edit",$data, true, true);
+        $framePath = getframePath($mod);
+        if ($this->migration->create_folder($framePath)) {
+            if ($this->create_folder($framePath."$submod/")) {
+                if ($this->create_folder($framePath."$submod/views/")) {
+                    $this->write_file($framePath."$submod/views/edit".$this->_ext_php,$phpContent);
+                }
+            }
+        }
+    }
+
+    private function getPhpFieldsProperties($fields)
+    {
+        $content = "";
+        foreach ($fields as $name => $field){
+            $type =
+                compareStrStr($field['type'],'datetime') ||
+                compareStrStr($field['type'],'date') ||
+                compareStrStr($field['type'],'text') ||
+                compareStrStr($field['type'],'varchar') ? "string" :
+                    (compareStrStr($field['type'],'int') ? "int" : "");
+            $content .= "
+             /**
+                * The value for the $name field.
+                *
+                * @var        $type
+                */             
+             public $$name;
+        ";
+        }
+        return $content;
+    }
+
+    private function getPhpFieldsRules($fields, $noPassword = false)
+    {
+        $rules = array();
+        $excepts = config_item('controlFields');
+        foreach ($fields as $name => $field){
+            if(!in_array($name,$excepts)){
+                if(strhas($name,'password') && !$noPassword){
+                    $rules[$name] = array(
+                        "field" => $name,
+                        "label" => validateArray($field,'label') ? $field['label'] : ucfirst($name),
+                        "rules" => $this->getRulesByField($field),
+                        "password_confirm" => array(
+                            "field" => "password_confirm",
+                            "label" => setTitleFromWordWithDashes("password_confirm"),
+                            "rules" => "trim|matches[$name]",
+                        )
+                    );
+                } else {
+                    $rules[$name] = array(
+                        "field" => $name,
+                        "label" => validateArray($field,'label') ? $field['label'] : ucfirst($name),
+                        "rules" => $this->getRulesByField($field)
+                    );
+                }
+            }
+        }
+        return $rules;
+    }
+
+    private function getPhpStdFields($tableName)
+    {
+        list($mod,$submod) = getModSubMod($tableName);
+        list($subModS,$subModP) = setSubModSingularPlural($submod);
+        $result = $this->dbforge->getTableFields($tableName);
+        $object = new stdClass();
+        $content = "";
+        foreach ($result as $field){
+            $columnName = $field->COLUMN_NAME;
+            $content .="$$subModS->$columnName = '';
+            ";
+        }
+        return $content;
+    }
+
+    private function getRulesByField($field)
+    {
+        $rules = "trim|";
+
+        if(validateArray($field,'constraint')){
+            $size = $field['constraint'];
+            $rules .= "max_length[$size]|";
+        }
+        if(validateArray($field,'password')){
+            $confirm = $field['password'];
+            $rules .= "matches[$confirm]|";
+        }
+        if(validateArray($field,'validate')){
+            if(validateVar($field['validate'],'array')){
+                foreach ($field['validate'] as $rule){
+                    $rules .= "$rule|";
+                }
+            } else if(validateVar($field['validate'],'string')){
+                $rules .= $field['validate']."|";
+            }
+        }
+        return $rules;
+    }
+
+    private function getExtraFunctions($tableName){
+        $content = "";
+        if($tableName=='ci_sessions'){
+            $content .= '
+            public function login(){
+                $this->session->login();
+            }
+            public function logout(){
+                $this->session->logout();
+            }
+            public function signup(){
+                $this->session->signUp();
+            }
+            ';
+            return $content;
+        }
+    }
+
+    public function content_variable_view_edit($objectKey = "object")
+    {
+        $content = config_item('replace_key_start_html');
+        $content .= '    
+        ';
+        $exepts = config_item('controlFields');
+        array_push($exepts,$this->_id_table);
+
+        foreach ($this->_fields as $key => $value) {
+
+            if (!in_array($key, $exepts)) {
+                $words = explode('_', $key);
+                $js = isset($value['js']) ? $value['js'] : '';
+                $class = isset($value['class']) ? $value['class'] : '';
+                $extra = isset($value['extra']) ? $value['extra'] : '';
+                $in_value = isset($value['value']) ? $value['value'] : '';
+                $checked = false;
+                $options = validateArray($value,'options') ? $value['options'] : [];
+                $options_selected = isset($value['options_selected'])  ? $value['options_selected'] : [];
+                $option_selected = isset($value['option_selected'])  ? $value['option_selected'] : '';
+                $id_tag = '';
+                $name_tag = $key;
+                $label = '';
+                $phpOptions = '';
+                foreach ($words as $index => $word) {
+                    $id_tag .= ucfirst($word);
+                    $label .= ucfirst($word) . ' ';
+                }
+                $label = isset($value['label']) ? $value['label'] : $label;
+                if (isset($value['type'])) {
+
+                    if (strhas($key,'password_')) {
+                        $content .= '
+                            <?php if(!isset($' . $objectKey . '->id_' . $this->_sub_mod_s . ')){ ?>';
+                    }
+
+                    // ***********************************************************************************************
+                    // ******************************* Para campos de tipo texto *************************************
+                    // ***********************************************************************************************
+                    if (compareArrayStr($value,'type','text') || compareArrayStr($value,'input','text')) {
+                        $content .= '
+                            <div class="form-group row">
+                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
+                        $content .= '
+                                <div class="col-sm-6">
+                                <?php
+                                ';
+                        $content .= '$data = array(';
+                        $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
+                        $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
+                        $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
+                        $content .= '
+                                     "name" => "' . $name_tag . '",
+                                     "id" => "field' . $id_tag . '",
+                                     "class" => "form-control textTinymce ' . $class . '",';
+                        $content .= '
+                                     "value" => set_value("';
+                        $content .= $name_tag;
+                        $content .= '", $' . $objectKey . '->' . $key . '),
+                                     "type" => "text"
+                                 );
+                                 echo form_textarea($data,"' . $in_value . '","' . $extra . '"); ?> 
+                                 </div>
+                    </div>';
+
+                        // ***********************************************************************************************
+                        // ******************************* Para campos de tipo varchar ***********************************
+                        // ***********************************************************************************************
+                    } else if (compareArrayStr($value,'type','varchar') || compareArrayStr($value,'type','longvarchar')) {
+
+                        // ******************************* input de tipo password **********************************
+                        // *****************************************************************************************
+                        if (strhas($key,'password_') || compareArrayStr($value, 'input' ,'password' )) {
+                            $content .= '
+                            <div class="form-group row">
+                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>
+                               
+                               <div class="col-sm-6">';
+                            $content .= '<?php
+                            $data = array(';
+                            $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
+                            $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
+                            $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
+                            $content .= '
+                                     "name" => "' . $name_tag . '",
+                                     "id" => "field' . $id_tag . '",
+                                     "class" => "form-control ' . $class . '",
+                                     "value" => set_value("';
+                            $content .= $name_tag;
+                            $content .= '", $' . $objectKey . '->' . $key . '),
+                                 );
+                                 echo form_password($data, "'.$in_value.'", "'.$extra.'"); ?>
+                                 </div>
+                                 </div>
+                                 
+                                 <div class="form-group row">
+                                <label for="fieldPassword" class="col-sm-4 col-form-label col-form-label-md">Confirmar Password  </label>
+                                <div class="col-sm-6">
+                                <?php
+                                $data = array(
+                                    "placeholder" => "Confirmar contraseña",
+                                     "name" => "' . $name_tag . '_confirm",
+                                     "id" => "fieldConfirm' . $id_tag . '",
+                                     "class" => "form-control ' . $class . '"
+                                 );
+                                 echo form_password($data, "'.$in_value.'", "'.$extra.'") ?>
+                                </div>
+                    </div>';
+
+                            // ******************************* input de tipo hidden ************************************
+                            // *****************************************************************************************
+                        } else if (compareArrayStr($value,'input','hidden')) {
+                            $content .= '
+                            <div class="form-group row">';
+                            $content .= '
+                                <div class="col-sm-6">
+                                <?php
+                                ';
+                            $content .= 'echo form_hidden("'.$name_tag.'","' . $in_value . '","' . $extra . '") ?>
+                                </div>
+                    </div>';
+
+                            // ******************************* input de tipo radio ************************************
+                            // ****************************************************************************************
+                        } else if (compareArrayStr($value,'input','radio') || strhas($key,'opt_')) {
+
+                            if(strhas($key,'opt_') && count($options)){
+                                $analized = true;
+                            } else if(compareArrayStr($value,'input','radio') && count($options)){
+                                $analized = true;
+                            } else if(validateArray($value,'table') && validateArray($value,'idForeign') && validateArray($value,'fieldRef')){
+                                $foreignTable = $value['table'];
+                                $foreignIDTable = $value['idForeign'];
+                                $foreignFieldRef = $value['fieldRef'];
+                                list($mod,$submod) = getModSubMod($foreignTable);
+                                $phpOptions = "\$options = \$this->model_$submod->get_by('$foreignFieldRef')";
+                                $analized = true;
+                                $bPHPoptions = true;
+                            } else {
+                                $analized = false;
+                            }
+
+                            if($analized){
+                                $content .= '
+                            <div class="form-group row">
+                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
+                                $content .= '
+                                <div class="col-sm-6">
+                                <?php
+                                ';
+                                if($phpOptions != ''){
+                                    $content .= "
+                                    <?php 
+                                        $phpOptions;
+                                        foreach(\$options as \$ind => \$option){ 
+                                            
+                                     } ?>
+                                    ";
+                                } else {
+                                    foreach ($options as $ind => $option){
+                                        if(is_array($option)){
+                                            $opt = array_keys($option)[0];
+                                            $checked = $option[$opt] == 'checked' ? true : false;
+                                        } else {
+                                            $opt = $option;
+                                        }
+                                        $content .= 'echo "<label>" . form_radio("'.$name_tag.'", "'.$opt.'", $'.$objectKey.'->'.$name_tag.' == "'.$opt.'" ? true : false, "'.$extra.'") . " ' . ucfirst($opt) . '</label><br>";
+                                    ';
+                                }
+
+                                    $checked = false;
+                                }
+                                $content .= '
+                                ?>
+                                </div>
+                    </div>
+                                ';
+                            }
+
+                            // ******************************* input de tipo checkbox **********************************
+                            // *****************************************************************************************
+                        } else if (strhas($key,'chk_') || compareArrayStr($value,'input','checkbox')) {
+
+                            if(strhas($key,'chk_')  && count($options)){
+                                $analized = true;
+                            } else if(compareArrayStr($value,'input','checkbox') && count($options)){
+                                $analized = true;
+                            } else if(validateArray($value,'table') && validateArray($value,'idForeign') && validateArray($value,'fieldRef')){
+                                $foreignTable = $value['table'];
+                                $foreignIDTable = $value['idForeign'];
+                                $foreignFieldRef = $value['fieldRef'];
+                                list($mod,$submod) = getModSubMod($foreignTable);
+                                $phpOptions = "\$options = \$this->model_$submod->get_by('$foreignFieldRef')";
+                                $analized = true;
+                                $bPHPoptions = true;
+                            } else {
+                                $analized = false;
+                            }
+
+                            if($analized){
+                                $content .= '
+                            <div class="form-group row">
+                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
+                                $content .= '
+                                <div class="col-sm-6">
+                                <?php
+                                ';
+                                if($phpOptions != ''){
+                                    $content .= "
+                                        $phpOptions;
+                                        foreach(\$options as \$ind => \$option){ 
+                                            
+                                     } ?>
+                                    ";
+                                } else {
+                                    foreach ($options as $ind => $option){
+                                        if(is_array($option)){
+                                            $opt = array_keys($option)[0];
+                                            $checked = $option[$opt] == 'checked' ? true : false;
+                                        } else {
+                                            $opt = $option;
+                                        }
+                                        $content .= 'echo "<label>" . form_checkbox("'.$name_tag.'", "'.$opt.'", $'.$objectKey.'->'.$name_tag.' == "'.$opt.'" ? true : false, "'.$extra.'") . " ' . ucfirst($opt) .
+                                            '</label><br>
+                                    ";
+                                ';
+                                        $checked = false;
+                                    }
+                                }
+                                $content .= ' ?>
+                                </div>
+                    </div>
+                                ';
+                            }
+
+                            // ******************************* input de tipo dropdown **********************************
+                            // *****************************************************************************************
+                        } else if (strhas($key,'drop_') || compareArrayStr($value,'input','dropdown')) {
+
+                            if(strhas($key,'drop_') && count($options)){
+                                $analized = true;
+                            } else if(compareArrayStr($value,'input','dropdown') && count($options)){
+                                $analized = true;
+                            } else if(validateArray($value,'table') && validateArray($value,'idForeign') && validateArray($value,'fieldRef')){
+                                $foreignTable = $value['table'];
+                                $foreignIDTable = $value['idForeign'];
+                                $foreignFieldRef = $value['fieldRef'];
+                                list($mod,$submod) = getModSubMod($foreignTable);
+                                $phpOptions = "\$options = \$this->model_$submod->get_by('$foreignFieldRef')";
+                                $analized = true;
+                                $bPHPoptions = true;
+                            } else {
+                                $analized = false;
+                            }
+
+                            if($analized){
+                                $content .= '
+                            <div class="form-group row">
+                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
+                                $content .= '
+                                <div class="col-sm-6">
+                                <?php
+                                ';
+                                if($phpOptions != ''){
+                                    $content .= "
+                                            
+                                        $phpOptions;
+                                        foreach(\$options as \$ind => \$option){ 
+                                            
+                                     } ?>
+                                    ";
+                                } else {
+
+                                    if(count($options_selected)){
+                                        $content .= '$data = array(';
+                                        $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
+                                        $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
+                                        $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
+                                        $content .= '
+                                    "name" => "' . $name_tag . '[]",
+                                    "id" => "field' . $id_tag . '",
+                                    "class" => "' . $class . '"
+                                );
+                                $options = '. var_export($options,true) . ';
+                                $options_selected = json_decode($'.$objectKey.'->'.$name_tag.');
+                                echo form_dropdown($data, $options, $options_selected, "'.$extra.'"); ';
+                                    } else {
+                                        $content .= '$data = array(';
+                                        $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
+                                        $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
+                                        $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
+                                        $content .= '
+                                    "name" => "' . $name_tag . '",
+                                    "id" => "field' . $id_tag . '",
+                                    "class" => "' . $class . '"
+                                );
+                                $options = '. var_export($options,true).';
+                                echo form_dropdown($data, $options, "$'.$objectKey.'->'.$name_tag.'","'.$extra.'") ?> 
+                                </div>
+                    </div>';
+                                    }
+                                }
+                            }
+
+                            // ******************************* input de tipo select *******************************
+                            // ************************************************************************************
+                        } else if (strhas($key,'sel_') || compareArrayStr($value,'input','select')) {
+
+                            if(strhas($key,'sel_') && count($options)){
+                                $analized = true;
+                            }else if(compareArrayStr($value,'input','select') && count($options)){
+                                $analized = true;
+                            } else if(validateArray($value,'table') && validateArray($value,'idForeign') && validateArray($value,'fieldRef')){
+                                $foreignTable = $value['table'];
+                                $foreignIDTable = $value['idForeign'];
+                                $foreignFieldRef = $value['fieldRef'];
+                                list($mod,$submod) = getModSubMod($foreignTable);
+                                $phpOptions = "\$options = \$this->model_$submod->get_by('$foreignFieldRef')";
+                                $analized = true;
+                                $bPHPoptions = true;
+                            } else {
+                                $analized = false;
+                            }
+
+                            if($analized){
+                                $content .= '
+                            <div class="form-group row">
+                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
+                                $content .= '
+                                <div class="col-sm-6">
+                                <?php
+                                ';
+                                if(count($options_selected) == 0){
+                                    $opt = array_keys($options);
+                                    $options_selected[] = $opt[0];
+                                }
+                                $content .= '$data = array(';
+                                $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
+                                $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
+                                $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
+                                $content .= '
+                                    "name" => "' . $name_tag . '[]",
+                                    "id" => "field' . $id_tag . '",
+                                    "class" => "' . $class . '"
+                                );
+                                $options = '. var_export($options,true) . ';
+                                $options_selected = json_decode($'.$objectKey.'->'.$name_tag.');
+                                echo form_select($data, $options, "$'.$objectKey.'->'.$name_tag.'", "'.$extra.'") ?>
+                                </div>
+                    </div>';
+                            }
+
+                            // ******************************* input de tipo multiselect *******************************
+                            // *****************************************************************************************
+                        } else if (strhas($key,'mulsel_') || compareArrayStr($value,'input','multiselect')) {
+
+                            if(strhas($key,'ndrop_') && count($options)){
+                                $analized = true;
+                            }else if(compareArrayStr($value,'input','multiselect') && count($options)){
+                                $analized = true;
+                            } else if(validateArray($value,'table') && validateArray($value,'idForeign') && validateArray($value,'fieldRef')){
+                                $foreignTable = $value['table'];
+                                $foreignIDTable = $value['idForeign'];
+                                $foreignFieldRef = $value['fieldRef'];
+                                list($mod,$submod) = getModSubMod($foreignTable);
+                                $phpOptions = "\$options = \$this->model_$submod->get_by('$foreignFieldRef')";
+                                $analized = true;
+                                $bPHPoptions = true;
+                            } else {
+                                $analized = false;
+                            }
+
+                            if($analized){
+                                $content .= '
+                            <div class="form-group row">
+                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
+                                $content .= '
+                                <div class="col-sm-6">
+                                <?php
+                                ';
+                                if(count($options_selected) == 0){
+                                    $opt = array_keys($options);
+                                    $options_selected[] = $opt[0];
+                                }
+                                $content .= '$data = array(';
+                                $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
+                                $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
+                                $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
+                                $content .= '
+                                    "name" => "' . $name_tag . '[]",
+                                    "id" => "field' . $id_tag . '",
+                                    "class" => "' . $class . '"
+                                );
+                                $options = '. var_export($options,true) . ';
+                                $options_selected = json_decode($'.$objectKey.'->'.$name_tag.');
+                                echo form_multiselect($data, $options, $options_selected, "'.$extra.'") ?>
+                                </div>
+                    </div>';
+                            }
+
+                            // ******************************* input de tipo imagen *******************************
+                            // ************************************************************************************
+                        } else if (strhas($key,'img_') || compareArrayStr($value,'input','image')) {
+
+                            if(strhas($key,'img_')){
+                                $analized = true;
+                            }else if(compareArrayStr($value,'input','image')){
+                                $analized = true;
+                            } else {
+                                $analized = false;
+                            }
+
+                            if($analized) {
+                                $content .= '
+                            <div class="form-group row">
+                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
+                                $content .= '
+                                <div class="col-sm-6">
+                                <div class="two-columns">
+                                <?php if(isset($'.$objectKey.'->imgThumb)){?>
+                                    <img class="img-thumb-1" id="imgThumb" src="<?=site_url("img/'.$this->_sub_mod_p.'/thumbs/".$'.$objectKey.'->imgThumb)?>"/>
+                                <?php }?>
+                                <?php
+                                ';
+                                $content .= '$data = array(';
+                                $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
+                                $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
+                                $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
+                                $content .= '
+                                     "name" => "' . $name_tag . '",
+                                     "id" => "field' . $id_tag . '",
+                                     "class" => "form-control ' . $class . '",
+                                     "onchange" => "oImgs.showThisImg(this)",
+                                     "value" => set_value("';
+
+                                $content .= $name_tag;
+
+                                $content .= '", $' . $objectKey . '->' . $key . '),
+                                     "type" => "text"
+                                 );
+                                 echo form_upload($data,"' . $in_value . '","' . $extra . '") ?>
+                                 </div>
+                                 </div>
+                    </div>';
+                            }
+
+                        } else if(compareArrayStr($value,'input','disabled')){
+
+                            // ******************************* Input por defecto *******************************
+                            // *********************************************************************************
+                            $content .= '
+                            <div class="form-group row">
+                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
+                            $content .= '
+                                <div class="col-sm-6">
+                                <?php
+                                ';
+                            $content .= '$data = array(';
+                            $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
+                            $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
+                            $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
+                            $content .= '
+                                     "name" => "' . $name_tag . '",
+                                     "id" => "field' . $id_tag . '",
+                                     "class" => "form-control ' . $class . '",
+                                     "value" => set_value("';
+
+                            $content .= $name_tag;
+
+                            $content .= '", $' . $objectKey . '->' . $key . '),
+                                     "type" => "text"
+                                 );
+                                 echo form_input($data,"'.$in_value.'","disabled") ?>
+                                 </div>
+                    </div>
+                                 ';
+                        } else if(compareArrayStr($value,'input','default')){
+
+                            // ******************************* Input por defecto *******************************
+                            // *********************************************************************************
+                            $content .= '
+                            <div class="form-group row">
+                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
+                            $content .= '
+                                <div class="col-sm-6">
+                                <?php
+                                ';
+                            $content .= '$data = array(';
+                            $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
+                            $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
+                            $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
+                            $content .= '
+                                     "name" => "' . $name_tag . '",
+                                     "id" => "field' . $id_tag . '",
+                                     "class" => "form-control ' . $class . '",
+                                     "value" => set_value("';
+
+                            $content .= $name_tag;
+
+                            $content .= '", $' . $objectKey . '->' . $key . '),
+                                     "type" => "text"
+                                 );
+                                 echo form_input($data,"'.$in_value.'","'.$extra.'") ?>
+                                 </div>
+                    </div>
+                                 ';
+                        } else {
+                            // ******************************* Input por defecto *******************************
+                            // *********************************************************************************
+                            $content .= '
+                            <div class="form-group row">
+                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
+                            $content .= '
+                                <div class="col-sm-6">
+                                <?php
+                                ';
+                            $content .= '$data = array(';
+                            $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
+                            $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
+                            $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
+                            $content .= '
+                                     "name" => "' . $name_tag . '",
+                                     "id" => "field' . $id_tag . '",
+                                     "class" => "form-control ' . $class . '",
+                                     "value" => set_value("';
+
+                            $content .= $name_tag;
+
+                            $content .= '", $' . $objectKey . '->' . $key . '),
+                                     "type" => "text"
+                                 );
+                                 echo form_input($data,"'.$in_value.'","'.$extra.'") ?>
+                                 </div>
+                    </div>
+                                 ';
+
+                        }
+
+                        // ***********************************************************************************************
+                        // ******************************* Para campos de tipo int ***************************************
+                        // ***********************************************************************************************
+                    } else if (compareArrayStr($value,'type','int')) {
+                        $content .= '
+                            <div class="form-group row">
+                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
+                        $content .= '
+                                <div class="col-sm-6">
+                                <?php
+                                ';
+                        $content .= '$data = array(';
+                        $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
+                        $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
+                        $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
+                        $content .= '
+                                     "name" => "' . $name_tag . '",
+                                     "id" => "field' . $id_tag . '",
+                                     "class" => "form-control ' . $class . '",
+                                     "value" => set_value("';
+                        $content .= $name_tag;
+
+                        $content .= '", $' . $objectKey . '->' . $key . '),
+                                     "type" => "number"
+                                 );
+                                 echo form_input($data, "'.$in_value.'", "'.$extra.'") ?>
+                                 </div>
+                                 </div>
+                                 ';
+
+                        // ***********************************************************************************************
+                        // ******************************* Para campos de tipo date **************************************
+                        // ***********************************************************************************************
+                    } else if (compareArrayStr($value,'type','date')) {
+
+                        $content .= '
+                            <div class="form-group row">
+                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
+                        $content .= '
+                                <div class="col-sm-6">
+                                <?php
+                                ';
+                        $content .= '$data = array(';
+                        $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
+                        $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
+                        $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
+                        $content .= '
+                                     "name" => "' . $name_tag . '",
+                                     "id" => "field' . $id_tag . '",
+                                     "class" => "form-control datepicker ' . $class . '",
+                                     "value" => set_value("';
+                        $content .= $name_tag;
+
+                        $content .= '", $' . $objectKey . '->' . $key . '),
+                                     "type" => "text"
+                                 );
+                                 echo form_input($data, "'.$in_value.'", "'.$extra.'") ?>
+                                 </div>
+                                 </div>';
+
+                        // ***********************************************************************************************
+                        // ******************************* Para campos de tipo datetime **********************************
+                        // ***********************************************************************************************
+                    } else if (compareArrayStr($value,'type','datetime') || compareArrayStr($value,'type','timestamp')) {
+                        $content .= '
+                            <div class="form-group row">
+                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
+                        $content .= '
+                                <div class="col-sm-6">
+                                <?php
+                                ';
+                        $content .= '$data = array(';
+                        $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
+                        $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
+                        $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
+                        $content .= '
+                                     "name" => "' . $name_tag . '",
+                                     "id" => "field' . $id_tag . '",
+                                     "class" => "form-control datepicker ' . $class . '",
+                                     "value" => set_value("';
+                        $content .= $name_tag;
+
+                        $content .= '", $' . $objectKey . '->' . $key . '),
+                                     "type" => "text"
+                                 );
+                                 echo form_input($data, "'.$in_value.'", "'.$extra.'") ?>
+                                 </div>
+                    </div>
+                                 ';
+                    }
+
+                    // ******************************* Para validar el campo **********************************
+                    // ****************************************************************************************
+                    $validate = (isset($value['validate']) ? ($value['validate'] ? true : false) : true);
+                    $content .= $validate? '<?php echo form_error("'.$name_tag.'"); ?>
+                    ' : '';
+                    if (strhas($key,'password_')) {
+                        $content .= '
+                            <?php } ?>';
+                    }
+
+                } else {
+                    return '';
+                }
+            }
+        }
+        $content .= '
+        
+            ';
+        $content .= config_item('replace_key_end_html') . '
+        ';
+
+        return $content;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // *************************************************************************************************
+    // **************************** Antiguos Metodos usados en la migracion de tablas ******************
+    // *************************************************************************************************
     
     public function set_params($tableLocal)
     {
@@ -1095,7 +1761,7 @@ class CI_Migration
 
             if($mod_name != '' && $mod_dir != ''){
 
-                list($this->_sub_mod_s, $this->_sub_mod_p) = $this->setSubModSingularPlural($sub_modulo);
+                list($this->_sub_mod_s, $this->_sub_mod_p) = setSubModSingularPlural($sub_modulo);
                 $this->verifyAppOrBase();
 
                 $this->_id_table = $this->_id_table == null ? $this->dbforge->getPrimaryKeyFromTable($tableLocal) : $this->_id_table;
@@ -2067,7 +2733,7 @@ class CI_Migration
         return false;
     }
 
-    public function createViewFiles($aFiles = [], $defaults = true)
+    public function createViewFiles($tableName, $idTable, $fields, $aFiles = [], $defaults = true)
     {
         if (validateVar($aFiles,'array')) {
 
@@ -2089,7 +2755,7 @@ class CI_Migration
 
             $this->create_view_index();
 
-            $this->create_view_edit();
+            $this->createViewEdit($tableName, $idTable, $fields);
 
             $this->create_view_cnt();
 
@@ -2825,588 +3491,7 @@ class CI_Migration
         return $content;
     }
 
-    public function content_variable_view_edit($objectKey = "object")
-    {
-        $content = config_item('replace_key_start_html');
-        $content .= '
-        
-        ';
-        $exepts = config_item('controlFields');
-        array_push($exepts,$this->_id_table);
 
-        foreach ($this->_fields as $key => $value) {
-
-            if (!in_array($key, $exepts)) {
-                $words = explode('_', $key);
-                $js = isset($value['js']) ? $value['js'] : '';
-                $class = isset($value['class']) ? $value['class'] : '';
-                $extra = isset($value['extra']) ? $value['extra'] : '';
-                $in_value = isset($value['value']) ? $value['value'] : '';
-                $checked = false;
-                $options = isset($value['options']) ? $value['options'] : [];
-                $options_selected = isset($value['options_selected'])  ? $value['options_selected'] : [];
-                $option_selected = isset($value['option_selected'])  ? $value['option_selected'] : '';
-                $id_tag = '';
-                $name_tag = $key;
-                $label = '';
-                foreach ($words as $index => $word) {
-                    $id_tag .= ucfirst($word);
-                    $label .= ucfirst($word) . ' ';
-                }
-                $label = isset($value['label']) ? $value['label'] : $label;
-                if (isset($value['type'])) {
-
-                    if (strhas($key,'password_')) {
-                        $content .= '
-                            <?php if(!isset($' . $objectKey . '->id_' . $this->_sub_mod_s . ')){ ?>';
-                    }
-
-                    // ***********************************************************************************************
-                    // ******************************* Para campos de tipo texto *************************************
-                    // ***********************************************************************************************
-                    if (compareArrayStr($value,'type','text') || compareArrayStr($value,'input','text')) {
-                        $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
-                        $content .= '
-                                <div class="col-sm-6">
-                                <?php
-                                ';
-                        $content .= '$data = array(';
-                        $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                        $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                        $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                        $content .= '
-                                     "name" => "' . $name_tag . '",
-                                     "id" => "field' . $id_tag . '",
-                                     "class" => "form-control textTinymce ' . $class . '",';
-                        $content .= '
-                                     "value" => set_value("';
-                        $content .= $name_tag;
-                        $content .= '", $' . $objectKey . '->' . $key . '),
-                                     "type" => "text"
-                                 );
-                                 echo form_textarea($data,"' . $in_value . '","' . $extra . '"); ?> 
-                                 </div>
-                    </div>';
-
-                        // ***********************************************************************************************
-                        // ******************************* Para campos de tipo varchar ***********************************
-                        // ***********************************************************************************************
-                    } else if (compareArrayStr($value,'type','varchar') || compareArrayStr($value,'type','longvarchar')) {
-
-                        // ******************************* input de tipo password **********************************
-                        // *****************************************************************************************
-                        if (strhas($key,'password_') || compareArrayStr($value, 'input' ,'password' )) {
-                            $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>
-                               
-                               <div class="col-sm-6">';
-                            $content .= '<?php
-                            $data = array(';
-                            $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                            $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                            $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                            $content .= '
-                                     "name" => "' . $name_tag . '",
-                                     "id" => "field' . $id_tag . '",
-                                     "class" => "form-control ' . $class . '",
-                                     "value" => set_value("';
-                            $content .= $name_tag;
-                            $content .= '", $' . $objectKey . '->' . $key . '),
-                                 );
-                                 echo form_password($data, "'.$in_value.'", "'.$extra.'"); ?>
-                                 </div>
-                                 </div>
-                                 
-                                 <div class="form-group row">
-                                <label for="fieldPassword" class="col-sm-4 col-form-label col-form-label-md">Confirmar Password  </label>
-                                <div class="col-sm-6">
-                                <?php
-                                $data = array(
-                                    "placeholder" => "Confirmar contraseña",
-                                     "name" => "' . $name_tag . '_confirm",
-                                     "id" => "fieldConfirm' . $id_tag . '",
-                                     "class" => "form-control ' . $class . '"
-                                 );
-                                 echo form_password($data, "'.$in_value.'", "'.$extra.'") ?>
-                                </div>
-                    </div>';
-
-                            // ******************************* input de tipo hidden ************************************
-                            // *****************************************************************************************
-                        } else if (compareArrayStr($value,'input','hidden')) {
-                            $content .= '
-                            <div class="form-group row">';
-                            $content .= '
-                                <div class="col-sm-6">
-                                <?php
-                                ';
-                            $content .= 'echo form_hidden("'.$name_tag.'","' . $in_value . '","' . $extra . '") ?>
-                                </div>
-                    </div>';
-
-                            // ******************************* input de tipo radio ************************************
-                            // ****************************************************************************************
-                        } else if (compareArrayStr($value,'input','radio') || strhas($key,'opt_')) {
-
-                            if(strhas($key,'opt_') && count($options)){
-                                $analized = true;
-                            } else if(compareArrayStr($value,'input','radio') && count($options)){
-                                $analized = true;
-                            } else {
-                                $analized = false;
-                            }
-
-                            if($analized){
-                                $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
-                                $content .= '
-                                <div class="col-sm-6">
-                                <?php
-                                ';
-                                foreach ($options as $ind => $option){
-                                    if(is_array($option)){
-                                        $opt = array_keys($option)[0];
-                                        $checked = $option[$opt] == 'checked' ? true : false;
-                                    } else {
-                                        $opt = $option;
-                                    }
-                                    $content .= 'echo "<label>" . form_radio("'.$name_tag.'", "'.$opt.'", $'.$objectKey.'->'.$name_tag.' == "'.$opt.'" ? true : false, "'.$extra.'") . " ' . ucfirst($opt) . '</label><br>";
-                                ';
-                                    $checked = false;
-                                }
-                                $content .= '
-                                ?>
-                                </div>
-                    </div>
-                                ';
-                            }
-
-                            // ******************************* input de tipo checkbox **********************************
-                            // *****************************************************************************************
-                        } else if (strhas($key,'chk_') || compareArrayStr($value,'input','checkbox')) {
-
-                            if(strhas($key,'chk_')  && count($options)){
-                                $analized = true;
-                            } else if(compareArrayStr($value,'input','checkbox') && count($options)){
-                                $analized = true;
-                            } else {
-                                $analized = false;
-                            }
-
-                            if($analized){
-                                $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
-                                $content .= '
-                                <div class="col-sm-6">
-                                <?php
-                                ';
-                                foreach ($options as $ind => $option){
-                                    if(is_array($option)){
-                                        $opt = array_keys($option)[0];
-                                        $checked = $option[$opt] == 'checked' ? true : false;
-                                    } else {
-                                        $opt = $option;
-                                    }
-                                    $content .= 'echo "<label>" . form_checkbox("'.$name_tag.'", "'.$opt.'", $'.$objectKey.'->'.$name_tag.' == "'.$opt.'" ? true : false, "'.$extra.'") . " ' . ucfirst($opt) .
-                                        '</label><br>
-                                    ";
-                                ';
-                                    $checked = false;
-                                }
-                                $content .= ' ?>
-                                </div>
-                    </div>
-                                ';
-                            }
-
-                            // ******************************* input de tipo dropdown **********************************
-                            // *****************************************************************************************
-                        } else if (strhas($key,'drop_') || compareArrayStr($value,'input','dropdown')) {
-
-                            if(strhas($key,'drop_') && count($options)){
-                                $analized = true;
-                            } else if(compareArrayStr($value,'input','dropdown') && count($options)){
-                                $analized = true;
-                            } else {
-                                $analized = false;
-                            }
-
-                            if($analized){
-                                $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
-                                $content .= '
-                                <div class="col-sm-6">
-                                <?php
-                                ';
-
-                                if(count($options_selected)){
-                                    $content .= '$data = array(';
-                                    $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                                    $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                                    $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                                    $content .= '
-                                    "name" => "' . $name_tag . '[]",
-                                    "id" => "field' . $id_tag . '",
-                                    "class" => "' . $class . '"
-                                );
-                                $options = '. var_export($options,true) . ';
-                                $options_selected = json_decode($'.$objectKey.'->'.$name_tag.');
-                                echo form_dropdown($data, $options, $options_selected, "'.$extra.'"); ';
-                                } else {
-                                    $content .= '$data = array(';
-                                    $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                                    $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                                    $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                                    $content .= '
-                                    "name" => "' . $name_tag . '",
-                                    "id" => "field' . $id_tag . '",
-                                    "class" => "' . $class . '"
-                                );
-                                $options = '. var_export($options,true).';
-                                echo form_dropdown($data, $options, "$'.$objectKey.'->'.$name_tag.'","'.$extra.'") ?> 
-                                </div>
-                    </div>';
-                                }
-                            }
-
-                            // ******************************* input de tipo select *******************************
-                            // ************************************************************************************
-                        } else if (strhas($key,'sel_') || compareArrayStr($value,'input','select')) {
-
-                            if(strhas($key,'sel_') && count($options)){
-                                $analized = true;
-                            }else if(compareArrayStr($value,'input','select') && count($options)){
-                                $analized = true;
-                            } else {
-                                $analized = false;
-                            }
-
-                            if($analized){
-                                $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
-                                $content .= '
-                                <div class="col-sm-6">
-                                <?php
-                                ';
-                                if(count($options_selected) == 0){
-                                    $opt = array_keys($options);
-                                    $options_selected[] = $opt[0];
-                                }
-                                $content .= '$data = array(';
-                                $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                                $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                                $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                                $content .= '
-                                    "name" => "' . $name_tag . '[]",
-                                    "id" => "field' . $id_tag . '",
-                                    "class" => "' . $class . '"
-                                );
-                                $options = '. var_export($options,true) . ';
-                                $options_selected = json_decode($'.$objectKey.'->'.$name_tag.');
-                                echo form_select($data, $options, "$'.$objectKey.'->'.$name_tag.'", "'.$extra.'") ?>
-                                </div>
-                    </div>';
-                            }
-
-                            // ******************************* input de tipo multiselect *******************************
-                            // *****************************************************************************************
-                        } else if (strhas($key,'mulsel_') || compareArrayStr($value,'input','multiselect')) {
-
-                            if(strhas($key,'ndrop_') && count($options)){
-                                $analized = true;
-                            }else if(compareArrayStr($value,'input','multiselect') && count($options)){
-                                $analized = true;
-                            } else {
-                                $analized = false;
-                            }
-
-                            if($analized){
-                                $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
-                                $content .= '
-                                <div class="col-sm-6">
-                                <?php
-                                ';
-                                if(count($options_selected) == 0){
-                                    $opt = array_keys($options);
-                                    $options_selected[] = $opt[0];
-                                }
-                                $content .= '$data = array(';
-                                $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                                $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                                $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                                $content .= '
-                                    "name" => "' . $name_tag . '[]",
-                                    "id" => "field' . $id_tag . '",
-                                    "class" => "' . $class . '"
-                                );
-                                $options = '. var_export($options,true) . ';
-                                $options_selected = json_decode($'.$objectKey.'->'.$name_tag.');
-                                echo form_multiselect($data, $options, $options_selected, "'.$extra.'") ?>
-                                </div>
-                    </div>';
-                            }
-
-                            // ******************************* input de tipo imagen *******************************
-                            // ************************************************************************************
-                        } else if (strhas($key,'img_') || compareArrayStr($value,'input','image')) {
-
-                            if(strhas($key,'img_')){
-                                $analized = true;
-                            }else if(compareArrayStr($value,'input','image')){
-                                $analized = true;
-                            } else {
-                                $analized = false;
-                            }
-
-                            if($analized) {
-                                $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
-                                $content .= '
-                                <div class="col-sm-6">
-                                <div class="two-columns">
-                                <?php if(isset($'.$objectKey.'->imgThumb)){?>
-                                    <img class="img-thumb-1" id="imgThumb" src="<?=site_url("img/'.$this->_sub_mod_p.'/thumbs/".$'.$objectKey.'->imgThumb)?>"/>
-                                <?php }?>
-                                <?php
-                                ';
-                                $content .= '$data = array(';
-                                $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                                $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                                $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                                $content .= '
-                                     "name" => "' . $name_tag . '",
-                                     "id" => "field' . $id_tag . '",
-                                     "class" => "form-control ' . $class . '",
-                                     "onchange" => "oImgs.showThisImg(this)",
-                                     "value" => set_value("';
-
-                                $content .= $name_tag;
-
-                                $content .= '", $' . $objectKey . '->' . $key . '),
-                                     "type" => "text"
-                                 );
-                                 echo form_upload($data,"' . $in_value . '","' . $extra . '") ?>
-                                 </div>
-                                 </div>
-                    </div>';
-                            }
-
-                        } else if(compareArrayStr($value,'input','disabled')){
-
-                            // ******************************* Input por defecto *******************************
-                            // *********************************************************************************
-                            $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
-                            $content .= '
-                                <div class="col-sm-6">
-                                <?php
-                                ';
-                            $content .= '$data = array(';
-                            $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                            $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                            $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                            $content .= '
-                                     "name" => "' . $name_tag . '",
-                                     "id" => "field' . $id_tag . '",
-                                     "class" => "form-control ' . $class . '",
-                                     "value" => set_value("';
-
-                            $content .= $name_tag;
-
-                            $content .= '", $' . $objectKey . '->' . $key . '),
-                                     "type" => "text"
-                                 );
-                                 echo form_input($data,"'.$in_value.'","disabled") ?>
-                                 </div>
-                    </div>
-                                 ';
-                        } else if(compareArrayStr($value,'input','default')){
-
-                        // ******************************* Input por defecto *******************************
-                        // *********************************************************************************
-                        $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
-                        $content .= '
-                                <div class="col-sm-6">
-                                <?php
-                                ';
-                        $content .= '$data = array(';
-                        $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                        $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                        $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                        $content .= '
-                                     "name" => "' . $name_tag . '",
-                                     "id" => "field' . $id_tag . '",
-                                     "class" => "form-control ' . $class . '",
-                                     "value" => set_value("';
-
-                        $content .= $name_tag;
-
-                        $content .= '", $' . $objectKey . '->' . $key . '),
-                                     "type" => "text"
-                                 );
-                                 echo form_input($data,"'.$in_value.'","'.$extra.'") ?>
-                                 </div>
-                    </div>
-                                 ';
-                    } else {
-                            // ******************************* Input por defecto *******************************
-                            // *********************************************************************************
-                            $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
-                            $content .= '
-                                <div class="col-sm-6">
-                                <?php
-                                ';
-                            $content .= '$data = array(';
-                            $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                            $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                            $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                            $content .= '
-                                     "name" => "' . $name_tag . '",
-                                     "id" => "field' . $id_tag . '",
-                                     "class" => "form-control ' . $class . '",
-                                     "value" => set_value("';
-
-                            $content .= $name_tag;
-
-                            $content .= '", $' . $objectKey . '->' . $key . '),
-                                     "type" => "text"
-                                 );
-                                 echo form_input($data,"'.$in_value.'","'.$extra.'") ?>
-                                 </div>
-                    </div>
-                                 ';
-
-                        }
-
-                        // ***********************************************************************************************
-                        // ******************************* Para campos de tipo int ***************************************
-                        // ***********************************************************************************************
-                    } else if (compareArrayStr($value,'type','int')) {
-                        $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
-                        $content .= '
-                                <div class="col-sm-6">
-                                <?php
-                                ';
-                        $content .= '$data = array(';
-                        $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                        $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                        $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                        $content .= '
-                                     "name" => "' . $name_tag . '",
-                                     "id" => "field' . $id_tag . '",
-                                     "class" => "form-control ' . $class . '",
-                                     "value" => set_value("';
-                        $content .= $name_tag;
-
-                        $content .= '", $' . $objectKey . '->' . $key . '),
-                                     "type" => "number"
-                                 );
-                                 echo form_input($data, "'.$in_value.'", "'.$extra.'") ?>
-                                 </div>
-                                 </div>
-                                 ';
-
-                        // ***********************************************************************************************
-                        // ******************************* Para campos de tipo date **************************************
-                        // ***********************************************************************************************
-                    } else if (compareArrayStr($value,'type','date')) {
-
-                        $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
-                        $content .= '
-                                <div class="col-sm-6">
-                                <?php
-                                ';
-                        $content .= '$data = array(';
-                        $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                        $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                        $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                        $content .= '
-                                     "name" => "' . $name_tag . '",
-                                     "id" => "field' . $id_tag . '",
-                                     "class" => "form-control datepicker ' . $class . '",
-                                     "value" => set_value("';
-                        $content .= $name_tag;
-
-                        $content .= '", $' . $objectKey . '->' . $key . '),
-                                     "type" => "text"
-                                 );
-                                 echo form_input($data, "'.$in_value.'", "'.$extra.'") ?>
-                                 </div>
-                                 </div>';
-
-                        // ***********************************************************************************************
-                        // ******************************* Para campos de tipo datetime **********************************
-                        // ***********************************************************************************************
-                    } else if (compareArrayStr($value,'type','datetime') || compareArrayStr($value,'type','timestamp')) {
-                        $content .= '
-                            <div class="form-group row">
-                                <label for="field' . $id_tag . '" class="col-sm-4 col-form-label col-form-label-md">' . $label . ' </label>';
-                        $content .= '
-                                <div class="col-sm-6">
-                                <?php
-                                ';
-                        $content .= '$data = array(';
-                        $content .= isset($value['onchange']) ? '"onchange" => "' . $value['onchange'] . '",' : '';
-                        $content .= isset($value['onclick']) ? '"onclick" => "' . $value['onclick'] . '",' : '';
-                        $content .= isset($value['placeholder']) ? '"placeholder" => "' . $value['placeholder'] . '",' : '';
-                        $content .= '
-                                     "name" => "' . $name_tag . '",
-                                     "id" => "field' . $id_tag . '",
-                                     "class" => "form-control datepicker ' . $class . '",
-                                     "value" => set_value("';
-                        $content .= $name_tag;
-
-                        $content .= '", $' . $objectKey . '->' . $key . '),
-                                     "type" => "text"
-                                 );
-                                 echo form_input($data, "'.$in_value.'", "'.$extra.'") ?>
-                                 </div>
-                    </div>
-                                 ';
-                    }
-
-                    // ******************************* Para validar el campo **********************************
-                    // ****************************************************************************************
-                    $validate = (isset($value['validate']) ? ($value['validate'] ? true : false) : true);
-                    $content .= $validate? '<?php echo form_error("'.$name_tag.'"); ?>
-                    ' : '';
-                    if (strhas($key,'password_')) {
-                        $content .= '
-                            <?php } ?>';
-                    }
-
-                } else {
-                    return '';
-                }
-            }
-        }
-        $content .= '
-        
-            ';
-        $content .= config_item('replace_key_end_html') . '
-        ';
-
-        return $content;
-    }
 
     // ***********************************************************************************************
     // ************************************ View lib.js File Content ***************************************
@@ -3955,97 +4040,12 @@ class Migration_Create_'.$this->_mod_type.'_'.$this->_sub_mod_p.' extends CI_Mig
     {
         $tables = $this->dbforge->getArrayTablesFieldsFromDB();
 
-
-
         foreach ($tables as $table){
             $content = var_export($table,true);
         }
     }
 
-    private function getPhpFieldsProperties($fields)
-    {
-        $content = "";
-        foreach ($fields as $name => $field){
-            $type =
-                compareStrStr($field['type'],'datetime') ||
-                compareStrStr($field['type'],'date') ||
-                compareStrStr($field['type'],'text') ||
-                compareStrStr($field['type'],'varchar') ? "string" :
-                    (compareStrStr($field['type'],'int') ? "int" : "");
-            $content .= "
-             /**
-                * The value for the $name field.
-                *
-                * @var        $type
-                */             
-             public $name;
-        ";
-        }
-        return $content;
-    }
 
-    private function getPhpFieldsRules($fields)
-    {
-        $rules = array();
-        $excepts = config_item('controlFields');
-        foreach ($fields as $name => $field){
-            if(!in_array($name,$excepts)){
-                if(strhas($name,'password')){
-                    $rules[$name] = array(
-                        "field" => $name,
-                        "label" => validateArray($field,'label') ? $field['label'] : ucfirst($name),
-                        "rules" => $this->getRulesByField($field),
-                        "password_confirm" => array(
-                            "field" => "password_confirm",
-                            "label" => setTitleFromWordWithDashes("password_confirm"),
-                            "rules" => "trim|matches[$name]",
-                        )
-                    );
-                } else {
-                    $rules[$name] = array(
-                        "field" => $name,
-                        "label" => validateArray($field,'label') ? $field['label'] : ucfirst($name),
-                        "rules" => $this->getRulesByField($field)
-                    );
-                }
-            }
-        }
-        return $rules;
-    }
-
-    private function getPhpFieldsRulesEdit($fields)
-    {
-
-    }
-
-    private function getPhpStdFields($fields)
-    {
-
-    }
-
-    private function getRulesByField($field)
-    {
-        $rules = "trim|";
-
-        if(validateArray($field,'constraint')){
-            $size = $field['constraint'];
-            $rules .= "max_length[$size]|";
-        }
-        if(validateArray($field,'password')){
-            $confirm = $field['password'];
-            $rules .= "matches[$confirm]|";
-        }
-        if(validateArray($field,'validate')){
-            if(validateVar($field['validate'],'array')){
-                foreach ($field['validate'] as $rule){
-                    $rules .= "$rule|";
-                }
-            } else if(validateVar($field['validate'],'string')){
-                $rules .= $field['validate']."|";
-            }
-        }
-        return $rules;
-    }
 
 
 }

@@ -2,12 +2,12 @@
 /**
  * Created by herbalife.
  * User: rafaelgutierrez
- * Date: 01/03/2018
- * Time: 6:10 pm
+ * Date: 02/03/2018
+ * Time: 3:42 am
  * @property Model_Usuarios $model_usuarios
  */
 
-Class Ctrl_Usuarios extends Admin_Controller {
+Class Ctrl_Usuarios extends Base_Controller {
 
 
     public function __construct()
@@ -24,7 +24,7 @@ Class Ctrl_Usuarios extends Admin_Controller {
 
         // Carga la vista
 
-        $this->data["subview"] = "admin/usuarios/index";
+        $this->data["subview"] = "Base/usuarios/index";
     }
 
     public function edit($id = NULL){
@@ -75,15 +75,17 @@ Class Ctrl_Usuarios extends Admin_Controller {
             );
 
             $this->model_usuarios->save($data,$id);
-            redirect("admin/usuarios");
+            redirect("Base/usuarios");
         }
 
         // Se carga la vista
-        $this->data["subview"] = "admin/usuarios/edit";
+        $this->data["subview"] = "Base/usuarios/edit";
     }
 
     public function delete($id){
         $this->model_usuarios->delete($id);
-        redirect("admin/usuarios");
+        redirect("Base/usuarios");
     }
+
+    
 }

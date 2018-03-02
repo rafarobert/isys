@@ -2,8 +2,8 @@
         /**
          * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
-         * Date: 01/03/2018
-         * Time: 1:04 am
+         * Date: 02/03/2018
+         * Time: 3:42 am
          * @var Model_sessions $model_sessions
          * @var Model_sessions $sessions
          * @var Model_sessions $session
@@ -28,9 +28,9 @@
                     
                     <!-- *** estic - tables - inicio - 1 *** -->
 
-            <th>Id</th>
-                <th>Ip Address</th>
+            <th>Ip Address</th>
                 <th>Timestamp</th>
+                <th>Data</th>
                 
 
             <!-- *** estic - tables - fin - 1 *** -->
@@ -46,9 +46,9 @@
                     
                     <!-- *** estic - tables - inicio - 2 *** -->
             
-            <td><?= $oSession->id; ?></td>
-                <td><?= $oSession->ip_address; ?></td>
+            <td><?= $oSession->ip_address; ?></td>
                 <td><?= $oSession->timestamp; ?></td>
+                <td><?= $oSession->data; ?></td>
                 
 
             <!-- *** estic - tables - fin - 2 *** -->
@@ -66,9 +66,3 @@
         </section>
 
         <!-- *** estic - index_file - end *** -->
-            
-            
-            
-            
-            
-            

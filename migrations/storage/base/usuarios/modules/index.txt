@@ -2,8 +2,8 @@
         /**
          * Created by herbalife.
          * User: Rafael Gutierrez Gaspar
-         * Date: 01/03/2018
-         * Time: 1:04 am
+         * Date: 02/03/2018
+         * Time: 3:42 am
          * @var Model_usuarios $model_usuarios
          * @var Model_usuarios $usuarios
          * @var Model_usuarios $usuario
@@ -28,9 +28,9 @@
                     
                     <!-- *** estic - tables - inicio - 1 *** -->
 
-            <th>Id Usuario</th>
-                <th>Nombre</th>
+            <th>Nombre</th>
                 <th>Apellido</th>
+                <th>Username</th>
                 
 
             <!-- *** estic - tables - fin - 1 *** -->
@@ -46,9 +46,9 @@
                     
                     <!-- *** estic - tables - inicio - 2 *** -->
             
-            <td><?= $oUsuario->id_usuario; ?></td>
-                <td><?= $oUsuario->nombre; ?></td>
+            <td><?= $oUsuario->nombre; ?></td>
                 <td><?= $oUsuario->apellido; ?></td>
+                <td><?= $oUsuario->username; ?></td>
                 
 
             <!-- *** estic - tables - fin - 2 *** -->
@@ -67,7 +67,3 @@
         </section>
 
         <!-- *** estic - index_file - end *** -->
-            
-            
-            
-            

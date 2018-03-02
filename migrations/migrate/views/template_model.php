@@ -1,4 +1,4 @@
-<?php // *** estic - model_file - start ***
+<?php
 /**
  * Created by Estic.
  * User: #userCreated
@@ -8,11 +8,11 @@
 
 defined("BASEPATH") OR exit("No direct script access allowed");
 
-class Model_ucTableP extends Admin_Model {
+class Model_ucTableP extends ucModS_Model {
 
     //fieldsProperties
 
-    protected $_table_name = "hbf_lcTableP";
+    protected $_table_name = "lcmodType_lcTableP";
     protected $_order_by = "id_lcTableS desc";
     protected $_timestaps = true;
     protected $_primary_key = "id_lcTableS";

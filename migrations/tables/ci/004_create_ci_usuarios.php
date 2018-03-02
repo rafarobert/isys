@@ -1,9 +1,9 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: rafaelgutierrez
- * Date: 01/03/2018
- * Time: 5:06 pm
+ * User: $rafaelgutierrez
+ * Date: $02/03/2018
+ * Time: $2:57 am
  */
 
 
@@ -71,8 +71,9 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'constraint' => '128',
     'unsigned' => false,
     'null' => true,
-    'default' => NULL,
+    'default' => '',
     'extra' => '',
+    'password' => '1',
     'validate' => 'required',
   ),
   'fec_nacimiento' => 
@@ -182,6 +183,8 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'input' => 'dropdown',
     'fieldRef' => 'nombre',
     'validate' => 'required',
+    'idForeign' => 'id_tipo_asociado',
+    'table' => 'hbf_tipos_asociados',
   ),
   'id_nivel_asociado' => 
   array (
@@ -195,6 +198,8 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'input' => 'dropdown',
     'fieldRef' => 'nombre',
     'validate' => 'required',
+    'idForeign' => 'id_nivel_asociado',
+    'table' => 'hbf_niveles_asociados',
   ),
   'id_turno' => 
   array (
@@ -355,11 +360,23 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'idLocal' => 'invitado_por',
     'idForeign' => 'id_usuario',
   ),
+  'ci_usuarios_ibfk_4' => 
+  array (
+    'table' => 'hbf_tipos_asociados',
+    'idLocal' => 'id_tipo_asociado',
+    'idForeign' => 'id_tipo_asociado',
+  ),
   'ci_usuarios_ibfk_5' => 
   array (
     'table' => 'hbf_turnos',
     'idLocal' => 'id_turno',
     'idForeign' => 'id_turno',
+  ),
+  'ci_usuarios_ibfk_6' => 
+  array (
+    'table' => 'hbf_niveles_asociados',
+    'idLocal' => 'id_nivel_asociado',
+    'idForeign' => 'id_nivel_asociado',
   ),
 );
         $this->dbforge->add_field($fields);

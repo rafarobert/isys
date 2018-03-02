@@ -1,21 +1,37 @@
-<?php // *** estic - edit_file - start ***
-        /**
-         * Created by herbalife.
-         * User: Rafael Gutierrez Gaspar
-         * Date: 01/03/2018
-         * Time: 1:04 am
-         * @var Model_Files $model_files
-         * @var Model_Files $files
-         * @var Model_Files $fil
-         */
-        ?>
+<?php
+/**
+ * Created by herbalife.
+ * User: rafaelgutierrez
+ * Date: 02/03/2018
+ * Time: 3:42 am
+ * @var Model_Files $model_files
+ * @var Model_Files $files
+ * @var Model_Files $fil
+ */
+?>
+
+<h3><?= empty($oFil->id_fil) ? "Agregar Files" : "Actualizando datos, Fil #" . $oFil->id_fil ?></h3>
+
+<?= form_open_multipart() ?>
+
+<!-- *** estic - tables - inicio *** -->    
         
-        <h3><?= empty($oFil->id_file) ? "Agregar Files" : "Actualizando datos, Fil #" . $oFil->id_file ?></h3>
-        
-        <?= form_open_multipart() ?>
-        <!-- *** estic - tables - inicio *** -->
-        
-        
+                            <div class="form-group row">
+                                <label for="fieldNombre" class="col-sm-4 col-form-label col-form-label-md">Nombre  </label>
+                                <div class="col-sm-6">
+                                <?php
+                                $data = array(
+                                     "name" => "nombre",
+                                     "id" => "fieldNombre",
+                                     "class" => "form-control ",
+                                     "value" => set_value("nombre", $oFil->nombre),
+                                     "type" => "text"
+                                 );
+                                 echo form_input($data,"","") ?>
+                                 </div>
+                    </div>
+                                 <?php echo form_error("nombre"); ?>
+                    
                             <div class="form-group row">
                                 <label for="fieldPath" class="col-sm-4 col-form-label col-form-label-md">Path  </label>
                                 <div class="col-sm-6">
@@ -146,26 +162,18 @@
         
             <!-- *** estic - tables - fin *** -->
         
-        <div class="form-group row">
-            <!-- Button -->
-            <div class="col-sm-12 controls">
-                <?php
-                 $data = array(
-                    "name" => "save",
-                    "value" => "Guardar",
-                    "id" => "btnSave",
-                    "class" => "btn btn-success"
-                 );
-                 echo form_submit($data) ?>
-            </div>
-        </div>
-        <?= form_close() ?>
 
-        <!-- *** estic - edit_file - end *** -->
-        
-        
-        
-        
-        
-        
-        
+<div class="form-group row">
+    <div class="col-sm-12 controls">
+        <?php
+        $data = array(
+            "name" => "save",
+            "value" => "Guardar",
+            "id" => "btnSave",
+            "class" => "btn btn-success"
+        );
+        echo form_submit($data) ?>
+    </div>
+</div>
+
+<?= form_close() ?>

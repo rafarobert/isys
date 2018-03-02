@@ -1,20 +1,20 @@
-<?php // *** estic - edit_file - start ***
-        /**
-         * Created by herbalife.
-         * User: Rafael Gutierrez Gaspar
-         * Date: 01/03/2018
-         * Time: 1:04 am
-         * @var Model_Sessions $model_sessions
-         * @var Model_Sessions $sessions
-         * @var Model_Sessions $session
-         */
-        ?>
-        
-        <h3><?= empty($oSession->id) ? "Agregar Sessions" : "Actualizando datos, Session #" . $oSession->id ?></h3>
-        
-        <?= form_open_multipart() ?>
-        <!-- *** estic - tables - inicio *** -->
-        
+<?php
+/**
+ * Created by herbalife.
+ * User: rafaelgutierrez
+ * Date: 02/03/2018
+ * Time: 3:42 am
+ * @var Model_Sessions $model_sessions
+ * @var Model_Sessions $sessions
+ * @var Model_Sessions $session
+ */
+?>
+
+<h3><?= empty($oSession->id_session) ? "Agregar Sessions" : "Actualizando datos, Session #" . $oSession->id_session ?></h3>
+
+<?= form_open_multipart() ?>
+
+<!-- *** estic - tables - inicio *** -->    
         
                             <div class="form-group row">
                                 <label for="fieldIpAddress" class="col-sm-4 col-form-label col-form-label-md">Ip Address  </label>
@@ -100,22 +100,18 @@
         
             <!-- *** estic - tables - fin *** -->
         
-        <div class="form-group row">
-            <!-- Button -->
-            <div class="col-sm-12 controls">
-                <?php
-                 $data = array(
-                    "name" => "save",
-                    "value" => "Guardar",
-                    "id" => "btnSave",
-                    "class" => "btn btn-success"
-                 );
-                 echo form_submit($data) ?>
-            </div>
-        </div>
-        <?= form_close() ?>
 
-        <!-- *** estic - edit_file - end *** -->
-        
-        
-        
+<div class="form-group row">
+    <div class="col-sm-12 controls">
+        <?php
+        $data = array(
+            "name" => "save",
+            "value" => "Guardar",
+            "id" => "btnSave",
+            "class" => "btn btn-success"
+        );
+        echo form_submit($data) ?>
+    </div>
+</div>
+
+<?= form_close() ?>

@@ -1,259 +1,236 @@
-<?php // *** estic - model_file - start ***
-        /**
-         * Created by Estic.
-         * User: RaFaEl Gutierrez Gaspar
-         * Date: 01/03/2018
-         * Time: 12:23 am
-         */
+<?php
+/**
+ * Created by Estic.
+ * User: rafaelgutierrez
+ * Date: 02/03/2018
+ * Time: 3:42 am
+ */
+
+defined("BASEPATH") OR exit("No direct script access allowed");
+
+class Model_Modulos extends Base_Model {
+
+    
+             /**
+                * The value for the id_modulo field.
+                *
+                * @var        int
+                */             
+             public $id_modulo;
         
-        defined("BASEPATH") OR exit("No direct script access allowed");
+             /**
+                * The value for the titulo field.
+                *
+                * @var        string
+                */             
+             public $titulo;
         
-        class Model_Modulos extends Base_Model {
-
-        // *** estic - tables - inicio - 1 ***
-
-            /**
-                         * The value for the title field.
-                         *
-                         * @var        int
-                         */
-                         
-                public $id_modulo;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        string
-                         */
-                         
-                public $titulo;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        string
-                         */
-                         
-                public $url;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        string
-                         */
-                         
-                public $descripcion;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        string
-                         */
-                         
-                public $icon;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        string
-                         */
-                         
-                public $listed;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        int
-                         */
-                         
-                public $change_count;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        int
-                         */
-                         
-                public $id_user_modified;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        int
-                         */
-                         
-                public $id_user_created;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        datetime
-                         */
-                         
-                public $date_modified;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        datetime
-                         */
-                         
-                public $date_created;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        string
-                         */
-                         
-                public $status;
-                /**
-                         * The value for the title field.
-                         *
-                         * @var        int
-                         */
-                         
-                public $id_file;
-                
-            
-            // *** estic - tables - fin - 1 ***
-            
-            protected $_table_name = "ci_modulos";
-            protected $_order_by = "id_modulo desc";
-            protected $_timestaps = true;
-            protected $_primary_key = "id_modulo";
+             /**
+                * The value for the url field.
+                *
+                * @var        string
+                */             
+             public $url;
         
-            public $rules = array(
-            // *** estic - tables - inicio - 2 ***
-            
-            
-                "titulo" => array(
-                    "field" => "titulo",
-                    "label" => "Titulo",
-                    "rules" => "trim|required|max_length[100]"
-                ),
-                
-                "url" => array(
-                    "field" => "url",
-                    "label" => "Url",
-                    "rules" => "trim|required|max_length[600]|valid_url"
-                ),
-                
-                "descripcion" => array(
-                    "field" => "descripcion",
-                    "label" => "Descripcion",
-                    "rules" => "trim|required|max_length[]"
-                ),
-                
-                "icon" => array(
-                    "field" => "icon",
-                    "label" => "Icon",
-                    "rules" => "trim|required|max_length[200]"
-                ),
-                
-                "listed" => array(
-                    "field" => "listed",
-                    "label" => "Listed",
-                    "rules" => "trim|required|max_length[15]"
-                ),
-                
-                "change_count" => array(
-                    "field" => "change_count",
-                    "label" => "Change_count",
-                    "rules" => "trim|required|max_length[11]"
-                ),
-                
-                "status" => array(
-                    "field" => "status",
-                    "label" => "Status",
-                    "rules" => "trim|required|max_length[255]"
-                ),
-                
-            
-            // *** estic - tables - fin - 2 ***
-            
-            );
-            
-            public $rules_edit = array(    
-            
-            
-            
-            
-            // *** estic - tables - inicio - 2 ***
-            
-            
-                "titulo" => array(
-                    "field" => "titulo",
-                    "label" => "Titulo",
-                    "rules" => "trim|required|max_length[100]"
-                ),
-                
-                "url" => array(
-                    "field" => "url",
-                    "label" => "Url",
-                    "rules" => "trim|required|max_length[600]|valid_url"
-                ),
-                
-                "descripcion" => array(
-                    "field" => "descripcion",
-                    "label" => "Descripcion",
-                    "rules" => "trim|required|max_length[]"
-                ),
-                
-                "icon" => array(
-                    "field" => "icon",
-                    "label" => "Icon",
-                    "rules" => "trim|required|max_length[200]"
-                ),
-                
-                "listed" => array(
-                    "field" => "listed",
-                    "label" => "Listed",
-                    "rules" => "trim|required|max_length[15]"
-                ),
-                
-                "change_count" => array(
-                    "field" => "change_count",
-                    "label" => "Change_count",
-                    "rules" => "trim|required|max_length[11]"
-                ),
-                
-                "status" => array(
-                    "field" => "status",
-                    "label" => "Status",
-                    "rules" => "trim|required|max_length[255]"
-                ),
-                
-            
-            // *** estic - tables - fin - 2 ***
-            
-            );
-            
-            function __construct(){
-                parent::__construct();
-            }
+             /**
+                * The value for the descripcion field.
+                *
+                * @var        string
+                */             
+             public $descripcion;
+        
+             /**
+                * The value for the icon field.
+                *
+                * @var        string
+                */             
+             public $icon;
+        
+             /**
+                * The value for the listed field.
+                *
+                * @var        string
+                */             
+             public $listed;
+        
+             /**
+                * The value for the change_count field.
+                *
+                * @var        int
+                */             
+             public $change_count;
+        
+             /**
+                * The value for the id_user_modified field.
+                *
+                * @var        int
+                */             
+             public $id_user_modified;
+        
+             /**
+                * The value for the id_user_created field.
+                *
+                * @var        int
+                */             
+             public $id_user_created;
+        
+             /**
+                * The value for the date_modified field.
+                *
+                * @var        string
+                */             
+             public $date_modified;
+        
+             /**
+                * The value for the date_created field.
+                *
+                * @var        string
+                */             
+             public $date_created;
+        
+             /**
+                * The value for the status field.
+                *
+                * @var        string
+                */             
+             public $status;
+        
+             /**
+                * The value for the id_file field.
+                *
+                * @var        int
+                */             
+             public $id_file;
+        
 
-            public function get_new(){
-                $modulo = new stdClass();
-                
-                // *** estic - tables - inicio - 3 ***
-            
-            $modulo->titulo = "";
-                    $modulo->url = "";
-                    $modulo->descripcion = "";
-                    $modulo->icon = "";
-                    $modulo->listed = "";
-                    $modulo->change_count = "";
-                    $modulo->date_modified = date("Y-m-d");
-                    $modulo->date_created = date("Y-m-d");
-                    $modulo->status = "";
-                    
-            
-            // *** estic - tables - fin - 3 ***
-            
-                return $modulo;
-            }
-        }
+    protected $_table_name = "ci_modulos";
+    protected $_order_by = "id_modulo desc";
+    protected $_timestaps = true;
+    protected $_primary_key = "id_modulo";
 
-        // *** estic - model_file - end ***
+    public $rules = array (
+  'id_modulo' => 
+  array (
+    'field' => 'id_modulo',
+    'label' => 'Id_modulo',
+    'rules' => 'trim|max_length[11]|required|',
+  ),
+  'titulo' => 
+  array (
+    'field' => 'titulo',
+    'label' => 'Titulo',
+    'rules' => 'trim|max_length[100]|required|',
+  ),
+  'url' => 
+  array (
+    'field' => 'url',
+    'label' => 'Url',
+    'rules' => 'trim|max_length[600]|required|',
+  ),
+  'descripcion' => 
+  array (
+    'field' => 'descripcion',
+    'label' => 'Descripcion',
+    'rules' => 'trim|required|',
+  ),
+  'icon' => 
+  array (
+    'field' => 'icon',
+    'label' => 'Icon',
+    'rules' => 'trim|max_length[200]|required|',
+  ),
+  'listed' => 
+  array (
+    'field' => 'listed',
+    'label' => 'Listed',
+    'rules' => 'trim|max_length[15]|required|',
+  ),
+  'status' => 
+  array (
+    'field' => 'status',
+    'label' => 'Status',
+    'rules' => 'trim|max_length[255]|required|',
+  ),
+  'id_file' => 
+  array (
+    'field' => 'id_file',
+    'label' => 'Id_file',
+    'rules' => 'trim|max_length[11]|required|',
+  ),
+);
+    public $rules_edit = array (
+  'id_modulo' => 
+  array (
+    'field' => 'id_modulo',
+    'label' => 'Id_modulo',
+    'rules' => 'trim|max_length[11]|required|',
+  ),
+  'titulo' => 
+  array (
+    'field' => 'titulo',
+    'label' => 'Titulo',
+    'rules' => 'trim|max_length[100]|required|',
+  ),
+  'url' => 
+  array (
+    'field' => 'url',
+    'label' => 'Url',
+    'rules' => 'trim|max_length[600]|required|',
+  ),
+  'descripcion' => 
+  array (
+    'field' => 'descripcion',
+    'label' => 'Descripcion',
+    'rules' => 'trim|required|',
+  ),
+  'icon' => 
+  array (
+    'field' => 'icon',
+    'label' => 'Icon',
+    'rules' => 'trim|max_length[200]|required|',
+  ),
+  'listed' => 
+  array (
+    'field' => 'listed',
+    'label' => 'Listed',
+    'rules' => 'trim|max_length[15]|required|',
+  ),
+  'status' => 
+  array (
+    'field' => 'status',
+    'label' => 'Status',
+    'rules' => 'trim|max_length[255]|required|',
+  ),
+  'id_file' => 
+  array (
+    'field' => 'id_file',
+    'label' => 'Id_file',
+    'rules' => 'trim|max_length[11]|required|',
+  ),
+);
+
+    function __construct(){
+        parent::__construct();
+    }
+
+    public function get_new(){
+        $modulo = new stdClass();
+
+        $modulo->id_modulo = '';
+            $modulo->titulo = '';
+            $modulo->url = '';
+            $modulo->descripcion = '';
+            $modulo->icon = '';
+            $modulo->listed = '';
+            $modulo->change_count = '';
+            $modulo->id_user_modified = '';
+            $modulo->id_user_created = '';
+            $modulo->date_modified = '';
+            $modulo->date_created = '';
+            $modulo->status = '';
+            $modulo->id_file = '';
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+
+        return $modulo;
+    }
+}

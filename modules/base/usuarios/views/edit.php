@@ -1,20 +1,20 @@
-<?php // *** estic - edit_file - start ***
-        /**
-         * Created by herbalife.
-         * User: Rafael Gutierrez Gaspar
-         * Date: 01/03/2018
-         * Time: 1:04 am
-         * @var Model_Usuarios $model_usuarios
-         * @var Model_Usuarios $usuarios
-         * @var Model_Usuarios $usuario
-         */
-        ?>
-        
-        <h3><?= empty($oUsuario->id_usuario) ? "Agregar Usuarios" : "Actualizando datos, Usuario #" . $oUsuario->id_usuario ?></h3>
-        
-        <?= form_open_multipart() ?>
-        <!-- *** estic - tables - inicio *** -->
-        
+<?php
+/**
+ * Created by herbalife.
+ * User: rafaelgutierrez
+ * Date: 02/03/2018
+ * Time: 3:42 am
+ * @var Model_Usuarios $model_usuarios
+ * @var Model_Usuarios $usuarios
+ * @var Model_Usuarios $usuario
+ */
+?>
+
+<h3><?= empty($oUsuario->id_usuario) ? "Agregar Usuarios" : "Actualizando datos, Usuario #" . $oUsuario->id_usuario ?></h3>
+
+<?= form_open_multipart() ?>
+
+<!-- *** estic - tables - inicio *** -->    
         
                             <div class="form-group row">
                                 <label for="fieldNombre" class="col-sm-4 col-form-label col-form-label-md">Nombre  </label>
@@ -130,8 +130,8 @@
                                 <div class="col-sm-6">
                                 <?php
                                 echo "<label>" . form_radio("sexo", "Masculino", $oUsuario->sexo == "Masculino" ? true : false, "") . " Masculino</label><br>";
-                                echo "<label>" . form_radio("sexo", "Femenino", $oUsuario->sexo == "Femenino" ? true : false, "") . " Femenino</label><br>";
-                                
+                                    echo "<label>" . form_radio("sexo", "Femenino", $oUsuario->sexo == "Femenino" ? true : false, "") . " Femenino</label><br>";
+                                    
                                 ?>
                                 </div>
                     </div>
@@ -318,8 +318,8 @@
                                 <div class="col-sm-6">
                                 <?php
                                 echo "<label>" . form_radio("app_monitor", "SI", $oUsuario->app_monitor == "SI" ? true : false, "") . " SI</label><br>";
-                                echo "<label>" . form_radio("app_monitor", "NO", $oUsuario->app_monitor == "NO" ? true : false, "") . " NO</label><br>";
-                                
+                                    echo "<label>" . form_radio("app_monitor", "NO", $oUsuario->app_monitor == "NO" ? true : false, "") . " NO</label><br>";
+                                    
                                 ?>
                                 </div>
                     </div>
@@ -330,8 +330,8 @@
                                 <div class="col-sm-6">
                                 <?php
                                 echo "<label>" . form_radio("app_orders", "SI", $oUsuario->app_orders == "SI" ? true : false, "") . " SI</label><br>";
-                                echo "<label>" . form_radio("app_orders", "NO", $oUsuario->app_orders == "NO" ? true : false, "") . " NO</label><br>";
-                                
+                                    echo "<label>" . form_radio("app_orders", "NO", $oUsuario->app_orders == "NO" ? true : false, "") . " NO</label><br>";
+                                    
                                 ?>
                                 </div>
                     </div>
@@ -342,8 +342,8 @@
                                 <div class="col-sm-6">
                                 <?php
                                 echo "<label>" . form_radio("app_admin", "SI", $oUsuario->app_admin == "SI" ? true : false, "") . " SI</label><br>";
-                                echo "<label>" . form_radio("app_admin", "NO", $oUsuario->app_admin == "NO" ? true : false, "") . " NO</label><br>";
-                                
+                                    echo "<label>" . form_radio("app_admin", "NO", $oUsuario->app_admin == "NO" ? true : false, "") . " NO</label><br>";
+                                    
                                 ?>
                                 </div>
                     </div>
@@ -368,21 +368,18 @@
         
             <!-- *** estic - tables - fin *** -->
         
-        <div class="form-group row">
-            <!-- Button -->
-            <div class="col-sm-12 controls">
-                <?php
-                 $data = array(
-                    "name" => "save",
-                    "value" => "Guardar",
-                    "id" => "btnSave",
-                    "class" => "btn btn-success"
-                 );
-                 echo form_submit($data) ?>
-            </div>
-        </div>
-        <?= form_close() ?>
 
-        <!-- *** estic - edit_file - end *** -->
-        
-        
+<div class="form-group row">
+    <div class="col-sm-12 controls">
+        <?php
+        $data = array(
+            "name" => "save",
+            "value" => "Guardar",
+            "id" => "btnSave",
+            "class" => "btn btn-success"
+        );
+        echo form_submit($data) ?>
+    </div>
+</div>
+
+<?= form_close() ?>
