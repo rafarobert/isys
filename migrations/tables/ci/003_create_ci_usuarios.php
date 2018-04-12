@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: $rafaelgutierrez
- * Date: $10/04/2018
- * Time: $3:04 am
+ * Date: $12/04/2018
+ * Time: $2:30 am
  */
 
 
@@ -232,7 +232,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     ),
     'validate' => 'required',
     'idForeign' => 'id_option',
-    'table' => 'ci_options',
+    'table' => 'hbf_options',
     'pk' => 'id_usuario',
   ),
   'id_option_nivel_asociado' => 
@@ -257,7 +257,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     ),
     'validate' => 'required',
     'idForeign' => 'id_option',
-    'table' => 'ci_options',
+    'table' => 'hbf_options',
     'pk' => 'id_usuario',
   ),
   'id_turno' => 
@@ -305,7 +305,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
     'extra' => '',
     'label' => 'Foto de perfil',
     'input' => 'image',
-    'validate' => 'required',
+    'validate' => 0,
     'pk' => 'id_usuario',
   ),
   'app_monitor' => 
@@ -438,7 +438,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
         $fk_keys = array (
   'ci_usuarios_ibfk_1' => 
   array (
-    'table' => 'ci_options',
+    'table' => 'hbf_options',
     'idLocal' => 'id_option_tipo_asociado',
     'idForeign' => 'id_option',
   ),
@@ -456,7 +456,7 @@ class Migration_Create_ci_usuarios extends CI_Migration
   ),
   'ci_usuarios_ibfk_4' => 
   array (
-    'table' => 'ci_options',
+    'table' => 'hbf_options',
     'idLocal' => 'id_option_nivel_asociado',
     'idForeign' => 'id_option',
   ),

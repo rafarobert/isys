@@ -2,8 +2,8 @@
 /**
  * Created by herbalife.
  * User: rafaelgutierrez
- * Date: 10/04/2018
- * Time: 1:00 am
+ * Date: 12/04/2018
+ * Time: 2:31 am
  * @property Model_Modulos $model_modulos
  
  * @property Model_Usuarios $model_usuarios
@@ -70,13 +70,14 @@ Class Ctrl_Modulos extends base_Controller {
             $error = "ok";
             $data = $this->model_modulos->array_from_post(
                 array (
-  0 => 'titulo',
-  1 => 'url',
-  2 => 'descripcion',
-  3 => 'icon',
-  4 => 'listed',
-  5 => 'status',
-  6 => 'id_file',
+  0 => 'id_modulo',
+  1 => 'name_modulo',
+  2 => 'titulo',
+  3 => 'url',
+  4 => 'descripcion',
+  5 => 'icon',
+  6 => 'listed',
+  7 => 'status',
 )
             );
             //validateFieldImgUpload

@@ -884,6 +884,7 @@ class CI_Migration
             $modTable = config_item('mod_table');
             list($mod, $submod) = getModSubMod($tableName);
             list($modMod, $modSubmod) = getModSubMod($modTable);
+            $modIdTable = $this->dbforge->getPrimaryKeyFromTable($modTable);
             $modModName = $sys[$modMod]['name'];
             $modModId = $sys[$mod]['id'];
 
@@ -901,7 +902,7 @@ class CI_Migration
 
                 $oModulos = $this->db->get($modTable)->result_object();
                 foreach ($oModulos as $modulo) {
-                    if ($modulo->id_modulo == $modModId.$id_migration) {
+                    if ($modulo->$modIdTable == $modModId.$id_migration) {
                         $exists = true;
                         break;
                     }
@@ -927,7 +928,7 @@ class CI_Migration
                     }
                 }
 
-            } else if ($tableName != "ci_modulos") {
+            } else if ($tableName != $modTable) {
                 redirect("migrate/set/ci/$modMigIndex");
             }
         }

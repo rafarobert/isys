@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: $rafaelgutierrez
- * Date: $10/04/2018
- * Time: $3:04 am
+ * Date: $12/04/2018
+ * Time: $2:30 am
  */
 
 
@@ -14,9 +14,9 @@ class Migration_Create_ci_modulos extends CI_Migration
     public function up()
     {
         $fields = array (
-  'id_modulo' => 
+  'id_table' => 
   array (
-    'field' => 'id_modulo',
+    'field' => 'id_table',
     'type' => 'int',
     'constraint' => '11',
     'unsigned' => true,
@@ -25,7 +25,31 @@ class Migration_Create_ci_modulos extends CI_Migration
     'auto_increment' => false,
     'extra' => '',
     'validate' => 'required',
-    'pk' => 'id_modulo',
+    'pk' => 'id_table',
+  ),
+  'id_modulo' => 
+  array (
+    'field' => 'id_modulo',
+    'type' => 'int',
+    'constraint' => '11',
+    'unsigned' => false,
+    'null' => true,
+    'default' => NULL,
+    'extra' => '',
+    'validate' => 'required',
+    'pk' => 'id_table',
+  ),
+  'name_modulo' => 
+  array (
+    'field' => 'name_modulo',
+    'type' => 'varchar',
+    'constraint' => '250',
+    'unsigned' => false,
+    'null' => true,
+    'default' => NULL,
+    'extra' => '',
+    'validate' => 'required',
+    'pk' => 'id_table',
   ),
   'titulo' => 
   array (
@@ -37,7 +61,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'default' => NULL,
     'extra' => '',
     'validate' => 'required',
-    'pk' => 'id_modulo',
+    'pk' => 'id_table',
   ),
   'url' => 
   array (
@@ -49,7 +73,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'default' => NULL,
     'extra' => '',
     'validate' => 'required',
-    'pk' => 'id_modulo',
+    'pk' => 'id_table',
   ),
   'descripcion' => 
   array (
@@ -61,7 +85,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'default' => NULL,
     'extra' => '',
     'validate' => 'required',
-    'pk' => 'id_modulo',
+    'pk' => 'id_table',
   ),
   'icon' => 
   array (
@@ -73,7 +97,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'default' => NULL,
     'extra' => '',
     'validate' => 'required',
-    'pk' => 'id_modulo',
+    'pk' => 'id_table',
   ),
   'listed' => 
   array (
@@ -91,7 +115,7 @@ class Migration_Create_ci_modulos extends CI_Migration
       1 => 'DISABLED',
     ),
     'validate' => 'required',
-    'pk' => 'id_modulo',
+    'pk' => 'id_table',
   ),
   'change_count' => 
   array (
@@ -104,7 +128,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'extra' => '',
     'label' => 'Numero de Cambios de este registro',
     'input' => 'disabled',
-    'pk' => 'id_modulo',
+    'pk' => 'id_table',
   ),
   'id_user_modified' => 
   array (
@@ -124,7 +148,7 @@ class Migration_Create_ci_modulos extends CI_Migration
       1 => 'apellido',
     ),
     'input' => 'disabled',
-    'pk' => 'id_modulo',
+    'pk' => 'id_table',
   ),
   'id_user_created' => 
   array (
@@ -144,7 +168,7 @@ class Migration_Create_ci_modulos extends CI_Migration
       1 => 'apellido',
     ),
     'input' => 'disabled',
-    'pk' => 'id_modulo',
+    'pk' => 'id_table',
   ),
   'date_modified' => 
   array (
@@ -157,7 +181,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'extra' => '',
     'label' => 'Fecha de modificación',
     'input' => 'disabled',
-    'pk' => 'id_modulo',
+    'pk' => 'id_table',
   ),
   'date_created' => 
   array (
@@ -170,7 +194,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'extra' => '',
     'label' => 'Fecha de creación',
     'input' => 'disabled',
-    'pk' => 'id_modulo',
+    'pk' => 'id_table',
   ),
   'status' => 
   array (
@@ -182,19 +206,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'default' => 'ENABLED',
     'extra' => '',
     'validate' => 'required',
-    'pk' => 'id_modulo',
-  ),
-  'id_file' => 
-  array (
-    'field' => 'id_file',
-    'type' => 'int',
-    'constraint' => '11',
-    'unsigned' => true,
-    'null' => true,
-    'default' => NULL,
-    'extra' => '',
-    'validate' => 'required',
-    'pk' => 'id_modulo',
+    'pk' => 'id_table',
   ),
 );
         $fk_keys = array (
@@ -212,7 +224,7 @@ class Migration_Create_ci_modulos extends CI_Migration
   ),
 );
         $this->dbforge->add_field($fields);
-        $this->dbforge->add_key('id_modulo', TRUE);
+        $this->dbforge->add_key('id_table', TRUE);
         $this->dbforge->add_key($fk_keys);
         $this->create_or_alter_table('ci_modulos');
         $settings = array (

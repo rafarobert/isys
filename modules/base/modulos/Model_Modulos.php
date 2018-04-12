@@ -2,8 +2,8 @@
 /**
  * Created by Estic.
  * User: rafaelgutierrez
- * Date: 10/04/2018
- * Time: 1:00 am
+ * Date: 12/04/2018
+ * Time: 2:31 am
  */
 
 defined("BASEPATH") OR exit("No direct script access allowed");
@@ -12,11 +12,25 @@ class Model_Modulos extends base_Model {
 
     
              /**
+                * The value for the id_table field.
+                *
+                * @var        int
+                */             
+             public $id_table;
+        
+             /**
                 * The value for the id_modulo field.
                 *
                 * @var        int
                 */             
              public $id_modulo;
+        
+             /**
+                * The value for the name_modulo field.
+                *
+                * @var        string
+                */             
+             public $name_modulo;
         
              /**
                 * The value for the titulo field.
@@ -95,20 +109,25 @@ class Model_Modulos extends base_Model {
                 */             
              public $status;
         
-             /**
-                * The value for the id_file field.
-                *
-                * @var        int
-                */             
-             public $id_file;
-        
 
     protected $_table_name = "ci_modulos";
-    protected $_order_by = "id_modulo desc";
+    protected $_order_by = "id_table desc";
     protected $_timestaps = true;
-    protected $_primary_key = "id_modulo";
+    protected $_primary_key = "id_table";
 
     public $rules = array (
+  'id_modulo' => 
+  array (
+    'field' => 'id_modulo',
+    'label' => 'Id_modulo',
+    'rules' => 'trim|max_length[11]|required',
+  ),
+  'name_modulo' => 
+  array (
+    'field' => 'name_modulo',
+    'label' => 'Name_modulo',
+    'rules' => 'trim|max_length[250]|required',
+  ),
   'titulo' => 
   array (
     'field' => 'titulo',
@@ -144,15 +163,21 @@ class Model_Modulos extends base_Model {
     'field' => 'status',
     'label' => 'Status',
     'rules' => 'trim|max_length[255]|required',
-  ),
-  'id_file' => 
-  array (
-    'field' => 'id_file',
-    'label' => 'Id_file',
-    'rules' => 'trim|max_length[11]|required',
   ),
 );
     public $rules_edit = array (
+  'id_modulo' => 
+  array (
+    'field' => 'id_modulo',
+    'label' => 'Id_modulo',
+    'rules' => 'trim|max_length[11]|required',
+  ),
+  'name_modulo' => 
+  array (
+    'field' => 'name_modulo',
+    'label' => 'Name_modulo',
+    'rules' => 'trim|max_length[250]|required',
+  ),
   'titulo' => 
   array (
     'field' => 'titulo',
@@ -188,12 +213,6 @@ class Model_Modulos extends base_Model {
     'field' => 'status',
     'label' => 'Status',
     'rules' => 'trim|max_length[255]|required',
-  ),
-  'id_file' => 
-  array (
-    'field' => 'id_file',
-    'label' => 'Id_file',
-    'rules' => 'trim|max_length[11]|required',
   ),
 );
 
@@ -204,7 +223,9 @@ class Model_Modulos extends base_Model {
     public function get_new(){
         $modulo = new stdClass();
 
-        $modulo->id_modulo = '';
+        $modulo->id_table = '';
+            $modulo->id_modulo = '';
+            $modulo->name_modulo = '';
             $modulo->titulo = '';
             $modulo->url = '';
             $modulo->descripcion = '';
@@ -216,7 +237,6 @@ class Model_Modulos extends base_Model {
             $modulo->date_modified = '';
             $modulo->date_created = '';
             $modulo->status = '';
-            $modulo->id_file = '';
             
 
         return $modulo;

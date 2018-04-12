@@ -2,8 +2,8 @@
 /**
  * Created by herbalife.
  * User: rafaelgutierrez
- * Date: 10/04/2018
- * Time: 1:00 am
+ * Date: 12/04/2018
+ * Time: 2:31 am
  * @var Model_modulos $model_modulos
  * @var Model_modulos $modulos
  * @var Model_modulos $modulo
@@ -25,12 +25,12 @@
     <table class="table table-striped">
         <thead>
         <tr>
-            <th>Titulo</th>
+            <th>Id_modulo</th>
+                <th>Name_modulo</th>
+                <th>Titulo</th>
                 <th>Url</th>
                 <th>Descripcion</th>
                 <th>Icon</th>
-                <th>Listed</th>
-                <th>Status</th>
                 <th>Fecha de creación</th>
             
             <th>Editar</th>
@@ -41,16 +41,16 @@
         <?php if (count($oModulos)) { ?>
             <?php foreach ($oModulos as $oModulo) { ?>
                 <tr>
-                    <td><?= $oModulo->titulo; ?></td>               
+                    <td><?= $oModulo->id_modulo; ?></td>               
+                <td><?= $oModulo->name_modulo; ?></td>               
+                <td><?= $oModulo->titulo; ?></td>               
                 <td><?= $oModulo->url; ?></td>               
                 <td><?= $oModulo->descripcion; ?></td>               
                 <td><?= $oModulo->icon; ?></td>               
-                <td><?= $oModulo->listed; ?></td>               
-                <td><?= $oModulo->status; ?></td>               
                 <td><?= $oModulo->date_created; ?></td>
             
-                    <td><?= btn_edit("base/modulos/edit/" . $oModulo->id_modulo)?></td>
-                    <td><?= btn_delete("base/modulos/delete/" . $oModulo->id_modulo)?></td>
+                    <td><?= btn_edit("base/modulos/edit/" . $oModulo->id_table)?></td>
+                    <td><?= btn_delete("base/modulos/delete/" . $oModulo->id_table)?></td>
                 </tr>
             <?php } ?>
         <?php } else { ?>

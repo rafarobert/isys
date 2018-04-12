@@ -2,8 +2,8 @@
 /**
  * Created by herbalife.
  * User: rafaelgutierrez
- * Date: 10/04/2018
- * Time: 1:00 am
+ * Date: 12/04/2018
+ * Time: 2:31 am
  * @property Model_Usuarios $model_usuarios
  
  * @property Model_Usuarios $model_usuarios
@@ -35,7 +35,7 @@ Class Ctrl_Usuarios extends base_Controller {
         
         $this->load->model("base/model_usuarios");
         
-        $this->load->model("base/model_options");
+        $this->load->model("admin/model_options");
         
         $this->load->model("admin/model_usuarios");
         
