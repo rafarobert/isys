@@ -953,6 +953,20 @@ abstract class CI_DB_forge
         $this->fields = $this->keys = $this->primary_keys = array();
     }
 
+    public function tableExists($table, $database = ''){
+        $CI = CI_Controller::get_instance();
+        if ($database == '') {
+            $database = $CI->db->database;
+        }
+        $sql = "SHOW TABLES LIKE '$table'";
+        $result = $CI->db->query($sql)->row();
+        if (count((array)$result)) {
+            return true;
+        }
+        return false;
+
+    }
+
     public function hasRelation($table1, $id1, $table2, $id2, $constraint = '', $database = '')
     {
         $CI = CI_Controller::get_instance();
@@ -966,7 +980,7 @@ abstract class CI_DB_forge
             $sql .= " and CONSTRAINT_NAME='$constraint'";
         }
         $result = $CI->db->query($sql)->row();
-        if (count($result)) {
+        if (count((array)$result)) {
             return true;
         }
         return false;
@@ -1030,7 +1044,7 @@ abstract class CI_DB_forge
         }
         $sql = "Select * from information_schema.`COLUMNS` where TABLE_SCHEMA='$database' and TABLE_NAME='$table' and COLUMN_NAME='$field'";
         $result = $CI->db->query($sql, false, true)->row();
-        if (count($result)) {
+        if (count((array)$result)) {
             return $result;
         }
         return false;
@@ -1141,7 +1155,7 @@ abstract class CI_DB_forge
         $sql = "SELECT CONSTRAINT_NAME, COLUMN_NAME,REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME  FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE table_schema = '$database' AND table_name = '$table' AND CONSTRAINT_NAME NOT LIKE 'PRIMARY'";
         $stdResult = $CI->db->query($sql)->result();
         $aResult = json_decode(json_encode($stdResult), true);
-        if (count($aResult)) {
+        if (count((array)$aResult)) {
             $aRelations = [];
             foreach ($aResult as $relation) {
                 $aRelations[$relation['CONSTRAINT_NAME']] = array(
@@ -1277,7 +1291,7 @@ abstract class CI_DB_forge
     {
         $CI = CI_Controller::get_instance();
 
-        if ($CI->db->table_exists('migrations')) {
+        if ($CI->dbforge->tableExists('migrations')) {
             $oMigrations = $CI->db->get('migrations')->result();
             if (count($oMigrations) > 1) {
                 $this->drop_table('migrations');

@@ -634,7 +634,7 @@ class CI_Migration
         $this->_keys = $this->dbforge->keys;
         $this->_fields = $this->dbforge->fields;
         // ================================================= o =================================================
-        if ($this->db->table_exists($tableLocal)) {
+        if ($this->dbforge->tableExists($tableLocal)) {
             $actual_table = $this->save_or_update_table($tableLocal);
         } else {
             $this->dbforge->create_table($tableLocal);
@@ -653,7 +653,7 @@ class CI_Migration
         if (is_array($keys) && count($keys)) {
             foreach ($keys as $i => $key) {
                 foreach ($key as $constraintName => $settings) {
-                    if (is_array($settings) && $this->db->table_exists($settings['table'])) {
+                    if (is_array($settings) && $this->dbforge->tableExists($settings['table'])) {
                         $tableForeign = $settings['table'];
                         $idForeign = $settings['idForeign'];
                         $idLocal = $settings['idLocal'];
@@ -667,7 +667,7 @@ class CI_Migration
                                     break;
                                 }
                             }
-                            if (count($fk_field)) {
+                            if (count((array)$fk_field)) {
                                 if ($fields[$idLocal]['type'] == $fk_field->type ||
                                     $fields[$idLocal]['type'] == strtoupper($fk_field->type) ||
                                     $fields[$idLocal]['type'] == ucfirst($fk_field->type) &&
@@ -966,7 +966,7 @@ class CI_Migration
         $allFields = array_keys($fields);
         $vFieldsNames = array_diff($allFields, $excepts);
         $vFields = [];
-        foreach ($vFieldsNames as $name) {
+        foreach ((array)$vFieldsNames as $name) {
             $vFields[$name] = $fields[$name];
         }
         $sys = config_item('sys');
@@ -1030,7 +1030,7 @@ class CI_Migration
         $relationsUnique  = $this->getTableRelations($fields, 'table', true);
         $relationsUniqueWithFilters = $this->getTableRelations($fields,'table', true, true);
 
-        foreach ($relationsUnique as $fkName => $settings){
+        foreach ((array)$relationsUnique as $fkName => $settings){
             list($fMod, $fSubmod) = getModSubMod($settings['table']);
             list($fSubModS, $fSubModP) = setSubModSingularPlural($fSubmod);
             list($fModS, $fModP) = setSubModSingularPlural($sys[$fMod]['name']);
