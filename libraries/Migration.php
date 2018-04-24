@@ -910,12 +910,12 @@ class CI_Migration
                 }
 
                 $data = array(
-                    'titulo' => validateArray($tableSettings, 'title') ? $tableSettings['title'] : ucfirst(setTitleFromWordWithDashes($submod)),
+                    'titulo' => validateArray($tableSettings, 'titulo') ? $tableSettings['titulo'] : ucfirst(setTitleFromWordWithDashes($submod)),
                     'icon' => validateArray($tableSettings, 'icon') ? $tableSettings['icon'] : '',
-                    'url' => config_item('sys')[$mod]['dir'] . "$submod",
-                    'descripcion' => validateArray($tableSettings, 'description') ? $tableSettings['descripcion'] : '',
+                    'url' => validateArray($tableSettings, 'url') ? $tableSettings['url'] : config_item('sys')[$mod]['dir'] . "$submod",
+                    'descripcion' => validateArray($tableSettings, 'descripcion') ? $tableSettings['descripcion'] : '',
                     'status' => validateArray($tableSettings, 'status') ? $tableSettings['status'] : '',
-                    'listed' => validateArray($tableSettings, 'listed_table') ? $tableSettings['listed_table'] : '',
+                    'listed' => validateArray($tableSettings, 'bIsListed') ? $tableSettings['bIsListed'] : 'ENABLED',
                     'id_user_created' => $this->getIdUserDefault(),
                     'id_user_modified' => $this->getIdUserDefault()
                 );
@@ -1378,11 +1378,11 @@ class CI_Migration
         $aListedFields = array();
         $except = array();
 
-        if (validateArray($tableSettings, 'listed_fields')) {
-            $aListedFields = $tableSettings['listed_fields'];
+        if (validateArray($tableSettings, 'aListedFields')) {
+            $aListedFields = $tableSettings['aListedFields'];
         }
-        if (validateArray($tableSettings, 'listed_num')) {
-            $numIndexFields = $tableSettings['listed_num'];
+        if (validateArray($tableSettings, 'numListed')) {
+            $numIndexFields = $tableSettings['numListed'];
         }
         if (validateVar($aListedFields, 'array') && validateVar($numIndexFields, 'numeric')) {
             $num = count($aListedFields);

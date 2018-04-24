@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: $rafaelgutierrez
- * Date: $12/04/2018
- * Time: $2:30 am
+ * Date: $24/04/2018
+ * Time: $1:12 am
  */
 
 
@@ -472,14 +472,14 @@ class Migration_Create_ci_usuarios extends CI_Migration
         $this->dbforge->add_key($fk_keys);
         $this->create_or_alter_table('ci_usuarios');
         $settings = array (
-  'listed_fields' => 
+  'aListedFields' => 
   array (
     0 => 'nombre',
     1 => 'apellido',
     2 => 'sexo',
     3 => 'cellphone_number_1',
   ),
-  'listed_num' => 5,
+  'numListed' => 5,
   'ctrl' => true,
   'model' => true,
   'views' => true,
