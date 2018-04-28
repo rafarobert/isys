@@ -2,8 +2,8 @@
 /**
  * Created by herbalife.
  * User: rafaelgutierrez
- * Date: 27/04/2018
- * Time: 8:12 pm
+ * Date: 28/04/2018
+ * Time: 1:05 am
  * @var Model_modulos $model_modulos
  * @var Model_modulos $modulos
  * @var Model_modulos $modulo
@@ -26,7 +26,7 @@
         <thead>
         <tr>
             <th>Id_modulo</th>
-                <th>Name_modulo</th>
+                <th>Modulo</th>
                 <th>Titulo</th>
                 <th>Url</th>
                 <th>Descripcion</th>

@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: $rafaelgutierrez
- * Date: $27/04/2018
- * Time: $8:10 pm
+ * Date: $28/04/2018
+ * Time: $1:10 am
  */
 
 
@@ -48,6 +48,7 @@ class Migration_Create_ci_modulos extends CI_Migration
     'null' => true,
     'default' => NULL,
     'extra' => '',
+    'label' => 'Modulo',
     'validate' => 'required',
     'pk' => 'id_table',
   ),

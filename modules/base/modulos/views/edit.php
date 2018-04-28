@@ -2,8 +2,8 @@
 /**
  * Created by herbalife.
  * User: rafaelgutierrez
- * Date: 27/04/2018
- * Time: 8:12 pm
+ * Date: 28/04/2018
+ * Time: 1:05 am
  * @var Model_Modulos $model_modulos
  * @var Model_Modulos $modulos
  * @var Model_Modulos $modulo
@@ -31,7 +31,7 @@
     </div>
 </div>
 <?php echo form_error("id_modulo"); ?><div class="form-group row">
-    <label for="fieldName_modulo" class="col-sm-4 col-form-label col-form-label-md">Name modulo</label>
+    <label for="fieldName_modulo" class="col-sm-4 col-form-label col-form-label-md">Modulo</label>
     <div class="col-sm-6">
         <?php
         $data = array (

@@ -2,8 +2,8 @@
 /**
  * Created by Estic.
  * User: rafaelgutierrez
- * Date: 27/04/2018
- * Time: 8:12 pm
+ * Date: 28/04/2018
+ * Time: 1:05 am
  */
 
 defined("BASEPATH") OR exit("No direct script access allowed");
@@ -125,7 +125,7 @@ class Model_Modulos extends base_Model {
   'name_modulo' => 
   array (
     'field' => 'name_modulo',
-    'label' => 'Name_modulo',
+    'label' => 'Modulo',
     'rules' => 'trim|max_length[250]|required',
   ),
   'titulo' => 
@@ -175,7 +175,7 @@ class Model_Modulos extends base_Model {
   'name_modulo' => 
   array (
     'field' => 'name_modulo',
-    'label' => 'Name_modulo',
+    'label' => 'Modulo',
     'rules' => 'trim|max_length[250]|required',
   ),
   'titulo' => 
