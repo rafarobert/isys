@@ -591,6 +591,10 @@ if ( ! is_php('5.4'))
  * ------------------------------------------------------
  */
 	call_user_func_array(array(&$CI, $method), $params);
+    if(isset($CI->data['view'])){
+        $CI->data['view'] = $URI->uri_string() . '/' .$CI->data['view'];
+    }
+
     $CI->load->view($CI->data['layout'], $CI->data);
 
 	// Mark a benchmark end point

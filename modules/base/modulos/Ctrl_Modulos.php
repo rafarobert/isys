@@ -2,8 +2,8 @@
 /**
  * Created by herbalife.
  * User: rafaelgutierrez
- * Date: 28/04/2018
- * Time: 1:05 am
+ * Date: 30/04/2018
+ * Time: 5:45 pm
  * @property Model_Modulos $model_modulos
  
  * @property Model_Usuarios $model_usuarios
@@ -44,7 +44,7 @@ Class Ctrl_Modulos extends base_Controller {
         $this->data["oModulos"] = $this->model_modulos->get();
 
         // Carga la vista
-        $this->data["subview"] = "base/modulos/index";
+        $this->data["view"] = "index";
     }
 
     public function edit($id = NULL){
@@ -86,11 +86,11 @@ Class Ctrl_Modulos extends base_Controller {
                 $this->model_modulos->save($data,$id);
                 redirect("base/modulos");
             } else {
-                $this->data["subview"] = "base/modulos/edit";
+                $this->data["view"] = "edit";
             }
         }
         // Se carga la vista
-        $this->data["subview"] = "base/modulos/edit";
+        $this->data["view"] = "edit";
     }
 
     public function delete($id){

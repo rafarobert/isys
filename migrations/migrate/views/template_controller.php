@@ -45,7 +45,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         $this->data["oUcTableP"] = $this->model_lcTableP->get();
 
         // Carga la vista
-        $this->data["subview"] = "lcModS/lcTableP/index";
+        $this->data["view"] = "index";
     }
 
     public function edit($id = NULL){
@@ -107,11 +107,11 @@ Class Ctrl_UcTableP extends UcModS_Controller {
                 $this->model_lcTableP->save($data,$id);
                 redirect("lcModS/lcTableP");
             } else {
-                $this->data["subview"] = "lcModS/lcTableP/edit";
+                $this->data["view"] = "edit";
             }
         }
         // Se carga la vista
-        $this->data["subview"] = "lcModS/lcTableP/edit";
+        $this->data["view"] = "edit";
     }
 
     public function delete($id){
