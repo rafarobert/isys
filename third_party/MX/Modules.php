@@ -9,14 +9,21 @@ $CONF =& get_config();
 /* get module locations from config settings or use the default module location and offset */
 
 $isysDirs = $CONF['isysDirs'];
-
+$DIRS = $CONF['dirs'];
 if($CFG->item('modules_locations') == null){
-    $iDirs = array_keys($isysDirs);
+    $iDirs = array_keys($DIRS);
     $got = false;
-    foreach ($iDirs as $dir){
-        Modules::$locations[BASEPATH."$dir/"] = "$dir/";
+    Modules::$locations[APPPATH] = "/";
+    foreach ($DIRS as $root => $dirs){
+        foreach ($dirs as $dir => $mods){
+            foreach ($mods as $mod => $type){
+                if($type == "HMVC"){
+                    Modules::$locations[ROOT_PATH."$root/$dir/"] = "$dir/";
+                }
+            }
+        }
     }
-    Modules::$locations[APPPATH.'modules/'] = 'modules/';
+//    Modules::$locations[APPPATH.'modules/'] = 'modules/';
 } else {
     is_array(Modules::$locations = $CFG->item('modules_locations')) OR Modules::$locations = array(
         APPPATH.'modules/' => 'modules/',

@@ -215,6 +215,7 @@ class MX_Loader extends CI_Loader
 			return $this;
 
 		/* check module */
+
 		list($path, $_model) = Modules::find($model, $this->_module, 'models/');
 
 		if ($path == FALSE)
@@ -247,12 +248,11 @@ class MX_Loader extends CI_Loader
                 Modules::load_file($model, $path);
             }
 
-
-
 			CI::$APP->$_alias = new $model();
 
 			$this->_ci_models[] = $_alias;
-		}
+
+            }
 		return $this;
 	}
 
@@ -336,6 +336,7 @@ class MX_Loader extends CI_Loader
             }
         } else if(validateVar($view)){
             list($path, $_view) = Modules::find($view, $this->_module, 'views/');
+
             if ($path != FALSE)
             {
                 $this->_ci_view_paths = array($path => TRUE) + $this->_ci_view_paths;

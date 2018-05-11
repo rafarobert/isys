@@ -12,6 +12,7 @@ class Ctrl_Migrate extends Base_Controller
 {
     function __construct(){
         parent::__construct();
+        $this->data['subLayout'] = '';
         $this->load->library('migration');
         set_time_limit(300);
     }
@@ -21,18 +22,23 @@ class Ctrl_Migrate extends Base_Controller
         $migrations_errors = array();
         $migration_error = '';
         $it_worked = false;
-        $sys = array_keys(config_item('sys'));
+//        $sys = array_keys(config_item('sys'));
 
         //*************************************************************
         //******* si se hace la reescritura por defecto ***************
         //*************************************************************
-        if ($funct == 'set') {
-            $_POST['bReset'] = false;
-        } else if ($funct == 'reset') {
-            $_POST['bReset'] = true;
-        }
+//        if ($funct == 'set') {
+//            $_POST['bReset'] = false;
+//        } else if ($funct == 'reset') {
+//            $_POST['bReset'] = true;
+//        }
 
         $migrations = $this->migration->_migration_files;
+
+        if($modulo == 'fromdatabase'){
+            $this->fromdatabase();
+            $it_worked = true;
+        }
 
         //*******************************************************************************************
         //******* si se hace el migration a un elemento de algun modulo especifico ******************
@@ -160,7 +166,7 @@ class Ctrl_Migrate extends Base_Controller
             $this->data["tableRelations"] = var_export($tableRelations,true);
             $this->data["tableSettings"] = var_export($tableSettings,true);
             $phpContent = $this->load->view("template_migrations",$this->data, true, true);
-            $framePath = ($mod == "ci" ? BASEPATH : APPPATH)."migrations/";
+            $framePath = "orm/migrations/";
             if (createFolder($framePath)) {
                 if (createFolder($framePath."tables/")) {
                     if (createFolder($framePath."tables/$mod")) {

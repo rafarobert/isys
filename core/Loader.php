@@ -105,7 +105,7 @@ class CI_Loader {
 	 *
 	 * @var	array
 	 */
-	protected $_ci_models =	array();
+	public $_ci_models =	array();
 
 	/**
 	 * List of loaded helpers

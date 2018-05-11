@@ -12,16 +12,26 @@ class Model_UcTableP extends UcModS_Model {
 
     //fieldsProperties
 
+    private static $instance = null;
     protected $_table_name = "lcmodType_lcTableP";
     protected $_order_by = "idTable desc";
     protected $_timestaps = true;
-    protected $_primary_key = "idTable";
 
+    protected $_primary_key = "idTable";
     public $rules = '$tableRules';
     public $rules_edit = '$tableRulesEdit';
 
     function __construct(){
         parent::__construct();
+    }
+
+    public static function create()
+    {
+        if(!self::$instance){
+            self::$instance = new self();
+            self::$instance->init();
+        }
+        return self::$instance;
     }
 
     public function get_new(){

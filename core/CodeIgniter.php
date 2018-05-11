@@ -376,62 +376,73 @@ if ( ! is_php('5.4'))
 
 
 
-    function getframePath($modType = ''){
+    function getframePath($modulo = '', $subMod = ''){
         $URI =& load_class('URI', 'core');
         $RTR =& load_class('Router', 'core', isset($routing) ? $routing : NULL);
         $CONF =& get_config();
-        $sys = $CONF['sys'];
-        if($modType != ''){
-            if(is_array($sys[$modType])){
-                $modType = $sys[$modType]['name'];
+        $SYS = $CONF['sys'];
+        $DIRS = $CONF['dirs'];
+        $isBasePath = false;
+        $isAppPath = false;
+        $isOrmPath = false;
+        $validating = false;
+
+        // **************** Establece el nombre del modulo *****************
+        if($modulo == ''){
+            $modulo = $URI->segments[1];
+        } else {
+            if(is_array($SYS[$modulo])){
+                $modulo = $SYS[$modulo]['name'];
             }
         }
 
-        $isysDirs = $CONF['isysDirs'];
-        $rDirs = array_keys($isysDirs);
-        $isBasePath = false;
-        $framePath = APPPATH;
-        foreach ($rDirs as $rDir) {
-            $baseMods = array_keys($isysDirs[$rDir]);
-            if($modType == ''){
-                $segment = $URI->segments[1];
-            } else {
-                $segment = $modType;
-            }
-            if(in_array($segment, $baseMods)) {
-                $mods = $isysDirs[$rDir];
+        // **************** Establece el nombre de la clase ****************
+        if($subMod == ''){
+            $class = $RTR->class;
+        } else {
+            $class = $subMod;
+            $validating = true;
+        }
+
+        foreach ($DIRS as $root => $dirs){
+            foreach ($dirs as $dir => $mods){
                 foreach ($mods as $mod => $type){
-                    if(is_dir(BASEPATH."$rDir/$mod/")){
-                        $dir = $type == 'HMVC' ? "$rDir/$mod/" : ($type == 'MVC' ? "$rDir/" : null);
-                        $RTR->directory = $dir;
-                        if($modType != ''){
-                            $framePath = BASEPATH."$rDir/$modType/";
-                            if(createFolder($framePath)){
-                                return $framePath;
+                    if($type == "HMVC"){
+                        $ruta = ROOT_PATH . "$root/$dir/$modulo/$class/";
+                        if (is_dir($ruta)) {
+                            $class = "Ctrl_".ucfirst($class);
+                            $content = file_get_contents($ruta."$class.php");
+                            $cont_funct = explode('function', $content);
+                            unset($cont_funct[0]);
+                            $funct = function($array){
+                                return str_replace(' ','',explode('(',$array)[0]);
+                            };
+                            $functions = array_map($funct,$cont_funct);
+                            if(in_array($RTR->method, $functions) && !$validating){
+                                if($subMod == ''){
+                                    return ROOT_PATH."$root/";
+                                } else {
+                                    $directorio = ROOT_PATH."$root/$dir/$modulo/$subMod/";
+                                    if(is_dir($directorio)){
+                                        return $directorio;
+                                    } else {
+                                        return ROOT_PATH."$root/";
+                                    }
+                                }
+                            } else {
+                                $directorio = ROOT_PATH."$root/$dir/$modulo/$subMod/";
+                                if(is_dir($directorio)){
+                                    return $directorio;
+                                } else {
+                                    return ROOT_PATH."$root/";
+                                }
                             }
-                        } else {
-                            $framePath = BASEPATH;;
                         }
-                        $isBasePath = true;
-                        break;
                     }
                 }
             }
         }
-        if(!$isBasePath){
-            $framePath = APPPATH;
-            if ($modType != '') {
-                $appDirs = $CONF['appDirs'];
-                $rDirs = array_keys($appDirs);
-                foreach ($rDirs as $rDir) {
-                    $path = $framePath."$rDir/$modType/";
-                    if(createFolder($path)){
-                        return $path;
-                    }
-                }
-            }
-        }
-        return $framePath;
+        return null;
     }
 
 /*
@@ -591,11 +602,9 @@ if ( ! is_php('5.4'))
  * ------------------------------------------------------
  */
 	call_user_func_array(array(&$CI, $method), $params);
-    if(isset($CI->data['view'])){
-        $CI->data['view'] = $URI->uri_string() . '/' .$CI->data['view'];
+	if(!$CI->input->post('fromModal')){
+        $CI->load->view($CI->data['layout'], $CI->data);
     }
-
-    $CI->load->view($CI->data['layout'], $CI->data);
 
 	// Mark a benchmark end point
 	$BM->mark('controller_execution_time_( '.$class.' / '.$method.' )_end');

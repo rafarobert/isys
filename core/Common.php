@@ -152,7 +152,7 @@ if ( ! function_exists('load_class'))
 
 		// Look for the class first in the local application/libraries folder
 		// then in the native system/libraries folder
-		foreach (array(APPPATH, BASEPATH) as $path)
+		foreach (array(APPPATH, BASEPATH, ORMPATH) as $path)
 		{
 			if (file_exists($path.$directory.'/'.$class.'.php'))
 			{
@@ -176,7 +176,14 @@ if ( ! function_exists('load_class'))
 			{
 				require_once(APPPATH.$directory.'/'.$name.'.php');
 			}
-		}
+		} else if(file_exists($directory)){
+            $name = $class;
+
+            if (class_exists($name, FALSE) === FALSE)
+            {
+                require_once($directory);
+            }
+        }
 
 		// Did we find the class?
 		if ($name === FALSE)

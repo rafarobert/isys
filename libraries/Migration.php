@@ -699,7 +699,7 @@ class CI_Migration
                     } else {
                         $migIndex = $this->getMigrationIndexFromTableName($settings['table']);
                         list($mod, $submod) = getModSubMod($settings['table']);
-                        redirect("migrate/set/$mod/$migIndex");
+                        redirect("base/migrate/$mod/$migIndex");
                     }
                 }
             }
@@ -929,7 +929,7 @@ class CI_Migration
                 }
 
             } else if ($tableName != $modTable) {
-                redirect("migrate/set/ci/$modMigIndex");
+                redirect("base/migrate/ci/$modMigIndex");
             }
         }
     }
@@ -1057,7 +1057,7 @@ class CI_Migration
             $data['lcFkModP'] = lcfirst($fModP);
             list($data) = $this->validateFkTable($data, $fields, $settings, $sys);
 //            $data['setObjectForeignTable'] .= $this->load->view(["template_controller" => "setObjectForeignTable"], $data, true, true, true);
-            if(validateArray($settings,'filterBy')){
+            if(validateArray($settings,'filterBy') && validateArray($settings,'idForeign')){
                 foreach($settings['filterBy'] as $filter){
                     $data['lcFkObjFieldP'] = $filter;
                     $data['UcFkObjFieldP'] = setObjectFromWordWithDashes($filter,true);
@@ -1079,7 +1079,8 @@ class CI_Migration
         }
         $data["extraFunctions"] = $this->getExtraFunctions($tableName);
         $phpContent = $this->load->view("template_controller", $data, true, true, true);
-        $framePath = getframePath($mod);
+        $mod = $sys[$mod]['dir'];
+        $framePath = ROOT_PATH.'orm/crud/'.$mod;
         if (createFolder($framePath)) {
             if (createFolder($framePath . "$submod/")) {
                 write_file($framePath . "$submod/Ctrl_" . ucfirst($submod) . $this->_ext_php, $phpContent);
@@ -1089,6 +1090,7 @@ class CI_Migration
 
     public function createModel2($tableName, $pkTable, $fields, $tableSettings = [])
     {
+        $sys = config_item('sys');
         list($mod, $submod, $subModS, $subModP, $data) = $this->setDataDefault($tableName, $pkTable, $fields);
         $fieldsProperties = $this->getPhpFieldsProperties($fields);
         $tableRules = $this->getPhpFieldsRules($fields,$pkTable);
@@ -1099,7 +1101,8 @@ class CI_Migration
         $data["tableRulesEdit"] = var_export($tableRulesEdit, true);
         $data["stdFields"] = $stdFields;
         $phpContent = $this->load->view("template_model", $data, true, true);
-        $framePath = getframePath($mod);
+        $mod = $sys[$mod]['dir'];
+        $framePath = ROOT_PATH.'orm/crud/'.$mod;
         if (createFolder($framePath)) {
             if (createFolder($framePath . "$submod/")) {
                 write_file($framePath . "$submod/Model_" . ucfirst($submod) . $this->_ext_php, $phpContent);
@@ -1109,11 +1112,13 @@ class CI_Migration
 
     public function createViewIndex($tableName, $pkTable, $fields, $tableSettings = [])
     {
+        $sys = config_item('sys');
         list($mod, $submod, $subModS, $subModP, $data, $vFields) = $this->setDataDefault($tableName, $pkTable, $fields);
         $data["tableHeaderHtmlTitles"] = $this->setHtmlHeaderTitles($fields, $vFields, $tableSettings);
         $data["tableBodyHtmlFields"] = $this->setHtmlBodyFields($fields, $vFields, $tableSettings, $subModS);
         $phpContent = $this->load->view("template_index", $data, true, true);
-        $framePath = getframePath($mod);
+        $mod = $sys[$mod]['dir'];
+        $framePath = ROOT_PATH.'orm/crud/'.$mod;
         if (createFolder($framePath)) {
             if (createFolder($framePath . "$submod/")) {
                 if (createFolder($framePath . "$submod/views/")) {
@@ -1125,20 +1130,42 @@ class CI_Migration
 
     public function createViewEdit($tableName, $pkTable, $fields, $tableSettings = [])
     {
+        $sys = config_item('sys');
         list($mod, $submod, $subModS, $subModP, $data, $vFields) = $this->setDataDefault($tableName, $pkTable, $fields);
         $sys = config_item('sys');
-
+        $modal = false;
+        $modalsContent = '';
         $htmlFormContent = '';
         foreach ($vFields as $name => $settings) {
             $inputData = array(
                 "name" => validateArray($settings, 'name') ? $settings['name'] : "$name",
                 "id" => validateArray($settings, 'id') ? $settings['id'] : "field" . ucfirst($name),
                 "class" => "form-control " . (validateArray($settings, 'class') ? $settings['class'] : ""),
-                "onclick" => validateArray($settings, 'onclick') ? $settings['onclick'] : '',
-                "onchange" => validateArray($settings, 'onchange') ? $settings['onchange'] : '',
                 "placeholder" => validateArray($settings, 'placeholder') ? $settings['placeholder'] : '',
             );
             $typeForm = validateArray($settings, 'input') ? $settings['input'] : 'default';
+
+            if(validateArray($settings,'onclick')){
+                $inputData['onclick'] = $settings['onclick'];
+                if((strstr($settings['onclick'],'Modal') || strstr($settings['onclick'],'modal'))&& !$modal){
+                    $modal = true;
+                }
+            }
+            if(validateArray($settings,'onchange')){
+                $inputData['onchange'] = $settings['onchange'];
+                if(strhas($settings['onclick'],'modal') && !$modal){
+                    $modal = true;
+                }
+            }
+            if(validateArray($settings,'table')){
+                $inputData['table'] = $settings['table'];
+            }
+            if(validateArray($settings,'action')){
+                $inputData['action'] = $settings['action'];
+            }
+            if(validateArray($settings,'content')){
+                $inputData['content'] = $settings['content'];
+            }
             if(compareArrayStr($settings,'input','disabled')){
                 $inputData['disabled'] = true;
             }
@@ -1154,23 +1181,22 @@ class CI_Migration
                 } else if (compareArrayStr($settings, 'input', 'hidden')) {
                     $typeForm = 'hidden';
                 } else if (compareArrayStr($settings, 'input', 'radio') ||
-                    compareArrayStr($settings, 'input', 'radios') ||
-                    compareArrayStr($settings, 'input', 'checkbox') ||
+                            compareArrayStr($settings, 'input', 'radios') ||
+                            compareArrayStr($settings, 'input', 'checkbox') ||
                     compareArrayStr($settings, 'input', 'checkboxes') ||
                     compareArrayStr($settings, 'input', 'select') ||
                     compareArrayStr($settings, 'input', 'dropdown') ||
                     compareArrayStr($settings, 'input', 'multiselect')) {
-                    $typeForm = compareArrayStr($settings, 'input', 'radio') ? 'radios' :
-                        (compareArrayStr($settings, 'input', 'radios') ? 'radios' :
-                        (compareArrayStr($settings, 'input', 'checkbox') ? 'checkboxes' :
-                            (compareArrayStr($settings, 'input', 'checkboxes') ? 'checkboxes' :
-                            (compareArrayStr($settings, 'input', 'select') ? 'select' :
-                                (compareArrayStr($settings, 'input', 'multiselect') ? 'multiselect' :
+                        $typeForm = compareArrayStr($settings, 'input', 'radio') ? 'radios' :
+                                    (compareArrayStr($settings, 'input', 'radios') ? 'radios' :
+                                    (compareArrayStr($settings, 'input', 'checkbox') ? 'checkboxes' :
+                                    (compareArrayStr($settings, 'input', 'checkboxes') ? 'checkboxes' :
+                                    (compareArrayStr($settings, 'input', 'select') ? 'select' :
+                                    (compareArrayStr($settings, 'input', 'multiselect') ? 'multiselect' :
                                     (compareArrayStr($settings, 'input', 'dropdown') ? 'dropdown' : 'input'))))));
                     if (!validateArray($settings, 'options')) {
-                        $options = ['prueba'];
+                        $inputData['options'] = $settings['options'];
                     }
-                    $inputData['options'] = $settings['options'];
                 }
             } else if (compareArrayStr($settings, 'type', 'int') || compareArrayStr($settings, 'type', 'decimal')) {
                 $typeForm = 'number';
@@ -1181,17 +1207,6 @@ class CI_Migration
                 $typeForm = 'input';
                 $inputData["class"] .= "datepicker ";
             }
-//            if(validateArray($settings,'table') && validateArray($settings,'idForeign')){
-//                list($fMod, $fSubmod) = getModSubMod($settings['table']);
-//                list($fSubModS, $fSubModP) = setSubModSingularPlural($fSubmod);
-//                list($fModS, $fModP) = setSubModSingularPlural($sys[$fMod]['name']);
-//                $data['objOptions'] = 'o'.ucfirst(setObjectFromWordWithDashes($fSubModP,true));
-//                $typeForm = validateArray($settings,'input') ? $settings['input'] : 'dropdown';
-//                $bIsForeing = true;
-//            } else {
-//                $data['objOptions'] = "data['options']";
-//                $bIsForeing = false;
-//            }
             $data['lcInputId'] = "field" . ucfirst($name);
             $data['lcInputName'] = lcfirst($name);
             $data['lcField'] = lcfirst($name);
@@ -1223,10 +1238,17 @@ class CI_Migration
             } else {
                 $htmlFormContent .= $this->load->view("template_form_default", $data, true, true);
             }
+            if($modal){
+                $modal = false;
+                $modalsContent .= "
+            <?=modal('".$inputData['id']."Modal')?>";
+            }
         }
         $data['htmlFieldsEditForm'] = $htmlFormContent;
         $phpContent = $this->load->view("template_edit", $data, true, true);
-        $framePath = getframePath($mod);
+        $phpContent .= $modalsContent;
+        $mod = $sys[$mod]['dir'];
+        $framePath = ROOT_PATH.'orm/crud/'.$mod;
         if (createFolder($framePath)) {
             if (createFolder($framePath . "$submod/")) {
                 if (createFolder($framePath . "$submod/views/")) {
@@ -1240,8 +1262,12 @@ class CI_Migration
         $bIsForeing = false;
         if(validateArray($settings,'idLocal') || validateArray($settings,'field')){
             $idLocal = isset($settings['idLocal']) ? $settings['idLocal'] : $settings['field'];
-            if(validateArray($fields[$idLocal],'selectBy')){
-                $fkTableName = $fields[$idLocal]['table'];
+            if(validateArray($fields[$idLocal],'selectBy') && validateArray($fields[$idLocal],'idForeign')){
+                if(validateArray($fields[$idLocal],'table')){
+                    $fkTableName = $fields[$idLocal]['table'];
+                } else {
+                    show_error('No se pudo encontrar la referencia selectBy, revisa las llaves foraneas: '.$idLocal);
+                }
                 $fkTableFieldRef = $fields[$idLocal]['selectBy'];
                 $fkTable = $this->dbforge->getArrayFieldsFromTable($fkTableName);
                 $fkTableFields = $fkTable[$fkTableName];
@@ -1250,7 +1276,11 @@ class CI_Migration
                 } else {
                     $vFkTableFieldRef = $fkTableFieldRef;
                 }
-                $fkTableFieldRefSettings = $fkTableFields[$vFkTableFieldRef];
+                if(isset($fkTableFields[$vFkTableFieldRef])){
+                    $fkTableFieldRefSettings = $fkTableFields[$vFkTableFieldRef];
+                } else {
+                    show_error("El parametro $vFkTableFieldRef no existe en la tabla $fkTableName, revisa los parametros json de la tabla.");
+                }
                 list($fMod, $fSubmod) = getModSubMod($settings['table']);
                 list($fSubModS, $fSubModP) = setSubModSingularPlural($fSubmod);
                 list($fModS, $fModP) = setSubModSingularPlural($sys[$fMod]['name']);
@@ -1300,7 +1330,7 @@ class CI_Migration
         $aDuplicated = array();
         if($bUniqueFilters){
             foreach ($fields as $name => $settings){
-                if (validateArray($settings,'filterBy') && validateArray($settings,'table')){
+                if (validateArray($settings,'filterBy') && validateArray($settings,'idForeign') && validateArray($settings,'table')){
                     $aDuplicated[] = $settings['table'];
                 }
             }
@@ -1314,7 +1344,7 @@ class CI_Migration
         $aUniqueRelations = array();
         foreach ($aTableNames as $tableName){
             foreach ($fields as $fkName => $settings){
-                if(validateArray($settings,'table')){
+                if(validateArray($settings,'table') && validateArray($settings,'idForeign')){
                     if($tableName == $settings['table']){
                         $aUniqueRelations[$fkName] = $settings;
                         unset($fields[$fkName]);

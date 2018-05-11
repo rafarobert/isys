@@ -250,9 +250,13 @@ if ( ! function_exists('form_upload'))
 	 */
 	function form_upload($data = '', $value = '', $extra = '')
 	{
+	    if($value != ''){
+	        $data['value'] = $value;
+        }
 		$defaults = array('type' => 'file', 'name' => '');
 		is_array($data) OR $data = array('name' => $data);
 		$data['type'] = 'file';
+
 
 		return '<input '._parse_form_attributes($data, $defaults)._attributes_to_string($extra)." />\n";
 	}
@@ -482,7 +486,6 @@ if ( ! function_exists('form_radio'))
 	{
 		is_array($data) OR $data = array('name' => $data);
 		$data['type'] = 'radio';
-
 		return form_checkbox($data, $value, $checked, $extra);
 	}
 }

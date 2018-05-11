@@ -12,7 +12,7 @@
 
 <h3><?= empty($oUcTableS->id_lcTableS) ? "Agregar UcTableP" : "Actualizando datos, UcTableS #" . $oUcTableS->id_lcTableS ?></h3>
 
-<?= form_open_multipart() ?>
+<?= form_open_multipart("lcModS/lcTableP/edit/".$oUcTableS->id_lcTableS,["id" => "lcTablePEdit"]) ?>
 
 #htmlFieldsEditForm
 

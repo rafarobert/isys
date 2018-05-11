@@ -16,15 +16,27 @@ Class Ctrl_UcTableP extends UcModS_Controller {
     //>>>initVarsForeignTable<<<
     public $lcFkObjFieldP;
     //<<<initVarsForeignTable>>>
+    private static $instance = null;
+
+    public static function create()
+    {
+        if(!self::$instance){
+            self::$instance = new self();
+            self::$instance->init();
+        }
+        return self::$instance;
+    }
+
     public function __construct()
     {
         parent::__construct();
-        $this->load->model("model_lcTableP");
+        $this->load->model("lcModS/model_lcTableP");
         //>>>loadModelsForeignTable<<<
         $this->load->model("lcFkModS/model_lcFkTableP");
         //<<<loadModelsForeignTable>>>
         //>>>initFieldsForeignTable<<<
-            $lcFkObjFieldP = $this->model_lcFkTableP->get_by('$fFieldsRef');
+        $this->initLoaded();
+        $lcFkObjFieldP = $this->model_lcFkTableP->get_by('$fFieldsRef');
             $this->data['oUcFkObjFieldP'] = $this->model_lcFkTableP->setOptions($lcFkObjFieldP);
         //<<<initFieldsForeignTable>>>
         //>>>initFieldImg<<<
@@ -45,7 +57,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         $this->data["oUcTableP"] = $this->model_lcTableP->get();
 
         // Carga la vista
-        $this->data["view"] = "index";
+        $this->data["subview"] = "lcModS/lcTableP/index";
     }
 
     public function edit($id = NULL){
@@ -84,12 +96,12 @@ Class Ctrl_UcTableP extends UcModS_Controller {
                 //validatedFieldsNames
             );
             //>>>validateFieldImgUpload<<<
-            if ( ! $this->upload->do_upload('lcField'))
+            if ( ! $this->upload->do_upload('lcField') && $id == null)
             {
                 $error = array('error' => $this->upload->display_errors());
                 $this->data['errors'] = $error;
             }
-            else
+            else if($this->upload->do_upload('foto_producto'))
             {
                 $file_info = $this->upload->data();
                 $this->_create_thumbnail('lcTableP',$file_info['file_name']);
@@ -107,11 +119,12 @@ Class Ctrl_UcTableP extends UcModS_Controller {
                 $this->model_lcTableP->save($data,$id);
                 redirect("lcModS/lcTableP");
             } else {
-                $this->data["view"] = "edit";
+                $this->data["subview"] = "lcModS/lcTableP/edit";
             }
         }
         // Se carga la vista
-        $this->data["view"] = "edit";
+        $this->data["subview"] = "lcModS/lcTableP/edit";
+        return $this->load->view("lcModS/lcTableP/edit",$this->data,true);
     }
 
     public function delete($id){
