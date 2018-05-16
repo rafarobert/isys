@@ -864,7 +864,7 @@ if (!function_exists('strhas')) {
         $strCase2 = strtoupper($obj);
         $strCase3 = strtolower($obj);
 
-        if(strpos($strCase1, $string) > -1 || strpos($strCase2, $string) > -1 || strpos($strCase3, $string) > -1){
+        if(strpos($obj, $string) > -1 || strpos($strCase1, $string) > -1 || strpos($strCase2, $string) > -1 || strpos($strCase3, $string) > -1 || preg_match("/\b$obj\b/",$string)){
             return true;
         } else {
             return false;

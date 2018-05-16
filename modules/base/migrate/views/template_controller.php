@@ -40,7 +40,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             $this->data['oUcFkObjFieldP'] = $this->model_lcFkTableP->setOptions($lcFkObjFieldP,'divider');
         //<<<initFieldsForeignTable>>>
         //>>>initFieldImg<<<
-        $dirPictures = 'img/lcTableP/';
+        $dirPictures = 'assets/img/lcTableP/';
         createFolder(FCPATH.$dirPictures);
         // Settings for images
         $config['upload_path']          = $dirPictures;
