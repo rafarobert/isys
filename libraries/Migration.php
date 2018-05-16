@@ -910,7 +910,7 @@ class CI_Migration
                 }
 
                 $data = array(
-                    'titulo' => validateArray($tableSettings, 'titulo') ? $tableSettings['titulo'] : ucfirst(setTitleFromWordWithDashes($submod)),
+                    'titulo' => validateArray($tableSettings, 'title') ? $tableSettings['title'] : ucfirst(setTitleFromWordWithDashes($submod)),
                     'icon' => validateArray($tableSettings, 'icon') ? $tableSettings['icon'] : '',
                     'url' => validateArray($tableSettings, 'url') ? $tableSettings['url'] : config_item('sys')[$mod]['dir'] . "$submod",
                     'descripcion' => validateArray($tableSettings, 'descripcion') ? $tableSettings['descripcion'] : '',

@@ -9,7 +9,9 @@
 class Ctrl_Ajax extends Base_Controller
 {
     public $ctrl_vasos;
-    public $ctrl_detalle_vasos;
+    public $ctrl_detalles_pedidos;
+    public $model_vasos;
+    public $model_detalles_pedidos;
     function __construct()
     {
         parent::__construct();
@@ -17,11 +19,11 @@ class Ctrl_Ajax extends Base_Controller
 
         // **************** Modelos **********************
         $this->model_vasos = Model_Vasos::create();
-        $this->model_detalle_vasos = Model_Detalles_vasos::create();
+        $this->model_detalles_pedidos = Model_Detalles_pedidos::create();
 
         // **************** Controladores ************************
         $this->ctrl_vasos = Ctrl_Vasos::create();
-        $this->ctrl_detalle_vasos = Ctrl_Detalles_vasos::create();
+        $this->ctrl_detalles_pedidos = Ctrl_Detalles_pedidos::create();
     }
 
     public function export($table = '', $funct = 'edit'){
