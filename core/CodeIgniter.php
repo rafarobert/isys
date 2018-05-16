@@ -409,7 +409,7 @@ if ( ! is_php('5.4'))
                 foreach ($mods as $mod => $type){
                     if($type == "HMVC"){
                         $ruta = ROOT_PATH . "$root/$dir/$modulo/$class/";
-                        if (is_dir($ruta)) {
+                        if (is_dir($ruta) && $class != '') {
                             $class = "Ctrl_".ucfirst($class);
                             $content = file_get_contents($ruta."$class.php");
                             $cont_funct = explode('function', $content);
