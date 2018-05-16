@@ -10,6 +10,8 @@ defined("BASEPATH") OR exit("No direct script access allowed");
 
 class Model_UcTableP extends UcModS_Model {
 
+    public $lcTableS;
+
     //fieldsProperties
 
     private static $instance = null;
@@ -35,10 +37,10 @@ class Model_UcTableP extends UcModS_Model {
     }
 
     public function get_new(){
-        $lcTableS = new stdClass();
+        $this->lcTableS = new stdClass();
 
         //stdFields
 
-        return $lcTableS;
+        return $this->lcTableS;
     }
 }

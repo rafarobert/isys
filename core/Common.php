@@ -1172,3 +1172,23 @@ if (!function_exists('deleteDir')) {
         rmdir($dir);
     }
 }
+
+if (!function_exists('array2std')) {
+
+    function array2std($array)
+    {
+        $stdClass = json_decode(json_encode($array));
+
+        return $stdClass;
+    }
+}
+
+if (!function_exists('std2array')) {
+
+    function std2array($std)
+    {
+        $array = json_decode(json_encode($std), true);
+
+        return $array;
+    }
+}

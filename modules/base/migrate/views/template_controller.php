@@ -37,7 +37,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         //>>>initFieldsForeignTable<<<
         $this->initLoaded();
         $lcFkObjFieldP = $this->model_lcFkTableP->get_by('$fFieldsRef');
-            $this->data['oUcFkObjFieldP'] = $this->model_lcFkTableP->setOptions($lcFkObjFieldP);
+            $this->data['oUcFkObjFieldP'] = $this->model_lcFkTableP->setOptions($lcFkObjFieldP,'divider');
         //<<<initFieldsForeignTable>>>
         //>>>initFieldImg<<<
         $dirPictures = 'img/lcTableP/';

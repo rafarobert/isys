@@ -10,9 +10,9 @@
  */
 ?>
 
-<h3><?= empty($oUcTableS->id_lcTableS) ? "Agregar UcTableP" : "Actualizando datos, UcTableS #" . $oUcTableS->id_lcTableS ?></h3>
+<h3><?= empty($oUcTableS->idTable) ? "Agregar UcTableP" : "Actualizando datos, UcTableS #" . $oUcTableS->idTable ?></h3>
 
-<?= form_open_multipart("lcModS/lcTableP/edit/".$oUcTableS->id_lcTableS,["id" => "lcTablePEdit"]) ?>
+<?= form_open_multipart("lcModS/lcTableP/edit/".$oUcTableS->idTable,["id" => "lcTablePEdit"]) ?>
 
 #htmlFieldsEditForm
 

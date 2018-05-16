@@ -1046,6 +1046,11 @@ class CI_Migration
             $data['loadModelsForeignTable'] .= $this->load->view(["template_controller" => "loadModelsForeignTable"], $data, true, true, true);
         }
         foreach($relations as $fkName => $settings) {
+            if(isset($settings['divider'])){
+                $data['divider'] = $settings['divider'];
+            } else {
+                $data['divider'] = ',';
+            }
             list($fMod, $fSubmod) = getModSubMod($settings['table']);
             list($fSubModS, $fSubModP) = setSubModSingularPlural($fSubmod);
             list($fModS, $fModP) = setSubModSingularPlural($sys[$fMod]['name']);
@@ -1160,6 +1165,7 @@ class CI_Migration
             if(validateArray($settings,'table')){
                 $inputData['table'] = $settings['table'];
             }
+
             if(validateArray($settings,'action')){
                 $inputData['action'] = $settings['action'];
             }
@@ -1195,8 +1201,9 @@ class CI_Migration
                                     (compareArrayStr($settings, 'input', 'multiselect') ? 'multiselect' :
                                     (compareArrayStr($settings, 'input', 'dropdown') ? 'dropdown' : 'input'))))));
                     if (!validateArray($settings, 'options')) {
-                        $inputData['options'] = $settings['options'];
+                        $inputData['options'] = [];
                     }
+                    $inputData['options'] = $settings['options'];
                 }
             } else if (compareArrayStr($settings, 'type', 'int') || compareArrayStr($settings, 'type', 'decimal')) {
                 $typeForm = 'number';
@@ -1500,7 +1507,7 @@ class CI_Migration
         $content = "";
         foreach ($result as $field) {
             $columnName = $field->COLUMN_NAME;
-            $content .= "$$subModS->$columnName = '';
+            $content .= "\$this->$subModS->$columnName = '';
             ";
         }
         return $content;

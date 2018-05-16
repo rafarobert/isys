@@ -572,14 +572,27 @@ if ( ! function_exists('form_checkboxes'))
             $checked = $options;
             $options = array();
         }
-
         is_array($data) OR $data = array('name' => $data);
         $htmlOptions = '';
+
+        // **************** busca imagenes ******************
+        if(validateArray($data,'table')){
+            $table = $data['table'];
+            list($mod,$submod) = getModSubMod($table);
+            foreach ($options as $i => $value){
+                $fields[$i] = explode('|',$value);
+            }
+        }
+        foreach ($fields as $i => $data){
+            foreach ($data as $field){
+
+            }
+        }
+
         if(validateArray($data,'options')){
             $options = $data['options'];
             unset($data['options']);
         }
-
         if(validateVar($options,'array')){
             foreach ($options as $key => $option){
                 $checkeds = [];
