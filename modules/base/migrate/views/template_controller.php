@@ -101,7 +101,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
                 $error = array('error' => $this->upload->display_errors());
                 $this->data['errors'] = $error;
             }
-            else if($this->upload->do_upload('foto_producto'))
+            else
             {
                 $file_info = $this->upload->data();
                 $this->_create_thumbnail('lcTableP',$file_info['file_name']);

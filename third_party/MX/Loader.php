@@ -154,8 +154,11 @@ class MX_Loader extends CI_Loader
 
 		$class = strtolower(basename($library));
 
-		if (isset($this->_ci_classes[$class]) && $_alias = $this->_ci_classes[$class])
-			return $this;
+		if (isset($this->_ci_classes[$class]) && $_alias = $this->_ci_classes[$class]){
+            if(!isset($params['reset'])){
+                return $this;
+            }
+        }
 
 		($_alias = strtolower($object_name)) OR $_alias = $class;
 
