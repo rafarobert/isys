@@ -39,17 +39,6 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         $lcFkObjFieldP = $this->model_lcFkTableP->get_by('$fFieldsRef');
             $this->data['oUcFkObjFieldP'] = $this->model_lcFkTableP->setOptions($lcFkObjFieldP,'divider');
         //<<<initFieldsForeignTable>>>
-        //>>>initFieldImg<<<
-        $dirPictures = 'assets/img/lcTableP/';
-        createFolder(FCPATH.$dirPictures);
-        // Settings for images
-        $config['upload_path']          = $dirPictures;
-        $config['allowed_types']        = 'gif|jpg|png|jpeg';
-        $config['max_size']             = 1000;
-        $config['max_width']            = 2024;
-        $config['max_height']           = 1008;
-        $this->load->library('upload', $config);
-        //<<<initFieldImg>>>
     }
 
     public function index(){
@@ -76,15 +65,11 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             $this->form_validation->set_rules($rules);
         }
         //>>>validateFieldImgIndex<<<
-        if(isset($oUcTableS->lcField)){
-            $aImg = explode('.',$oUcTableS->lcField);
-            if(count($aImg)>1){
-                $oUcTableS->imgThumb = $aImg[0].'_thumb.'.$aImg[1];
-            } else {
-                $oUcTableS->imgThumb = '';
+        if(validateVar($oUcTableS->lcField)){
+            $aThumbs = $this->model_lcTableP->getThumbs($oUcTableS->lcField,$id);
+            foreach ($aThumbs as $i => $thumb){
+                $oUcTableS->{"imgThumb".($i+1)} = $thumb;
             }
-        } else {
-            $oUcTableS->imgThumb = '';
         }
         //<<<validateFieldImgIndex>>>
         $this->data["oUcTableS"] = $oUcTableS;
@@ -96,17 +81,13 @@ Class Ctrl_UcTableP extends UcModS_Controller {
                 //validatedFieldsNames
             );
             //>>>validateFieldImgUpload<<<
-            if ( ! $this->upload->do_upload('lcField') && $id == null)
-            {
+            if ( ! $this->model_lcTableP->do_upload("lcField", $id) && $id == null) {
                 $error = array('error' => $this->upload->display_errors());
                 $this->data['errors'] = $error;
-            }
-            else
-            {
+                return false;
+            } else {
                 $file_info = $this->upload->data();
-                $this->_create_thumbnail('lcTableP',$file_info['file_name']);
-                $this->data['lcField'] = array('upload_data' => $file_info);
-                $data['lcField'] = $file_info['file_name'];
+                $this->data["lcField"] = $file_info['file_name'];
             }
             //<<<validateFieldImgUpload>>>
             //>>>validateFieldPassword<<<

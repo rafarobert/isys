@@ -1074,7 +1074,7 @@ class CI_Migration
         }
         if($fieldImg != ''){
             $data['lcField'] = $fieldImg;
-            $data["initFieldImg"] = $this->load->view(["template_controller" => "initFieldImg"], $data, true, true);
+//            $data["initFieldImg"] = $this->load->view(["template_controller" => "initFieldImg"], $data, true, true);
             $data["validateFieldImgIndex"] = $this->load->view(["template_controller" => "validateFieldImgIndex"], $data, true, true);
             $data["validateFieldImgUpload"] = $this->load->view(["template_controller" => "validateFieldImgUpload"], $data, true, true);
         }

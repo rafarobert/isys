@@ -3,7 +3,7 @@
     <div class="col-sm-6">
         <?php
         $data = '$inputData';
-        echo img('assets/img/lcTableP/thumbs/'.$oUcTableS->imgThumb);
+        echo img('assets/img/lcTableP/thumbs/'.$oUcTableS->imgThumb2);
         echo form_upload($data,set_value("lcInputName", $oUcTableS->lcField),"");
         ?>
     </div>
