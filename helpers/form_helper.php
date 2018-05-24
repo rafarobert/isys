@@ -595,12 +595,18 @@ if ( ! function_exists('form_checkboxes'))
         }
         $new_options = array();
         $aImgs = array();
-        foreach ($fields as $i => $data){
-            foreach ($data as $j => $field){
+        foreach ($fields as $i => $objects){
+            foreach ($objects as $j => $field){
                 $fieldName = str_replace(' ','',$field);
-                $fileUrl = site_url("assets/img/$submod/".$fieldName);
-                if(filter_var($fileUrl, FILTER_VALIDATE_URL) === false && !strhas($fileUrl,"<") && !strhas($fileUrl,">")){
-                    $aImgs[$i][$j] = $fileUrl;
+                $fileParts = explode('.',$fieldName);
+                if(validateArray($fileParts,1)){
+                    $fieldName = $fileParts[0].'-thumb_50.'.$fileParts[1];
+                } else {
+                    $fieldName = $fieldName;
+                }
+                $fileUrl = "assets/img/$submod/thumbs/".$fieldName;
+                if(is_file(FCPATH.$fileUrl) && !strhas($fileUrl,"<") && !strhas($fileUrl,">")){
+                    $aImgs[$i][$j] = site_url($fileUrl);
                 } else {
                     $new_options[$i][$j] = $field;
                 }

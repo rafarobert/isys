@@ -1075,6 +1075,7 @@ class CI_Migration
         if($fieldImg != ''){
             $data['lcField'] = $fieldImg;
 //            $data["initFieldImg"] = $this->load->view(["template_controller" => "initFieldImg"], $data, true, true);
+            $data["validateFieldsImgsIndex"] = $this->load->view(["template_controller" => "validateFieldsImgsIndex"], $data, true, true);
             $data["validateFieldImgIndex"] = $this->load->view(["template_controller" => "validateFieldImgIndex"], $data, true, true);
             $data["validateFieldImgUpload"] = $this->load->view(["template_controller" => "validateFieldImgUpload"], $data, true, true);
         }
@@ -1120,7 +1121,7 @@ class CI_Migration
         $sys = config_item('sys');
         list($mod, $submod, $subModS, $subModP, $data, $vFields) = $this->setDataDefault($tableName, $pkTable, $fields);
         $data["tableHeaderHtmlTitles"] = $this->setHtmlHeaderTitles($fields, $vFields, $tableSettings);
-        $data["tableBodyHtmlFields"] = $this->setHtmlBodyFields($fields, $vFields, $tableSettings, $subModS);
+        $data["tableBodyHtmlFields"] = $this->setHtmlBodyFields($fields, $vFields, $tableSettings, $subModS, $subModP);
         $phpContent = $this->load->view("template_index", $data, true, true);
         $mod = $sys[$mod]['dir'];
         $framePath = ROOT_PATH.'orm/crud/'.$mod;
@@ -1162,15 +1163,18 @@ class CI_Migration
                     $modal = true;
                 }
             }
+            // *********************** Atributos dentro del input : <input class.. id.. > ****************
             if(validateArray($settings,'table')){
                 $inputData['table'] = $settings['table'];
             }
-
             if(validateArray($settings,'action')){
                 $inputData['action'] = $settings['action'];
             }
             if(validateArray($settings,'content')){
                 $inputData['content'] = $settings['content'];
+            }
+            if(validateArray($settings,'insertWith')){
+                $inputData['with'] = $settings['insertWith'];
             }
             if(compareArrayStr($settings,'input','disabled')){
                 $inputData['disabled'] = true;
@@ -1178,6 +1182,7 @@ class CI_Migration
             if(compareArrayStr($settings,'input','hidden')){
                 $inputData['class'] .= 'display-none ';
             }
+            // ********************************************************************************************
             if (compareArrayStr($settings, 'type', 'text')) {
                 $typeForm = 'textarea';
                 $inputData["class"] .= "textTinymce ";
@@ -1189,10 +1194,10 @@ class CI_Migration
                 } else if (compareArrayStr($settings, 'input', 'radio') ||
                             compareArrayStr($settings, 'input', 'radios') ||
                             compareArrayStr($settings, 'input', 'checkbox') ||
-                    compareArrayStr($settings, 'input', 'checkboxes') ||
-                    compareArrayStr($settings, 'input', 'select') ||
-                    compareArrayStr($settings, 'input', 'dropdown') ||
-                    compareArrayStr($settings, 'input', 'multiselect')) {
+                            compareArrayStr($settings, 'input', 'checkboxes') ||
+                            compareArrayStr($settings, 'input', 'select') ||
+                            compareArrayStr($settings, 'input', 'dropdown') ||
+                            compareArrayStr($settings, 'input', 'multiselect')) {
                         $typeForm = compareArrayStr($settings, 'input', 'radio') ? 'radios' :
                                     (compareArrayStr($settings, 'input', 'radios') ? 'radios' :
                                     (compareArrayStr($settings, 'input', 'checkbox') ? 'checkboxes' :
@@ -1220,10 +1225,10 @@ class CI_Migration
             list($data,$typeForm,$bIsForeing) = $this->validateFkTable($data, $fields, $settings, $sys, $typeForm);
             $data['lcInputFormType'] = $typeForm;
 
-            if(!compareArrayStr($settings,'input','hidden')){
-                $data['UcInputLabel'] = validateArray($settings,'label') ? $settings['label'] : setTitleFromWordWithDashes(ucfirst($name));
-            } else {
+            if(compareArrayStr($settings,'input','hidden')){
                 $data['UcInputLabel'] = '';
+            } else {
+                $data['UcInputLabel'] = validateArray($settings,'label') ? $settings['label'] : setTitleFromWordWithDashes(ucfirst($name));
             }
 
             if(compareArrayStr($settings,'options','db_tabs')){
@@ -1333,6 +1338,7 @@ class CI_Migration
 
         return [$data, $typeForm, $bIsForeing];
     }
+
     private function getTableRelations($fields, $column, $bUnique = false, $bUniqueFilters = false){
         $aDuplicated = array();
         if($bUniqueFilters){
@@ -1386,15 +1392,20 @@ class CI_Migration
         return $content;
     }
 
-    private function setHtmlBodyFields($fields, $validFields, $tableSettings, $subModS)
+    private function setHtmlBodyFields($fields, $validFields, $tableSettings, $subModS, $subModP)
     {
         $oUcTableS = 'o' . ucfirst($subModS);
         $content = "";
         list($vFields, $numFields) = $this->getValidatedFieldsWithTableSettings($fields, $validFields, $tableSettings);
         $numFields = $numFields == 0 ? 5 : $numFields;
         foreach ($vFields as $name => $settings) {
-            $content .= "<td><?= \$$oUcTableS->$name; ?></td>               
+            if(compareArrayStr($settings,'input','image') || compareArrayStr($settings,'input','img')){
+                $content .= "<td><?= img('assets/img/$subModP/thumbs/'.\$$oUcTableS->$name"."_thumb1); ?></td>               
                 ";
+            } else {
+                $content .= "<td><?= \$$oUcTableS->$name; ?></td>               
+                ";
+            }
             if ($numFields) {
                 $numFields--;
             } else {

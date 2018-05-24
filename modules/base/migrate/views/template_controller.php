@@ -43,8 +43,11 @@ Class Ctrl_UcTableP extends UcModS_Controller {
 
     public function index(){
         // Obtiene a todos los lcTableP
-        $this->data["oUcTableP"] = $this->model_lcTableP->get();
-
+        $oUcTableP = $this->model_lcTableP->get();
+        //>>>validateFieldsImgsIndex<<<
+        $oUcTableP = $this->model_lcTableP->getThumbs($oUcTableP);
+        //<<<validateFieldsImgsIndex>>>
+        $this->data["oUcTableP"] = $oUcTableP;
         // Carga la vista
         $this->data["subview"] = "lcModS/lcTableP/index";
     }
@@ -65,12 +68,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             $this->form_validation->set_rules($rules);
         }
         //>>>validateFieldImgIndex<<<
-        if(validateVar($oUcTableS->lcField)){
-            $aThumbs = $this->model_lcTableP->getThumbs($oUcTableS->lcField,$id);
-            foreach ($aThumbs as $i => $thumb){
-                $oUcTableS->{"imgThumb".($i+1)} = $thumb;
-            }
-        }
+        $oUcTableS = $this->model_lcTableP->getThumbs($oUcTableS)[0];
         //<<<validateFieldImgIndex>>>
         $this->data["oUcTableS"] = $oUcTableS;
 
@@ -84,10 +82,11 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             if ( ! $this->model_lcTableP->do_upload("lcField", $id) && $id == null) {
                 $error = array('error' => $this->upload->display_errors());
                 $this->data['errors'] = $error;
-                return false;
+                show_error($error);
             } else {
                 $file_info = $this->upload->data();
                 $this->data["lcField"] = $file_info['file_name'];
+                $data['lcField'] = $file_info['file_name'];
             }
             //<<<validateFieldImgUpload>>>
             //>>>validateFieldPassword<<<

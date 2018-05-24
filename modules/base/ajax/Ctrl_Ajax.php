@@ -12,6 +12,7 @@ class Ctrl_Ajax extends Base_Controller
     public $ctrl_detalles_pedidos;
     public $model_vasos;
     public $model_detalles_pedidos;
+
     function __construct()
     {
         parent::__construct();
@@ -23,6 +24,7 @@ class Ctrl_Ajax extends Base_Controller
         $this->model_turnos = Model_Turnos::create();
         $this->model_sesiones = Model_Sesiones::create();
         $this->model_detalles_pedidos = Model_Detalles_pedidos::create();
+        $this->model_porciones = Model_Porciones::create();
 
         // **************** Controladores ************************
         $this->ctrl_vasos = Ctrl_Vasos::create();
@@ -30,6 +32,7 @@ class Ctrl_Ajax extends Base_Controller
         $this->ctrl_turnos = Ctrl_Turnos::create();
         $this->ctrl_sesiones = Ctrl_Sesiones::create();
         $this->ctrl_detalles_pedidos = Ctrl_Detalles_pedidos::create();
+        $this->ctrl_porciones = Ctrl_Porciones::create();
     }
 
     public function export($table = '', $funct = 'edit'){
@@ -60,5 +63,10 @@ class Ctrl_Ajax extends Base_Controller
         echo json_encode($result);
 
         exit();
+    }
+
+    public function filterOptions(){
+        $name = $this->input->post('name');
+        $pk = $this->input->post('pk');
     }
 }
