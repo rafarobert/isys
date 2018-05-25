@@ -977,6 +977,7 @@ class CI_Migration
         $data["userCreated"] = config_item('soft_user');
         $data["dateCreated"] = date('d/m/Y');
         $data["timeCreated"] = date("g:i a");
+        $data["tableName"] = $tableName;
         $data["UcTableP"] = ucfirst($subModP);
         $data["UcTableModel"] = ucfirst($submod);
         $data["UcTableS"] = ucfirst($subModS);
@@ -1164,6 +1165,9 @@ class CI_Migration
                 }
             }
             // *********************** Atributos dentro del input : <input class.. id.. > ****************
+            if(validateArray($settings,'subTable')){
+                $inputData['subTable'] = $settings['subTable'];
+            }
             if(validateArray($settings,'table')){
                 $inputData['table'] = $settings['table'];
             }
@@ -1274,6 +1278,7 @@ class CI_Migration
         $bIsForeing = false;
         if(validateArray($settings,'idLocal') || validateArray($settings,'field')){
             $idLocal = isset($settings['idLocal']) ? $settings['idLocal'] : $settings['field'];
+            //TODO: cuando es un array en selectBy, verificar que cuando se apunta a una columna id de otra tabla se extraiga las columnas del selectBy de dicha columna referenciada
             if(validateArray($fields[$idLocal],'selectBy') && validateArray($fields[$idLocal],'idForeign')){
                 if(validateArray($fields[$idLocal],'table')){
                     $fkTableName = $fields[$idLocal]['table'];
@@ -1291,7 +1296,7 @@ class CI_Migration
                 if(isset($fkTableFields[$vFkTableFieldRef])){
                     $fkTableFieldRefSettings = $fkTableFields[$vFkTableFieldRef];
                 } else {
-                    show_error("El parametro $vFkTableFieldRef no existe en la tabla $fkTableName, revisa los parametros json de la tabla.");
+                    show_error("El parametro $vFkTableFieldRef no existe en la tabla $fkTableName, revisa los parametros json de la tabla: ".$data["tableName"].'.');
                 }
                 list($fMod, $fSubmod) = getModSubMod($settings['table']);
                 list($fSubModS, $fSubModP) = setSubModSingularPlural($fSubmod);

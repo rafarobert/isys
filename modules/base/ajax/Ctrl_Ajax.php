@@ -68,5 +68,33 @@ class Ctrl_Ajax extends Base_Controller
     public function filterOptions(){
         $name = $this->input->post('name');
         $pk = $this->input->post('pk');
+        $checked = $this->input->post('check');
+        $tipo = str_replace('id_option_','',$name);
+        if($checked == 'true'){
+            $oTipo = HbfOpcionesQuery::create()
+                ->findOneByIdOption($pk);
+            $aTipo = array(
+                'id_option' => $oTipo->getIdOption(),
+                'tabla' => $oTipo->getTabla(),
+                'tipo' => $oTipo->getTipo(),
+                'nombre' => $oTipo->getNombre(),
+                'descripcion' => $oTipo->getDescripcion()
+            );
+            echo json_encode($aTipo);
+        } else {
+            $oTipos = HbfOpcionesQuery::create()
+                ->filterByTipo($tipo)
+                ->find();
+            foreach ($oTipos as $k => $oTipo){
+                $aTipos[$k] = array(
+                    'id_option' => $oTipo->getIdOption(),
+                    'tabla' => $oTipo->getTabla(),
+                    'tipo' => $oTipo->getTipo(),
+                    'nombre' => $oTipo->getNombre(),
+                    'descripcion' => $oTipo->getDescripcion()
+                );
+            }
+            echo json_encode($aTipos);
+        }
     }
 }

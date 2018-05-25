@@ -581,6 +581,11 @@ if ( ! function_exists('form_checkboxes'))
         // **************** busca imagenes ******************
         if(validateArray($data,'table')){
             $table = $data['table'];
+        } else if(validateArray($data,'subTable')){
+            $table = $data['subTable'];
+        }
+
+        if(validateArray($data,'table') || validateArray($data,'subTable')){
             $delimiter = ' ';
             list($mod,$submod) = getModSubMod($table);
             foreach ($options as $i => $value){
@@ -595,6 +600,7 @@ if ( ! function_exists('form_checkboxes'))
         }
         $new_options = array();
         $aImgs = array();
+        $aNums = array();
         foreach ($fields as $i => $objects){
             foreach ($objects as $j => $field){
                 $fieldName = str_replace(' ','',$field);
@@ -607,6 +613,8 @@ if ( ! function_exists('form_checkboxes'))
                 $fileUrl = "assets/img/$submod/thumbs/".$fieldName;
                 if(is_file(FCPATH.$fileUrl) && !strhas($fileUrl,"<") && !strhas($fileUrl,">")){
                     $aImgs[$i][$j] = site_url($fileUrl);
+                } else if(validateVar($field,'numeric')){
+                    $aNums[$i][$j] = intval($field);
                 } else {
                     $new_options[$i][$j] = $field;
                 }
@@ -624,6 +632,11 @@ if ( ! function_exists('form_checkboxes'))
         if(validateVar($options,'array')){
             $htmlOptions = "<label>";
             foreach ($options as $key => $option){
+                if(validateVar($aNums,'array')){
+                    foreach ($aNums[$key] as $l => $idRef){
+                        $data['data-'.$l] = $idRef;
+                    }
+                }
                 $checkeds = [];
                 if(validateArray($data,'checked')){
                     $checkeds = $data['checked'];
