@@ -12,6 +12,12 @@
 
 <h3><?= empty($oUcTableS->idTable) ? "Agregar UcTableP" : "Actualizando datos, UcTableS #" . $oUcTableS->idTable ?></h3>
 
+<?php
+    //>>>startInsertEachOne<<<
+    foreach ($oUcEachTableP as $idEachTable => $oUcEachTableS){
+    //<<<startInsertEachOne>>>
+    ?>
+
 <?= form_open_multipart("lcModS/lcTableP/edit/".$oUcTableS->idTable,["id" => "lcTablePEdit"]) ?>
 
 #htmlFieldsEditForm
@@ -36,4 +42,9 @@ if(validateArray($errors,'error')){?>
         </div>
     </div>
 <?php } ?>
+<?php
+//>>>endInsertEachOne<<<
+    }
+//<<<endInsertEachOne>>>
+?>
 

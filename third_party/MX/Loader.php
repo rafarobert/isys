@@ -314,9 +314,9 @@ class MX_Loader extends CI_Loader
 	}
 
 	/** Load a module view **/
-	public function view($view, $vars = array(), $return = FALSE, $bReturnAny = FALSE, $bReplaceKeys = FALSE)
+	public function view($view, $vars = array(), $return = FALSE, $bReturnAny = FALSE, $bReplaceKeys = FALSE, $bHasExtraData = FALSE)
 	{
-        if(validateVar($view,'array') && count($view) == 1){
+        if((validateVar($view,'array') && count($view) == 1) || $bHasExtraData){
             $views = [];
             $viewKey = array_keys($view)[0];
             list($path, $_view) = Modules::find($viewKey, $this->_module, 'views/');
@@ -471,8 +471,16 @@ class MX_Loader extends CI_Loader
                 $str1 = "'$$name'";
                 $str2 = "#$name";
                 $str3 = "//$name";
-                $str4 = "$name";
-                $str5 = "$$name";
+                $str4 = "$$name";
+                $str5 = "$name";
+                // *************** Verifica variables dentro de una variable en texto **************
+                if(validateVar($content)){
+                    if(strpos($content,'/$')>-1){
+                        $content = str_replace('/$',"$",$content);
+                        $content = str_replace("'","",$content);
+                    }
+                }
+                // *********************************************************************************
                 if(strpos($file_content,$str1)>-1){
                     $file_content = str_replace($str1,$content,$file_content);
                 } else if(strpos($file_content,$str2)>-1){
@@ -481,6 +489,9 @@ class MX_Loader extends CI_Loader
                     $file_content = str_replace($str3,$content,$file_content);
                 } else if(strpos($file_content,$str4)>-1){
                     $file_content = str_replace($str4,$content,$file_content);
+                    if(strpos($file_content,$str5)>-1){
+                        $file_content = str_replace($str5,$content,$file_content);
+                    }
                 } else if(strpos($file_content,$str5)>-1){
                     $file_content = str_replace($str5,$content,$file_content);
                 }

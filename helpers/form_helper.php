@@ -440,11 +440,17 @@ if ( ! function_exists('form_checkbox'))
 	 */
 	function form_checkbox($data = '', $value = '', $checked = FALSE, $extra = '')
 	{
+	    if(validateVar($value, 'array')){
+            $data['option'] = array_values($value)[0];
+            $value = array_keys($value)[0];
+        }
 		$defaults = array('type' => 'checkbox', 'name' => ( ! is_array($data) ? $data : ''), 'value' => $value);
 
 		if (is_array($data) && array_key_exists('checked', $data))
 		{
-			$checked = $data['checked'];
+		    if(validateArray($data,'checked')){
+                $checked = validateVar($data['checked'],'bool') ? $data['checked'] : FALSE;
+            }
 
 			if ($checked == FALSE)
 			{
@@ -464,8 +470,12 @@ if ( ! function_exists('form_checkbox'))
 		{
 			unset($defaults['checked']);
 		}
-
-		return '<input '._parse_form_attributes($data, $defaults)._attributes_to_string($extra)." />\n";
+        if(validateArray($data,'option')){
+		    $options = [$value => $data['option']];
+            return set_options($data,$options,$checked,$extra);
+        } else {
+            return '<input '._parse_form_attributes($data, $defaults)._attributes_to_string($extra)." />\n";
+        }
 	}
 }
 
@@ -513,44 +523,7 @@ if ( ! function_exists('form_radios'))
 
         is_array($data) OR $data = array('name' => $data);
         $data['type'] = 'radio';
-        $htmlOptions = '';
-
-        if(validateArray($data,'options')){
-            $options = $data['options'];
-            unset($data['options']);
-        }
-
-        if(validateVar($options,'array')){
-            $htmlOptions = "<label>";
-            foreach ($options as $key => $option){
-                $checkeds = array();
-                if(validateArray($data,'checked')){
-                    $checkeds = $data['checked'];
-                } else if(validateVar($checked,'array')){
-                    $checkeds = $checked;
-                }
-
-                if(validateVar($checkeds,'array')){
-                    foreach ($checkeds as $k => $check){
-                        if($option == $check){
-                            $htmlOptions .= form_checkbox($data, $k, true, $extra).ucfirst($option)."</label>";
-                        } else {
-                            $htmlOptions .= form_checkbox($data, $k, false, $extra).ucfirst($option)."</label>";
-                        }
-                    }
-                } else {
-                    if($checked == $key){
-                        $htmlOptions .= form_checkbox($data, $key, true, $extra).ucfirst($option)."</label>";
-                    } else {
-                        $htmlOptions .= form_checkbox($data, $key, false, $extra).ucfirst($option)."</label>";
-                    }
-                }
-                $htmlOptions .= "<label>";
-            }
-            return $htmlOptions;
-        } else {
-            return 'Options not Registered';
-        }
+        return set_options($data,$options,$checked,$extra);
     }
 }
 
@@ -576,15 +549,32 @@ if ( ! function_exists('form_checkboxes'))
             $options = array();
         }
         is_array($data) OR $data = array('name' => $data);
-        $htmlOptions = '';
+        return set_options($data,$options,$checked,$extra);
+    }
+}
 
+
+// ------------------------------------------------------------------------
+
+if ( ! function_exists('distribute_options'))
+{
+	/**
+	 * Submit Button
+	 *
+	 * @param	mixed
+	 * @param	string
+	 * @param	mixed
+	 * @return	string
+	 */
+	function distribute_options($data, $options)
+	{
+        $fields = array();
         // **************** busca imagenes ******************
         if(validateArray($data,'table')){
             $table = $data['table'];
         } else if(validateArray($data,'subTable')){
             $table = $data['subTable'];
         }
-
         if(validateArray($data,'table') || validateArray($data,'subTable')){
             $delimiter = ' ';
             list($mod,$submod) = getModSubMod($table);
@@ -598,9 +588,9 @@ if ( ! function_exists('form_checkboxes'))
                 }
             }
         }
-        $new_options = array();
+        $aOptions = array();
         $aImgs = array();
-        $aNums = array();
+        $aData = array();
         foreach ($fields as $i => $objects){
             foreach ($objects as $j => $field){
                 $fieldName = str_replace(' ','',$field);
@@ -614,17 +604,33 @@ if ( ! function_exists('form_checkboxes'))
                 if(is_file(FCPATH.$fileUrl) && !strhas($fileUrl,"<") && !strhas($fileUrl,">")){
                     $aImgs[$i][$j] = site_url($fileUrl);
                 } else if(validateVar($field,'numeric')){
-                    $aNums[$i][$j] = intval($field);
+                    $aData[$i][$j] = intval($field);
                 } else {
-                    $new_options[$i][$j] = $field;
+                    $aOptions[$i][$j] = $field;
                 }
             }
         }
-        foreach ($new_options as $i => $option){
+        foreach ($aOptions as $i => $option){
             $options[$i] = implode($delimiter,$option);
         }
         // *************** hasta aqui se busca imagenes **************
+        return [$options, $aImgs, $aData];
+	}
+}
 
+if ( ! function_exists('set_options'))
+{
+	/**
+	 * Submit Button
+	 *
+	 * @param	mixed
+	 * @param	string
+	 * @param	mixed
+	 * @return	string
+	 */
+	function set_options($data, $options, $checked = FALSE, $extra = '')
+	{
+        list($options, $aImgs, $aData) = distribute_options($data, $options);
         if(validateArray($data,'options')){
             $options = $data['options'];
             unset($data['options']);
@@ -632,24 +638,26 @@ if ( ! function_exists('form_checkboxes'))
         if(validateVar($options,'array')){
             $htmlOptions = "<label>";
             foreach ($options as $key => $option){
-                if(validateVar($aNums,'array')){
-                    foreach ($aNums[$key] as $l => $idRef){
+
+                // ****************** incluye data *******************
+                if(validateVar($aData,'array')){
+                    foreach ($aData[$key] as $l => $idRef){
                         $data['data-'.$l] = $idRef;
                     }
                 }
+                if(validateVar($aImgs,'array')){
+                    foreach ($aImgs[$key] as $img){
+                        $htmlOptions .= img($img);
+                    }
+                }
+                // ****************** hasta aqui incluye  imagenes *******************
                 $checkeds = [];
                 if(validateArray($data,'checked')){
                     $checkeds = $data['checked'];
                 } else if(validateVar($checked,'array')){
                     $checkeds = $checked;
                 }
-                // ****************** incluye  imagenes *******************
-                if(isset($aImgs[$key])){
-                    foreach ($aImgs[$key] as $img){
-                        $htmlOptions .= img($img);
-                    }
-                }
-                // ****************** hasta aqui incluye  imagenes *******************
+                unset($data['option']);
                 if(validateVar($checkeds,'array')){
                     foreach ($checkeds as $k => $check){
                         if($option == $check){
@@ -671,10 +679,8 @@ if ( ! function_exists('form_checkboxes'))
         } else {
             return 'Options not Registered';
         }
-    }
+	}
 }
-
-// ------------------------------------------------------------------------
 
 if ( ! function_exists('form_submit'))
 {
