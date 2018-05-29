@@ -967,7 +967,7 @@ class CI_Migration
         $allFields = array_keys($fields);
         $vFieldsIni = array();
         if(validateVar($tableSettings,'array')){
-            if(validateVar($tableSettings['edit_ini'],'array')){
+            if(validateArray($tableSettings,'edit_ini')){
                 $fieldsIni = $tableSettings['edit_ini'];
                 foreach ((array)$fieldsIni as $name) {
                     if(validateArray($fields,$name)){

@@ -60,13 +60,16 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             if(!count((array)$oUcTableS)){
                 $this->data["errors"][] = "El lcTableS no pudo ser encontrado";
             }
-            $this->form_validation->set_rules($this->model_lcTableP->rules_edit);
+            $rules = $this->model_lcTableP->rules_edit;
         } else {
+            $rules = $this->model_lcTableP->rules;
             $oUcTableS = $this->model_lcTableP->get_new();
-            $this->form_validation->set_rules($this->model_lcTableP->rules);
         }
+
         if($bEditIni){
             $this->form_validation->set_rules($this->model_lcTableP->rules_ini);
+        } else {
+            $this->form_validation->set_rules($rules);
         }
         //>>>validateFieldImgIndex<<<
         $oUcTableS = $this->model_lcTableP->getThumbs($oUcTableS)[0];
