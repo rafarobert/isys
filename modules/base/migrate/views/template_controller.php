@@ -52,20 +52,21 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         $this->data["subview"] = "lcModS/lcTableP/index";
     }
 
-    public function edit($id = NULL){
+    public function edit($id = NULL, $bEditIni = FALSE){
         // Optiene un lcTableS o crea uno nuevo
         // Se construye las reglas de validacion del formulario
-        if($id){
+        if(validateVar($id,'numeric')){
             $oUcTableS = $this->model_lcTableP->get($id);
             if(!count((array)$oUcTableS)){
                 $this->data["errors"][] = "El lcTableS no pudo ser encontrado";
             }
-            $rules_edit = $this->model_lcTableP->rules_edit;
-            $this->form_validation->set_rules($rules_edit);
+            $this->form_validation->set_rules($this->model_lcTableP->rules_edit);
         } else {
             $oUcTableS = $this->model_lcTableP->get_new();
-            $rules = $this->model_lcTableP->rules;
-            $this->form_validation->set_rules($rules);
+            $this->form_validation->set_rules($this->model_lcTableP->rules);
+        }
+        if($bEditIni){
+            $this->form_validation->set_rules($this->model_lcTableP->rules_ini);
         }
         //>>>validateFieldImgIndex<<<
         $oUcTableS = $this->model_lcTableP->getThumbs($oUcTableS)[0];
@@ -75,9 +76,15 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         // Se procesa el formulario
         if($this->form_validation->run() == true){
             $error = "ok";
-            $data = $this->model_lcTableP->array_from_post(
+            if($bEditIni){
+                $data = $this->model_lcTableP->array_from_post(
+                //validatedFieldsIniNames
+                );
+            } else {
+                $data = $this->model_lcTableP->array_from_post(
                 //validatedFieldsNames
-            );
+                );
+            }
             //>>>validateFieldImgUpload<<<
             if ( ! $this->model_lcTableP->do_upload("lcField", $id) && $id == null) {
                 $error = array('error' => $this->upload->display_errors());
@@ -103,8 +110,13 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             }
         }
         // Se carga la vista
-        $this->data["subview"] = "lcModS/lcTableP/edit";
-        return $this->load->view("lcModS/lcTableP/edit",$this->data,true);
+        if($bEditIni){
+            $this->data["subview"] = "lcModS/lcTableP/edit-ini";
+            return $this->load->view("lcModS/lcTableP/edit-ini",$this->data,true);
+        } else {
+            $this->data["subview"] = "lcModS/lcTableP/edit";
+            return $this->load->view("lcModS/lcTableP/edit",$this->data,true);
+        }
     }
 
     public function delete($id){

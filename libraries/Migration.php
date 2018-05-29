@@ -857,6 +857,7 @@ class CI_Migration
         if (count($tableSettings)) {
             $fields = $this->dbforge->fields != [] ? $this->dbforge->fields : ($this->_fields == [] ? header("Refresh:0") : $this->_fields);
             $pkTable = $this->dbforge->getPrimaryKeyFromTable($tableName);
+            $defaultData = $this->setDataDefault($tableName, $pkTable, $fields, $tableSettings);
             // ******************************************************************************************
             // *********************** Si la tabla modulos existe se agrega el modulo actual*************
             // *********** de lo contrario se redirecciona a la creacion de la tabla modulos ************
@@ -866,13 +867,13 @@ class CI_Migration
             // ************************* Se crea el Modelo, Vista Controlador **************************
             // *****************************************************************************************
             if (validateArray($tableSettings, 'ctrl') || validateVar($tableSettings['ctrl'], 'bool')) {
-                $this->createCtrl2($tableName, $pkTable, $fields, $tableSettings);
+                $this->createCtrl2($tableName, $pkTable, $fields, $tableSettings, $defaultData);
             }
             if (validateArray($tableSettings, 'model') || validateVar($tableSettings['model'], 'bool')) {
-                $this->createModel2($tableName, $pkTable, $fields, $tableSettings);
+                $this->createModel2($tableName, $pkTable, $fields, $tableSettings, $defaultData);
             }
             if (validateArray($tableSettings, 'views') || validateVar($tableSettings['views'], 'bool')) {
-                $this->createViewFiles($tableName,  $pkTable, $fields, $tableSettings);
+                $this->createViewFiles($tableName,  $pkTable, $fields, $tableSettings, $defaultData);
             }
         }
     }
@@ -960,10 +961,21 @@ class CI_Migration
         }
     }
 
-    public function setDataDefault($tableName, $pkTable, $fields)
+    public function setDataDefault($tableName, $pkTable, $fields, $tableSettings)
     {
         $excepts = array_merge(config_item('controlFields'), [$pkTable]);
         $allFields = array_keys($fields);
+        $vFieldsIni = array();
+        if(validateVar($tableSettings,'array')){
+            if(validateVar($tableSettings['edit_ini'],'array')){
+                $fieldsIni = $tableSettings['edit_ini'];
+                foreach ((array)$fieldsIni as $name) {
+                    if(validateArray($fields,$name)){
+                        $vFieldsIni[$name] = $fields[$name];
+                    }
+                }
+            }
+        }
         $vFieldsNames = array_diff($allFields, $excepts);
         $vFields = [];
         foreach ((array)$vFieldsNames as $name) {
@@ -989,13 +1001,10 @@ class CI_Migration
         $data['lcTableS'] = lcfirst($subModS);
         $data["lcModS"] = lcfirst($sys[$mod]['name']);
         $data["lcmodType"] = strtolower($mod);
-        return [$mod, $submod, $subModS, $subModP, $data, $vFields];
+        return [$mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsIni];
     }
 
-    public function createCtrl2($tableName, $pkTable, $fields, $tableSettings = [])
-    {
-        list($mod, $submod, $subModS, $subModP, $data, $vFields) = $this->setDataDefault($tableName, $pkTable, $fields);
-        $sys = config_item('sys');
+    public function checkInputFields($vFields){
         $vFieldsBackup = $vFields;
         $fieldPass = '';
         $fieldImg = false;
@@ -1019,9 +1028,23 @@ class CI_Migration
                 unset($vFieldsBackup[$name]);
             }
         }
-        $aFieldsNames = array_keys($vFieldsBackup);
+        return [$vFieldsBackup, $fieldImg, $fieldPass];
+    }
+
+    public function createCtrl2($tableName, $pkTable, $fields, $tableSettings = [], $default = [])
+    {
+        $sys = config_item('sys');
+        list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsIni) = $default;
+        list($vFieldsChecked, $fieldImg, $fieldPass) = $this->checkInputFields($vFields);
+
+        if(validateVar($vFieldsIni,'array')){
+            list($vFieldsIniChecked, $fieldIniImg, $fieldIniPass) = $this->checkInputFields($vFieldsIni);
+            $aFieldsIniNames = array_keys($vFieldsIniChecked);
+            $data["validatedFieldsIniNames"] = var_export($aFieldsIniNames, true);
+        }
+
+        $aFieldsNames = array_keys($vFieldsChecked);
         $data["validatedFieldsNames"] = var_export($aFieldsNames, true);
-//        $relations = $this->dbforge->getTableRelations($tableName);
         $data['initPropertiesVarsForeignTable'] ='';
         $data['initVarsForeignTable'] ='';
         $data['loadModelsForeignTable'] ='';
@@ -1096,14 +1119,19 @@ class CI_Migration
         }
     }
 
-    public function createModel2($tableName, $pkTable, $fields, $tableSettings = [])
+    public function createModel2($tableName, $pkTable, $fields, $tableSettings = [], $default = [])
     {
         $sys = config_item('sys');
-        list($mod, $submod, $subModS, $subModP, $data) = $this->setDataDefault($tableName, $pkTable, $fields);
+        list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsIni) = $default;
         $fieldsProperties = $this->getPhpFieldsProperties($fields);
-        $tableRules = $this->getPhpFieldsRules($fields,$pkTable);
-        $tableRulesEdit = $this->getPhpFieldsRules($fields,$pkTable, true);
-        $stdFields = $this->getPhpStdFields($tableName);
+        $tableRules = $this->getPhpFieldsRules($vFields,$pkTable);
+        $tableRulesEdit = $this->getPhpFieldsRules($vFields,$pkTable, true);
+        if(validateVar($vFieldsIni,'array')){
+            $tableRulesEditIni = $this->getPhpFieldsRules($vFieldsIni,$pkTable, true);
+            $data["tableRulesEditIni"] = var_export($tableRulesEditIni, true);
+        }
+
+        $stdFields = $this->getPhpStdFields($tableName,$pkTable);
         $data["fieldsProperties"] = $fieldsProperties;
         $data["tableRules"] = var_export($tableRules, true);
         $data["tableRulesEdit"] = var_export($tableRulesEdit, true);
@@ -1118,10 +1146,10 @@ class CI_Migration
         }
     }
 
-    public function createViewIndex($tableName, $pkTable, $fields, $tableSettings = [])
+    public function createViewIndex($tableName, $pkTable, $fields, $tableSettings = [], $default = [])
     {
         $sys = config_item('sys');
-        list($mod, $submod, $subModS, $subModP, $data, $vFields) = $this->setDataDefault($tableName, $pkTable, $fields);
+        list($mod, $submod, $subModS, $subModP, $data, $vFields) = $default;
         $data["tableHeaderHtmlTitles"] = $this->setHtmlHeaderTitles($fields, $vFields, $tableSettings);
         $data["tableBodyHtmlFields"] = $this->setHtmlBodyFields($fields, $vFields, $tableSettings, $subModS, $subModP);
         $phpContent = $this->load->view("template_index", $data, true, true);
@@ -1136,16 +1164,64 @@ class CI_Migration
         }
     }
 
-    public function createViewEdit($tableName, $pkTable, $fields, $tableSettings = [])
+    public function createViewEdit($tableName, $pkTable, $fields, $tableSettings = [], $default = [])
     {
         $sys = config_item('sys');
-        list($mod, $submod, $subModS, $subModP, $data, $vFields) = $this->setDataDefault($tableName, $pkTable, $fields);
-        $sys = config_item('sys');
+        list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsIni) = $default;
+
+        list($htmlFormContent,$aEachNames, $modalsContent) = $this->setInputFields($fields, $vFields, $pkTable,$data);
+        list($data) = $this->setEachFields($fields, $aEachNames, $data);
+        $data['htmlFieldsEditForm'] = $htmlFormContent;
+        $data['.$editIni'] = '';
+        $phpContent = $this->load->view("template_edit", $data, true, true, true);
+        $phpContent .= $modalsContent;
+
+        if(validateVar($vFieldsIni,'array')){
+            list($htmlFormContentEditIni,$aEachNamesEditIni, $modalsContentEditIni) = $this->setInputFields($fields, $vFieldsIni, $pkTable,$data);
+            list($data) = $this->setEachFields($fields, $aEachNamesEditIni, $data);
+            $data['htmlFieldsEditForm'] = $htmlFormContentEditIni;
+            $data['.$editIni'] = ".'/1'";
+            $phpContentEditIni = $this->load->view("template_edit", $data, true, true, true);
+            $phpContentEditIni .= $modalsContentEditIni;
+        }
+
+        $mod = $sys[$mod]['dir'];
+        $framePath = ROOT_PATH.'orm/crud/'.$mod;
+        if (createFolder($framePath)) {
+            if (createFolder($framePath . "$submod/")) {
+                if (createFolder($framePath . "$submod/views/")) {
+                    write_file($framePath . "$submod/views/edit" . $this->_ext_php, $phpContent);
+                    if (validateVar($vFieldsIni, 'array')) {
+                        write_file($framePath . "$submod/views/edit-ini" . $this->_ext_php, $phpContentEditIni);
+                    }
+                }
+            }
+        }
+    }
+    private function setEachFields($fields, $aEachNames, $data){
+        if (validateVar($aEachNames, 'array')) {
+            foreach ($aEachNames as $i => $eachName){
+                // TODO: Solo funciona para un each, modificar para que funcione para varios
+                $tableEach = $fields[$eachName]['table'];
+                $idTableEach = $eachName;
+                list($modEach, $submodEach) = getModSubMod($tableEach);
+                list($tableEachS, $tableEachP) = setSubModSingularPlural($submodEach);
+                $data["UcEachTableP"] = ucfirst($tableEachP);
+                $data["UcEachTableS"] = ucfirst($tableEachS);
+                $data["idEachTable"] = "$$idTableEach";
+                $data["startInsertEachOne"] = $this->load->view(["template_edit" => "startInsertEachOne"], $data, true, true);
+                $data["endInsertEachOne"] = $this->load->view(["template_edit" => "endInsertEachOne"], $data, true, true);
+            }
+        }
+        return [$data];
+    }
+
+    private function setInputFields($fields, $vFields, $pkTable, $data){
         $modal = false;
-        $modalsContent = '';
         $htmlFormContent = '';
-        $aSettings = [];
         $aEachNames = [];
+        $modalsContent = '';
+        $sys = config_item('sys');
         foreach ($vFields as $name => $settings) {
             $inputData = array(
                 "name" => validateArray($settings, 'name') ? $settings['name'] : "$name",
@@ -1202,19 +1278,19 @@ class CI_Migration
                 } else if (compareArrayStr($settings, 'input', 'hidden')) {
                     $typeForm = 'hidden';
                 } else if (compareArrayStr($settings, 'input', 'radio') ||
-                            compareArrayStr($settings, 'input', 'radios') ||
-                            compareArrayStr($settings, 'input', 'checkbox') ||
-                            compareArrayStr($settings, 'input', 'checkboxes') ||
-                            compareArrayStr($settings, 'input', 'select') ||
-                            compareArrayStr($settings, 'input', 'dropdown') ||
-                            compareArrayStr($settings, 'input', 'multiselect')) {
-                        $typeForm = compareArrayStr($settings, 'input', 'radio') ? 'radios' :
-                                    (compareArrayStr($settings, 'input', 'radios') ? 'radios' :
-                                    (compareArrayStr($settings, 'input', 'checkbox') ? 'checkboxes' :
-                                    (compareArrayStr($settings, 'input', 'checkboxes') ? 'checkboxes' :
+                    compareArrayStr($settings, 'input', 'radios') ||
+                    compareArrayStr($settings, 'input', 'checkbox') ||
+                    compareArrayStr($settings, 'input', 'checkboxes') ||
+                    compareArrayStr($settings, 'input', 'select') ||
+                    compareArrayStr($settings, 'input', 'dropdown') ||
+                    compareArrayStr($settings, 'input', 'multiselect')) {
+                    $typeForm = compareArrayStr($settings, 'input', 'radio') ? 'radios' :
+                        (compareArrayStr($settings, 'input', 'radios') ? 'radios' :
+                            (compareArrayStr($settings, 'input', 'checkbox') ? 'checkboxes' :
+                                (compareArrayStr($settings, 'input', 'checkboxes') ? 'checkboxes' :
                                     (compareArrayStr($settings, 'input', 'select') ? 'select' :
-                                    (compareArrayStr($settings, 'input', 'multiselect') ? 'multiselect' :
-                                    (compareArrayStr($settings, 'input', 'dropdown') ? 'dropdown' : 'input'))))));
+                                        (compareArrayStr($settings, 'input', 'multiselect') ? 'multiselect' :
+                                            (compareArrayStr($settings, 'input', 'dropdown') ? 'dropdown' : 'input'))))));
                     if (!validateArray($settings, 'options')) {
                         $inputData['options'] = [];
                     }
@@ -1265,36 +1341,7 @@ class CI_Migration
             <?=modal('".$inputData['id']."Modal')?>";
             }
         }
-        $data['htmlFieldsEditForm'] = $htmlFormContent;
-        if (validateVar($aEachNames, 'array')) {
-            foreach ($aEachNames as $i => $eachName){
-                // TODO: Solo funciona para un each, modificar para que funcione para varios
-                $tableEach = $fields[$eachName]['table'];
-                $idTableEach = $eachName;
-                list($modEach, $submodEach) = getModSubMod($tableEach);
-                list($tableEachS, $tableEachP) = setSubModSingularPlural($submodEach);
-                $data["UcEachTableP"] = ucfirst($tableEachP);
-                $data["UcEachTableS"] = ucfirst($tableEachS);
-                $data["idEachTable"] = "$$idTableEach";
-                $data["startInsertEachOne"] = $this->load->view(["template_edit" => "startInsertEachOne"], $data, true, true);
-                $data["endInsertEachOne"] = $this->load->view(["template_edit" => "endInsertEachOne"], $data, true, true);
-                $phpContent = $this->load->view("template_edit", $data, true, true, true);
-            }
-        } else {
-//            $data["startInsertEachOne"] = $data["startInsertEachOne"] = $this->load->view(["template_edit" => "startInsertEachOne"], $data, true, true);
-//            $data["endInsertEachOne"] = $data["endInsertEachOne"] = $this->load->view(["template_edit" => "endInsertEachOne"], $data, true, true);
-            $phpContent = $this->load->view("template_edit", $data, true, true, true);
-        }
-        $phpContent .= $modalsContent;
-        $mod = $sys[$mod]['dir'];
-        $framePath = ROOT_PATH.'orm/crud/'.$mod;
-        if (createFolder($framePath)) {
-            if (createFolder($framePath . "$submod/")) {
-                if (createFolder($framePath . "$submod/views/")) {
-                    write_file($framePath . "$submod/views/edit" . $this->_ext_php, $phpContent);
-                }
-            }
-        }
+        return [$htmlFormContent,$aEachNames, $modalsContent];
     }
 
     private function validateFkTable($data, $fields, $settings, $sys, $typeForm = null){
@@ -1571,7 +1618,7 @@ class CI_Migration
         return $rules;
     }
 
-    private function getPhpStdFields($tableName)
+    private function getPhpStdFields($tableName,$pkTable)
     {
         list($mod, $submod) = getModSubMod($tableName);
         list($subModS, $subModP) = setSubModSingularPlural($submod);
@@ -1580,8 +1627,13 @@ class CI_Migration
         $content = "";
         foreach ($result as $field) {
             $columnName = $field->COLUMN_NAME;
-            $content .= "\$this->$subModS->$columnName = '';
+            if($columnName == $pkTable){
+                $content .= "\$this->$subModS->$columnName = 0;
             ";
+            } else {
+                $content .= "\$this->$subModS->$columnName = '';
+            ";
+            }
         }
         return $content;
     }
@@ -1670,11 +1722,11 @@ class CI_Migration
             $this->_dir_root_store = $this->CI->uri->segments[3] == 'ci' || $this->CI->uri->segments[3] == 'tic' ? BASEPATH . "migrations/storage/" : APPPATH . "migrations/storage/";
         }
     }
-    public function createViewFiles($tableName, $pkTable, $fields, $settings = [], $defaults = true)
+
+    public function createViewFiles($tableName, $pkTable, $fields, $settings = [], $defaultData = [])
     {
-        if ($defaults) {
-            $this->createViewIndex($tableName, $pkTable, $fields, $settings);
-            $this->createViewEdit($tableName, $pkTable, $fields, $settings);
-        }
+        $this->createViewIndex($tableName, $pkTable, $fields, $settings, $defaultData);
+        $this->createViewEdit($tableName, $pkTable, $fields, $settings, $defaultData);
+
     }
 }

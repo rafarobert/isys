@@ -22,6 +22,7 @@ class Model_UcTableP extends UcModS_Model {
     protected $_primary_key = "idTable";
     public $rules = '$tableRules';
     public $rules_edit = '$tableRulesEdit';
+    public $rules_ini = '$tableRulesEditIni';
 
     function __construct(){
         parent::__construct();
