@@ -84,13 +84,13 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             $error = "ok";
             if(compareStrStr($id_or_view, 'ini')){
                 $data = $this->model_lcTableP->array_from_post(
-                //validatedFieldsIniNames
+                //validatedFieldsEditIni
                 );
-            } else if(compareStrStr($id_or_view, 'draft')){
-                $data = $this->model_lcTableP->array_from_post(
-                //validatedFieldsDraftNames
-                );
-            } else {
+            } else
+                if(compareStrStr($id_or_view, 'draft')){$data = $this->model_lcTableP->array_from_post(
+                //validatedFieldsEditView
+                );}
+            else {
                 $data = $this->model_lcTableP->array_from_post(
                 //validatedFieldsNames
                 );

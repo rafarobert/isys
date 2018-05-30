@@ -965,27 +965,25 @@ class CI_Migration
     {
         $excepts = array_merge(config_item('controlFields'), [$pkTable]);
         $allFields = array_keys($fields);
-        $vFieldsIni = array();
-        $vFieldsDraft = array();
+        $vFieldsViews = array();
         $aFieldsColumnsKey = $this->dbforge->getArrayColumnsKey($tableName);
+
         if(validateVar($tableSettings,'array')){
-            if(validateArray($tableSettings,'view_edit_ini')){
-                $fieldsIni = $tableSettings['view_edit_ini'];
-                foreach ($allFields as $name) {
-                    if(in_array($name, $fieldsIni)){
-                        $vFieldsIni[$name] = $fields[$name];
-                    } else if(in_array($name,$aFieldsColumnsKey)){
-                        $vFieldsIni[$name] = $fields[$name];
-                    }
-                }
-            }
-        }
-        if(validateVar($tableSettings,'array')) {
-            if (validateArray($tableSettings, 'view_edit_draft')) {
-                $fieldsDraft = $tableSettings['view_edit_draft'];
-                foreach ($allFields as $name) {
-                    if(in_array($name, $fieldsDraft)){
-                        $vFieldsDraft[$name] = $fields[$name];
+            $tableSettingNames = array_keys($tableSettings);
+            foreach ($tableSettingNames as $settingName){
+                if(strhas($settingName,'edit_')){
+                    if(validateArray($tableSettings,$settingName)){
+                        $fieldsViews = $tableSettings[$settingName];
+                        foreach ($allFields as $name) {
+                            if(in_array($name, $fieldsViews)){
+                                $vFieldsViews[$settingName][$name] = $fields[$name];
+                            }
+                            if(strhas($settingName,'_ini')){
+                                if(in_array($name,$aFieldsColumnsKey)){
+                                    $vFieldsViews[$settingName][$name] = $fields[$name];
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1015,7 +1013,7 @@ class CI_Migration
         $data['lcTableS'] = lcfirst($subModS);
         $data["lcModS"] = lcfirst($sys[$mod]['name']);
         $data["lcmodType"] = strtolower($mod);
-        return [$mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsIni,$vFieldsDraft];
+        return [$mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsViews];
     }
 
     public function checkInputFields($vFields){
@@ -1048,19 +1046,28 @@ class CI_Migration
     public function createCtrl2($tableName, $pkTable, $fields, $tableSettings = [], $default = [])
     {
         $sys = config_item('sys');
-        list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsIni, $vFieldsDraft) = $default;
+        list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsViews) = $default;
         list($vFieldsChecked, $fieldImg, $fieldPass) = $this->checkInputFields($vFields);
 
-        if(validateVar($vFieldsIni,'array')){
-            list($vFieldsIniChecked, $fieldIniImg, $fieldIniPass) = $this->checkInputFields($vFieldsIni);
-            $aFieldsIniNames = array_keys($vFieldsIniChecked);
-            $data["validatedFieldsIniNames"] = var_export($aFieldsIniNames, true);
+        foreach ($vFieldsViews as $vNameView => $vFieldsView){
+            $vNameViewTitle = ucfirst(setObjectFromWordWithDashes($vNameView,true));
+            if(validateVar($vFieldsView,'array')){
+                if(compareStrStr($vNameView,'edit_ini')){
+                    list($vFieldsIniChecked, $fieldIniImg, $fieldIniPass) = $this->checkInputFields($vFieldsView);
+                    $data["validatedFieldsEditIni"] = var_export(array_keys($vFieldsIniChecked), true);
+                } else {
+                    list(${"vFieldsChecked$vNameViewTitle"}, $fieldIniImg, $fieldIniPass) = $this->checkInputFields($vFieldsView);
+                    $data['if(compareStrStr($id_or_view, "draft")){$data = $this->model_lcTableP->array_from_post(
+                //validatedFields'.$vNameViewTitle.'
+                );}'] = var_export(array_keys(${"vFieldsChecked$vNameViewTitle"}), true);
+                }
+            }
         }
-        if(validateVar($vFieldsDraft,'array')){
-            list($vFieldsDraftChecked, $fieldDraftImg, $fieldDraftPass) = $this->checkInputFields($vFieldsDraft);
-            $aFieldsDraftNames = array_keys($vFieldsDraftChecked);
-            $data["validatedFieldsDraftNames"] = var_export($aFieldsDraftNames, true);
-        }
+//        if(validateVar($vFieldsDraft,'array')){
+//            list($vFieldsDraftChecked, $fieldDraftImg, $fieldDraftPass) = $this->checkInputFields($vFieldsDraft);
+//            $aFieldsDraftNames = array_keys($vFieldsDraftChecked);
+//            $data["validatedFieldsDraftNames"] = var_export($aFieldsDraftNames, true);
+//        }
 
         $aFieldsNames = array_keys($vFieldsChecked);
         $data["validatedFieldsNames"] = var_export($aFieldsNames, true);
