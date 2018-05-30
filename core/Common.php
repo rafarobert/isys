@@ -864,7 +864,7 @@ if (!function_exists('strhas')) {
         $strCase2 = strtoupper($obj);
         $strCase3 = strtolower($obj);
 
-        if(strpos($obj, $string) > -1 || strpos($strCase1, $string) > -1 || strpos($strCase2, $string) > -1 || strpos($strCase3, $string) > -1 || preg_match("/\b$obj\b/",$string)){
+        if(strpos($obj, $string) !== false || strpos($strCase1, $string) !== false || strpos($strCase2, $string) !== false || strpos($strCase3, $string) !== false || preg_match("/\b$obj\b/",$string)){
             return true;
         } else {
             return false;
@@ -875,14 +875,18 @@ if (!function_exists('strhas')) {
 if (!function_exists('compareStrStr')) {
     function compareStrStr($string1, $string2, $anyway = true)
     {
-        if($anyway){
-            if($string1 == $string2 || $string1 == ucfirst($string2) || $string1 == strtoupper($string2)){
-                return true;
+        if(validateVar($string1) && validateVar($string1)){
+            if($anyway){
+                if($string1 == $string2 || $string1 == ucfirst($string2) || $string1 == strtoupper($string2)){
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
-                return false;
+                return $string1 == $string2 ? true : false;
             }
         } else {
-            return $string1 == $string2 ? true : false;
+            return false;
         }
     }
 }

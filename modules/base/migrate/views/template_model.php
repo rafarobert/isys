@@ -23,6 +23,7 @@ class Model_UcTableP extends UcModS_Model {
     public $rules = '$tableRules';
     public $rules_edit = '$tableRulesEdit';
     public $rules_ini = '$tableRulesEditIni';
+    public $rules_draft = '$tableRulesEditDraft';
 
     function __construct(){
         parent::__construct();

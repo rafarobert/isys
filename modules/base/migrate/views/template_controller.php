@@ -52,7 +52,10 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         $this->data["subview"] = "lcModS/lcTableP/index";
     }
 
-    public function edit($id = NULL, $bEditIni = FALSE){
+    public function edit($id_or_view = NULL , $id = NULL){
+        if(validateVar($id_or_view, 'numeric')){
+            $id = $id_or_view ;
+        }
         // Optiene un lcTableS o crea uno nuevo
         // Se construye las reglas de validacion del formulario
         if(validateVar($id,'numeric')){
@@ -66,8 +69,8 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             $oUcTableS = $this->model_lcTableP->get_new();
         }
 
-        if($bEditIni){
-            $this->form_validation->set_rules($this->model_lcTableP->rules_ini);
+        if(compareStrStr($id_or_view, 'ini') || compareStrStr($id_or_view, 'draft')){
+            $this->form_validation->set_rules($this->model_lcTableP->{"rules_$id_or_view"});
         } else {
             $this->form_validation->set_rules($rules);
         }
@@ -79,9 +82,13 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         // Se procesa el formulario
         if($this->form_validation->run() == true){
             $error = "ok";
-            if($bEditIni){
+            if(compareStrStr($id_or_view, 'ini')){
                 $data = $this->model_lcTableP->array_from_post(
                 //validatedFieldsIniNames
+                );
+            } else if(compareStrStr($id_or_view, 'draft')){
+                $data = $this->model_lcTableP->array_from_post(
+                //validatedFieldsDraftNames
                 );
             } else {
                 $data = $this->model_lcTableP->array_from_post(
@@ -113,9 +120,12 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             }
         }
         // Se carga la vista
-        if($bEditIni){
+        if(compareStrStr($id_or_view, 'ini')){
             $this->data["subview"] = "lcModS/lcTableP/edit-ini";
             return $this->load->view("lcModS/lcTableP/edit-ini",$this->data,true);
+        } else if(compareStrStr($id_or_view, 'draft')){
+            $this->data["subview"] = "lcModS/lcTableP/edit-draft";
+            return $this->load->view("lcModS/lcTableP/edit-draft",$this->data,true);
         } else {
             $this->data["subview"] = "lcModS/lcTableP/edit";
             return $this->load->view("lcModS/lcTableP/edit",$this->data,true);

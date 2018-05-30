@@ -1036,6 +1036,25 @@ abstract class CI_DB_forge
         return false;
     }
 
+    public function getArrayColumnsKey($table, $database = '')
+    {
+        $CI = CI_Controller::get_instance();
+
+        if ($database == '') {
+            $database = $CI->db->database;
+        }
+        $sql = "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE COLUMN_KEY = 'MUL' AND TABLE_SCHEMA = '$database' AND TABLE_NAME = '$table'";
+        $results = $CI->db->query($sql)->result();
+        if (count($results)) {
+            $aResults = array();
+            foreach ($results as $result){
+                $aResults[] = $result->COLUMN_NAME;
+            }
+            return $aResults;
+        }
+        return false;
+    }
+
     public function fieldExistsInDB($table, $field, $database = '')
     {
         $CI = CI_Controller::get_instance();

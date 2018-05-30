@@ -18,7 +18,7 @@
     //<<<startInsertEachOne>>>
     ?>
 
-<?= form_open_multipart("lcModS/lcTableP/edit/".$oUcTableS->idTable.$editIni,["id" => "lcTablePEdit"]) ?>
+<?= form_open_multipart("lcModS/lcTableP/edit/$editView".$oUcTableS->idTable,["id" => "lcTablePEdit"]) ?>
 
 #htmlFieldsEditForm
 

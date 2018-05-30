@@ -966,12 +966,26 @@ class CI_Migration
         $excepts = array_merge(config_item('controlFields'), [$pkTable]);
         $allFields = array_keys($fields);
         $vFieldsIni = array();
+        $vFieldsDraft = array();
+        $aFieldsColumnsKey = $this->dbforge->getArrayColumnsKey($tableName);
         if(validateVar($tableSettings,'array')){
-            if(validateArray($tableSettings,'edit_ini')){
-                $fieldsIni = $tableSettings['edit_ini'];
-                foreach ((array)$fieldsIni as $name) {
-                    if(validateArray($fields,$name)){
+            if(validateArray($tableSettings,'view_edit_ini')){
+                $fieldsIni = $tableSettings['view_edit_ini'];
+                foreach ($allFields as $name) {
+                    if(in_array($name, $fieldsIni)){
                         $vFieldsIni[$name] = $fields[$name];
+                    } else if(in_array($name,$aFieldsColumnsKey)){
+                        $vFieldsIni[$name] = $fields[$name];
+                    }
+                }
+            }
+        }
+        if(validateVar($tableSettings,'array')) {
+            if (validateArray($tableSettings, 'view_edit_draft')) {
+                $fieldsDraft = $tableSettings['view_edit_draft'];
+                foreach ($allFields as $name) {
+                    if(in_array($name, $fieldsDraft)){
+                        $vFieldsDraft[$name] = $fields[$name];
                     }
                 }
             }
@@ -1001,7 +1015,7 @@ class CI_Migration
         $data['lcTableS'] = lcfirst($subModS);
         $data["lcModS"] = lcfirst($sys[$mod]['name']);
         $data["lcmodType"] = strtolower($mod);
-        return [$mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsIni];
+        return [$mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsIni,$vFieldsDraft];
     }
 
     public function checkInputFields($vFields){
@@ -1034,13 +1048,18 @@ class CI_Migration
     public function createCtrl2($tableName, $pkTable, $fields, $tableSettings = [], $default = [])
     {
         $sys = config_item('sys');
-        list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsIni) = $default;
+        list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsIni, $vFieldsDraft) = $default;
         list($vFieldsChecked, $fieldImg, $fieldPass) = $this->checkInputFields($vFields);
 
         if(validateVar($vFieldsIni,'array')){
             list($vFieldsIniChecked, $fieldIniImg, $fieldIniPass) = $this->checkInputFields($vFieldsIni);
             $aFieldsIniNames = array_keys($vFieldsIniChecked);
             $data["validatedFieldsIniNames"] = var_export($aFieldsIniNames, true);
+        }
+        if(validateVar($vFieldsDraft,'array')){
+            list($vFieldsDraftChecked, $fieldDraftImg, $fieldDraftPass) = $this->checkInputFields($vFieldsDraft);
+            $aFieldsDraftNames = array_keys($vFieldsDraftChecked);
+            $data["validatedFieldsDraftNames"] = var_export($aFieldsDraftNames, true);
         }
 
         $aFieldsNames = array_keys($vFieldsChecked);
@@ -1122,13 +1141,18 @@ class CI_Migration
     public function createModel2($tableName, $pkTable, $fields, $tableSettings = [], $default = [])
     {
         $sys = config_item('sys');
-        list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsIni) = $default;
+        list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsIni, $vFieldsDraft) = $default;
         $fieldsProperties = $this->getPhpFieldsProperties($fields);
         $tableRules = $this->getPhpFieldsRules($vFields,$pkTable);
         $tableRulesEdit = $this->getPhpFieldsRules($vFields,$pkTable, true);
+
         if(validateVar($vFieldsIni,'array')){
             $tableRulesEditIni = $this->getPhpFieldsRules($vFieldsIni,$pkTable, true);
             $data["tableRulesEditIni"] = var_export($tableRulesEditIni, true);
+        }
+        if(validateVar($vFieldsDraft,'array')){
+            $tableRulesEditDraft = $this->getPhpFieldsRules($vFieldsDraft,$pkTable, true);
+            $data["tableRulesEditDraft"] = var_export($tableRulesEditDraft, true);
         }
 
         $stdFields = $this->getPhpStdFields($tableName,$pkTable);
@@ -1167,12 +1191,12 @@ class CI_Migration
     public function createViewEdit($tableName, $pkTable, $fields, $tableSettings = [], $default = [])
     {
         $sys = config_item('sys');
-        list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsIni) = $default;
+        list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsIni, $vFieldsDraft) = $default;
 
         list($htmlFormContent,$aEachNames, $modalsContent) = $this->setInputFields($fields, $vFields, $pkTable,$data);
         list($data) = $this->setEachFields($fields, $aEachNames, $data);
         $data['htmlFieldsEditForm'] = $htmlFormContent;
-        $data['.$editIni'] = '';
+        $data['editView'] = '';
         $phpContent = $this->load->view("template_edit", $data, true, true, true);
         $phpContent .= $modalsContent;
 
@@ -1180,9 +1204,22 @@ class CI_Migration
             list($htmlFormContentEditIni,$aEachNamesEditIni, $modalsContentEditIni) = $this->setInputFields($fields, $vFieldsIni, $pkTable,$data);
             list($data) = $this->setEachFields($fields, $aEachNamesEditIni, $data);
             $data['htmlFieldsEditForm'] = $htmlFormContentEditIni;
-            $data['.$editIni'] = ".'/1'";
+            $data['editView'] = "ini/";
             $phpContentEditIni = $this->load->view("template_edit", $data, true, true, true);
             $phpContentEditIni .= $modalsContentEditIni;
+        } else {
+            //$data['editView'] = '';
+        }
+
+        if(validateVar($vFieldsDraft,'array')){
+            list($htmlFormContentEditDraft,$aEachNamesEditDraft, $modalsContentEditDraft) = $this->setInputFields($fields, $vFieldsDraft, $pkTable,$data);
+            list($data) = $this->setEachFields($fields, $aEachNamesEditDraft, $data);
+            $data['htmlFieldsEditForm'] = $htmlFormContentEditDraft;
+            $data['editView'] = "draft/";
+            $phpContentEditDraft = $this->load->view("template_edit", $data, true, true, true);
+            $phpContentEditDraft .= $modalsContentEditDraft;
+        } else {
+            //$data['editView'] = '';
         }
 
         $mod = $sys[$mod]['dir'];
@@ -1193,6 +1230,9 @@ class CI_Migration
                     write_file($framePath . "$submod/views/edit" . $this->_ext_php, $phpContent);
                     if (validateVar($vFieldsIni, 'array')) {
                         write_file($framePath . "$submod/views/edit-ini" . $this->_ext_php, $phpContentEditIni);
+                    }
+                    if (validateVar($vFieldsDraft, 'array')) {
+                        write_file($framePath . "$submod/views/edit-draft" . $this->_ext_php, $phpContentEditDraft);
                     }
                 }
             }
