@@ -967,6 +967,14 @@ class CI_Migration
         $allFields = array_keys($fields);
         $vFieldsViews = array();
         $aFieldsColumnsKey = $this->dbforge->getArrayColumnsKey($tableName);
+        foreach ($aFieldsColumnsKey as $fieldFkName){
+            if(compareStrStr($fieldFkName,'id_user_modified')){
+                unset($aFieldsColumnsKey[$fieldFkName]);
+            }
+            if(compareStrStr($fieldFkName,'id_user_created')){
+                unset($aFieldsColumnsKey[$fieldFkName]);
+            }
+        }
 
         if(validateVar($tableSettings,'array')){
             $tableSettingNames = array_keys($tableSettings);
