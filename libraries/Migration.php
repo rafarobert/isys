@@ -1060,6 +1060,7 @@ class CI_Migration
                     $data['fieldsEditView'] = var_export(array_keys($vFieldsIniChecked), true);
                     $data['validatedControllerFieldsEditView'] .= $this->load->view(["template_controller" => "validatedControllerFieldsEditView"],$data, true, true, true);
                     $data['editView'] = $vNameView;
+                    $data['editNameView'] = explode('-',$vNameView)[1];
                     $data['viewLoadEditData'] .= $this->load->view(["template_controller" => "viewLoadEditData"],$data, true, true, true);
                 }
             }

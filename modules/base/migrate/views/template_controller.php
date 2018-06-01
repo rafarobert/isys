@@ -127,7 +127,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             return $this->load->view("lcModS/lcTableP/edit-ini",$this->data,true);
         }
         //>>>viewLoadEditData<<<
-        else if(compareStrStr($id_or_view, 'draft')){
+        else if(compareStrStr($id_or_view, 'editNameView')){
             $this->data["subview"] = "lcModS/lcTableP/editView";
             return $this->load->view("lcModS/lcTableP/editView",$this->data,true);
         }
