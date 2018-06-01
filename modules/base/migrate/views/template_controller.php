@@ -69,8 +69,8 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             $oUcTableS = $this->model_lcTableP->get_new();
         }
 
-        if(compareStrStr($id_or_view, 'ini') || compareStrStr($id_or_view, 'draft')){
-            $this->form_validation->set_rules($this->model_lcTableP->{"rules_$id_or_view"});
+        if(validateVar($id_or_view)){
+            $this->form_validation->set_rules($this->model_lcTableP->{"rules_edit_$id_or_view"});
         } else {
             $this->form_validation->set_rules($rules);
         }
@@ -86,10 +86,12 @@ Class Ctrl_UcTableP extends UcModS_Controller {
                 $data = $this->model_lcTableP->array_from_post(
                 //validatedFieldsEditIni
                 );
-            } else
-                if(compareStrStr($id_or_view, 'draft')){$data = $this->model_lcTableP->array_from_post(
-                //validatedFieldsEditView
+            }
+            //>>>validatedControllerFieldsEditView<<<
+            else if(compareStrStr($id_or_view, 'draft')){$data = $this->model_lcTableP->array_from_post(
+                //fieldsEditView
                 );}
+            //<<<validatedControllerFieldsEditView>>>
             else {
                 $data = $this->model_lcTableP->array_from_post(
                 //validatedFieldsNames
@@ -123,10 +125,14 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         if(compareStrStr($id_or_view, 'ini')){
             $this->data["subview"] = "lcModS/lcTableP/edit-ini";
             return $this->load->view("lcModS/lcTableP/edit-ini",$this->data,true);
-        } else if(compareStrStr($id_or_view, 'draft')){
-            $this->data["subview"] = "lcModS/lcTableP/edit-draft";
-            return $this->load->view("lcModS/lcTableP/edit-draft",$this->data,true);
-        } else {
+        }
+        //>>>viewLoadEditData<<<
+        else if(compareStrStr($id_or_view, 'draft')){
+            $this->data["subview"] = "lcModS/lcTableP/editView";
+            return $this->load->view("lcModS/lcTableP/editView",$this->data,true);
+        }
+        //<<<viewLoadEditData>>>
+        else {
             $this->data["subview"] = "lcModS/lcTableP/edit";
             return $this->load->view("lcModS/lcTableP/edit",$this->data,true);
         }
