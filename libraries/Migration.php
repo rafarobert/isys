@@ -1453,8 +1453,11 @@ class CI_Migration
                 $fkTableFieldRef = $fields[$idLocal]['selectBy'];
                 $fkTable = $this->dbforge->getArrayFieldsFromTable($fkTableName);
                 $fkTableFields = $fkTable[$fkTableName];
+
                 if(validateVar($fkTableFieldRef,'array')){
                     $vFkTableFieldRef = $fkTableFieldRef[0];
+
+
 
                     if(validateArray($fkTableFields[$vFkTableFieldRef],'table')){
 
@@ -1477,6 +1480,16 @@ class CI_Migration
                         if(validateVar($vFkFkTableFieldRef)){
                             $fkfkTableFieldRefSettings = $fkfkTableFields[$vFkFkTableFieldRef];
                             if(validateArray($fkfkTableFieldRefSettings ,'idForeign') && validateArray($fkfkTableFieldRefSettings ,'selectBy')){
+
+                                // ************** para setear el setOfFkSettings ***********
+                                $newTableSettings = $fkTableFields[$vFkTableFieldRef];
+                                list($fMod, $fSubmod) = getModSubMod($newTableSettings['table']);
+                                list($fSubModS, $fSubModP) = setSubModSingularPlural($fSubmod);
+                                $data['setOfFkSettings']['t1FieldRef'] = $newTableSettings['field'];
+                                $data['setOfFkSettings']['t2Contents'] = setObjectFromWordWithDashes($fSubModP,true,true);
+                                $data['setOfFkSettings']['t2FieldRef'] = $newTableSettings['idForeign'];
+
+                                // **********************************
                                 $fkTableFields = $fkfkTableFields;
                                 $vFkTableFieldRef = $vFkFkTableFieldRef;
                             }
@@ -1525,9 +1538,11 @@ class CI_Migration
                     $data['setOfFkSettings']['fFieldsRef'] = var_export($fkTableFieldRefSettings['selectBy'], true);
                     $data['setOfFkSettings']['UcFkObjFieldP'] = setObjectFromWordWithDashes($ffSubModP,true);
                     $data['setOfFkSettings']['t1Contents'] = setObjectFromWordWithDashes($fSubModP,true,true);
-                    $data['setOfFkSettings']['t1FieldRef'] = $fkTableFieldRefSettings['field'];
-                    $data['setOfFkSettings']['t2Contents'] = setObjectFromWordWithDashes($ffSubModP,true,true);
-                    $data['setOfFkSettings']['t2FieldRef'] = $fkTableFieldRefSettings['idForeign'];
+                    $data['setOfFkSettings']['t1FieldRef'] = isset($data['setOfFkSettings']['t1FieldRef']) ? $data['setOfFkSettings']['t1FieldRef'] : $fkTableFieldRefSettings['field'];
+                    $data['setOfFkSettings']['t2Contents'] = isset($data['setOfFkSettings']['t2Contents']) ? $data['setOfFkSettings']['t2Contents'] : setObjectFromWordWithDashes($ffSubModP,true,true);
+                    $data['setOfFkSettings']['t2FieldRef'] = isset($data['setOfFkSettings']['t2FieldRef']) ? $data['setOfFkSettings']['t2FieldRef'] : $fkTableFieldRefSettings['idForeign'];
+
+
 
                     $typeForm = validateArray($fkTableFieldRefSettings,'input') ? $fkTableFieldRefSettings['input'] : 'dropdown';
                 } else {
