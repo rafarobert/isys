@@ -1145,8 +1145,9 @@ if ( ! function_exists('_parse_form_attributes'))
 			{
 				continue;
 			}
-
-			$att .= $key.'="'.$val.'" ';
+            if(!validateVar($val,'array')){
+                $att .= $key.'="'.$val.'" ';
+            }
 		}
 
 		return $att;

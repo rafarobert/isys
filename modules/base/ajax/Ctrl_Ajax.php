@@ -35,7 +35,7 @@ class Ctrl_Ajax extends Base_Controller
         $this->ctrl_porciones = Ctrl_Porciones::create();
     }
 
-    public function export($table = '', $funct = 'edit'){
+    public function export($table = '', $funct = 'edit', $subview = ''){
         $SYS = config_item('sys');
         list($mod, $submod) = getModSubMod($table);
         if($tableRelated = $this->input->get('verifyFields')){
@@ -49,7 +49,7 @@ class Ctrl_Ajax extends Base_Controller
         $mod = $SYS[$mod]['name'];
         $ctrl_submod = "ctrl_".$submod;
         $model_submod = "model_".$submod;
-        $view = $this->$ctrl_submod->$funct();
+        $view = $this->$ctrl_submod->$funct($subview);
         $fields = $this->$model_submod->get_new();
         $fields = std2array($fields);
 

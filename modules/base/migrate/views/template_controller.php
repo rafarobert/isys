@@ -34,11 +34,16 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         //>>>loadModelsForeignTable<<<
         $this->load->model("lcFkModS/model_lcFkTableP");
         //<<<loadModelsForeignTable>>>
-        //>>>initFieldsForeignTable<<<
         $this->initLoaded();
+        //>>>initFieldsForeignTable<<<
         $lcFkObjFieldP = $this->model_lcFkTableP->get_by('$fFieldsRef');
-            $this->data['oUcFkObjFieldP'] = $this->model_lcFkTableP->setOptions($lcFkObjFieldP,'divider');
         //<<<initFieldsForeignTable>>>
+        ////>>>compareFieldsForeignTable<<<
+        $lcFkObjFieldP = $this->model_lcFkTableP->setForeignValues('$t1Contents','t1FieldRef','$t2Contents','t2FieldRef');
+        //<<<compareFieldsForeignTable>>>
+        //>>>setFieldsForeignTable<<<
+        $this->data['oUcFkObjFieldP'] = $this->model_lcFkTableP->setOptions($lcFkObjFieldP,'divider');
+        //<<<setFieldsForeignTable>>>
     }
 
     public function index(){

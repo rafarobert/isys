@@ -967,12 +967,12 @@ class CI_Migration
         $allFields = array_keys($fields);
         $vFieldsViews = array();
         $aFieldsColumnsKey = $this->dbforge->getArrayColumnsKey($tableName);
-        foreach ($aFieldsColumnsKey as $fieldFkName){
+        foreach ($aFieldsColumnsKey as $keyNum => $fieldFkName){
             if(compareStrStr($fieldFkName,'id_user_modified')){
-                unset($aFieldsColumnsKey[$fieldFkName]);
+                unset($aFieldsColumnsKey[$keyNum]);
             }
             if(compareStrStr($fieldFkName,'id_user_created')){
-                unset($aFieldsColumnsKey[$fieldFkName]);
+                unset($aFieldsColumnsKey[$keyNum]);
             }
         }
 
@@ -1054,6 +1054,7 @@ class CI_Migration
     public function createCtrl2($tableName, $pkTable, $fields, $tableSettings = [], $default = [])
     {
         $sys = config_item('sys');
+        $excepts = array_merge(config_item('controlFields'), [$pkTable]);
         list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsViews) = $default;
         list($vFieldsChecked, $fieldImg, $fieldPass) = $this->checkInputFields($vFields);
         $data['validatedControllerFieldsEditView'] = '';
@@ -1080,10 +1081,13 @@ class CI_Migration
         $data['loadModelsForeignTable'] ='';
         $data['setObjectForeignTable'] ='';
         $data['initFieldsForeignTable'] ='';
+        $data['setFieldsForeignTable'] ='';
+        $data['compareFieldsForeignTable'] ='';
 
         $relations  = $this->getTableRelations($fields, 'table');
         $relationsUnique  = $this->getTableRelations($fields, 'table', true);
         $relationsUniqueWithFilters = $this->getTableRelations($fields,'table', true, true);
+        $relationsWithOutExcepts = $this->getTableRelations($fields,'table', false, false, true);
 
         foreach ((array)$relationsUnique as $fkName => $settings){
             list($fMod, $fSubmod) = getModSubMod($settings['table']);
@@ -1091,40 +1095,77 @@ class CI_Migration
             list($fModS, $fModP) = setSubModSingularPlural($sys[$fMod]['name']);
             $data['lcFkObjFieldP'] = '$'.lcfirst(setObjectFromWordWithDashes($fSubModP,true));
             $data['UcFkObjFieldP'] = ucfirst(setObjectFromWordWithDashes($fSubModP,true));
-            $data['lcFkTableP'] = lcfirst($fSubmod);
-            $data['UcFkTableP'] = ucfirst($fSubmod);
+            $data['lcFkTableP'] = lcfirst($fSubModP);
+            $data['UcFkTableP'] = ucfirst($fSubModP);
             $data['lcFkModS'] = lcfirst($fModS);
             $data['lcFkModP'] = lcfirst($fModP);
-            list($data) = $this->validateFkTable($data, $fields, $settings, $sys);
+//            list($data) = $this->validateFkTable($data, $fields, $settings, $sys);
             $data['initPropertiesVarsForeignTable'] .= $this->load->view(["template_controller" => "initPropertiesVarsForeignTable"], $data, true, true, true);
             $data['initVarsForeignTable'] .= $this->load->view(["template_controller" => "initVarsForeignTable"], $data, true, true, true);
             $data['loadModelsForeignTable'] .= $this->load->view(["template_controller" => "loadModelsForeignTable"], $data, true, true, true);
         }
-        foreach($relations as $fkName => $settings) {
-            if(isset($settings['divider'])){
-                $data['divider'] = $settings['divider'];
-            } else {
-                $data['divider'] = ',';
+        for($ind = 0; $ind < 3; $ind++){
+            $aLoaded = [];
+            if($ind == 2){
+                $selector = 'compareFieldsForeignTable';
+            } else if($ind == 1){
+                $selector = 'setFieldsForeignTable';
+            } else if($ind == 0){
+                $selector = 'initFieldsForeignTable';
             }
-            list($fMod, $fSubmod) = getModSubMod($settings['table']);
-            list($fSubModS, $fSubModP) = setSubModSingularPlural($fSubmod);
-            list($fModS, $fModP) = setSubModSingularPlural($sys[$fMod]['name']);
-            $data['lcFkObjFieldP'] = '$'.lcfirst(setObjectFromWordWithDashes($fSubModP,true));
-            $data['UcFkObjFieldP'] = ucfirst(setObjectFromWordWithDashes($fSubModP,true));
-            $data['lcFkTableP'] = lcfirst($fSubmod);
-            $data['UcFkTableP'] = ucfirst($fSubmod);
-            $data['lcFkModS'] = lcfirst($fModS);
-            $data['lcFkModP'] = lcfirst($fModP);
-            list($data) = $this->validateFkTable($data, $fields, $settings, $sys);
-//            $data['setObjectForeignTable'] .= $this->load->view(["template_controller" => "setObjectForeignTable"], $data, true, true, true);
-            if(validateArray($settings,'filterBy') && validateArray($settings,'idForeign')){
-                foreach($settings['filterBy'] as $filter){
-                    $data['lcFkObjFieldP'] = "$$filter";
-                    $data['UcFkObjFieldP'] = setObjectFromWordWithDashes($filter,true);
+
+            foreach($relationsWithOutExcepts as $fkName => $settings) {
+                if(isset($settings['divider'])){
+                    $data['divider'] = $settings['divider'];
+                } else {
+                    $data['divider'] = ',';
                 }
-                $data['initFieldsForeignTable'] .= $this->load->view(["template_controller" => "initFieldsForeignTable"], $data, true, true, true);
-            } else {
-                $data['initFieldsForeignTable'] .= $this->load->view(["template_controller" => "initFieldsForeignTable"], $data, true, true, true);
+                list($fMod, $fSubmod) = getModSubMod($settings['table']);
+                list($fSubModS, $fSubModP) = setSubModSingularPlural($fSubmod);
+                list($fModS, $fModP) = setSubModSingularPlural($sys[$fMod]['name']);
+                $data['lcFkObjFieldP'] = '$'.lcfirst(setObjectFromWordWithDashes($fSubModP,true));
+                $data['UcFkObjFieldP'] = ucfirst(setObjectFromWordWithDashes($fSubModP,true));
+                $data['lcFkTableP'] = lcfirst($fSubmod);
+                $data['UcFkTableP'] = ucfirst($fSubmod);
+                $data['lcFkModS'] = lcfirst($fModS);
+                $data['lcFkModP'] = lcfirst($fModP);
+                list($data) = $this->validateFkTable($data, $fields, $settings, $sys);
+//            $data['setObjectForeignTable'] .= $this->load->view(["template_controller" => "setObjectForeignTable"], $data, true, true, true);
+                if(validateArray($settings,'filterBy') && validateArray($settings,'idForeign')){
+                    foreach($settings['filterBy'] as $filter){
+                        $data['lcFkObjFieldP'] = "$$filter";
+                        $data['UcFkObjFieldP'] = setObjectFromWordWithDashes($filter,true);
+                    }
+                    if($ind != 2){
+                        $data[$selector] .= $this->load->view(["template_controller" => $selector], $data, true, true, true);
+                        $aLoaded[] = $data['lcFkTableP'];
+                    }
+                } else {
+                    if(!in_array($data['lcFkTableP'], $aLoaded) && $ind != 2){
+                        $data[$selector] .= $this->load->view(["template_controller" => $selector], $data, true, true, true);
+                        $aLoaded[] = $data['lcFkTableP'];
+                    }
+                }
+                if(validateArray($data, 'setOfFkSettings')){
+                    if(!in_array($data['lcFkTableP'], $aLoaded)){
+                        $data['lcFkObjFieldP'] = '$'.$data['setOfFkSettings']['lcFkObjFieldP'];
+                        $data['lcFkTableP'] = $data['setOfFkSettings']['lcFkTableP'];
+                        $data['fFieldsRef'] = $data['setOfFkSettings']['fFieldsRef'];
+                        $data['UcFkObjFieldP'] = $data['setOfFkSettings']['UcFkObjFieldP'];
+                        if($ind == 2){
+                            $data['t1Contents'] = '$'.$data['setOfFkSettings']['t1Contents'];
+                            $data['t1FieldRef'] = $data['setOfFkSettings']['t1FieldRef'];
+                            $data['t2Contents'] = '$'.$data['setOfFkSettings']['t2Contents'];
+                            $data['t2FieldRef'] = $data['setOfFkSettings']['t2FieldRef'];
+                            $data[$selector] .= $this->load->view(["template_controller" => $selector], $data, true, true, true);
+                            $aLoaded[] = $data['lcFkTableP'];
+                        } else {
+                            $data[$selector] .= $this->load->view(["template_controller" => $selector], $data, true, true, true);
+                            $aLoaded[] = $data['lcFkTableP'];
+                        }
+                    }
+                    unset($data['setOfFkSettings']);
+                }
             }
         }
         if($fieldImg != ''){
@@ -1203,7 +1244,6 @@ class CI_Migration
     {
         $sys = config_item('sys');
         list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsViews) = $default;
-
         list($htmlFormContent,$aEachNames, $modalsContent) = $this->setInputFields($fields, $vFields, $pkTable,$data);
         list($data) = $this->setEachFields($fields, $aEachNames, $data);
         $data['htmlFieldsEditForm'] = $htmlFormContent;
@@ -1286,6 +1326,21 @@ class CI_Migration
             // *********************** Atributos dentro del input : <input class.. id.. > ****************
             if(validateArray($settings,'subTable')){
                 $inputData['subTable'] = $settings['subTable'];
+            }
+            if(validateArray($settings,'subView')){
+                $inputData['subView'] = $settings['subView'];
+            }
+            if(validateArray($settings,'button')){
+                $settings['button']['id'] = $inputData['id'];
+                $settings['button']['class'] = $inputData['class'];
+                $inputData['button'] = $settings['button'];
+                if(validateArray($settings['button'],'onclick')){
+                    if((strstr($settings['button']['onclick'],'Modal') || strstr($settings['button']['onclick'],'modal'))&& !$modal){
+                        $modal = true;
+                        $data["lcSecondInputFormType"] = 'button';
+                        $data["printSecondItem"] = $this->load->view(["template_form_with_options" => "printSecondItem"], $data, true, true);
+                    }
+                }
             }
             if(validateArray($settings,'table')){
                 $inputData['table'] = $settings['table'];
@@ -1371,7 +1426,7 @@ class CI_Migration
             } else if (compareArrayStr($settings,'input', 'image')) {
                 $htmlFormContent .= $this->load->view("template_form_img", $data, true, true);
             } else if (validateArray($settings, 'options') || $bIsForeing) {
-                $htmlFormContent .= $this->load->view("template_form_with_options", $data, true, true);
+                $htmlFormContent .= $this->load->view("template_form_with_options", $data, true, true, true);
             } else {
                 $htmlFormContent .= $this->load->view("template_form_default", $data, true, true);
             }
@@ -1461,10 +1516,19 @@ class CI_Migration
                     if(validateArray($fkTableFieldRefSettings,'filterBy')){
                         $fkTableFieldRefSettings['selectBy'] = array_merge($fkTableFieldRefSettings['selectBy'],$fkTableFieldRefSettings['filterBy']);
                     }
-                    $data['fFieldsRef'] = var_export($fkTableFieldRefSettings['selectBy'], true);
-                    list($fMod, $fSubmod) = getModSubMod($fkTableFieldRefSettings['table']);
-                    list($fSubModS, $fSubModP) = setSubModSingularPlural($fSubmod);
-                    $data['lcFkTableP'] = lcfirst($fSubModP);
+                    $data['fFieldsRef'] = var_export($settings['selectBy'], true);
+                    list($ffMod, $ffSubmod) = getModSubMod($fkTableFieldRefSettings['table']);
+                    list($ffSubModS, $ffSubModP) = setSubModSingularPlural($ffSubmod);
+
+                    $data['setOfFkSettings']['lcFkObjFieldP'] = setObjectFromWordWithDashes($fSubModP,true,true);
+                    $data['setOfFkSettings']['lcFkTableP'] = $fSubModP;
+                    $data['setOfFkSettings']['fFieldsRef'] = var_export($fkTableFieldRefSettings['selectBy'], true);
+                    $data['setOfFkSettings']['UcFkObjFieldP'] = setObjectFromWordWithDashes($ffSubModP,true);
+                    $data['setOfFkSettings']['t1Contents'] = setObjectFromWordWithDashes($fSubModP,true,true);
+                    $data['setOfFkSettings']['t1FieldRef'] = $fkTableFieldRefSettings['field'];
+                    $data['setOfFkSettings']['t2Contents'] = setObjectFromWordWithDashes($ffSubModP,true,true);
+                    $data['setOfFkSettings']['t2FieldRef'] = $fkTableFieldRefSettings['idForeign'];
+
                     $typeForm = validateArray($fkTableFieldRefSettings,'input') ? $fkTableFieldRefSettings['input'] : 'dropdown';
                 } else {
                     if(validateVar($fields[$idLocal]['selectBy'])){
@@ -1488,7 +1552,8 @@ class CI_Migration
         return [$data, $typeForm, $bIsForeing];
     }
 
-    private function getTableRelations($fields, $column, $bUnique = false, $bUniqueFilters = false){
+    private function getTableRelations($fields, $column, $bUnique = false, $bUniqueFilters = false, $bWithOutExcepts = FALSE){
+        $excepts = array_merge(config_item('controlFields'));
         $aDuplicated = array();
         if($bUniqueFilters){
             foreach ($fields as $name => $settings){
@@ -1501,6 +1566,13 @@ class CI_Migration
             $aTableNames = array_unique(array_column($fields,$column));
         } else {
             $aTableNames = array_column($fields,'table');
+        }
+        if($bWithOutExcepts){
+            foreach ($fields as $name => $field){
+                if(in_array($name, $excepts) && $name != 'id_user_modified'){
+                    unset($fields[$name]);
+                }
+            }
         }
         $aTableNames = array_merge($aTableNames, $aDuplicated);
         $aUniqueRelations = array();

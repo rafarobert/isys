@@ -1100,7 +1100,7 @@ if (!function_exists('probar_sesion')) {
 
 if (!function_exists('setObjectFromWordWithDashes')) {
 
-    function setObjectFromWordWithDashes($nameWithDashes, $bReturnUcNames = false)
+    function setObjectFromWordWithDashes($nameWithDashes, $bReturnUcNames = false, $blcFirst = false)
     {
         $aNames = explode('_',$nameWithDashes);
         if($bReturnUcNames){
@@ -1109,7 +1109,11 @@ if (!function_exists('setObjectFromWordWithDashes')) {
             };
             $aNames = array_map($callback,$aNames);
         }
-        return implode('',$aNames);
+        if($blcFirst){
+            return lcfirst(implode('',$aNames));
+        } else {
+            return implode('',$aNames);
+        }
     }
 }
 
