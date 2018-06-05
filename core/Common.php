@@ -1200,3 +1200,19 @@ if (!function_exists('std2array')) {
         return $array;
     }
 }
+
+if (!function_exists('setMessage')) {
+
+    function setMessage($aData, $aSearched,$added)
+    {
+        $message = '';
+        foreach ($aData as $key => $data){
+            foreach ($aSearched as $search){
+                if($key == $search && validateVar($data)){
+                    $message .= $data .' ';
+                }
+            }
+        }
+        return ucfirst("$message, $added.");
+    }
+}

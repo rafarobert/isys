@@ -11,7 +11,7 @@
 ?>
 
 <section>
-    <h3>Lista de UcTableP</h3>
+    <h3>Lista de tableTitle</h3>
 
     <?php
     $data_icon = array(

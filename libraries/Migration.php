@@ -1021,6 +1021,7 @@ class CI_Migration
         $data['lcTableS'] = lcfirst($subModS);
         $data["lcModS"] = lcfirst($sys[$mod]['name']);
         $data["lcmodType"] = strtolower($mod);
+        $data["tableTitle"] = validateArray($tableSettings,'title') ? $tableSettings['title'] : setTitleFromWordWithDashes($subModS);
         return [$mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsViews];
     }
 
@@ -1755,7 +1756,7 @@ class CI_Migration
         foreach ($result as $field) {
             $columnName = $field->COLUMN_NAME;
             if($columnName == $pkTable){
-                $content .= "\$this->$subModS->$columnName = 0;
+                $content .= "\$this->$subModS->$columnName = '';
             ";
             } else {
                 $content .= "\$this->$subModS->$columnName = '';

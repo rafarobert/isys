@@ -10,7 +10,7 @@
  */
 ?>
 
-<h3><?= empty($oUcTableS->idTable) ? "Agregar UcTableP" : "Actualizando datos, UcTableS #" . $oUcTableS->idTable ?></h3>
+<h3><?= empty($oUcTableS->idTable) ? "Agregar tableTitle" : "Actualizando datos, UcTableS #" . $oUcTableS->idTable ?></h3>
 
 <?php
     //>>>startInsertEachOne<<<

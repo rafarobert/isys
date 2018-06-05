@@ -603,7 +603,7 @@ if ( ! is_php('5.4'))
  */
 	call_user_func_array(array(&$CI, $method), $params);
 //	if(!$CI->input->post('fromModal')){
-    if($ctrlClass != 'Ctrl_Ajax'){
+    if($ctrlClass != 'Ctrl_Ajax' && !$CI->input->post('fromAjax')){
         $CI->load->view($CI->data['layout'], $CI->data);
     }
 

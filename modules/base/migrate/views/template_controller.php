@@ -88,18 +88,16 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         if($this->form_validation->run() == true){
             $error = "ok";
             if(compareStrStr($id_or_view, 'ini')){
-                $data = $this->model_lcTableP->array_from_post(
-                //validatedFieldsEditIni
-                );
+                $data = $this->model_lcTableP->array_from_post($aFromPost = '$validatedFieldsEditIni');
             }
             //>>>validatedControllerFieldsEditView<<<
             else if(compareStrStr($id_or_view, 'draft')){$data = $this->model_lcTableP->array_from_post(
-                //fieldsEditView
+                $aFromPost = '$fieldsEditView'
                 );}
             //<<<validatedControllerFieldsEditView>>>
             else {
                 $data = $this->model_lcTableP->array_from_post(
-                //validatedFieldsNames
+                    $aFromPost = '$validatedFieldsNames'
                 );
             }
             //>>>validateFieldImgUpload<<<
@@ -121,7 +119,13 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             //<<<validateFieldPassword>>>
             if ($error == 'ok') {
                 $this->model_lcTableP->save($data,$id);
-                redirect("lcModS/lcTableP");
+                if($this->input->post('fromAjax')){
+                    $aReturn['message'] = setMessage($data,$aFromPost,'fue agregado exitosamente');
+                    $aReturn = array_merge($aReturn,$data);
+                    echo json_encode($aReturn);
+                } else {
+                    redirect("lcModS/lcTableP");
+                }
             } else {
                 $this->data["subview"] = "lcModS/lcTableP/edit";
             }
@@ -137,7 +141,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             return $this->load->view("lcModS/lcTableP/editView",$this->data,true);
         }
         //<<<viewLoadEditData>>>
-        else {
+        else if(!$this->input->post('fromAjax')){
             $this->data["subview"] = "lcModS/lcTableP/edit";
             return $this->load->view("lcModS/lcTableP/edit",$this->data,true);
         }
