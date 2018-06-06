@@ -83,10 +83,10 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         $oUcTableS = $this->model_lcTableP->getThumbs($oUcTableS)[0];
         //<<<validateFieldImgIndex>>>
         $this->data["oUcTableS"] = $oUcTableS;
-
+        $aReturn = array();
         // Se procesa el formulario
         if($this->form_validation->run() == true){
-            $error = "ok";
+            $error = 'ok';
             if(compareStrStr($id_or_view, 'ini')){
                 $data = $this->model_lcTableP->array_from_post($aFromPost = '$validatedFieldsEditIni');
             }
@@ -118,17 +118,28 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             }
             //<<<validateFieldPassword>>>
             if ($error == 'ok') {
-                $this->model_lcTableP->save($data,$id);
+                $data = $this->model_lcTableP->save($data,$id);
                 if($this->input->post('fromAjax')){
-                    $aReturn['message'] = setMessage($data,$aFromPost,'fue agregado exitosamente');
+                    $aReturn['message'] = setMessage($data,$aFromPost,'tableTitle agregado exitosamente');
+                    $aReturn['error'] = $error;
+                    $this->data['oUcTableS'] = $this->model_lcTableP->get_by($data,true)[0];
+                    $aReturn['view'] = $this->load->view("lcModS/lcTableP/edit",$this->data,true);
                     $aReturn = array_merge($aReturn,$data);
                     echo json_encode($aReturn);
                 } else {
                     redirect("lcModS/lcTableP");
                 }
             } else {
-                $this->data["subview"] = "lcModS/lcTableP/edit";
+                if($this->input->post('fromAjax')){
+                    $aReturn['error'] = $error = "tableTitle con datos incompletos, porfavor revisa los datos";;
+                    $aReturn['view'] = $this->load->view("lcModS/lcTableP/edit",$this->data,true);
+                    echo json_encode($aReturn);
+                } else {
+                    $this->data["subview"] = "lcModS/lcTableP/edit";
+                }
             }
+        } else {
+            $aReturn['error'] = $error = "tableTitle con datos incompletos, porfavor revisa los datos";;
         }
         // Se carga la vista
         if(compareStrStr($id_or_view, 'ini')){
@@ -141,7 +152,11 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             return $this->load->view("lcModS/lcTableP/editView",$this->data,true);
         }
         //<<<viewLoadEditData>>>
-        else if(!$this->input->post('fromAjax')){
+        else if($this->input->post('fromAjax') && $error != 'ok'){
+            $aReturn['error'] = $error;
+            $aReturn['view'] = $this->load->view("lcModS/lcTableP/edit",$this->data,true);
+            echo json_encode($aReturn);
+        } else if(!$this->input->post('fromAjax')){
             $this->data["subview"] = "lcModS/lcTableP/edit";
             return $this->load->view("lcModS/lcTableP/edit",$this->data,true);
         }

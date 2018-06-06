@@ -1213,6 +1213,10 @@ if (!function_exists('setMessage')) {
                 }
             }
         }
-        return ucfirst("$message, $added.");
+        if($message == ""){
+            return ucfirst("$added.");
+        } else {
+            return ucfirst("$message, $added.");
+        }
     }
 }
