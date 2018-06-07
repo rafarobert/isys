@@ -19,7 +19,7 @@ class Model_UcTableP extends UcModS_Model {
     protected $_order_by = "idTable desc";
     protected $_timestaps = true;
 
-    protected $_primary_key = "idTable";
+    public $_primary_key = "idTable";
     public $rules = '$tableRules';
     public $rules_edit = '$tableRulesEdit';
     //>>>validatedModelFieldsEditView<<<

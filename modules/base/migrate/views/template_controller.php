@@ -122,9 +122,11 @@ Class Ctrl_UcTableP extends UcModS_Controller {
                 if($this->input->post('fromAjax')){
                     $aReturn['message'] = setMessage($data,$aFromPost,'tableTitle agregado exitosamente');
                     $aReturn['error'] = $error;
-                    $this->data['oUcTableS'] = $this->model_lcTableP->get_by($data,true)[0];
+                    $this->data['oUcTableS'] = $data = $this->model_lcTableP->get_by($data,true)[0];
+                    $data->primary = $primary = $this->model_lcTableP->_primary_key;
+                    $data->pk = $data->$primary;
                     $aReturn['view'] = $this->load->view("lcModS/lcTableP/edit",$this->data,true);
-                    $aReturn = array_merge($aReturn,$data);
+                    $aReturn = array_merge($aReturn,std2array($data));
                     echo json_encode($aReturn);
                 } else {
                     redirect("lcModS/lcTableP");
@@ -143,13 +145,25 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         }
         // Se carga la vista
         if(compareStrStr($id_or_view, 'ini')){
-            $this->data["subview"] = "lcModS/lcTableP/edit-ini";
-            return $this->load->view("lcModS/lcTableP/edit-ini",$this->data,true);
+            if($this->input->post('fromAjax') && $error != 'ok'){
+                $aReturn['error'] = $error;
+                $aReturn['view'] = $this->load->view("lcModS/lcTableP/edit-ini",$this->data,true);
+                echo json_encode($aReturn);
+            } else if(!$this->input->post('fromAjax')){
+                $this->data["subview"] = "lcModS/lcTableP/edit-ini";
+                return $this->load->view("lcModS/lcTableP/edit-ini",$this->data,true);
+            }
         }
         //>>>viewLoadEditData<<<
         else if(compareStrStr($id_or_view, 'editNameView')){
-            $this->data["subview"] = "lcModS/lcTableP/editView";
-            return $this->load->view("lcModS/lcTableP/editView",$this->data,true);
+            if($this->input->post('fromAjax') && $error != 'ok'){
+                $aReturn['error'] = $error;
+                $aReturn['view'] = $this->load->view("lcModS/lcTableP/editView",$this->data,true);
+                echo json_encode($aReturn);
+            } else if(!$this->input->post('fromAjax')){
+                $this->data["subview"] = "lcModS/lcTableP/editView";
+                return $this->load->view("lcModS/lcTableP/editView",$this->data,true);
+            }
         }
         //<<<viewLoadEditData>>>
         else if($this->input->post('fromAjax') && $error != 'ok'){
