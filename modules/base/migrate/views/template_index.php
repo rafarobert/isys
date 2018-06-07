@@ -9,41 +9,95 @@
  * @var Model_lcTableP $lcTableS
  */
 ?>
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Lista de tableTitle</h2>
+        <ol class="breadcrumb">
+            <li>
+                <?= anchor('lcModS', 'Inicio') ?>
+            </li>
+            <li class="active">
+                <strong>Lista de tableTitle</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
 
-<section>
-    <h3>Lista de tableTitle</h3>
+    </div>
+</div>
 
-    <?php
-    $data_icon = array(
-        "class" => "fa fa-plus",
-        "aria-hidden" => "true",
-        "tag" => "i",
-        "title" => ""
-    );
-    $icon = icon($data_icon);
-    echo anchor("lcModS/lcTableP/edit", "Agregar UcTableP", null, $icon)?>
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            //tableHeaderHtmlTitles
-            <th>Editar</th>
-            <th>Borrar</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php if (count($oUcTableP)) { ?>
-            <?php foreach ($oUcTableP as $oUcTableS) { ?>
-                <tr>
-                    //tableBodyHtmlFields
-                    <td><?= btn_edit("lcModS/lcTableP/edit/" . $oUcTableS->idTable)?></td>
-                    <td><?= btn_delete("lcModS/lcTableP/delete/" . $oUcTableS->idTable)?></td>
-                </tr>
-            <?php } ?>
-        <?php } else { ?>
-            <tr>
-                <td colspan="3">No se pudo encontrar lcTableP registrados</td>
-            </tr>
-        <?php }?>
-        </tbody>
-    </table>
-</section>
+<div class="wrapper wrapper-content animated fadeInRight ecommerce">
+
+
+    <div class="ibox-content m-b-sm border-bottom">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label" for="product_name">tableTitle</label>
+                    <input type="text" id="product_name" name="product_name" value=""
+                           placeholder="Product Name" class="form-control">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5></h5>
+                    <div class="ibox-tools">
+                        <?= anchor("lcModS/lcTableP/edit", "<i class='fa fa-plus'></i> Agregar tableTitle", "class='btn btn-primary btn-xs'"); ?>
+                        <?= anchor("lcModS/lcTableP/edit", "<i class='fa fa-plus'></i> Agregar tableTitle", "class='btn btn-primary btn-xs'"); ?>
+                    </div>
+                </div>
+                <div class="ibox-content">
+
+                    <table class="footable table table-stripped toggle-arrow-tiny" data-page-size="15">
+                        <thead>
+                        <tr>
+                            //tableHeaderHtmlTitles
+                            <th class="text-right" data-sort-ignore="true">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        <?php if (count($oUcTableP)) { ?>
+                            <?php foreach ($oUcTableP as $oUcTableS) { ?>
+                                <tr>
+                                    //tableBodyHtmlFields
+                                    <td class="text-right">
+                                        <div class="btn-group">
+                                            <td><?= btn_edit("lcModS/lcTableP/edit/" . $oUcTableS->idTable, "class='btn-white btn btn-xs'") ?></td>
+                                            <td><?= btn_delete("lcModS/lcTableP/delete/" . $oUcTableS->idTable, "class='btn-white btn btn-xs'") ?></td>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php } ?>
+                        <?php } else { ?>
+                            <tr>
+                                <td colspan="3">No se pudo encontrar lcTableP registrados</td>
+                            </tr>
+                        <?php }?>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="6">
+                                <ul class="pagination pull-right"></ul>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    <div class="pull-right">
+        10GB of <strong>250GB</strong> Free.
+    </div>
+    <div>
+        <strong>Copyright</strong> Estic Framework &copy; 2018-2019
+    </div>
+</div>

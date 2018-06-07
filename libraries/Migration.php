@@ -881,6 +881,7 @@ class CI_Migration
     private function saveTableIntoModules($tableSettings, $tableName, $tablePk){
         if(validate_modulo('base','modulos')) {
             $sys = config_item('sys');
+
             $modMigIndex = config_item('mod_migIndex');
             $modTable = config_item('mod_table');
             list($mod, $submod) = getModSubMod($tableName);
