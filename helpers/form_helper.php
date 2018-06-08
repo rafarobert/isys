@@ -415,9 +415,10 @@ if ( ! function_exists('form_dropdown'))
 			}
 			else
 			{
-				$form .= '<option value="'.html_escape($key).'"'
-					.(in_array($key, $selected) ? ' selected="selected"' : '').'>'
-					.(string) $val."</option>\n";
+                    $form .= '<option value="'.html_escape($key).'"'
+                        .(in_array($key, $selected) ? ' selected="selected"' : '').'>'
+                        .(string) $val."</option>\n";
+
 			}
 		}
 

@@ -126,6 +126,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
                     $data->primary = $primary = $this->model_lcTableP->_primary_key;
                     $data->pk = $data->$primary;
                     $aReturn['view'] = $this->load->view("lcModS/lcTableP/edit",$this->data,true);
+                    $aReturn['redirect'] = 'lcModS/lcTableP';
                     $aReturn = array_merge($aReturn,std2array($data));
                     echo json_encode($aReturn);
                 } else {

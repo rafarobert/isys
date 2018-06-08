@@ -1270,9 +1270,11 @@ class CI_Migration
         $sys = config_item('sys');
         list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsViews) = $default;
         list($htmlFormContent,$aEachNames, $modalsContent) = $this->setInputFields($fields, $vFields,$data);
+        list($data) = $this->setEachFields($fields, $aEachNames, $data);
         $data['htmlFieldsEditForm'] = $htmlFormContent;
-        list($data,$phpContentEditViews) = $this->loadEditViews($fields, $vFieldsViews, $data);
+        $data['editView'] = '';
         $phpContent = $this->load->view("template_edit", $data, true, true, true);
+        list($data,$phpContentEditViews) = $this->loadEditViews($fields, $vFieldsViews, $data);
         $phpContent .= $modalsContent;
 
         $mod = $sys[$mod]['dir'];
