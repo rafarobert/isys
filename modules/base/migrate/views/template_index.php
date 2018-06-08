@@ -28,7 +28,6 @@
 
 <div class="wrapper wrapper-content animated fadeInRight ecommerce">
 
-
     <div class="ibox-content m-b-sm border-bottom">
         <div class="row">
             <div class="col-sm-4">
@@ -46,48 +45,49 @@
             <div class="ibox">
                 <div class="ibox-title">
                     <h5></h5>
-                    <div class="ibox-tools">
-                        <?= anchor("lcModS/lcTableP/edit", "<i class='fa fa-plus'></i> Agregar tableTitle", "class='btn btn-primary btn-xs'"); ?>
-                        <?= anchor("lcModS/lcTableP/edit", "<i class='fa fa-plus'></i> Agregar tableTitle", "class='btn btn-primary btn-xs'"); ?>
-                    </div>
+                        <?= anchor("lcModS/lcTableP/edit", "<i class='fa fa-plus'></i> Agregar tableTitle", "class='btn btn-primary btn-xs m-l-sm'"); ?>
+                        <?php
+                        //>>>anchorToEditView<<<
+                        echo anchor("lcModS/lcTableP/edit/editNameView", "<i class='fa fa-plus'></i> Agregar indexEditViewTitle", "class='btn btn-primary btn-xs m-l-sm'");
+                        //<<<anchorToEditView>>>
+                        ?>
                 </div>
                 <div class="ibox-content">
-
-                    <table class="footable table table-stripped toggle-arrow-tiny" data-page-size="15">
-                        <thead>
-                        <tr>
-                            //tableHeaderHtmlTitles
-                            <th class="text-right" data-sort-ignore="true">Acciones</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-
-                        <?php if (count($oUcTableP)) { ?>
-                            <?php foreach ($oUcTableP as $oUcTableS) { ?>
-                                <tr>
-                                    //tableBodyHtmlFields
-                                    <td class="text-right">
-                                        <div class="btn-group">
-                                            <td><?= btn_edit("lcModS/lcTableP/edit/" . $oUcTableS->idTable, "class='btn-white btn btn-xs'") ?></td>
-                                            <td><?= btn_delete("lcModS/lcTableP/delete/" . $oUcTableS->idTable, "class='btn-white btn btn-xs'") ?></td>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php } ?>
-                        <?php } else { ?>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover dataTables-example">
+                            <thead>
                             <tr>
-                                <td colspan="3">No se pudo encontrar lcTableP registrados</td>
+                                //tableHeaderHtmlTitles
+                                <th class="text-right" data-sort-ignore="true">Acciones</th>
                             </tr>
-                        <?php }?>
-                        </tbody>
-                        <tfoot>
-                        <tr>
-                            <td colspan="6">
-                                <ul class="pagination pull-right"></ul>
-                            </td>
-                        </tr>
-                        </tfoot>
-                    </table>
+                            </thead>
+                            <tbody>
+                            <?php if (count($oUcTableP)) { ?>
+                                <?php foreach ($oUcTableP as $oUcTableS) { ?>
+                                    <tr>
+                                        //tableBodyHtmlFields
+                                        <td class="text-right">
+                                            <div class="btn-group">
+                                                <?= btn_edit("lcModS/lcTableP/edit/" . $oUcTableS->idTable, "class='btn-white btn btn-xs'") ?>
+                                                <?= btn_delete("lcModS/lcTableP/delete/" . $oUcTableS->idTable, "class='btn-white btn btn-xs'") ?>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            <?php } else { ?>
+                                <tr>
+                                    <td colspan="3">No se pudo encontrar lcTableP registrados</td>
+                                </tr>
+                            <?php }?>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                //tableHeaderHtmlTitles
+                                <th class="text-right" data-sort-ignore="true">Acciones</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

@@ -91,7 +91,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
                 $data = $this->model_lcTableP->array_from_post($aFromPost = '$validatedFieldsEditIni');
             }
             //>>>validatedControllerFieldsEditView<<<
-            else if(compareStrStr($id_or_view, 'draft')){$data = $this->model_lcTableP->array_from_post(
+            else if(compareStrStr($id_or_view, 'editNameView')){$data = $this->model_lcTableP->array_from_post(
                 $aFromPost = '$fieldsEditView'
                 );}
             //<<<validatedControllerFieldsEditView>>>
