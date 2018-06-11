@@ -1091,7 +1091,7 @@ class CI_Migration
                     $data['viewLoadEditData'] .= $this->load->view(["template_controller" => "viewLoadEditData"],$data, true, true, true);
 
                     // ********************* Para el View Index ***************************
-                    $data['indexEditViewTitle'] = $data["tableTitle"] .' '. ($data['editNameView'] == 'ini' ? 'con lo Basico' : ucfirst($data['editNameView']));
+                    $data['indexEditViewTitle'] = $data['editNameView'] == 'ini' ? 'con lo Basico' : ucfirst($data['editNameView']);
                     $data['anchorToEditView'] .= $this->load->view(["template_index" => "anchorToEditView"],$data, true, true, true);
                 }
             }

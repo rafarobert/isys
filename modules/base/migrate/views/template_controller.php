@@ -38,7 +38,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         //>>>initFieldsForeignTable<<<
         $lcFkObjFieldP = $this->model_lcFkTableP->get_by('$fFieldsRef');
         //<<<initFieldsForeignTable>>>
-        ////>>>compareFieldsForeignTable<<<
+        //>>>compareFieldsForeignTable<<<
         $lcFkObjFieldP = $this->model_lcFkTableP->setForeignValues('$t1Contents','t1FieldRef','$t2Contents','t2FieldRef');
         //<<<compareFieldsForeignTable>>>
         //>>>setFieldsForeignTable<<<

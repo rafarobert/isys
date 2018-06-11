@@ -1013,7 +1013,7 @@ class CI_Session {
             $this->set_userdata($this->sessKey,$data);
             redirect('admin/dashboard');
         } else {
-            return true;
+            return false;
         }
     }
 
