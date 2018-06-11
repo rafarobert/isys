@@ -1000,6 +1000,20 @@ abstract class CI_DB_forge
         return false;
     }
 
+    public function getTableNameByIdTable($idTable, $database = '')
+    {
+        $CI = CI_Controller::get_instance();
+        if ($database == '') {
+            $database = $CI->db->database;
+        }
+        $sql = "Select TABLE_NAME from information_schema.`COLUMNS` where TABLE_SCHEMA='$database' and COLUMN_NAME='$idTable' and COLUMN_KEY='PRI'";
+        $result = $CI->db->query($sql)->row();
+        if (count((array)$result)) {
+            return $result->TABLE_NAME;
+        }
+        return false;
+    }
+
     public function getTables($database = '')
     {
         $CI = CI_Controller::get_instance();

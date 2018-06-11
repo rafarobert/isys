@@ -134,7 +134,11 @@ class Ctrl_Migrate extends Base_Controller
         $migIndex = 1;
         $modInit = '';
         $submodInit = '';
+        $framePath = "orm/migrations/";
         unset($tables['migrations']);
+        // ***************** refresh *********************
+        rrmdir('orm/migrations');
+        // ***************** creating migrations ********************
         foreach ($tables as $name => $fields){
             foreach ($fields as $fieldName => $fieldValues){
                 $aJsonFields = $this->dbforge->getFieldCommentsFromDB($fieldName,$name);
@@ -166,7 +170,6 @@ class Ctrl_Migrate extends Base_Controller
             $this->data["tableRelations"] = var_export($tableRelations,true);
             $this->data["tableSettings"] = var_export($tableSettings,true);
             $phpContent = $this->load->view("template_migrations",$this->data, true, true);
-            $framePath = "orm/migrations/";
             if (createFolder($framePath)) {
                 if (createFolder($framePath."tables/")) {
                     if (createFolder($framePath."tables/$mod")) {

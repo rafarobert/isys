@@ -1116,10 +1116,10 @@ class CI_Migration
         $data['setFieldsForeignTable'] ='';
         $data['compareFieldsForeignTable'] ='';
 
-        $relations  = $this->getTableRelations($fields, 'table');
-        $relationsUnique  = $this->getTableRelations($fields, 'table', true);
-        $relationsUniqueWithFilters = $this->getTableRelations($fields,'table', true, true);
-        $relationsWithOutExcepts = $this->getTableRelations($fields,'table', false, false, true);
+//        $relations  = $this->getTableRelations($fields);
+        $relationsUnique  = $this->getTableRelations($fields, true);
+//        $relationsUniqueWithFilters = $this->getTableRelations($fields, true, true);
+        $relationsWithOutExcepts = $this->getTableRelations($fields, false, true, true);
 
         foreach ((array)$relationsUnique as $fkName => $settings){
             list($fMod, $fSubmod) = getModSubMod($settings['table']);
@@ -1131,7 +1131,6 @@ class CI_Migration
             $data['UcFkTableP'] = ucfirst($fSubModP);
             $data['lcFkModS'] = lcfirst($fModS);
             $data['lcFkModP'] = lcfirst($fModP);
-//            list($data) = $this->validateFkTable($data, $fields, $settings, $sys);
             $data['initPropertiesVarsForeignTable'] .= $this->load->view(["template_controller" => "initPropertiesVarsForeignTable"], $data, true, true, true);
             $data['initVarsForeignTable'] .= $this->load->view(["template_controller" => "initVarsForeignTable"], $data, true, true, true);
             $data['loadModelsForeignTable'] .= $this->load->view(["template_controller" => "loadModelsForeignTable"], $data, true, true, true);
@@ -1164,10 +1163,10 @@ class CI_Migration
                 list($data) = $this->validateFkTable($data, $fields, $settings, $sys);
 //            $data['setObjectForeignTable'] .= $this->load->view(["template_controller" => "setObjectForeignTable"], $data, true, true, true);
                 if(validateArray($settings,'filterBy') && validateArray($settings,'idForeign')){
-                    foreach($settings['filterBy'] as $filter){
-                        $data['lcFkObjFieldP'] = "$$filter";
-                        $data['UcFkObjFieldP'] = setObjectFromWordWithDashes($filter,true);
-                    }
+//                    foreach($settings['filterBy'] as $filter){
+//                        $data['lcFkObjFieldP'] = "$$filter";
+//                        $data['UcFkObjFieldP'] = setObjectFromWordWithDashes($filter,true);
+//                    }
                     if($ind != 2){
                         $data[$selector] .= $this->load->view(["template_controller" => $selector], $data, true, true, true);
                         $aLoaded[] = $data['lcFkTableP'];
@@ -1471,8 +1470,6 @@ class CI_Migration
                 if(validateVar($fkTableFieldRef,'array')){
                     $vFkTableFieldRef = $fkTableFieldRef[0];
 
-
-
                     if(validateArray($fkTableFields[$vFkTableFieldRef],'table')){
 
                         // ****************** verifica fkField dentro de otro fkField *******************
@@ -1524,17 +1521,17 @@ class CI_Migration
                 list($fSubModS, $fSubModP) = setSubModSingularPlural($fSubmod);
                 list($fModS, $fModP) = setSubModSingularPlural($sys[$fMod]['name']);
 
-                if(validateArray($settings,'filterBy')){
-                    foreach($settings['filterBy'] as $filter){
-                        $data['objOptions'] = '$o'.setObjectFromWordWithDashes($filter,true);
-                    }
-                } else {
+//                if(validateArray($settings,'filterBy')){
+//                    foreach($settings['filterBy'] as $filter){
+//                        $data['objOptions'] = '$o'.setObjectFromWordWithDashes($filter,true);
+//                    }
+//                } else {
                     if(validateArray($settings,'insertEachOne')){
                         $data['objOptions'] = var_export(['/$id_'.$fSubModS => '/$o'.setObjectFromWordWithDashes($fSubModS,true)],true);
                     } else {
                         $data['objOptions'] = '$o'.setObjectFromWordWithDashes($fSubModP,true);
                     }
-                }
+//                }
                 $bIsForeing = true;
                 if(validateArray($fkTableFieldRefSettings,'idForeign') && validateArray($fkTableFieldRefSettings,'selectBy')){
                     if(validateVar($fkTableFieldRefSettings['selectBy'])){
@@ -1555,8 +1552,6 @@ class CI_Migration
                     $data['setOfFkSettings']['t1FieldRef'] = isset($data['setOfFkSettings']['t1FieldRef']) ? $data['setOfFkSettings']['t1FieldRef'] : $fkTableFieldRefSettings['field'];
                     $data['setOfFkSettings']['t2Contents'] = isset($data['setOfFkSettings']['t2Contents']) ? $data['setOfFkSettings']['t2Contents'] : setObjectFromWordWithDashes($ffSubModP,true,true);
                     $data['setOfFkSettings']['t2FieldRef'] = isset($data['setOfFkSettings']['t2FieldRef']) ? $data['setOfFkSettings']['t2FieldRef'] : $fkTableFieldRefSettings['idForeign'];
-
-
 
                     $typeForm = validateArray($fkTableFieldRefSettings,'input') ? $fkTableFieldRefSettings['input'] : 'dropdown';
                 } else {
@@ -1581,16 +1576,31 @@ class CI_Migration
         return [$data, $typeForm, $bIsForeing];
     }
 
-    private function getTableRelations($fields, $column, $bUnique = false, $bUniqueFilters = false, $bWithOutExcepts = FALSE){
+    private function getTableRelations($fields, $bUnique = false, $bUniqueFilters = false, $bWithOutExcepts = FALSE){
+        $column = 'table';
         $excepts = array_merge(config_item('controlFields'));
         $aDuplicated = array();
-        if($bUniqueFilters){
-            foreach ($fields as $name => $settings){
-                if (validateArray($settings,'filterBy') && validateArray($settings,'idForeign') && validateArray($settings,'table')){
+        $aUniqueRelations = array();
+
+        foreach ($fields as $name => $settings) {
+            if(validateArray($settings, 'filterBy')){
+                if ($bUniqueFilters && validateArray($settings, 'idForeign') && validateArray($settings, 'table')) {
                     $aDuplicated[] = $settings['table'];
+                }
+                $filterByKeys = array_keys($settings['filterBy']);
+                foreach ($filterByKeys as $filterBy){
+                    if($this->dbforge->getTableNameByIdTable($filterBy)){
+                        $aUniqueRelations[$filterBy] = array(
+                            'table' => $this->dbforge->getTableNameByIdTable($filterBy)
+                        );
+                    }
                 }
             }
         }
+
+        // ********************** valida que el filterBy tenga su columna referenciada agregada en la tabla actual **************
+
+        // ******************************
         if($bUnique){
             $aTableNames = array_unique(array_column($fields,$column));
         } else {
@@ -1604,7 +1614,6 @@ class CI_Migration
             }
         }
         $aTableNames = array_merge($aTableNames, $aDuplicated);
-        $aUniqueRelations = array();
         foreach ($aTableNames as $tableName){
             foreach ($fields as $fkName => $settings){
                 if(validateArray($settings,'table') && validateArray($settings,'idForeign')){

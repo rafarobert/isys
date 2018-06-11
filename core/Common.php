@@ -1171,13 +1171,32 @@ if (!function_exists('deleteDir')) {
 
     function deleteDir($dir)
     {
-
         if (!is_dir($dir)) {
 
             mkdir($dir);
         }
 
         rmdir($dir);
+    }
+}
+
+if (!function_exists('rrmdir')) {
+
+    function rrmdir($src) {
+        $dir = opendir($src);
+        while(false !== ( $file = readdir($dir)) ) {
+            if (( $file != '.' ) && ( $file != '..' )) {
+                $full = $src . '/' . $file;
+                if ( is_dir($full) ) {
+                    rrmdir($full);
+                }
+                else {
+                    unlink($full);
+                }
+            }
+        }
+        closedir($dir);
+        rmdir($src);
     }
 }
 
