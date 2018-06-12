@@ -226,6 +226,7 @@ class CI_Migration
      * @param    array $config
      * @return    void
      */
+
     public function __construct($config = array())
     {
         $this->CI = CI_Controller::get_instance();
@@ -987,11 +988,6 @@ class CI_Migration
                             if(in_array($name, $fieldsViews)){
                                 $vFieldsViews[$settingName][$name] = $fields[$name];
                             }
-                            if(strhas($settingName,'-ini')){
-                                if(in_array($name,$aFieldsColumnsKey)){
-                                    $vFieldsViews[$settingName][$name] = $fields[$name];
-                                }
-                            }
                         }
                     }
                 }
@@ -1054,26 +1050,27 @@ class CI_Migration
         return [$vFieldsBackup, $fieldImg, $fieldPass];
     }
 
-    public function loadEditViews($fields, $vFieldsViews, $data){
+    public function loadEditViews($fields, $vFieldsViews, $data, $tableSettings){
         $data['editView'] = '';
         $data['validatedControllerFieldsEditView'] = '';
         $data['viewLoadEditData'] = '';
         $data['anchorToEditView'] = '';
+        $data['linkToEditView'] = '';
         $data["validatedModelFieldsEditView"]='';
+        $tableTitle = $data['tableTitle'];
         $phpContentEditViews = array();
-
         foreach ($vFieldsViews as $vNameView => $vFieldsView){
             $vNameViewTitle = ucfirst(setObjectFromWordWithDashes($vNameView,true));
             if(validateVar($vFieldsView,'array')){
-
                 // ********************* Para el View Edit ***************************
                 list($htmlFormContentEditView,$aEachNamesEditView, $modalsContentEditView) = $this->setInputFields($fields, $vFieldsView ,$data);
                 list($data) = $this->setEachFields($fields, $aEachNamesEditView, $data);
                 $data['htmlFieldsEditForm'] = $htmlFormContentEditView;
                 $name = explode('-',$vNameView)[1];
                 $data['editView'] = "$name/";
+                $data['tableTitle'] = setTitleFromWordWithDashes($name,true);
                 $phpContentEditViews[$vNameView] = $this->load->view("template_edit", $data, true, true, true);
-
+                $data['tableTitle'] = $tableTitle;
                 // ********************* Para el Model ***************************
                 $data['rulesNameEditView'] = '$rules_'.str_replace('-','_',$vNameView);
                 $data['tableRulesEditView'] = var_export($this->getPhpFieldsRules($vFieldsView,$data['pkTable'], true), true);
@@ -1091,8 +1088,9 @@ class CI_Migration
                     $data['viewLoadEditData'] .= $this->load->view(["template_controller" => "viewLoadEditData"],$data, true, true, true);
 
                     // ********************* Para el View Index ***************************
-                    $data['indexEditViewTitle'] = $data['editNameView'] == 'ini' ? 'con lo Basico' : ucfirst($data['editNameView']);
+                    $data['indexEditViewTitle'] = setTitleFromWordWithDashes($data['editNameView']);
                     $data['anchorToEditView'] .= $this->load->view(["template_index" => "anchorToEditView"],$data, true, true, true);
+                    $data['linkToEditView'] = $this->load->view(["template_index" => "linkToEditView"],$data, true, true, true);
                 }
             }
         }
@@ -1105,10 +1103,10 @@ class CI_Migration
         $excepts = array_merge(config_item('controlFields'), [$pkTable]);
         list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsViews) = $default;
         list($vFieldsChecked, $fieldImg, $fieldPass) = $this->checkInputFields($vFields);
-        list($data) = $this->loadEditViews($fields, $vFieldsViews, $data);
+        list($data) = $this->loadEditViews($fields, $vFieldsViews, $data, $tableSettings);
         $aFieldsNames = array_keys($vFieldsChecked);
         $data["validatedFieldsNames"] = var_export($aFieldsNames, true);
-        $data['initPropertiesVarsForeignTable'] ='';
+//        $data['initPropertiesVarsForeignTable'] ='';
         $data['initVarsForeignTable'] ='';
         $data['loadModelsForeignTable'] ='';
         $data['setObjectForeignTable'] ='';
@@ -1131,7 +1129,7 @@ class CI_Migration
             $data['UcFkTableP'] = ucfirst($fSubModP);
             $data['lcFkModS'] = lcfirst($fModS);
             $data['lcFkModP'] = lcfirst($fModP);
-            $data['initPropertiesVarsForeignTable'] .= $this->load->view(["template_controller" => "initPropertiesVarsForeignTable"], $data, true, true, true);
+//            $data['initPropertiesVarsForeignTable'] .= $this->load->view(["template_controller" => "initPropertiesVarsForeignTable"], $data, true, true, true);
             $data['initVarsForeignTable'] .= $this->load->view(["template_controller" => "initVarsForeignTable"], $data, true, true, true);
             $data['loadModelsForeignTable'] .= $this->load->view(["template_controller" => "loadModelsForeignTable"], $data, true, true, true);
         }
@@ -1167,6 +1165,7 @@ class CI_Migration
 //                        $data['lcFkObjFieldP'] = "$$filter";
 //                        $data['UcFkObjFieldP'] = setObjectFromWordWithDashes($filter,true);
 //                    }
+                    $data['fFieldsRef'] = var_export($settings['filterBy'],true);
                     if($ind != 2){
                         $data[$selector] .= $this->load->view(["template_controller" => $selector], $data, true, true, true);
                         $aLoaded[] = $data['lcFkTableP'];
@@ -1229,7 +1228,7 @@ class CI_Migration
         $tableRules = $this->getPhpFieldsRules($vFields,$pkTable);
         $tableRulesEdit = $this->getPhpFieldsRules($vFields,$pkTable, true);
         $stdFields = $this->getPhpStdFields($tableName,$pkTable);
-        list($data) = $this->loadEditViews($fields, $vFieldsViews, $data);
+        list($data) = $this->loadEditViews($fields, $vFieldsViews, $data, $tableSettings);
 
         $data["fieldsProperties"] = $fieldsProperties;
         $data["tableRules"] = var_export($tableRules, true);
@@ -1251,7 +1250,7 @@ class CI_Migration
         list($mod, $submod, $subModS, $subModP, $data, $vFields, $vFieldsViews) = $default;
         $data["tableHeaderHtmlTitles"] = $this->setHtmlHeaderTitles($fields, $vFields, $tableSettings);
         $data["tableBodyHtmlFields"] = $this->setHtmlBodyFields($fields, $vFields, $tableSettings, $subModS, $subModP);
-        list($data) = $this->loadEditViews($fields, $vFieldsViews, $data);
+        list($data) = $this->loadEditViews($fields, $vFieldsViews, $data, $tableSettings);
         $phpContent = $this->load->view("template_index", $data, true, true,true);
         $mod = $sys[$mod]['dir'];
         $framePath = ROOT_PATH.'orm/crud/'.$mod;
@@ -1273,7 +1272,7 @@ class CI_Migration
         $data['htmlFieldsEditForm'] = $htmlFormContent;
         $data['editView'] = '';
         $phpContent = $this->load->view("template_edit", $data, true, true, true);
-        list($data,$phpContentEditViews) = $this->loadEditViews($fields, $vFieldsViews, $data);
+        list($data,$phpContentEditViews) = $this->loadEditViews($fields, $vFieldsViews, $data, $tableSettings);
         $phpContent .= $modalsContent;
 
         $mod = $sys[$mod]['dir'];
@@ -1581,6 +1580,7 @@ class CI_Migration
         $excepts = array_merge(config_item('controlFields'));
         $aDuplicated = array();
         $aUniqueRelations = array();
+        initStaticTableVars($this);
 
         foreach ($fields as $name => $settings) {
             if(validateArray($settings, 'filterBy')){
@@ -1590,17 +1590,17 @@ class CI_Migration
                 $filterByKeys = array_keys($settings['filterBy']);
                 foreach ($filterByKeys as $filterBy){
                     if($this->dbforge->getTableNameByIdTable($filterBy)){
+                        $tableFilterByFields = "table_".$settings['table'];
                         $aUniqueRelations[$filterBy] = array(
-                            'table' => $this->dbforge->getTableNameByIdTable($filterBy)
+                            'table' => $this->dbforge->getTableNameByIdTable($filterBy),
+                            'filterBy' => validateArray($this->$tableFilterByFields,$filterBy) ? (validateArray($this->$tableFilterByFields[$filterBy], 'selectBy') ? $this->$tableFilterByFields[$filterBy]['selectBy'] : []) : [],
+                            'idForeign' => $filterBy
                         );
                     }
                 }
             }
         }
 
-        // ********************** valida que el filterBy tenga su columna referenciada agregada en la tabla actual **************
-
-        // ******************************
         if($bUnique){
             $aTableNames = array_unique(array_column($fields,$column));
         } else {

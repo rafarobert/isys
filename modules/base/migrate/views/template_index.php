@@ -63,12 +63,18 @@
                             </thead>
                             <tbody>
                             <?php if (count($oUcTableP)) { ?>
-                                <?php foreach ($oUcTableP as $oUcTableS) { ?>
+                                <?php foreach ($oUcTableP as $oUcTableS) {
+                                    $editLink = "lcModS/lcTableP/edit/";
+                                    //>>>linkToEditView<<<
+                                    $editLink .= validateVar($oUcTableS->tipo) ? $oUcTableS->tipo.'/' : '';
+                                    //<<<linkToEditView>>>
+                                    $editLink .= $oUcTableS->idTable;
+                                    ?>
                                     <tr>
                                         //tableBodyHtmlFields
                                         <td class="text-right">
                                             <div class="btn-group">
-                                                <?= btn_edit("lcModS/lcTableP/edit/" . $oUcTableS->idTable, "class='btn-white btn btn-xs'") ?>
+                                                <?= btn_edit($editLink, "class='btn-white btn btn-xs'") ?>
                                                 <?= btn_delete("lcModS/lcTableP/delete/" . $oUcTableS->idTable, "class='btn-white btn btn-xs'") ?>
                                             </div>
                                         </td>

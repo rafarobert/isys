@@ -1,13 +1,9 @@
 <?php 
 /**
- * Created by herbalife.
+ * Created by Estic.
  * User: #userCreated
  * Date: #dateCreated
  * Time: #timeCreated
- * @property Model_UcTableP $model_lcTableP
- //>>>initPropertiesVarsForeignTable<<<
- * @property Model_UcFkTableP $model_lcFkTableP
- //<<<initPropertiesVarsForeignTable>>>
  */
 use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
@@ -162,6 +158,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
                 $aReturn['view'] = $this->load->view("lcModS/lcTableP/editView",$this->data,true);
                 echo json_encode($aReturn);
             } else if(!$this->input->post('fromAjax')){
+                $this->data["oUcTableS"]->tipo = "editNameView";
                 $this->data["subview"] = "lcModS/lcTableP/editView";
                 return $this->load->view("lcModS/lcTableP/editView",$this->data,true);
             }

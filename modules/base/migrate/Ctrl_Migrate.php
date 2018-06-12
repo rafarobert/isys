@@ -15,6 +15,7 @@ class Ctrl_Migrate extends Base_Controller
         $this->data['subLayout'] = '';
         $this->load->library('migration');
         set_time_limit(300);
+
     }
 
     public function run($frame = 0, $funct = 0, $modulo = 0, $submod = 0)
