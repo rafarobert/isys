@@ -1058,6 +1058,10 @@ class CI_Migration
         $data['linkToEditView'] = '';
         $data["validatedModelFieldsEditView"]='';
         $tableTitle = $data['tableTitle'];
+        $aEditNameViewsSettings = CiSettingsQuery::create()->select(['id_setting','edit_tag'])->find()->getData();
+        $aIdsSettings = array_column($aEditNameViewsSettings,'id_setting');
+        $aTagsSettings = array_column($aEditNameViewsSettings,'edit_tag');
+        $aEditViewSettings = array_combine($aTagsSettings,$aIdsSettings);
         $phpContentEditViews = array();
         foreach ($vFieldsViews as $vNameView => $vFieldsView){
             $vNameViewTitle = ucfirst(setObjectFromWordWithDashes($vNameView,true));
@@ -1085,6 +1089,7 @@ class CI_Migration
                     $data['validatedControllerFieldsEditView'] .= $this->load->view(["template_controller" => "validatedControllerFieldsEditView"],$data, true, true, true);
                     $data['editView'] = $vNameView;
                     $data['editNameView'] = explode('-',$vNameView)[1];
+                    $data['indexEditNameView'] = validateArray($aEditViewSettings, $vNameView) ? $aEditViewSettings[$vNameView] : '';
                     $data['viewLoadEditData'] .= $this->load->view(["template_controller" => "viewLoadEditData"],$data, true, true, true);
 
                     // ********************* Para el View Index ***************************
@@ -1447,6 +1452,7 @@ class CI_Migration
                 $modalsContent .= "
             <?=modal('".$inputData['id']."Modal')?>";
             }
+            unset($data["printSecondItem"]);
         }
         return [$htmlFormContent,$aEachNames, $modalsContent];
     }

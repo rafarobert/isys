@@ -158,7 +158,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
                 $aReturn['view'] = $this->load->view("lcModS/lcTableP/editView",$this->data,true);
                 echo json_encode($aReturn);
             } else if(!$this->input->post('fromAjax')){
-                $this->data["oUcTableS"]->tipo = "editNameView";
+                $this->data["oUcTableS"]->id_setting = "indexEditNameView";
                 $this->data["subview"] = "lcModS/lcTableP/editView";
                 return $this->load->view("lcModS/lcTableP/editView",$this->data,true);
             }
