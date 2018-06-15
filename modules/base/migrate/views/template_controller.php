@@ -32,7 +32,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         //<<<loadModelsForeignTable>>>
         $this->initLoaded();
         //>>>initFieldsForeignTable<<<
-        $lcFkObjFieldP = $this->model_lcFkTableP->get_by('$fFieldsRef');
+        $lcFkObjFieldP = $this->model_lcFkTableP->get_by('$fFieldsRef', true);
         //<<<initFieldsForeignTable>>>
         //>>>compareFieldsForeignTable<<<
         $lcFkObjFieldP = $this->model_lcFkTableP->setForeignValues('$t1Contents','t1FieldRef','$t2Contents','t2FieldRef');
@@ -141,10 +141,10 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             $aReturn['error'] = $error = "tableTitle con datos incompletos, porfavor revisa los datos";;
         }
         // Se carga la vista
-        if(compareStrStr($id_or_view, 'ini')){
+        if(strhas($id_or_view, 'ini')){
             if($this->input->post('fromAjax') && $error != 'ok'){
                 $aReturn['error'] = $error;
-                $aReturn['view'] = $this->load->view("lcModS/lcTableP/edit-ini",$this->data,true);
+                $aReturn['view'] = $this->load->view("lcModS/lcTableP/editView",$this->data,true);
                 echo json_encode($aReturn);
             } else if(!$this->input->post('fromAjax')){
                 $this->data["subview"] = "lcModS/lcTableP/edit-ini";
@@ -158,7 +158,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
                 $aReturn['view'] = $this->load->view("lcModS/lcTableP/editView",$this->data,true);
                 echo json_encode($aReturn);
             } else if(!$this->input->post('fromAjax')){
-                $this->data["oUcTableS"]->id_setting = "indexEditNameView";
+                $this->data["oUcTableS"]->fieldEditView = CiSettingsQuery::create()->findOneByEditTag('editView')->getIdSetting();
                 $this->data["subview"] = "lcModS/lcTableP/editView";
                 return $this->load->view("lcModS/lcTableP/editView",$this->data,true);
             }

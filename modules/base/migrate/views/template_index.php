@@ -66,7 +66,10 @@
                                 <?php foreach ($oUcTableP as $oUcTableS) {
                                     $editLink = "lcModS/lcTableP/edit/";
                                     //>>>linkToEditView<<<
-                                    $editLink .= validateVar($oUcTableS->tipo) ? $oUcTableS->tipo.'/' : '';
+                                    if(validateVar($oUcTableS->fieldEditView, 'numeric')){
+                                        $editTag = CiSettingsQuery::create()->findOneByIdSetting($oUcTableS->fieldEditView)->getEditTag();
+                                        $editLink .= explode('edit-',$editTag)[1].'/';
+                                    }
                                     //<<<linkToEditView>>>
                                     $editLink .= $oUcTableS->idTable;
                                     ?>

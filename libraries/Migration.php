@@ -857,6 +857,7 @@ class CI_Migration
     {
         if (count($tableSettings)) {
             $fields = $this->dbforge->fields != [] ? $this->dbforge->fields : ($this->_fields == [] ? header("Refresh:0") : $this->_fields);
+
             $pkTable = $this->dbforge->getPrimaryKeyFromTable($tableName);
             $defaultData = $this->setDataDefault($tableName, $pkTable, $fields, $tableSettings);
             // ******************************************************************************************
@@ -917,7 +918,7 @@ class CI_Migration
                     'icon' => validateArray($tableSettings, 'icon') ? $tableSettings['icon'] : '',
                     'url' => validateArray($tableSettings, 'url') ? $tableSettings['url'] : config_item('sys')[$mod]['dir'] . "$submod",
                     'descripcion' => validateArray($tableSettings, 'descripcion') ? $tableSettings['descripcion'] : '',
-                    'status' => validateArray($tableSettings, 'status') ? $tableSettings['status'] : '',
+                    'estado' => validateArray($tableSettings, 'estado') ? $tableSettings['estado'] : '',
                     'listed' => validateArray($tableSettings, 'bIsListed') ? $tableSettings['bIsListed'] : 'ENABLED',
                     'id_user_created' => $this->getIdUserDefault(),
                     'id_user_modified' => $this->getIdUserDefault()
@@ -1050,6 +1051,51 @@ class CI_Migration
         return [$vFieldsBackup, $fieldImg, $fieldPass];
     }
 
+    public function getFieldNameEditView($fields, $idSettings, $editView){
+        $aFieldsNames = array_keys($fields);
+        if(in_array($idSettings,$aFieldsNames)){
+            return $idSettings;
+        } else {
+            foreach ($fields as $name => $fieldSettings){
+                if(validateArray($fieldSettings,'idForeign')){
+                    if($fieldSettings['idForeign'] == $idSettings){
+                        return $idSettings;
+                    }
+                }
+                if(validateArray($fieldSettings, 'selectBy')){
+                    if(validateVar($fieldSettings['selectBy'], 'array')){
+                        foreach ($fieldSettings['selectBy'] as $selected){
+                            if($selected == $idSettings){
+                                return $fieldSettings['field'];
+                            }
+                        }
+                    } else if(validateVar($fieldSettings['selectBy'])){
+                        if($fieldSettings['selectBy'] == $idSettings){
+                            return $fieldSettings['field'];
+                        }
+                    }
+                }
+                if(validateArray($fieldSettings, 'filterBy')){
+                    if(validateVar($fieldSettings['filterBy'], 'array')){
+                        foreach ($fieldSettings['filterBy'] as $filtered){
+                            if($filtered == $idSettings){
+                                return $fieldSettings['field'];
+                            }
+                        }
+                    } else if(validateVar($fieldSettings['filterBy'])){
+                        if($fieldSettings['filterBy'] == $idSettings){
+                            return $fieldSettings['field'];
+                        }
+                    }
+                } else {
+                    show_error("Para armar la vista $editView, se necesita una relacion a la tabla ci_settings, 
+                    introduce una fila en la tabla que se relacione con ci_options, por ejemplo: id_option_tipo_$editView, 
+                    y que filtre en base a ese tipo de opciones");
+                }
+            }
+        }
+    }
+
     public function loadEditViews($fields, $vFieldsViews, $data, $tableSettings){
         $data['editView'] = '';
         $data['validatedControllerFieldsEditView'] = '';
@@ -1072,7 +1118,7 @@ class CI_Migration
                 $data['htmlFieldsEditForm'] = $htmlFormContentEditView;
                 $name = explode('-',$vNameView)[1];
                 $data['editView'] = "$name/";
-                $data['tableTitle'] = setTitleFromWordWithDashes($name,true);
+                $data['tableTitle'] = $tableTitle . ' para: ' .setTitleFromWordWithDashes($name,true);
                 $phpContentEditViews[$vNameView] = $this->load->view("template_edit", $data, true, true, true);
                 $data['tableTitle'] = $tableTitle;
                 // ********************* Para el Model ***************************
@@ -1081,22 +1127,26 @@ class CI_Migration
                 $data["validatedModelFieldsEditView"] .= $this->load->view(["template_model" => "validatedModelFieldsEditView"],$data, true, true, true);
 
                 list($vFieldsIniChecked, $fieldIniImg, $fieldIniPass) = $this->checkInputFields($vFieldsView);
-                if(compareStrStr($vNameView,'edit-ini')){
+                if(strhas($vNameView,'ini')){
+                    $data['editView'] = $vNameView;
                     $data["validatedFieldsEditIni"] = var_export(array_keys($vFieldsIniChecked), true);
+                    $data['editNameView'] = explode('-',$vNameView)[1];
                 } else {
                     // ********************* Para el Controller ***************************
                     $data['fieldsEditView'] = var_export(array_keys($vFieldsIniChecked), true);
                     $data['validatedControllerFieldsEditView'] .= $this->load->view(["template_controller" => "validatedControllerFieldsEditView"],$data, true, true, true);
                     $data['editView'] = $vNameView;
                     $data['editNameView'] = explode('-',$vNameView)[1];
+
                     $data['indexEditNameView'] = validateArray($aEditViewSettings, $vNameView) ? $aEditViewSettings[$vNameView] : '';
                     $data['viewLoadEditData'] .= $this->load->view(["template_controller" => "viewLoadEditData"],$data, true, true, true);
 
-                    // ********************* Para el View Index ***************************
-                    $data['indexEditViewTitle'] = setTitleFromWordWithDashes($data['editNameView']);
-                    $data['anchorToEditView'] .= $this->load->view(["template_index" => "anchorToEditView"],$data, true, true, true);
-                    $data['linkToEditView'] = $this->load->view(["template_index" => "linkToEditView"],$data, true, true, true);
                 }
+                // ********************* Para el View Index ***************************
+                $data['indexEditViewTitle'] = setTitleFromWordWithDashes($data['editNameView']);
+                $data['anchorToEditView'] .= $this->load->view(["template_index" => "anchorToEditView"],$data, true, true, true);
+                $data['fieldEditView'] = $this->getFieldNameEditView($fields,'id_setting', $vNameView);
+                $data['linkToEditView'] = $this->load->view(["template_index" => "linkToEditView"],$data, true, true, true);
             }
         }
         return [$data,$phpContentEditViews];
