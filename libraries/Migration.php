@@ -1163,8 +1163,11 @@ class CI_Migration
                                 $data['validatedControllerFieldsEditView'] .= $this->load->view(["template_controller" => "validatedControllerFieldsEditView"],$data, true, true, true);
                                 $data['editNameView'] = explode('-',$vNameView)[1];
                                 $data['indexEditNameView'] = validateArray($aEditViewSettings, $vNameView) ? $aEditViewSettings[$vNameView] : '';
-                                $data['viewLoadEditData'] .= $this->load->view(["template_controller" => "viewLoadEditData"],$data, true, true, true);
+
                             }
+                                $data['queryToOptionsTable'] = '';
+                                $data['queryToSettingsTable'] = $this->load->view(["template_controller" => "queryToSettingsTable"],$data, true, true);
+                                $data['viewLoadEditData'] .= $this->load->view(["template_controller" => "viewLoadEditData"],$data, true, true, true);
                             // ********************* Para el View Index ***************************
                             $data['indexEditViewTitle'] = setTitleFromWordWithDashes($data['editNameView']);
                             $data['anchorToEditView'] .= $this->load->view(["template_index" => "anchorToEditView"],$data, true, true, true);
