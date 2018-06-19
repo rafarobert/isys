@@ -54,12 +54,15 @@ Class Ctrl_UcTableP extends UcModS_Controller {
     }
 
     public function edit($id_or_view = NULL , $id = NULL){
-        if(validateVar($id_or_view, 'numeric')){
-            $id = $id_or_view ;
+        if($id == null && (validateVar($id_or_view, 'numeric') || validateVar($id_or_view, 'string'))){
+            if(!in_array("edit-$id_or_view",$this->data['editTags'])){
+                $id = $id_or_view ;
+                $id_or_view = null;
+            }
         }
         // Optiene un lcTableS o crea uno nuevo
         // Se construye las reglas de validacion del formulario
-        if(validateVar($id,'numeric')){
+        if(validateVar($id,'numeric') || validateVar($id,'string')){
             $oUcTableS = $this->model_lcTableP->get($id);
             if(!count((array)$oUcTableS)){
                 $this->data["errors"][] = "El lcTableS no pudo ser encontrado";
@@ -147,6 +150,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
                 $aReturn['view'] = $this->load->view("lcModS/lcTableP/editView",$this->data,true);
                 echo json_encode($aReturn);
             } else if(!$this->input->post('fromAjax')){
+                $this->data["oUcTableS"]->fieldEditView = CiSettingsQuery::create()->findOneByEditTag('editView')->getIdSetting();
                 $this->data["subview"] = "lcModS/lcTableP/edit-ini";
                 return $this->load->view("lcModS/lcTableP/edit-ini",$this->data,true);
             }
