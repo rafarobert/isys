@@ -37,6 +37,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         //>>>compareFieldsForeignTable<<<
         $lcFkObjFieldP = $this->model_lcFkTableP->setForeignValues('$t1Contents','t1FieldRef','$t2Contents','t2FieldRef');
         //<<<compareFieldsForeignTable>>>
+        $this->data['table_name'] = $this->model_lcFkTableP->_table_name;
         //>>>setFieldsForeignTable<<<
         $this->data['oUcFkObjFieldP'] = $this->model_lcFkTableP->setOptions($lcFkObjFieldP,'divider');
         //<<<setFieldsForeignTable>>>
@@ -162,9 +163,11 @@ Class Ctrl_UcTableP extends UcModS_Controller {
                 $aReturn['view'] = $this->load->view("lcModS/lcTableP/editView",$this->data,true);
                 echo json_encode($aReturn);
             } else if(!$this->input->post('fromAjax')){
-
-                $this->data["oUcTableS"]->fieldEditView = CiOptionsQuery::create()->findOneByEditTag('editView')->getIdSetting();
-
+                if($this->model_lcTableP->_table_name == 'ci_options'){
+                    $this->data["oUcTableS"]->fieldEditView = CiSettingsQuery::create()->findOneByEditTag('editView')->getIdSetting();
+                } else {
+                    $this->data["oUcTableS"]->fieldEditView = CiOptionsQuery::create()->findOneByEditTag('editView')->getIdSetting();
+                }
                 $this->data["subview"] = "lcModS/lcTableP/editView";
                 return $this->load->view("lcModS/lcTableP/editView",$this->data,true);
             }

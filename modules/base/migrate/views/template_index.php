@@ -67,7 +67,11 @@
                                     $editLink = "lcModS/lcTableP/edit/";
                                     //>>>linkToEditView<<<
                                     if(validateVar($oUcTableS->fieldEditView, 'numeric')){
-                                        $editTag = CiSettingsQuery::create()->findOneByIdSetting($oUcTableS->fieldEditView)->getEditTag();
+                                        if($table_name == 'ci_options'){
+                                            $editTag = CiSettingsQuery::create()->findOneByIdSetting($oUcTableS->fieldEditView)->getEditTag();
+                                        } else {
+                                            $editTag = CiOptionsQuery::create()->findOneByIdOption($oUcTableS->fieldEditView)->getEditTag();
+                                        }
                                         $editLink .= explode('edit-',$editTag)[1].'/';
                                     }
                                     //<<<linkToEditView>>>

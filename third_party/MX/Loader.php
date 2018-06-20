@@ -328,9 +328,9 @@ class MX_Loader extends CI_Loader
 
             $viewHtml = $this->_ci_load(array('_ci_view' => $viewKey, '_ci_vars' => $this->_ci_object_to_array([]), '_ci_return' => $return), $bReturnAny);
             $subview = '';
-            foreach ($view as $v){
-                $html1 = explode("//<<<$v>>>",$viewHtml)[0];
-                $subview = isset(explode("//>>>$v<<<",$html1)[1]) ? explode("//>>>$v<<<",$html1)[1]:'';
+            foreach ($view as $v) {
+                $html1 = explode("//<<<$v>>>", $viewHtml)[0];
+                $subview = isset(explode("//>>>$v<<<", $html1)[1]) ? explode("//>>>$v<<<", $html1)[1] : '';
             }
             if($subview == ''){
                 return $this->_ci_load(array('_ci_view' => $viewKey, '_ci_vars' => $this->_ci_object_to_array($vars), '_ci_return' => $return), $bReturnAny);

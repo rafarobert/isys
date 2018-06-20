@@ -15,7 +15,7 @@ class Model_UcTableP extends UcModS_Model {
     //fieldsProperties
 
     private static $instance = null;
-    protected $_table_name = "lcmodType_lcTableP";
+    public $_table_name = "lcmodType_lcTableP";
     protected $_order_by = "idTable desc";
     protected $_timestaps = true;
 
