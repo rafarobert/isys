@@ -1239,6 +1239,18 @@ if (!function_exists('setMessage')) {
         }
     }
 }
+if (!function_exists('unsetall')) {
+
+    function unsetall($array, $index)
+    {
+        foreach ($array as $key => $cont){
+            if($cont == $index){
+                unset($array[$key]);
+            }
+        }
+        return $array;
+    }
+}
 
 if (!function_exists('initStaticTableVars')) {
 

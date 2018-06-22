@@ -990,7 +990,7 @@ class CI_Migration
                             if(strhas($editName, 'ini')){
                                 $fieldsViews = $ditFields;
                                 foreach ($fields as $name => $editFieldSettings) {
-                                    if (in_array($name, $fieldsViews) || validateArray($editFieldSettings,'idForeign')) {
+                                    if ((in_array($name, $fieldsViews) || validateArray($editFieldSettings,'idForeign')) && !in_array($name,$excepts)) {
                                         $vFieldsViews[$key][$editName][$name] = $fields[$name];
                                         $vReturnFieldsViews[$editName][$name] = $fields[$name];
                                     }
@@ -1013,7 +1013,7 @@ class CI_Migration
                         if(strhas($editName, 'ini')){
                             $fieldsViews = $ditFields;
                             foreach ($fields as $name => $editFieldSettings) {
-                                if (in_array($name, $fieldsViews) || validateArray($settings,'idForeign')) {
+                                if ((in_array($name, $fieldsViews) || validateArray($editFieldSettings,'idForeign')) && !in_array($name,$excepts)) {
                                     $vFieldsViews[$key][$editName][$name] = $fields[$name];
                                     $vReturnFieldsViews[$editName][$name] = $fields[$name];
                                 }
@@ -1216,8 +1216,20 @@ class CI_Migration
             list($fMod, $fSubmod) = getModSubMod($settings['table']);
             list($fSubModS, $fSubModP) = setSubModSingularPlural($fSubmod);
             list($fModS, $fModP) = setSubModSingularPlural($sys[$fMod]['name']);
-            $data['lcFkObjFieldP'] = '$'.lcfirst(setObjectFromWordWithDashes($fSubModP,true));
-            $data['UcFkObjFieldP'] = ucfirst(setObjectFromWordWithDashes($fSubModP,true));
+
+            if($fSubModP == "options"){
+                if(validateArray($settings,'field')){
+                    $object = strhas($settings['field'],'id_') ? explode('id_',$settings['field'])[1] : $settings['field'];
+                } else {
+                    $object = $fSubModP;
+                }
+                $data['lcFkObjFieldP'] = '$'.lcfirst(setObjectFromWordWithDashes($object,true));
+                $data['UcFkObjFieldP'] = ucfirst(setObjectFromWordWithDashes($object,true));
+            } else {
+                $data['lcFkObjFieldP'] = '$'.lcfirst(setObjectFromWordWithDashes($fSubModP,true));
+                $data['UcFkObjFieldP'] = ucfirst(setObjectFromWordWithDashes($fSubModP,true));
+            }
+
             $data['lcFkTableP'] = lcfirst($fSubModP);
             $data['UcFkTableP'] = ucfirst($fSubModP);
             $data['lcFkModS'] = lcfirst($fModS);
@@ -1242,12 +1254,21 @@ class CI_Migration
                 } else {
                     $data['divider'] = ',';
                 }
-//                list($fMod, $fSubmod) = getModSubMod($settings['field']);
-
-                list($fSubModS, $fSubModP) = setSubModSingularPlural($settings['field']);
+                list($fMod, $fSubmod) = getModSubMod($settings['table']);
+                list($fSubModS, $fSubModP) = setSubModSingularPlural($fSubmod);
                 list($fModS, $fModP) = setSubModSingularPlural($sys[$fMod]['name']);
-                $data['lcFkObjFieldP'] = '$'.lcfirst(setObjectFromWordWithDashes($fSubModP,true));
-                $data['UcFkObjFieldP'] = ucfirst(setObjectFromWordWithDashes($fSubModP,true));
+                if($fSubModP == "options"){
+                    if(validateArray($settings,'field')){
+                        $object = strhas($settings['field'],'id_') ? explode('id_',$settings['field'])[1] : $settings['field'];
+                    } else {
+                        $object = $fSubModP;
+                    }
+                    $data['lcFkObjFieldP'] = '$'.lcfirst(setObjectFromWordWithDashes($object,true));
+                    $data['UcFkObjFieldP'] = ucfirst(setObjectFromWordWithDashes($object,true));
+                } else {
+                    $data['lcFkObjFieldP'] = '$'.lcfirst(setObjectFromWordWithDashes($fSubModP,true));
+                    $data['UcFkObjFieldP'] = ucfirst(setObjectFromWordWithDashes($fSubModP,true));
+                }
                 $data['lcFkTableP'] = lcfirst($fSubmod);
                 $data['UcFkTableP'] = ucfirst($fSubmod);
                 $data['lcFkModS'] = lcfirst($fModS);
@@ -1271,11 +1292,28 @@ class CI_Migration
                     }
                 }
                 if(validateArray($data, 'setOfFkSettings')){
+                    $bVerified = false;
+//                    if(compareArrayStr($data,'lcFkTableP', 'options')){
+//                        $aLoaded = unsetall($aLoaded,'options');
+//                    }
                     if(!in_array($data['lcFkTableP'], $aLoaded)){
-                        $data['lcFkObjFieldP'] = '$'.$data['setOfFkSettings']['lcFkObjFieldP'];
+                        $bVerified = true;
+                    }
+                    if($bVerified){
+                        if($fSubModP == "options"){
+                            if(validateArray($settings,'field')){
+                                $object = strhas($settings['field'],'id_') ? explode('id_',$settings['field'])[1] : $settings['field'];
+                            } else {
+                                $object = $fSubModP;
+                            }
+                            $data['lcFkObjFieldP'] = '$'.setObjectFromWordWithDashes($object,true,true);
+                            $data['UcFkObjFieldP'] = setObjectFromWordWithDashes($data['setOfFkSettings']['UcFkObjFieldP'],true,true);
+                        } else {
+                            $data['lcFkObjFieldP'] = '$'.setObjectFromWordWithDashes($data['setOfFkSettings']['lcFkObjFieldP'],true,true);
+                            $data['UcFkObjFieldP'] = setObjectFromWordWithDashes($data['setOfFkSettings']['UcFkObjFieldP'],true,true);
+                        }
                         $data['lcFkTableP'] = $data['setOfFkSettings']['lcFkTableP'];
                         $data['fFieldsRef'] = $data['setOfFkSettings']['fFieldsRef'];
-                        $data['UcFkObjFieldP'] = $data['setOfFkSettings']['UcFkObjFieldP'];
                         if($ind == 2){
                             $data['t1Contents'] = '$'.$data['setOfFkSettings']['t1Contents'];
                             $data['t1FieldRef'] = $data['setOfFkSettings']['t1FieldRef'];
@@ -1451,6 +1489,7 @@ class CI_Migration
                     }
                 }
             }
+
             if(validateArray($settings,'table')){
                 $inputData['table'] = $settings['table'];
             }
@@ -1465,6 +1504,11 @@ class CI_Migration
             }
             if(validateArray($settings,'insertEachOne')){
                 $aEachNames[] = $name;
+            }
+            if(validateArray($settings, 'data')){
+                foreach ($settings['data'] as $data_key => $data_value){
+                    $inputData["data-$data_key "] = $data_value;
+                }
             }
             if(compareArrayStr($settings,'input','disabled')){
                 $inputData['disabled'] = true;
@@ -1498,10 +1542,39 @@ class CI_Migration
                     if (!validateArray($settings, 'options')) {
                         $inputData['options'] = [];
                     }
-                    $inputData['options'] = $settings['options'];
+                    if(validateArray($settings,'options')){
+                        $inputData['options'] = $settings['options'];
+                    }
                 }
             } else if (compareArrayStr($settings, 'type', 'int') || compareArrayStr($settings, 'type', 'decimal')) {
-                $typeForm = 'number';
+                if(!compareArrayStr($settings, 'type', 'decimal') && !validateArray($settings, 'idForeign')){
+                    $inputData['data-fgColor'] = !validateArray($settings,'data') ? "#1AB394" : (validateArray($settings['data'], 'fgColor') ? $settings['data']['fgColor'] : "#1AB394");
+                    $inputData['data-width'] = !validateArray($settings,'data') ? "70" : (validateArray($settings['data'], 'width') ? $settings['data']['width'] : "70");
+                    $inputData['data-height'] = !validateArray($settings,'data') ? "70" : (validateArray($settings['data'], 'height') ? $settings['data']['height'] : "70");
+                    $inputData['data-step'] = !validateArray($settings,'data') ? "10" : (validateArray($settings['data'], 'step') ? $settings['data']['step'] : "10");
+                    $inputData['class'] .= 'dial m-r-sm';
+                }
+                if (compareArrayStr($settings, 'input', 'radio') ||
+                    compareArrayStr($settings, 'input', 'radios') ||
+                    compareArrayStr($settings, 'input', 'checkbox') ||
+                    compareArrayStr($settings, 'input', 'checkboxes') ||
+                    compareArrayStr($settings, 'input', 'select') ||
+                    compareArrayStr($settings, 'input', 'dropdown') ||
+                    compareArrayStr($settings, 'input', 'multiselect')
+                ) {
+                    $typeForm = compareArrayStr($settings, 'input', 'radio') ? 'radios' :
+                        (compareArrayStr($settings, 'input', 'radios') ? 'radios' :
+                            (compareArrayStr($settings, 'input', 'checkbox') ? 'checkboxes' :
+                                (compareArrayStr($settings, 'input', 'checkboxes') ? 'checkboxes' :
+                                    (compareArrayStr($settings, 'input', 'select') ? 'select' :
+                                        (compareArrayStr($settings, 'input', 'multiselect') ? 'multiselect' :
+                                            (compareArrayStr($settings, 'input', 'dropdown') ? 'dropdown' : 'input'))))));
+                    if(validateArray($settings,'options')){
+                        $inputData['options'] = $settings['options'];
+                    }
+                } else {
+                    $typeForm = 'number';
+                }
             } else if (compareArrayStr($settings, 'type', 'date')) {
                 $typeForm = 'input';
                 $inputData["class"] .= "datepicker ";
@@ -1623,11 +1696,7 @@ class CI_Migration
 //                        $data['objOptions'] = '$o'.setObjectFromWordWithDashes($filter,true);
 //                    }
 //                } else {
-                    if(validateArray($settings,'insertEachOne')){
-                        $data['objOptions'] = var_export(['/$id_'.$fSubModS => '/$o'.setObjectFromWordWithDashes($fSubModS,true)],true);
-                    } else {
-                        $data['objOptions'] = '$o'.setObjectFromWordWithDashes($fSubModP,true);
-                    }
+
 //                }
                 $bIsForeing = true;
                 if(validateArray($fkTableFieldRefSettings,'idForeign') && validateArray($fkTableFieldRefSettings,'selectBy')){
@@ -1641,16 +1710,47 @@ class CI_Migration
                     list($ffMod, $ffSubmod) = getModSubMod($fkTableFieldRefSettings['table']);
                     list($ffSubModS, $ffSubModP) = setSubModSingularPlural($ffSubmod);
 
-                    $data['setOfFkSettings']['lcFkObjFieldP'] = setObjectFromWordWithDashes($fSubModP,true,true);
+                    if($fSubModP == "options"){
+                        if(validateArray($settings,'field')){
+                            $object = strhas($settings['field'],'id_') ? explode('id_',$settings['field'])[1] : $settings['field'];
+                        } else {
+                            $object = $fSubModP;
+                        }
+                        $data['setOfFkSettings']['lcFkObjFieldP'] = setObjectFromWordWithDashes($object,true,true);
+                        $data['setOfFkSettings']['UcFkObjFieldP'] = setObjectFromWordWithDashes($object,true);
+                        if(validateArray($settings,'insertEachOne')){
+                            $data['objOptions'] = var_export(['/$id_'.$fSubModS => '/$o'.setObjectFromWordWithDashes($fSubModS,true)],true);
+                        } else {
+                            $data['objOptions'] = '$o'.setObjectFromWordWithDashes($object,true);
+                        }
+                    } else {
+                        $data['setOfFkSettings']['lcFkObjFieldP'] = setObjectFromWordWithDashes($fSubModP,true,true);
+                        $data['setOfFkSettings']['UcFkObjFieldP'] = setObjectFromWordWithDashes($ffSubModP,true);
+                        if(validateArray($settings,'insertEachOne')){
+                            $data['objOptions'] = var_export(['/$id_'.$fSubModS => '/$o'.setObjectFromWordWithDashes($fSubModS,true)],true);
+                        } else {
+                            $data['objOptions'] = '$o'.setObjectFromWordWithDashes($fSubModP,true);
+                        }
+                    }
                     $data['setOfFkSettings']['lcFkTableP'] = $fSubModP;
                     $data['setOfFkSettings']['fFieldsRef'] = var_export($fkTableFieldRefSettings['selectBy'], true);
-                    $data['setOfFkSettings']['UcFkObjFieldP'] = setObjectFromWordWithDashes($ffSubModP,true);
-                    $data['setOfFkSettings']['t1Contents'] = setObjectFromWordWithDashes($fSubModP,true,true);
+
+                    if($fSubModP == "options"){
+                        if(validateArray($settings,'field')){
+                            $object = strhas($settings['field'],'id_') ? explode('id_',$settings['field'])[1] : $settings['field'];
+                        } else {
+                            $object = $fSubModP;
+                        }
+                        $data['setOfFkSettings']['t1Contents'] = setObjectFromWordWithDashes($object,true,true);
+                    } else {
+                        $data['setOfFkSettings']['t1Contents'] = setObjectFromWordWithDashes($fSubModP,true,true);
+                    }
+
                     $data['setOfFkSettings']['t1FieldRef'] = isset($data['setOfFkSettings']['t1FieldRef']) ? $data['setOfFkSettings']['t1FieldRef'] : $fkTableFieldRefSettings['field'];
                     $data['setOfFkSettings']['t2Contents'] = isset($data['setOfFkSettings']['t2Contents']) ? $data['setOfFkSettings']['t2Contents'] : setObjectFromWordWithDashes($ffSubModP,true,true);
                     $data['setOfFkSettings']['t2FieldRef'] = isset($data['setOfFkSettings']['t2FieldRef']) ? $data['setOfFkSettings']['t2FieldRef'] : $fkTableFieldRefSettings['idForeign'];
 
-                    $typeForm = validateArray($fkTableFieldRefSettings,'input') ? $fkTableFieldRefSettings['input'] : 'dropdown';
+                    $typeForm = validateArray($settings, 'input') ? $settings['input'] : (validateArray($fkTableFieldRefSettings,'input') ? $fkTableFieldRefSettings['input'] : 'dropdown');
                 } else {
                     if(validateVar($fields[$idLocal]['selectBy'])){
                         $fields[$idLocal]['selectBy'] = [$fields[$idLocal]['selectBy']];
@@ -1660,6 +1760,11 @@ class CI_Migration
                     }
                     $data['fFieldsRef'] = var_export($fields[$idLocal]['selectBy'], true);
                     $typeForm = validateArray($settings,'input') ? $settings['input'] : 'dropdown';
+                    if(validateArray($settings,'insertEachOne')){
+                        $data['objOptions'] = var_export(['/$id_'.$fSubModS => '/$o'.setObjectFromWordWithDashes($fSubModS,true)],true);
+                    } else {
+                        $data['objOptions'] = '$o'.setObjectFromWordWithDashes($fSubModP,true);
+                    }
                 }
             } else {
                 $data['objOptions'] = '$data["options"]';
@@ -1692,7 +1797,7 @@ class CI_Migration
                         $aUniqueRelations[$filterBy] = array(
                             'table' => $this->dbforge->getTableNameByIdTable($filterBy),
                             'selectBy' => validateArray($this->$tableFilterByFields,$filterBy) ? (validateArray($this->$tableFilterByFields[$filterBy], 'selectBy') ? $this->$tableFilterByFields[$filterBy]['selectBy'] : []) : [],
-                            'filterBy' => validateArray($this->$tableFilterByFields,$filterBy) ? (validateArray($this->$tableFilterByFields[$filterBy], 'selectBy') ? $this->$tableFilterByFields[$filterBy]['selectBy'] : []) : [],
+                            'filterBy' => validateArray($this->$tableFilterByFields,$filterBy) ? (validateArray($this->$tableFilterByFields[$filterBy], 'filterBy') ? $this->$tableFilterByFields[$filterBy]['filterBy'] : []) : [],
                             'idForeign' => $filterBy,
                             'field' => $name
                         );

@@ -37,7 +37,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         //>>>compareFieldsForeignTable<<<
         $lcFkObjFieldP = $this->model_lcFkTableP->setForeignValues('$t1Contents','t1FieldRef','$t2Contents','t2FieldRef');
         //<<<compareFieldsForeignTable>>>
-        $this->data['table_name'] = $this->model_lcFkTableP->_table_name;
+        $this->data['table_name'] = $this->model_lcTableP->_table_name;
         //>>>setFieldsForeignTable<<<
         $this->data['oUcFkObjFieldP'] = $this->model_lcFkTableP->setOptions($lcFkObjFieldP,'divider');
         //<<<setFieldsForeignTable>>>
