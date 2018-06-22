@@ -1252,6 +1252,14 @@ if (!function_exists('unsetall')) {
     }
 }
 
+if (!function_exists('hash_sha')) {
+
+    function hash_sha($string)
+    {
+        return hash('sha512', $string . config_item('encryption_key'));
+    }
+}
+
 if (!function_exists('initStaticTableVars')) {
 
     function initStaticTableVars($obj)

@@ -953,7 +953,7 @@ class CI_Migration
                     'nombre' => 'Rafael',
                     'apellido' => 'Gutierrez',
                     'email' => 'rafael@herbalife.com.bo',
-                    'password' => '123',
+                    'password' => hash_sha('123'),
                     'date_created' => date('Y-m-d H:i:s'),
                     'date_modified' => date('Y-m-d H:i:s')
                 );
@@ -995,7 +995,7 @@ class CI_Migration
                                         $vReturnFieldsViews[$editName][$name] = $fields[$name];
                                     }
                                 }
-                            } else{
+                            } else {
                                 $fieldsViews = $ditFields;
                                 foreach ($allFields as $name) {
                                     if (in_array($name, $fieldsViews)) {

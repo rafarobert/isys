@@ -928,7 +928,7 @@ class CI_Session {
     public function getIdUserLoggued(){
         if($this->has_userdata($this->sessKey)) {
             $aDataSession = $this->userdata($this->sessKey);
-            return $aDataSession['IdUsuario'];
+            return validateArray($aDataSession, 'IdUsuario') ? $aDataSession['IdUsuario'] : (validateArray($aDataSession, 'id_usuario') ? $aDataSession['id_usuario'] : '');
         }
         return '';
     }
@@ -974,15 +974,13 @@ class CI_Session {
             // We can login and redirect
             if($this->_unique_email()){
                 $data = $this->MI->array_from_post(array(
-
                     // *** estic - tables - inicio ***
                     "email",
                     "password",
-
                     // *** estic - tables - fin ***
                 ));
-                $data["password"] = $this->CI->input->post("password");
-                $data["password"] = $this->hash($data["password"]);
+                $data["password"] = $this->hash($this->CI->input->post("password"));
+                $data["id_opcion_role"] = 7;
 
                 $this->MI->save($data);
                 $this->login();
@@ -991,24 +989,31 @@ class CI_Session {
                 $this->set_flashdata('error', 'El email introducido ya existe');
             }
         }
-
         // Load view
         $this->CI->data['subLayout'] = "start";
     }
 
     public function login(){
-        $data = array(
+//        $data = array(
+//            'email' => $this->CI->input->post('email'),
+//            'password' => $this->hash($this->CI->input->post('password')),
+//        );
+        $oUsuario = $this->MI->get_by(array(
             'email' => $this->CI->input->post('email'),
             'password' => $this->hash($this->CI->input->post('password')),
-        );
-        $oUsuario = CiUsuariosQuery::create()
-            ->condition('cond1', 'CiUsuarios.email LIKE ?', $data['email'])
-            ->condition('cond2', 'CiUsuarios.password LIKE ?', $data['password'])
-            ->findOneBy(array('cond1', 'cond2'), 'and');
+            0 => 'id_opcion_role',
+            1 => 'nombre',
+            2 => 'apellido'
+
+        ), true, true);
+//        $oUsuario = CiUsuariosQuery::create()
+//            ->condition('cond1', 'CiUsuarios.Email = ?', $data['email'])
+//            ->condition('cond2', 'CiUsuarios.Password = ?', $data['password'])
+//            ->findOneBy(array('cond1', 'cond2'), 'and');
 
         if(is_object($oUsuario)){
             // log in user
-            $data = $oUsuario->toArray();
+            $data = std2array($oUsuario);
             $data['loggedin'] = TRUE;
             $this->set_userdata($this->sessKey,$data);
             redirect('admin/dashboard');
