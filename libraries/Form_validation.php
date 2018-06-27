@@ -570,17 +570,15 @@ class CI_Form_validation {
 		//
 		// Note: We MUST check if the array is empty or not!
 		//       Otherwise empty arrays will always pass validation.
-        $rules = array_flip($row['rules']);
+		if (is_array($postdata) && ! empty($postdata))
+		{
+			foreach ($postdata as $key => $val)
+			{
+				$this->_execute($row, $rules, $val, $key);
+			}
 
-            if (is_array($postdata) && ! empty($postdata) && !validateArray($rules,'array'))
-            {
-                foreach ($postdata as $key => $val)
-                {
-                    $this->_execute($row, $rules, $val, $key);
-                }
-
-                return;
-            }
+			return;
+		}
 
 
 		// If the field is blank, but NOT required, no further tests are necessary
@@ -670,10 +668,9 @@ class CI_Form_validation {
 				// If we get an array field, but it's not expected - then it is most likely
 				// somebody messing with the form on the client side, so we'll just consider
 				// it an empty field
-//				$postdata = is_array($this->_field_data[$row['field']]['postdata'])
-//					? NULL
-//					: $this->_field_data[$row['field']]['postdata'];
-                $postdata = $this->_field_data[$row['field']]['postdata'];
+				$postdata = is_array($this->_field_data[$row['field']]['postdata'])
+					? NULL
+					: $this->_field_data[$row['field']]['postdata'];
 			}
 
 			// Is the rule a callback?
@@ -758,13 +755,7 @@ class CI_Form_validation {
 				if (function_exists($rule))
 				{
 					// Native PHP functions issue warnings if you pass them more parameters than they use
-                    if(validateVar($postdata,'array')){
-                        foreach ($postdata as $pData){
-                            $result = ($param !== FALSE) ? $rule($pData, $param) : $rule($pData);
-                        }
-                    } else {
-					    $result = ($param !== FALSE) ? $rule($postdata, $param) : $rule($postdata);
-                    }
+					$result = ($param !== FALSE) ? $rule($postdata, $param) : $rule($postdata);
 
 					if ($_in_array === TRUE)
 					{
