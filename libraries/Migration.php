@@ -1532,6 +1532,7 @@ class CI_Migration
                     compareArrayStr($settings, 'input', 'select') ||
                     compareArrayStr($settings, 'input', 'dropdown') ||
                     compareArrayStr($settings, 'input', 'multiselect')) {
+                    $inputData['name'] = $inputData['name'].'[]';
                     $typeForm = compareArrayStr($settings, 'input', 'radio') ? 'radios' :
                         (compareArrayStr($settings, 'input', 'radios') ? 'radios' :
                             (compareArrayStr($settings, 'input', 'checkbox') ? 'checkboxes' :
@@ -1562,6 +1563,7 @@ class CI_Migration
                     compareArrayStr($settings, 'input', 'dropdown') ||
                     compareArrayStr($settings, 'input', 'multiselect')
                 ) {
+                    $inputData['name'] = $inputData['name'].'[]';
                     $typeForm = compareArrayStr($settings, 'input', 'radio') ? 'radios' :
                         (compareArrayStr($settings, 'input', 'radios') ? 'radios' :
                             (compareArrayStr($settings, 'input', 'checkbox') ? 'checkboxes' :
