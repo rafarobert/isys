@@ -1358,7 +1358,7 @@ class CI_Migration
         list($mod, $submod, $subModS, $subModP, $data, $vFields) = $default;
         $fieldsProperties = $this->getPhpFieldsProperties($fields);
         $tableRules = $this->getPhpFieldsRules($vFields,$pkTable);
-        $tableRulesEdit = $this->getPhpFieldsRules($vFields,$pkTable, true);
+        $tableRulesEdit= $this->getPhpFieldsRules($vFields,$pkTable, true);
         $stdFields = $this->getPhpStdFields($tableName,$pkTable);
 //        list($data) = $this->loadEditViews($fields, $vFieldsViews, $data, $tableSettings);
 
@@ -1525,21 +1525,8 @@ class CI_Migration
                     $typeForm = 'password';
                 } else if (compareArrayStr($settings, 'input', 'hidden')) {
                     $typeForm = 'hidden';
-                } else if (compareArrayStr($settings, 'input', 'radio') ||
-                    compareArrayStr($settings, 'input', 'radios') ||
-                    compareArrayStr($settings, 'input', 'checkbox') ||
-                    compareArrayStr($settings, 'input', 'checkboxes') ||
-                    compareArrayStr($settings, 'input', 'select') ||
-                    compareArrayStr($settings, 'input', 'dropdown') ||
-                    compareArrayStr($settings, 'input', 'multiselect')) {
-                    $inputData['name'] = $inputData['name'].'[]';
-                    $typeForm = compareArrayStr($settings, 'input', 'radio') ? 'radios' :
-                        (compareArrayStr($settings, 'input', 'radios') ? 'radios' :
-                            (compareArrayStr($settings, 'input', 'checkbox') ? 'checkboxes' :
-                                (compareArrayStr($settings, 'input', 'checkboxes') ? 'checkboxes' :
-                                    (compareArrayStr($settings, 'input', 'select') ? 'select' :
-                                        (compareArrayStr($settings, 'input', 'multiselect') ? 'multiselect' :
-                                            (compareArrayStr($settings, 'input', 'dropdown') ? 'dropdown' : 'input'))))));
+                } else if ($this->bInputHasOptions($settings)) {
+                    list($typeForm, $inputData) = $this->getInputType($settings,$inputData);
                     if (!validateArray($settings, 'options')) {
                         $inputData['options'] = [];
                     }
@@ -1555,22 +1542,8 @@ class CI_Migration
                     $inputData['data-step'] = !validateArray($settings,'data') ? "10" : (validateArray($settings['data'], 'step') ? $settings['data']['step'] : "10");
                     $inputData['class'] .= 'dial m-r-sm';
                 }
-                if (compareArrayStr($settings, 'input', 'radio') ||
-                    compareArrayStr($settings, 'input', 'radios') ||
-                    compareArrayStr($settings, 'input', 'checkbox') ||
-                    compareArrayStr($settings, 'input', 'checkboxes') ||
-                    compareArrayStr($settings, 'input', 'select') ||
-                    compareArrayStr($settings, 'input', 'dropdown') ||
-                    compareArrayStr($settings, 'input', 'multiselect')
-                ) {
-                    $inputData['name'] = $inputData['name'].'[]';
-                    $typeForm = compareArrayStr($settings, 'input', 'radio') ? 'radios' :
-                        (compareArrayStr($settings, 'input', 'radios') ? 'radios' :
-                            (compareArrayStr($settings, 'input', 'checkbox') ? 'checkboxes' :
-                                (compareArrayStr($settings, 'input', 'checkboxes') ? 'checkboxes' :
-                                    (compareArrayStr($settings, 'input', 'select') ? 'select' :
-                                        (compareArrayStr($settings, 'input', 'multiselect') ? 'multiselect' :
-                                            (compareArrayStr($settings, 'input', 'dropdown') ? 'dropdown' : 'input'))))));
+                if ($this->bInputHasOptions($settings)) {
+                    list($typeForm, $inputData)= $this->getInputType($settings, $inputData);
                     if(validateArray($settings,'options')){
                         $inputData['options'] = $settings['options'];
                     }
@@ -1622,6 +1595,66 @@ class CI_Migration
             unset($data["printSecondItem"]);
         }
         return [$htmlFormContent,$aEachNames, $modalsContent];
+    }
+
+    private function bInputHasOptions($settings){
+        if(compareArrayStr($settings, 'input', 'radio') ||
+            compareArrayStr($settings, 'input', 'radios') ||
+            compareArrayStr($settings, 'input', 'checkbox') ||
+            compareArrayStr($settings, 'input', 'checkboxes') ||
+            compareArrayStr($settings, 'input', 'select') ||
+            compareArrayStr($settings, 'input', 'dropdown') ||
+            compareArrayStr($settings, 'input', 'multiselect')){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private function getInputType($settings,$inputData){
+
+        $formType = 'default';
+
+        if($this->inputRadio($settings)){
+            $formType = 'radio';
+        } else if($this->inputRadios($settings)){
+            $formType = 'radios';
+        } else if($this->inputCheckbox($settings)){
+            $formType = 'checkbox';
+        } else if($this->inputCheckboxes($settings)){
+            $inputData['name'] = $inputData['name'].'[]';
+            $formType = 'checkboxes';
+        } else if($this->inputSelect($settings)){
+            $formType = 'select';
+        } else if($this->inputMultiselect($settings)){
+            $inputData['name'] = $inputData['name'].'[]';
+            $formType = 'multiselect';
+        } else if($this->inputDropdown($settings)){
+            $formType = 'dropdown';
+        }
+        return [$formType, $inputData];
+    }
+
+    private function inputRadio($settings){
+        return compareArrayStr($settings, 'input', 'radio');
+    }
+    private function inputRadios($settings){
+        return compareArrayStr($settings, 'input', 'radios');
+    }
+    private function inputCheckbox($settings){
+        return compareArrayStr($settings, 'input', 'checkbox');
+    }
+    private function inputCheckboxes($settings){
+        return compareArrayStr($settings, 'input', 'checkboxes');
+    }
+    private function inputSelect($settings){
+        return compareArrayStr($settings, 'input', 'select');
+    }
+    private function inputMultiselect($settings){
+        return compareArrayStr($settings, 'input', 'multiselect');
+    }
+    private function inputDropdown($settings){
+        return compareArrayStr($settings, 'input', 'dropdown');
     }
 
     private function validateFkTable($data, $fields, $settings, $sys, $typeForm = null){
@@ -1953,14 +1986,17 @@ class CI_Migration
     {
         $rules = array();
         $excepts = array_merge(config_item('controlFields'),[$pkTable]);
-        foreach ($fields as $name => $field) {
+        foreach ($fields as $name => $settings) {
+            if($this->bInputHasOptions($settings) && ($this->inputMultiselect($settings) || $this->inputCheckboxes($settings))){
+                $name .= '[]';
+            }
             if (!in_array($name, $excepts)) {
                 if (strhas($name, 'password') && !$noPassword) {
                     $rules[$name] = array(
                         "password" => array(
                             "field" => $name,
-                            "label" => validateArray($field, 'label') ? $field['label'] : ucfirst($name),
-                            "rules" => $this->getRulesByField($field),),
+                            "label" => validateArray($settings, 'label') ? $settings['label'] : ucfirst($name),
+                            "rules" => $this->getRulesByField($settings),),
                         "password_confirm" => array(
                             "field" => "password_confirm",
                             "label" => setTitleFromWordWithDashes("password_confirm"),
@@ -1968,11 +2004,11 @@ class CI_Migration
                         ),
                     );
                 } else {
-                    if(!compareArrayStr($field,'input','image') && !compareArrayStr($field,'input','password')){
+                    if(!compareArrayStr($settings,'input','image') && !compareArrayStr($settings,'input','password')){
                         $rules[$name] = array(
                             "field" => $name,
-                            "label" => validateArray($field, 'label') ? $field['label'] : ucfirst($name),
-                            "rules" => $this->getRulesByField($field)
+                            "label" => validateArray($settings, 'label') ? $settings['label'] : ucfirst($name),
+                            "rules" => $this->getRulesByField($settings)
                         );
                     }
                 }
