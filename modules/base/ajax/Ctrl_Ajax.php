@@ -39,6 +39,7 @@ class Ctrl_Ajax extends Base_Controller
 
     public function export($table = '', $funct = 'edit', $subview = ''){
         $SYS = config_item('sys');
+        $data = $this->input->post('data');
         list($mod, $submod) = getModSubMod($table);
         if($tableRelated = $this->input->get('verifyFields')){
             list($modP, $submodP) = getModSubMod($tableRelated);
@@ -65,6 +66,24 @@ class Ctrl_Ajax extends Base_Controller
         echo json_encode($result);
 
         exit();
+    }
+
+    public function exportFields($table = ''){
+        $aReturn = array();
+        if(validateVar($table)){
+            $fields = $this->dbforge->getArrayFieldsFromTable($table)[$table];
+            if(validateVar($fields, 'array')){
+                $fields = array_keys($fields);
+                $fields = array_combine($fields,$fields);
+                $fields['error'] = 'ok';
+            } else {
+                $fields['error'] = 'Algo salio mal, revisa el nombre de la tabla';
+            }
+            $aReturn = $fields;
+        } else {
+            $aReturn['error'] = 'Debe introducir como parametro el nombre de una tabla';
+        }
+        echo json_encode($aReturn);
     }
 
     public function filterOptions(){

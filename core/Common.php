@@ -1260,6 +1260,36 @@ if (!function_exists('hash_sha')) {
     }
 }
 
+if (!function_exists('setTitleFromObject')) {
+
+    function setTitleFromObject($object,$aValues)
+    {
+        $title = '';
+        if(validateVar($aValues, 'array')){
+            foreach ($aValues as $value){
+                $title .= $object->$value . ' ';
+            }
+        } else if(validateVar($aValues)){
+            $title .= $object->$aValues . ' ';
+        }
+        return $title;
+    }
+}
+
+if (!function_exists('setInputData')) {
+
+    function setInputData($data,$object)
+    {
+        if(is_object($object)){
+            $aValues = std2array($object);
+            foreach ($aValues as $name => $value){
+                $data["data-$name"] = $value;
+            }
+        }
+        return $data;
+    }
+}
+
 if (!function_exists('initStaticTableVars')) {
 
     function initStaticTableVars($obj)

@@ -1176,7 +1176,9 @@ abstract class CI_DB_forge
             $database = $CI->db->database;
         }
         $sql = "SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA LIKE '$database'";
-        return $CI->db->query($sql)->result();
+
+        $result = $CI->db->query($sql)->result();
+        return array_column(json_decode(json_encode($result), true), "TABLE_NAME");
     }
 
     public function getTableRelations($table, $database = '')
@@ -1213,7 +1215,7 @@ abstract class CI_DB_forge
             $database = $CI->db->database;
         }
         if ($table == '') {
-            $tables = array_column(json_decode(json_encode($this->getArrayTableNamesFromDB()), true), "TABLE_NAME");
+            $tables = $this->getArrayTableNamesFromDB();
         } else {
             $tables[] = $table;
         }
