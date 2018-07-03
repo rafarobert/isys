@@ -21,6 +21,7 @@ class Ctrl_Ajax extends Base_Controller
         // **************** Modelos **********************
         $this->model_vasos = Model_Vasos::create();
         $this->model_usuarios = Model_Usuarios::create();
+        $this->model_vasos = Model_Vasos::create();
         $this->model_turnos = Model_Turnos::create();
         $this->model_sesiones = Model_Sesiones::create();
         $this->model_detalles_pedidos = Model_Detalles_pedidos::create();
@@ -29,6 +30,7 @@ class Ctrl_Ajax extends Base_Controller
         // **************** Controladores ************************
         $this->ctrl_vasos = Ctrl_Vasos::create();
         $this->ctrl_usuarios = Ctrl_Usuarios::create();
+        $this->ctrl_vasos = Ctrl_Vasos::create();
         $this->ctrl_turnos = Ctrl_Turnos::create();
         $this->ctrl_sesiones = Ctrl_Sesiones::create();
         $this->ctrl_detalles_pedidos = Ctrl_Detalles_pedidos::create();

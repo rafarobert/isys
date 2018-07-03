@@ -1300,31 +1300,16 @@ class CI_Migration
                         $bVerified = true;
                     }
                     if($bVerified){
-                        if($fSubModP == "options"){
-                            if(validateArray($settings,'field')){
-                                $object = strhas($settings['field'],'id_') ? explode('id_',$settings['field'])[1] : $settings['field'];
-                            } else {
-                                $object = $fSubModP;
-                            }
-                            $data['lcFkObjFieldP'] = '$'.setObjectFromWordWithDashes($object,true,true);
-                            $data['UcFkObjFieldP'] = setObjectFromWordWithDashes($data['setOfFkSettings']['UcFkObjFieldP'],true,true);
-                        } else {
-                            $data['lcFkObjFieldP'] = '$'.setObjectFromWordWithDashes($data['setOfFkSettings']['lcFkObjFieldP'],true,true);
-                            $data['UcFkObjFieldP'] = setObjectFromWordWithDashes($data['setOfFkSettings']['UcFkObjFieldP'],true,true);
-                        }
-                        $data['lcFkTableP'] = $data['setOfFkSettings']['lcFkTableP'];
-                        $data['fFieldsRef'] = $data['setOfFkSettings']['fFieldsRef'];
+                        $data = $this->verifySubModOptions($fSubModP, $settings, $data);
                         if($ind == 2){
-                            $data['t1Contents'] = '$'.$data['setOfFkSettings']['t1Contents'];
-                            $data['t1FieldRef'] = $data['setOfFkSettings']['t1FieldRef'];
-                            $data['t2Contents'] = '$'.$data['setOfFkSettings']['t2Contents'];
-                            $data['t2FieldRef'] = $data['setOfFkSettings']['t2FieldRef'];
-                            $data[$selector] .= $this->load->view(["template_controller" => $selector], $data, true, true, true);
-                            $aLoaded[] = $data['lcFkTableP'];
+                            list($data, $aLoaded) = $this->verifySetOfSettings($data, $ind, $selector, $aLoaded);
                         } else {
                             $data[$selector] .= $this->load->view(["template_controller" => $selector], $data, true, true, true);
                             $aLoaded[] = $data['lcFkTableP'];
                         }
+                    } else if($data['lcFkTableP'] == 'options'){
+                        $data = $this->verifySubModOptions($fSubModP, $settings, $data);
+                        list($data, $aLoaded) = $this->verifySetOfSettings($data, $ind, $selector, $aLoaded);
                     }
                     unset($data['setOfFkSettings']);
                 }
@@ -1352,6 +1337,35 @@ class CI_Migration
         }
     }
 
+    private function verifySubModOptions($fSubModP, $settings, $data){
+        if($fSubModP == "options"){
+            if(validateArray($settings,'field')){
+                $object = strhas($settings['field'],'id_') ? explode('id_',$settings['field'])[1] : $settings['field'];
+            } else {
+                $object = $fSubModP;
+            }
+            $data['lcFkObjFieldP'] = '$'.setObjectFromWordWithDashes($object,true,true);
+            $data['UcFkObjFieldP'] = setObjectFromWordWithDashes($data['setOfFkSettings']['UcFkObjFieldP'],true,true);
+        } else {
+            $data['lcFkObjFieldP'] = '$'.setObjectFromWordWithDashes($data['setOfFkSettings']['lcFkObjFieldP'],true,true);
+            $data['UcFkObjFieldP'] = setObjectFromWordWithDashes($data['setOfFkSettings']['UcFkObjFieldP'],true,true);
+        }
+        $data['lcFkTableP'] = $data['setOfFkSettings']['lcFkTableP'];
+        $data['fFieldsRef'] = $data['setOfFkSettings']['fFieldsRef'];
+        return $data;
+    }
+
+    private function verifySetOfSettings($data, $ind, $selector, $aLoaded){
+        if($ind == 2){
+            $data['t1Contents'] = '$'.$data['setOfFkSettings']['t1Contents'];
+            $data['t1FieldRef'] = $data['setOfFkSettings']['t1FieldRef'];
+            $data['t2Contents'] = '$'.$data['setOfFkSettings']['t2Contents'];
+            $data['t2FieldRef'] = $data['setOfFkSettings']['t2FieldRef'];
+            $data[$selector] .= $this->load->view(["template_controller" => $selector], $data, true, true, true);
+            $aLoaded[] = $data['lcFkTableP'];
+        }
+        return [$data, $aLoaded];
+    }
     public function createModel2($tableName, $pkTable, $fields, $tableSettings = [], $default = [])
     {
         $sys = config_item('sys');
