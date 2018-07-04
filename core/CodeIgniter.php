@@ -430,11 +430,15 @@ if ( ! is_php('5.4'))
                                     }
                                 }
                             } else {
-                                $directorio = ROOT_PATH."$root/$dir/$modulo/$subMod/";
-                                if(is_dir($directorio)){
-                                    return $directorio;
-                                } else {
+                                if($subMod == ''){
                                     return ROOT_PATH."$root/";
+                                } else {
+                                    $directorio = ROOT_PATH."$root/$dir/$modulo/$subMod/";
+                                    if(is_dir($directorio)){
+                                        return $directorio;
+                                    } else {
+                                        return ROOT_PATH."$root/";
+                                    }
                                 }
                             }
                         }

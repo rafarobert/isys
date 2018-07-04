@@ -29,7 +29,7 @@ class Ctrl_Ajax extends Base_Controller
 
         // **************** Controladores ************************
         $this->ctrl_vasos = Ctrl_Vasos::create();
-        $this->ctrl_usuarios = Ctrl_Usuarios::create();
+        $this->ctrl_usuarios = Crud_Usuarios::create();
         $this->ctrl_vasos = Ctrl_Vasos::create();
         $this->ctrl_turnos = Ctrl_Turnos::create();
         $this->ctrl_sesiones = Ctrl_Sesiones::create();

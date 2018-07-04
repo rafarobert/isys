@@ -1329,10 +1329,14 @@ class CI_Migration
         $data["extraFunctions"] = $this->getExtraFunctions($tableName);
         $phpContent = $this->load->view("template_controller", $data, true, true, true);
         $mod = $sys[$mod]['dir'];
-        $framePath = ROOT_PATH.'orm/crud/'.$mod;
-        if (createFolder($framePath)) {
-            if (createFolder($framePath . "$submod/")) {
-                write_file($framePath . "$submod/Ctrl_" . ucfirst($submod) . $this->_ext_php, $phpContent);
+        $framePathOrm = ROOT_PATH.'orm/crud/'.$mod;
+        $framePathApp = ROOT_PATH.'app/modules/'.$mod;
+        if (createFolder($framePathOrm)) {
+            if (createFolder($framePathOrm . "$submod/")) {
+                write_file($framePathOrm . "$submod/Crud_" . ucfirst($submod) . $this->_ext_php, $phpContent);
+                if(!file_exists($framePathApp . "$submod/Ctrl_" . ucfirst($submod) . $this->_ext_php, $phpContent)){
+                    write_file($framePathApp . "$submod/Ctrl_" . ucfirst($submod) . $this->_ext_php, $phpContent);
+                }
             }
         }
     }
