@@ -338,6 +338,9 @@ if ( ! function_exists('form_dropdown'))
 	 */
 	function form_dropdown($data = '', $options = array(), $selected = array(), $extra = '')
 	{
+	    if(is_object($selected)){
+            $selected = std2array($selected);
+        }
         if(!validateVar($options, 'array', false) &&
             validateVar($options, 'string', false) &&
             $extra = ''){

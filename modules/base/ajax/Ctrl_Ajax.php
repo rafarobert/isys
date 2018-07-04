@@ -72,14 +72,22 @@ class Ctrl_Ajax extends Base_Controller
         $aReturn = array();
         if(validateVar($table)){
             $fields = $this->dbforge->getArrayFieldsFromTable($table)[$table];
-            if(validateVar($fields, 'array')){
+            $vFields = array();
+            foreach ($fields as $field => $settings){
+                if(compareArrayStr($settings,'table','ci_options')){
+                    $vFields[] = $field;
+                }
+            }
+            if(validateVar($vFields, 'array')){
                 $fields = array_keys($fields);
                 $fields = array_combine($fields,$fields);
-                $fields['error'] = 'ok';
+                $vFields = array_combine($vFields,$vFields);
+                $vFields['fields'] = $fields;
+                $vFields['error'] = 'ok';
             } else {
-                $fields['error'] = 'Algo salio mal, revisa el nombre de la tabla';
+                $vFields['error'] = 'Algo salio mal, revisa el nombre de la tabla';
             }
-            $aReturn = $fields;
+            $aReturn = $vFields;
         } else {
             $aReturn['error'] = 'Debe introducir como parametro el nombre de una tabla';
         }
