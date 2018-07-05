@@ -7,40 +7,11 @@
  */
 use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
-Class Ctrl_UcTableP extends UcModS_Controller {
-
-    //>>>initVarsForeignTable<<<
-    public $lcFkObjFieldP;
-    //<<<initVarsForeignTable>>>
-    private static $instance = null;
-
-    public static function create()
-    {
-        if(!self::$instance){
-            self::$instance = new self();
-            self::$instance->init();
-        }
-        return self::$instance;
-    }
+Class Ctrl_UcTableP extends Crud_Controller {
 
     public function __construct()
     {
         parent::__construct();
-        $this->load->model("lcModS/model_lcTableP");
-        //>>>loadModelsForeignTable<<<
-        $this->load->model("lcFkModS/model_lcFkTableP");
-        //<<<loadModelsForeignTable>>>
-        $this->initLoaded();
-        //>>>initFieldsForeignTable<<<
-        $lcFkObjFieldP = $this->model_lcFkTableP->get_by('$fFieldsRef', true);
-        //<<<initFieldsForeignTable>>>
-        //>>>compareFieldsForeignTable<<<
-        $lcFkObjFieldP = $this->model_lcFkTableP->setForeignValues('$t1Contents','t1FieldRef','$t2Contents','t2FieldRef');
-        //<<<compareFieldsForeignTable>>>
-        $this->data['table_name'] = $this->model_lcTableP->_table_name;
-        //>>>setFieldsForeignTable<<<
-        $this->data['oUcFkObjFieldP'] = $this->model_lcFkTableP->setOptions($lcFkObjFieldP,'divider');
-        //<<<setFieldsForeignTable>>>
     }
 
     public function index(){
@@ -54,13 +25,9 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         $this->data["subview"] = "lcModS/lcTableP/index";
     }
 
-    public function edit($id_or_view = NULL , $id = NULL){
-        if($id == null && (validateVar($id_or_view, 'numeric') || validateVar($id_or_view, 'string'))){
-            if(!in_array("edit-$id_or_view",$this->data['editTags'])){
-                $id = $id_or_view ;
-                $id_or_view = null;
-            }
-        }
+    public function edit($view = NULL , $id = NULL)
+    {
+        list($id, $view) = $this->filterIdOrView($id, $view);
         // Optiene un lcTableS o crea uno nuevo
         // Se construye las reglas de validacion del formulario
         if(validateVar($id,'numeric') || validateVar($id,'string')){
@@ -74,8 +41,8 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             $oUcTableS = $this->model_lcTableP->get_new();
         }
 
-        if(validateVar($id_or_view)){
-            $this->form_validation->set_rules($this->model_lcTableP->{"rules_edit_$id_or_view"});
+        if(validateVar($view)){
+            $this->form_validation->set_rules($this->model_lcTableP->{"rules_edit_$view"});
         } else {
             $this->form_validation->set_rules($rules);
         }
@@ -87,19 +54,8 @@ Class Ctrl_UcTableP extends UcModS_Controller {
         // Se procesa el formulario
         if($this->form_validation->run() == true){
             $error = 'ok';
-            if(compareStrStr($id_or_view, 'ini')){
-                $data = $this->model_lcTableP->array_from_post($aFromPost = '$validatedFieldsEditIni');
-            }
-            //>>>validatedControllerFieldsEditView<<<
-            else if(compareStrStr($id_or_view, 'editNameView')){$data = $this->model_lcTableP->array_from_post(
-                $aFromPost = '$fieldsEditView'
-                );}
-            //<<<validatedControllerFieldsEditView>>>
-            else {
-                $data = $this->model_lcTableP->array_from_post(
-                    $aFromPost = '$validatedFieldsNames'
-                );
-            }
+            list($data,$aFromPost) = $this->dataFromPost($view);
+
             //>>>validateFieldImgUpload<<<
             if ( ! $this->model_lcTableP->do_upload("lcField", $id) && $id == null) {
                 $error = array('error' => $this->upload->display_errors());
@@ -145,42 +101,7 @@ Class Ctrl_UcTableP extends UcModS_Controller {
             $aReturn['error'] = $error = "tableTitle con datos incompletos, porfavor revisa los datos";;
         }
         // Se carga la vista
-        if(strhas($id_or_view, 'ini')){
-            if($this->input->post('fromAjax') && $error != 'ok'){
-                $aReturn['error'] = $error;
-                $aReturn['view'] = $this->load->view("lcModS/lcTableP/editView",$this->data,true);
-                echo json_encode($aReturn);
-            } else if(!$this->input->post('fromAjax')){
-                $this->data["oUcTableS"]->fieldEditView = CiOptionsQuery::create()->findOneByEditTag('editView')->getIdSetting();
-                $this->data["subview"] = "lcModS/lcTableP/edit-ini";
-                return $this->load->view("lcModS/lcTableP/edit-ini",$this->data,true);
-            }
-        }
-        //>>>viewLoadEditData<<<
-        else if(compareStrStr($id_or_view, 'editNameView')){
-            if($this->input->post('fromAjax') && $error != 'ok'){
-                $aReturn['error'] = $error;
-                $aReturn['view'] = $this->load->view("lcModS/lcTableP/editView",$this->data,true);
-                echo json_encode($aReturn);
-            } else if(!$this->input->post('fromAjax')){
-                if($this->model_lcTableP->_table_name == 'ci_options'){
-                    $this->data["oUcTableS"]->fieldEditView = CiSettingsQuery::create()->findOneByEditTag('editView')->getIdSetting();
-                } else {
-                    $this->data["oUcTableS"]->fieldEditView = CiOptionsQuery::create()->findOneByEditTag('editView')->getIdSetting();
-                }
-                $this->data["subview"] = "lcModS/lcTableP/editView";
-                return $this->load->view("lcModS/lcTableP/editView",$this->data,true);
-            }
-        }
-        //<<<viewLoadEditData>>>
-        else if($this->input->post('fromAjax') && $error != 'ok'){
-            $aReturn['error'] = $error;
-            $aReturn['view'] = $this->load->view("lcModS/lcTableP/edit",$this->data,true);
-            echo json_encode($aReturn);
-        } else if(!$this->input->post('fromAjax')){
-            $this->data["subview"] = "lcModS/lcTableP/edit";
-            return $this->load->view("lcModS/lcTableP/edit",$this->data,true);
-        }
+        $this->loadEditViews($view ,'fieldEditView', $error);
     }
 
     public function delete($id){

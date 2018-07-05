@@ -1327,15 +1327,21 @@ class CI_Migration
             $data["validateFieldPassword"] = $this->load->view(["template_controller" => "validateFieldPassword"], $data, true, true);
         }
         $data["extraFunctions"] = $this->getExtraFunctions($tableName);
-        $phpContent = $this->load->view("template_controller", $data, true, true, true);
         $mod = $sys[$mod]['dir'];
+        $phpCtrlContent = $this->load->view("template_controller", $data, true, true, true);
+        $phpCrudContent = $this->load->view("template_crud", $data, true, true, true);
         $framePathOrm = ROOT_PATH.'orm/crud/'.$mod;
         $framePathApp = ROOT_PATH.'app/modules/'.$mod;
         if (createFolder($framePathOrm)) {
             if (createFolder($framePathOrm . "$submod/")) {
-                write_file($framePathOrm . "$submod/Crud_" . ucfirst($submod) . $this->_ext_php, $phpContent);
-                if(!file_exists($framePathApp . "$submod/Ctrl_" . ucfirst($submod) . $this->_ext_php, $phpContent)){
-                    write_file($framePathApp . "$submod/Ctrl_" . ucfirst($submod) . $this->_ext_php, $phpContent);
+                write_file($framePathOrm . "$submod/Crud_" . ucfirst($submod) . $this->_ext_php, $phpCrudContent);
+            }
+        }
+        if (createFolder($framePathApp)) {
+            if (createFolder($framePathApp . "$submod/")) {
+                $ctrlFile = $framePathApp . "$submod/Ctrl_" . ucfirst($submod) . $this->_ext_php;
+                if(!file_exists($ctrlFile)){
+                    write_file($ctrlFile, $phpCtrlContent);
                 }
             }
         }
@@ -1384,12 +1390,22 @@ class CI_Migration
         $data["tableRules"] = var_export($tableRules, true);
         $data["tableRulesEdit"] = var_export($tableRulesEdit, true);
         $data["stdFields"] = $stdFields;
-        $phpContent = $this->load->view("template_model", $data, true, true,true);
-        $mod = $sys[$mod]['dir'];
-        $framePath = ROOT_PATH.'orm/crud/'.$mod;
-        if (createFolder($framePath)) {
-            if (createFolder($framePath . "$submod/")) {
-                write_file($framePath . "$submod/Model_" . ucfirst($submod) . $this->_ext_php, $phpContent);
+
+        $phpModelContent = $this->load->view("template_model", $data, true, true, true);
+        $phpTraitContent = $this->load->view("template_trait", $data, true, true, true);
+        $framePathOrm = ROOT_PATH.'orm/crud/'.$mod;
+        $framePathApp = ROOT_PATH.'app/modules/'.$mod;
+        if (createFolder($framePathOrm)) {
+            if (createFolder($framePathOrm . "$submod/")) {
+                write_file($framePathOrm . "$submod/Trait_" . ucfirst($submod) . $this->_ext_php, $phpTraitContent);
+            }
+        }
+        if (createFolder($framePathApp)) {
+            if (createFolder($framePathApp . "$submod/")) {
+                $modelFile = $framePathApp . "$submod/Model_" . ucfirst($submod) . $this->_ext_php;
+                if(!file_exists($modelFile)){
+                    write_file($modelFile, $phpModelContent);
+                }
             }
         }
     }
@@ -1403,11 +1419,11 @@ class CI_Migration
 //        list($data) = $this->loadEditViews($fields, $vFieldsViews, $data, $tableSettings);
         $phpContent = $this->load->view("template_index", $data, true, true,true);
         $mod = $sys[$mod]['dir'];
-        $framePath = ROOT_PATH.'orm/crud/'.$mod;
-        if (createFolder($framePath)) {
-            if (createFolder($framePath . "$submod/")) {
-                if (createFolder($framePath . "$submod/views/")) {
-                    write_file($framePath . "$submod/views/index" . $this->_ext_php, $phpContent);
+        $frameAppPath = ROOT_PATH.'app/modules/'.$mod;
+        if (createFolder($frameAppPath)) {
+            if (createFolder($frameAppPath . "$submod/")) {
+                if (createFolder($frameAppPath . "$submod/views/")) {
+                    write_file($frameAppPath . "$submod/views/index" . $this->_ext_php, $phpContent);
                 }
             }
         }
@@ -1427,15 +1443,15 @@ class CI_Migration
         $phpContent .= $modalsContent;
 
         $mod = $sys[$mod]['dir'];
-        $framePath = ROOT_PATH.'orm/crud/'.$mod;
-        if (createFolder($framePath)) {
-            if (createFolder($framePath . "$submod/")) {
-                if (createFolder($framePath . "$submod/views/")) {
-                    write_file($framePath . "$submod/views/edit" . $this->_ext_php, $phpContent);
+        $frameAppPath = ROOT_PATH.'app/modules/'.$mod;
+        if (createFolder($frameAppPath)) {
+            if (createFolder($frameAppPath . "$submod/")) {
+                if (createFolder($frameAppPath . "$submod/views/")) {
+                    write_file($frameAppPath . "$submod/views/edit" . $this->_ext_php, $phpContent);
                     if(validateVar($phpContentEditViews, 'array')){
                         foreach ($phpContentEditViews as $phpContentEditName => $phpContentEditView){
                             if (validateVar($vFieldsViews[$phpContentEditName], 'array')) {
-                                write_file($framePath . "$submod/views/$phpContentEditName" . $this->_ext_php, $phpContentEditView);
+                                write_file($frameAppPath . "$submod/views/$phpContentEditName" . $this->_ext_php, $phpContentEditView);
                             }
                         }
                     }
