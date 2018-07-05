@@ -902,7 +902,7 @@ class CI_Migration
 
             if (validate_modulo($modModName, $modSubmod)) {
                 $exists = false;
-                $this->load->model("$modMod/model_$modSubmod");
+                $this->load->model("$modModName/model_$modSubmod");
                 $modelModulos = "model_$modSubmod";
 
                 $oModulos = $this->db->get($modTable)->result_object();
@@ -1148,7 +1148,7 @@ class CI_Migration
                             // ********************* Para el Model ***************************
                             $data['rulesNameEditView'] = '$rules_'.str_replace('-','_',$vNameView);
                             $data['tableRulesEditView'] = var_export($this->getPhpFieldsRules($vFieldsView,$data['pkTable'], true), true);
-                            $data["validatedModelFieldsEditView"] .= $this->load->view(["template_model" => "validatedModelFieldsEditView"],$data, true, true, true);
+                            $data["validatedModelFieldsEditView"] .= $this->load->view(["template_trait" => "validatedModelFieldsEditView"],$data, true, true, true);
 
                             list($vFieldsIniChecked, $fieldIniImg, $fieldIniPass) = $this->checkInputFields($vFieldsView);
                             if (strhas($vNameView, 'ini')) {
@@ -1160,22 +1160,22 @@ class CI_Migration
                                 $data['fieldsEditView'] = var_export(array_keys($vFieldsIniChecked), true);
                                 $data['editView'] = $vNameView;
                                 $data['editNameView'] = explode('-', $vNameView)[1];
-                                $data['validatedControllerFieldsEditView'] .= $this->load->view(["template_controller" => "validatedControllerFieldsEditView"], $data, true, true, true);
+                                $data['validatedControllerFieldsEditView'] .= $this->load->view(["template_crud" => "validatedControllerFieldsEditView"], $data, true, true, true);
                                 $data['editNameView'] = explode('-', $vNameView)[1];
                                 $data['indexEditNameView'] = validateArray($aEditViewSettings, $vNameView) ? $aEditViewSettings[$vNameView] : '';
                             }
 
-                            if (validateArray($fields, $fieldLink)) {
-                                if (compareArrayStr($fields[$fieldLink], 'idForeign', $fieldLink)) {
-                                    $data['queryToCiSettings'] = $this->load->view(["template_controller" => "queryToCiSettings"], $data, true, true, true);
-                                } else {
-                                    $data['queryToCiOptions'] = $this->load->view(["template_controller" => "queryToCiOptions"], $data, true, true, true);
-                                }
-                            } else {
-                                $data['queryToCiOptions'] = $this->load->view(["template_controller" => "queryToCiOptions"], $data, true, true, true);
-                            }
+//                            if (validateArray($fields, $fieldLink)) {
+//                                if (compareArrayStr($fields[$fieldLink], 'idForeign', $fieldLink)) {
+//                                    $data['queryToCiSettings'] = $this->load->view(["template_controller" => "queryToCiSettings"], $data, true, true, true);
+//                                } else {
+//                                    $data['queryToCiOptions'] = $this->load->view(["template_controller" => "queryToCiOptions"], $data, true, true, true);
+//                                }
+//                            } else {
+//                                $data['queryToCiOptions'] = $this->load->view(["template_controller" => "queryToCiOptions"], $data, true, true, true);
+//                            }
 
-                            $data['viewLoadEditData'] .= $this->load->view(["template_controller" => "viewLoadEditData"], $data, true, true, true);
+//                            $data['viewLoadEditData'] .= $this->load->view(["template_controller" => "viewLoadEditData"], $data, true, true, true);
                             // ********************* Para el View Index ***************************
                             $data['indexEditViewTitle'] = setTitleFromWordWithDashes($data['editNameView']);
                             $data['anchorToEditView'] .= $this->load->view(["template_index" => "anchorToEditView"], $data, true, true, true);
@@ -1235,8 +1235,8 @@ class CI_Migration
             $data['lcFkModS'] = lcfirst($fModS);
             $data['lcFkModP'] = lcfirst($fModP);
 //            $data['initPropertiesVarsForeignTable'] .= $this->load->view(["template_controller" => "initPropertiesVarsForeignTable"], $data, true, true, true);
-            $data['initVarsForeignTable'] .= $this->load->view(["template_controller" => "initVarsForeignTable"], $data, true, true, true);
-            $data['loadModelsForeignTable'] .= $this->load->view(["template_controller" => "loadModelsForeignTable"], $data, true, true, true);
+            $data['initVarsForeignTable'] .= $this->load->view(["template_crud" => "initVarsForeignTable"], $data, true, true, true);
+            $data['loadModelsForeignTable'] .= $this->load->view(["template_crud" => "loadModelsForeignTable"], $data, true, true, true);
         }
         for($ind = 0; $ind < 3; $ind++){
             $aLoaded = [];
@@ -1263,10 +1263,10 @@ class CI_Migration
                     } else {
                         $object = $fSubModP;
                     }
-                    $data['lcFkObjFieldP'] = '$'.lcfirst(setObjectFromWordWithDashes($object,true));
+                    $data['lcFkObjFieldP'] = lcfirst(setObjectFromWordWithDashes($object,true));
                     $data['UcFkObjFieldP'] = ucfirst(setObjectFromWordWithDashes($object,true));
                 } else {
-                    $data['lcFkObjFieldP'] = '$'.lcfirst(setObjectFromWordWithDashes($fSubModP,true));
+                    $data['lcFkObjFieldP'] = lcfirst(setObjectFromWordWithDashes($fSubModP,true));
                     $data['UcFkObjFieldP'] = ucfirst(setObjectFromWordWithDashes($fSubModP,true));
                 }
                 $data['lcFkTableP'] = lcfirst($fSubmod);
@@ -1282,12 +1282,12 @@ class CI_Migration
 //                    }
                     $data['fFieldsRef'] = var_export($settings['filterBy'],true);
                     if($ind != 2){
-                        $data[$selector] .= $this->load->view(["template_controller" => $selector], $data, true, true, true);
+                        $data[$selector] .= $this->load->view(["template_crud" => $selector], $data, true, true, true);
                         $aLoaded[] = $data['lcFkTableP'];
                     }
                 } else {
                     if(!in_array($data['lcFkTableP'], $aLoaded) && $ind != 2){
-                        $data[$selector] .= $this->load->view(["template_controller" => $selector], $data, true, true, true);
+                        $data[$selector] .= $this->load->view(["template_crud" => $selector], $data, true, true, true);
                         $aLoaded[] = $data['lcFkTableP'];
                     }
                 }
@@ -1304,7 +1304,7 @@ class CI_Migration
                         if($ind == 2){
                             list($data, $aLoaded) = $this->verifySetOfSettings($data, $ind, $selector, $aLoaded);
                         } else {
-                            $data[$selector] .= $this->load->view(["template_controller" => $selector], $data, true, true, true);
+                            $data[$selector] .= $this->load->view(["template_crud" => $selector], $data, true, true, true);
                             $aLoaded[] = $data['lcFkTableP'];
                         }
                     } else if($data['lcFkTableP'] == 'options'){
@@ -1328,8 +1328,8 @@ class CI_Migration
         }
         $data["extraFunctions"] = $this->getExtraFunctions($tableName);
         $mod = $sys[$mod]['dir'];
-        $phpCtrlContent = $this->load->view("template_controller", $data, true, true, true);
         $phpCrudContent = $this->load->view("template_crud", $data, true, true, true);
+        $phpCtrlContent = $this->load->view("template_controller", $data, true, true, true);
         $framePathOrm = ROOT_PATH.'orm/crud/'.$mod;
         $framePathApp = ROOT_PATH.'app/modules/'.$mod;
         if (createFolder($framePathOrm)) {
@@ -1354,10 +1354,10 @@ class CI_Migration
             } else {
                 $object = $fSubModP;
             }
-            $data['lcFkObjFieldP'] = '$'.setObjectFromWordWithDashes($object,true,true);
+            $data['lcFkObjFieldP'] = setObjectFromWordWithDashes($object,true,true);
             $data['UcFkObjFieldP'] = setObjectFromWordWithDashes($data['setOfFkSettings']['UcFkObjFieldP'],true,true);
         } else {
-            $data['lcFkObjFieldP'] = '$'.setObjectFromWordWithDashes($data['setOfFkSettings']['lcFkObjFieldP'],true,true);
+            $data['lcFkObjFieldP'] = setObjectFromWordWithDashes($data['setOfFkSettings']['lcFkObjFieldP'],true,true);
             $data['UcFkObjFieldP'] = setObjectFromWordWithDashes($data['setOfFkSettings']['UcFkObjFieldP'],true,true);
         }
         $data['lcFkTableP'] = $data['setOfFkSettings']['lcFkTableP'];
@@ -1367,11 +1367,11 @@ class CI_Migration
 
     private function verifySetOfSettings($data, $ind, $selector, $aLoaded){
         if($ind == 2){
-            $data['t1Contents'] = '$'.$data['setOfFkSettings']['t1Contents'];
+            $data['t1Contents'] = $data['setOfFkSettings']['t1Contents'];
             $data['t1FieldRef'] = $data['setOfFkSettings']['t1FieldRef'];
-            $data['t2Contents'] = '$'.$data['setOfFkSettings']['t2Contents'];
+            $data['t2Contents'] = $data['setOfFkSettings']['t2Contents'];
             $data['t2FieldRef'] = $data['setOfFkSettings']['t2FieldRef'];
-            $data[$selector] .= $this->load->view(["template_controller" => $selector], $data, true, true, true);
+            $data[$selector] .= $this->load->view(["template_crud" => $selector], $data, true, true, true);
             $aLoaded[] = $data['lcFkTableP'];
         }
         return [$data, $aLoaded];
@@ -1391,8 +1391,10 @@ class CI_Migration
         $data["tableRulesEdit"] = var_export($tableRulesEdit, true);
         $data["stdFields"] = $stdFields;
 
+        $mod = $sys[$mod]['dir'];
         $phpModelContent = $this->load->view("template_model", $data, true, true, true);
         $phpTraitContent = $this->load->view("template_trait", $data, true, true, true);
+
         $framePathOrm = ROOT_PATH.'orm/crud/'.$mod;
         $framePathApp = ROOT_PATH.'app/modules/'.$mod;
         if (createFolder($framePathOrm)) {
@@ -1423,7 +1425,10 @@ class CI_Migration
         if (createFolder($frameAppPath)) {
             if (createFolder($frameAppPath . "$submod/")) {
                 if (createFolder($frameAppPath . "$submod/views/")) {
-                    write_file($frameAppPath . "$submod/views/index" . $this->_ext_php, $phpContent);
+                    $filePath = $frameAppPath . "$submod/views/index" . $this->_ext_php;
+                    if(!file_exists($filePath)){
+                        write_file($filePath, $phpContent);
+                    }
                 }
             }
         }
@@ -1447,11 +1452,17 @@ class CI_Migration
         if (createFolder($frameAppPath)) {
             if (createFolder($frameAppPath . "$submod/")) {
                 if (createFolder($frameAppPath . "$submod/views/")) {
-                    write_file($frameAppPath . "$submod/views/edit" . $this->_ext_php, $phpContent);
+                    $filePath = $frameAppPath . "$submod/views/edit" . $this->_ext_php;
+                    if(!file_exists($filePath)){
+                        write_file($filePath, $phpContent);
+                    }
                     if(validateVar($phpContentEditViews, 'array')){
                         foreach ($phpContentEditViews as $phpContentEditName => $phpContentEditView){
                             if (validateVar($vFieldsViews[$phpContentEditName], 'array')) {
-                                write_file($frameAppPath . "$submod/views/$phpContentEditName" . $this->_ext_php, $phpContentEditView);
+                                $fileEditViewPath = $frameAppPath . "$submod/views/$phpContentEditName" . $this->_ext_php;
+                                if(!file_exists($fileEditViewPath)){
+                                    write_file($fileEditViewPath, $phpContentEditView);
+                                }
                             }
                         }
                     }

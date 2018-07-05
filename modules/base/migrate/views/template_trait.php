@@ -14,12 +14,6 @@ class Trait_UcTableP extends UcModS_Model {
 
     //fieldsProperties
 
-    private static $instance = null;
-    public $_table_name = "lcmodType_lcTableP";
-    protected $_order_by = "idTable desc";
-    protected $_timestaps = true;
-
-    public $_primary_key = "idTable";
     public $rules = '$tableRules';
     public $rules_edit = '$tableRulesEdit';
     //>>>validatedModelFieldsEditView<<<

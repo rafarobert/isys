@@ -81,8 +81,8 @@ class CI_Session {
 	public function __construct(array $params = array())
 	{
         // Load migration language
-        $this->CI = CI_Controller::get_instance();
-        $this->MI = CI_Model::get_instance();
+        $this->CI = class_exists('CI_Controller') ? CI_Controller::get_instance() : null;
+        $this->MI = class_exists('CI_Model') ? CI_Model::get_instance() : null;
         // They'll probably be using dbforge
 		// No sessions under CLI
 		if (is_cli())

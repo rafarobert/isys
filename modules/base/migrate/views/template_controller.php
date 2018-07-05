@@ -7,11 +7,22 @@
  */
 use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
-Class Ctrl_UcTableP extends Crud_Controller {
+Class Ctrl_UcTableP extends Crud_UcTableP {
+
+    private static $instance = null;
 
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public static function create()
+    {
+        if(!self::$instance){
+            self::$instance = new self();
+            self::$instance->init();
+        }
+        return self::$instance;
     }
 
     public function index(){
@@ -101,7 +112,12 @@ Class Ctrl_UcTableP extends Crud_Controller {
             $aReturn['error'] = $error = "tableTitle con datos incompletos, porfavor revisa los datos";;
         }
         // Se carga la vista
-        $this->loadEditViews($view ,'fieldEditView', $error);
+
+        if($this->input->post('fromAjax') || compareStrStr($this->router->class,'ajax')){
+            return [$this->loadEditViews('lcModS','lcTableP','edit',$view ,'fieldEditView'), $error];
+        } else {
+            $this->loadEditViews('lcModS','lcTableP','edit',$view ,'fieldEditView', $error);
+        }
     }
 
     public function delete($id){

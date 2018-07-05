@@ -29,7 +29,7 @@ class Ctrl_Ajax extends Base_Controller
 
         // **************** Controladores ************************
         $this->ctrl_vasos = Ctrl_Vasos::create();
-        $this->ctrl_usuarios = Crud_Usuarios::create();
+        $this->ctrl_usuarios = Ctrl_Usuarios::create();
         $this->ctrl_vasos = Ctrl_Vasos::create();
         $this->ctrl_turnos = Ctrl_Turnos::create();
         $this->ctrl_sesiones = Ctrl_Sesiones::create();
@@ -52,11 +52,12 @@ class Ctrl_Ajax extends Base_Controller
         $mod = $SYS[$mod]['name'];
         $ctrl_submod = "ctrl_".$submod;
         $model_submod = "model_".$submod;
-        $view = $this->$ctrl_submod->$funct($subview);
+        list($view, $error) = $this->$ctrl_submod->$funct($subview);
         $fields = $this->$model_submod->get_new();
         $fields = std2array($fields);
 
         $result['view'] = $view;
+        $result['error'] = $error;
         if(isset($fieldsP)){
             $fields_diff = array_diff_assoc($fieldsP,$fields);
             $fields_intersect = array_intersect_assoc($fields,$fieldsP);

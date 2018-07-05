@@ -411,22 +411,36 @@ if ( ! is_php('5.4'))
                         $ruta = ROOT_PATH . "$root/$dir/$modulo/$class/";
                         if (is_dir($ruta) && $class != '') {
                             $class = "Ctrl_".ucfirst($class);
-                            $content = file_get_contents($ruta."$class.php");
-                            $cont_funct = explode('function', $content);
-                            unset($cont_funct[0]);
-                            $funct = function($array){
-                                return str_replace(' ','',explode('(',$array)[0]);
-                            };
-                            $functions = array_map($funct,$cont_funct);
-                            if(in_array($RTR->method, $functions) && !$validating){
-                                if($subMod == ''){
-                                    return ROOT_PATH."$root/";
-                                } else {
-                                    $directorio = ROOT_PATH."$root/$dir/$modulo/$subMod/";
-                                    if(is_dir($directorio)){
-                                        return $directorio;
-                                    } else {
+                            $classFile = $ruta."$class.php";
+                            if(is_file($classFile)){
+                                $content = file_get_contents($classFile);
+                                $cont_funct = explode('function', $content);
+                                unset($cont_funct[0]);
+                                $funct = function($array){
+                                    return str_replace(' ','',explode('(',$array)[0]);
+                                };
+                                $functions = array_map($funct,$cont_funct);
+                                if(in_array($RTR->method, $functions) && !$validating){
+                                    if($subMod == ''){
                                         return ROOT_PATH."$root/";
+                                    } else {
+                                        $directorio = ROOT_PATH."$root/$dir/$modulo/$subMod/";
+                                        if(is_dir($directorio)){
+                                            return $directorio;
+                                        } else {
+                                            return ROOT_PATH."$root/";
+                                        }
+                                    }
+                                } else {
+                                    if($subMod == ''){
+                                        return ROOT_PATH."$root/";
+                                    } else {
+                                        $directorio = ROOT_PATH."$root/$dir/$modulo/$subMod/";
+                                        if(is_dir($directorio)){
+                                            return $directorio;
+                                        } else {
+                                            return ROOT_PATH."$root/";
+                                        }
                                     }
                                 }
                             } else {
