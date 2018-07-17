@@ -8,33 +8,10 @@
  */
 class Ctrl_Ajax extends Base_Controller
 {
-    public $ctrl_vasos;
-    public $ctrl_detalles_pedidos;
-    public $model_vasos;
-    public $model_detalles_pedidos;
-
     function __construct()
     {
         parent::__construct();
         $this->load->model('base/model_ajax');
-
-        // **************** Modelos **********************
-        $this->model_vasos = Model_Vasos::create();
-        $this->model_usuarios = Model_Usuarios::create();
-        $this->model_vasos = Model_Vasos::create();
-        $this->model_turnos = Model_Turnos::create();
-        $this->model_sesiones = Model_Sesiones::create();
-        $this->model_detalles_pedidos = Model_Detalles_pedidos::create();
-        $this->model_porciones = Model_Porciones::create();
-
-        // **************** Controladores ************************
-        $this->ctrl_vasos = Ctrl_Vasos::create();
-        $this->ctrl_usuarios = Ctrl_Usuarios::create();
-        $this->ctrl_vasos = Ctrl_Vasos::create();
-        $this->ctrl_turnos = Ctrl_Turnos::create();
-        $this->ctrl_sesiones = Ctrl_Sesiones::create();
-        $this->ctrl_detalles_pedidos = Ctrl_Detalles_pedidos::create();
-        $this->ctrl_porciones = Ctrl_Porciones::create();
     }
 
     public function export($table = '', $funct = 'edit', $subview = ''){
@@ -50,6 +27,9 @@ class Ctrl_Ajax extends Base_Controller
             $fieldsP = std2array($fieldsP);
         };
         $mod = $SYS[$mod]['name'];
+        // ************** inicia el submodulo ************
+        $this->{"init_$submod"}(true);
+        // **********************
         $ctrl_submod = "ctrl_".$submod;
         $model_submod = "model_".$submod;
         list($view, $error) = $this->$ctrl_submod->$funct($subview);
@@ -126,5 +106,74 @@ class Ctrl_Ajax extends Base_Controller
             }
             echo json_encode($aTipos);
         }
+    }
+
+    public function deleteRegistryFromDB(){
+        $dir = $this->input->post('dir');
+        $dir = preg_replace(['/^\//','/\/$/'],'',$dir);
+        list($mod, $table, $method, $pk) = substr_count($dir,'/') == 3 ? explode('/',$dir) : [];
+        $this->{"init_$table"}();
+        $response = $this->{"model_$table"}->{$method}($pk);
+        if(validateArray($response,'message')){
+            $message = preg_match_all("/^`/",$response['message']);
+            $aMessage = explode('CONSTRAINT',$response['message']);
+
+            $response['error'] = $response['message'];
+        } else {
+            $response['error'] = 'ok';
+        }
+        echo json_encode($response);
+    }
+
+
+
+
+    private function init_comandas($both){
+        if($both){
+            $this->ctrl_comandas = Ctrl_Comandas::create();
+        }
+        $this->model_comandas = Model_Comandas::create();
+    }
+    private function init_vasos($both){
+        if($both){
+            $this->ctrl_vasos = Ctrl_Vasos::create();
+        }
+        $this->model_vasos = Model_Vasos::create();
+    }
+    private function init_porciones($both){
+        if($both){
+            $this->ctrl_porciones = Ctrl_Porciones::create();
+        }
+        $this->model_porciones = Model_Porciones::create();
+    }
+    private function init_detalles_pedidos($both){
+        if($both){
+            $this->ctrl_detalles_pedidos = Ctrl_Detalles_pedidos::create();
+        }
+        $this->model_detalles_pedidos = Model_Detalles_pedidos::create();
+    }
+    private function init_productos($both){
+        if($both){
+            $this->ctrl_productos = Ctrl_Productos::create();
+        }
+        $this->model_productos = Model_Productos::create();
+    }
+    private function init_usuarios($both){
+        if($both){
+            $this->ctrl_usuarios = Ctrl_Usuarios::create();
+        }
+        $this->model_usuarios= Model_Usuarios::create();
+    }
+    private function init_turnos($both){
+        if($both){
+            $this->ctrl_turnos = Ctrl_Turnos::create();
+        }
+        $this->model_turnos= Model_Turnos::create();
+    }
+    private function init_sesiones($both){
+        if($both){
+            $this->ctrl_sesiones = Ctrl_Sesiones::create();
+        }
+        $this->model_sesiones= Model_Sesiones::create();
     }
 }

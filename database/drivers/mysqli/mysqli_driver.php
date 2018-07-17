@@ -505,8 +505,10 @@ class CI_DB_mysqli_driver extends CI_DB {
 				'message' => is_php('5.2.9') ? $this->_mysqli->connect_error : mysqli_connect_error()
 			);
 		}
-
-		return array('code' => $this->conn_id->errno, 'message' => $this->conn_id->error);
+		return array(
+		    'code' => $this->conn_id->errno,
+            'message' => $this->conn_id->error
+        );
 	}
 
 	// --------------------------------------------------------------------

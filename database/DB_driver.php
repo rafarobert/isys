@@ -686,9 +686,12 @@ abstract class CI_DB_driver {
 						break;
 					}
 				}
-
 				// Display errors
-				return $this->display_error(array('Error Number: '.$error['code'], $error['message'], $sql));
+                if(compareArrayNum($error,'code',1451)){
+                    return $error;
+                } else {
+				    return $this->display_error(array('Error Number: '.$error['code'], $error['message'], $sql));
+                }
 			}
 
 			return FALSE;

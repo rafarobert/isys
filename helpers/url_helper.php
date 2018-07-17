@@ -182,6 +182,36 @@ if ( ! function_exists('anchor'))
 	}
 }
 
+if ( ! function_exists('button'))
+{
+	/**
+	 * Anchor Link
+	 *
+	 * Creates an anchor based on the local URL.
+	 *
+	 * @param	string	the URL
+	 * @param	string	the link title
+	 * @param	mixed	any attributes
+	 * @return	string
+	 */
+	function button($title = '', $attributes = '', $icon = '')
+	{
+		$title = (string) $title;
+
+		if ($attributes !== '')
+		{
+			$attributes = _stringify_attributes($attributes);
+		}
+
+		if (is_array($attributes)){
+
+			$attributes = _attributes_to_string($attributes);
+		}
+
+		return '<button '.$attributes.'> '.$icon.$title.'</button>';
+	}
+}
+
 // ------------------------------------------------------------------------
 
 if ( ! function_exists('anchor_popup'))
