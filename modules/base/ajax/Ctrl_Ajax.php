@@ -26,7 +26,7 @@ class Ctrl_Ajax extends Base_Controller
             $fieldsP = $this->$model_submod->get_new();
             $fieldsP = std2array($fieldsP);
         };
-        $mod = $SYS[$mod]['name'];
+//        $mod = $SYS[$mod]['name'];
         // ************** inicia el submodulo ************
         $this->{"init_$submod"}(true);
         // **********************
@@ -66,7 +66,7 @@ class Ctrl_Ajax extends Base_Controller
                 $vFields['fields'] = $fields;
                 $vFields['error'] = 'ok';
             } else {
-                $vFields['error'] = 'Algo salio mal, revisa el nombre de la tabla';
+                $vFields['error'] = 'La tabla seleccionada no contiene columnas que referencien a la tabla ci_options';
             }
             $aReturn = $vFields;
         } else {
@@ -112,68 +112,33 @@ class Ctrl_Ajax extends Base_Controller
         $dir = $this->input->post('dir');
         $dir = preg_replace(['/^\//','/\/$/'],'',$dir);
         list($mod, $table, $method, $pk) = substr_count($dir,'/') == 3 ? explode('/',$dir) : [];
-        $this->{"init_$table"}();
+        $this->{"init_$table"}(true);
         $response = $this->{"model_$table"}->{$method}($pk);
-        if(validateArray($response,'message')){
-            $message = preg_match_all("/^`/",$response['message']);
-            $aMessage = explode('CONSTRAINT',$response['message']);
-
-            $response['error'] = $response['message'];
+        if(validateArray($response,'message') && validateArray($response,'code')){
+            preg_match_all("/`(.*?)`/",$response['message'],$aMessage);
+            if(validateArray($aMessage,1)){
+                $response['constraints'] = $aMessage[1];
+                if(compareArrayNum($response,'code',1451)){
+                    list($foreignMod, $foreignTable) = getModSubMod($aMessage[1][1]);
+                    list($localMod, $localTable) = getModSubMod($aMessage[1][4]);
+                    list($foreignTableS, $foreignP) = setSubModSingularPlural($foreignTable);
+                    list($localTableS, $localTableP) = setSubModSingularPlural($localTable);
+                    $response['SQL'] = $response['message'];
+                    $response['message'] = "No se puede eliminar el registro debido a que existe un $foreignTableS que hace referencia a esta $localTableS";
+                }
+            }
+            $response['error'] = 'Hubo un error al eliminar el registro';
         } else {
-            $response['error'] = 'ok';
+            $response = array();
+            $view = $this->{"ctrl_$table"}->index();
+            if(validateVar($view,'array')){
+                list($response['view'], $response['error']) = $view;
+            } else {
+                $response['error'] = 'ok';
+                $response['view'] = $view;
+            }
+            $response['message'] = 'El registro fue eliminado de forma definitiva exitosamente';
         }
         echo json_encode($response);
-    }
-
-
-
-
-    private function init_comandas($both){
-        if($both){
-            $this->ctrl_comandas = Ctrl_Comandas::create();
-        }
-        $this->model_comandas = Model_Comandas::create();
-    }
-    private function init_vasos($both){
-        if($both){
-            $this->ctrl_vasos = Ctrl_Vasos::create();
-        }
-        $this->model_vasos = Model_Vasos::create();
-    }
-    private function init_porciones($both){
-        if($both){
-            $this->ctrl_porciones = Ctrl_Porciones::create();
-        }
-        $this->model_porciones = Model_Porciones::create();
-    }
-    private function init_detalles_pedidos($both){
-        if($both){
-            $this->ctrl_detalles_pedidos = Ctrl_Detalles_pedidos::create();
-        }
-        $this->model_detalles_pedidos = Model_Detalles_pedidos::create();
-    }
-    private function init_productos($both){
-        if($both){
-            $this->ctrl_productos = Ctrl_Productos::create();
-        }
-        $this->model_productos = Model_Productos::create();
-    }
-    private function init_usuarios($both){
-        if($both){
-            $this->ctrl_usuarios = Ctrl_Usuarios::create();
-        }
-        $this->model_usuarios= Model_Usuarios::create();
-    }
-    private function init_turnos($both){
-        if($both){
-            $this->ctrl_turnos = Ctrl_Turnos::create();
-        }
-        $this->model_turnos= Model_Turnos::create();
-    }
-    private function init_sesiones($both){
-        if($both){
-            $this->ctrl_sesiones = Ctrl_Sesiones::create();
-        }
-        $this->model_sesiones= Model_Sesiones::create();
     }
 }

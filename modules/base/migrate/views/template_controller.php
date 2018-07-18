@@ -33,7 +33,7 @@ Class Ctrl_UcTableP extends Crud_UcTableP {
         //<<<validateFieldsImgsIndex>>>
         $this->data["oUcTableP"] = $oUcTableP;
         // Carga la vista
-        $this->data["subview"] = "lcModS/lcTableP/index";
+        return $this->loadView('lcModS/lcTableP/index');
     }
 
     public function edit($view = NULL , $id = NULL)
@@ -96,6 +96,7 @@ Class Ctrl_UcTableP extends Crud_UcTableP {
                     $aReturn['redirect'] = 'lcModS/lcTableP';
                     $aReturn = array_merge($aReturn,std2array($data));
                     echo json_encode($aReturn);
+                    exit;
                 } else {
                     redirect("lcModS/lcTableP");
                 }
@@ -104,6 +105,7 @@ Class Ctrl_UcTableP extends Crud_UcTableP {
                     $aReturn['error'] = $error = "tableTitle con datos incompletos, porfavor revisa los datos";;
                     $aReturn['view'] = $this->load->view("lcModS/lcTableP/edit",$this->data,true);
                     echo json_encode($aReturn);
+                    exit;
                 } else {
                     $this->data["subview"] = "lcModS/lcTableP/edit";
                 }
@@ -112,17 +114,7 @@ Class Ctrl_UcTableP extends Crud_UcTableP {
             $aReturn['error'] = $error = "tableTitle con datos incompletos, porfavor revisa los datos";;
         }
         // Se carga la vista
-
-        if($this->input->post('fromAjax') || compareStrStr($this->router->class,'ajax')){
-            return [$this->loadEditViews('lcModS','lcTableP','edit',$view ,'fieldEditView'), $error];
-        } else {
-            $this->loadEditViews('lcModS','lcTableP','edit',$view ,'fieldEditView', $error);
-        }
-    }
-
-    public function delete($id){
-        $this->model_lcTableP->delete($id);
-        redirect("lcModS/lcTableP");
+        return $this->loadView('lcModS/lcTableP/edit',$view ,'fieldEditView', $error);
     }
     //extraFunctions
 }
