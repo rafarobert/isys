@@ -21,6 +21,7 @@ class Ctrl_Ajax extends Base_Controller
         if($tableRelated = $this->input->get('verifyFields')){
             list($modP, $submodP) = getModSubMod($tableRelated);
             $modP = $SYS[$modP]['name'];
+            $this->{"init_$submodP"}(true);
             $ctrl_submod = "ctrl_".$submodP;
             $model_submod = "model_".$submodP;
             $fieldsP = $this->$model_submod->get_new();
