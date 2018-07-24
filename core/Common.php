@@ -877,7 +877,7 @@ if (!function_exists('compareStrStr')) {
     {
         if(validateVar($string1) && validateVar($string1)){
             if($anyway){
-                if($string1 == $string2 || $string1 == ucfirst($string2) || $string1 == strtoupper($string2)){
+                if($string1 == $string2 || $string1 == ucfirst($string2) || $string1 == strtoupper($string2) || strhas($string1, $string2)){
                     return true;
                 } else {
                     return false;

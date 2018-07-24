@@ -138,11 +138,21 @@ class Ctrl_Migrate extends Base_Controller
         $framePath = "orm/migrations/";
         unset($tables['migrations']);
         // ***************** refresh *********************
-        rrmdir('orm/migrations');
+//        rrmdir('orm/migrations');
         // ***************** creating migrations ********************
         foreach ($tables as $name => $fields){
             foreach ($fields as $fieldName => $fieldValues){
                 $aJsonFields = $this->dbforge->getFieldCommentsFromDB($fieldName,$name);
+                if(validateVar($aJsonFields, 'array')){
+                    foreach ($aJsonFields as $jsonKey => $dataJson){
+                        if($jsonKey == 'options' && validateVar($dataJson, 'array')){
+                            foreach ($dataJson as $key => $value){
+                                unset($aJsonFields[$jsonKey][$key]);
+                                $aJsonFields[$jsonKey][strtolower($value)] = $value;
+                            }
+                        }
+                    }
+                }
                 if($aJsonFields != null){
                     $fields[$fieldName] = array_merge($fields[$fieldName], $aJsonFields);
                 }

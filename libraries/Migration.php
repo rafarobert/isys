@@ -1066,10 +1066,12 @@ class CI_Migration
         return [$mod, $submod, $subModS, $subModP, $data, $vFields, $vReturnFieldsViews, $phpContent];
     }
 
-    public function checkInputFields($vFields){
+    public function checkInputFields($vFields, $data){
         $vFieldsBackup = $vFields;
         $fieldPass = '';
         $fieldImg = false;
+        $data['setADBTablesRefFields'] = '';
+        $bDBTable = false;
         foreach ($vFields as $name => $settings){
             if(compareArrayStr($settings,'input','hidden')){
                 $fieldHidden = $name;
@@ -1089,8 +1091,16 @@ class CI_Migration
                 $fieldImg = $name;
                 unset($vFieldsBackup[$name]);
             }
+
+            if(!$bDBTable && validateArray($settings,'options') && compareArrayStr($settings,'options', 'db_tabs')){
+                $data['idDBTableRef'] = validateArray($settings,'db_idTableRef') ? $settings['db_idTableRef'] : 'idDBTableRef';
+                $data['fieldDBTableRef'] = validateArray($settings, 'db_fieldTableRef') ? $settings['db_fieldTableRef'] : 'fieldDBTableRef';
+                $data['setADBTablesRefFields'] .= $this->load->view(["template_controller" => 'setADBTablesRefFields'], $data, true, true, true);
+                $bDBTable = true;
+            }
         }
-        return [$vFieldsBackup, $fieldImg, $fieldPass];
+
+        return [$vFieldsBackup, $fieldImg, $fieldPass,$data];
     }
 
     public function getFieldNameEditView($fields, $idSettings, $editView, $tableName = ''){
@@ -1195,7 +1205,7 @@ class CI_Migration
         $excepts = array_merge(config_item('controlFields'), [$pkTable]);
         list($mod, $submod, $subModS, $subModP, $data, $vFields) = $default;
 
-        list($vFieldsChecked, $fieldImg, $fieldPass) = $this->checkInputFields($vFields);
+        list($vFieldsChecked, $fieldImg, $fieldPass, $data) = $this->checkInputFields($vFields,$data);
 //        list($data) = $this->loadEditViews($fields, $vFieldsViews, $data, $tableSettings);
         $aFieldsNames = array_keys($vFieldsChecked);
         $data["validatedFieldsNames"] = var_export($aFieldsNames, true);
@@ -1205,6 +1215,7 @@ class CI_Migration
         $data['setObjectForeignTable'] ='';
         $data['initFieldsForeignTable'] ='';
         $data['setFieldsForeignTable'] ='';
+        $data['setForeignTableFields'] ='';
         $data['compareFieldsForeignTable'] ='';
 
 //        $relations  = $this->getTableRelations($fields);
@@ -1275,6 +1286,12 @@ class CI_Migration
                 $data['lcFkModP'] = lcfirst($fModP);
                 list($data) = $this->validateFkTable($data, $fields, $settings, $sys);
 //            $data['setObjectForeignTable'] .= $this->load->view(["template_controller" => "setObjectForeignTable"], $data, true, true, true);
+                if($ind == 1){
+                    $data['fkLcTableP'] = $data['lcFkTableP'];
+                    $data['idFkLcTableP'] = $settings['idForeign'];
+                    $data['idLocalLcTableP'] = $settings['field'];
+                    $data['setForeignTableFields'] .= $this->load->view(["template_controller" => 'setForeignTableFields'], $data, true, true, true);
+                }
                 if(validateArray($settings,'filterBy') && validateArray($settings,'idForeign')){
 //                    foreach($settings['filterBy'] as $filter){
 //                        $data['lcFkObjFieldP'] = "$filter";
@@ -1511,7 +1528,7 @@ class CI_Migration
             }
             if(validateArray($settings,'onchange')){
                 $inputData['onchange'] = $settings['onchange'];
-                if(strhas($settings['onclick'],'modal') && !$modal){
+                if(strhas($settings['onchange'],'modal') && !$modal){
                     $modal = true;
                 }
             }
@@ -1614,8 +1631,13 @@ class CI_Migration
             }
 
             if(compareArrayStr($settings,'options','db_tabs')){
-                $aDBTables = $this->dbforge->getTables();
-                $inputData['options'] = $aDBTables;
+                $data['objOptions'] = '$aDBTables';
+            }
+            if(compareArrayStr($settings,'options','db_tab_ref')){
+                $data['objOptions'] = '$aDBTableRef';
+            }
+            if(compareArrayStr($settings,'options','db_tabs_fields')){
+                $data['objOptions'] = '$aDBTableFields';
             }
 
             $data['inputData'] = var_export($inputData, true);
@@ -1669,11 +1691,11 @@ class CI_Migration
         } else if($this->inputCheckboxes($settings)){
             $inputData['name'] = $inputData['name'].'[]';
             $formType = 'checkboxes';
-        } else if($this->inputSelect($settings)){
-            $formType = 'select';
         } else if($this->inputMultiselect($settings)){
             $inputData['name'] = $inputData['name'].'[]';
             $formType = 'multiselect';
+        } else if($this->inputSelect($settings)){
+            $formType = 'select';
         } else if($this->inputDropdown($settings)){
             $formType = 'dropdown';
         }
@@ -1947,7 +1969,7 @@ class CI_Migration
                 $content .= "<td><?= img('assets/img/$subModP/thumbs/'.\$$oUcTableS->$name"."_thumb1); ?></td>               
                 ";
             } else {
-                $content .= "<td><?= \$$oUcTableS->$name; ?></td>               
+                $content .= "<td><?= setTitleFromObject(\$$oUcTableS,'$name'); ?></td>               
                 ";
             }
             if ($numFields) {

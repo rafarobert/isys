@@ -25,15 +25,19 @@ Class Ctrl_UcTableP extends Crud_UcTableP {
         return self::$instance;
     }
 
-    public function index(){
+    public function index($view = NULL , $id = NULL){
+        list($id, $view) = $this->filterIdOrView($id, $view);
         // Obtiene a todos los lcTableP
         $oUcTableP = $this->model_lcTableP->get();
+        //>>>setForeignTableFields<<<
+        $oUcTableP = $this->model_fkLcTableP->setForeignFields($this->fkLcTableP,'idFkLcTableP',$oUcTableP,'idLocalLcTableP', true);
+        //<<<setForeignTableFields>>>
         //>>>validateFieldsImgsIndex<<<
         $oUcTableP = $this->model_lcTableP->getThumbs($oUcTableP);
         //<<<validateFieldsImgsIndex>>>
         $this->data["oUcTableP"] = $oUcTableP;
         // Carga la vista
-        return $this->loadView('lcModS/lcTableP/index');
+        return $this->loadView('lcModS/lcTableP/index',$view);
     }
 
     public function edit($view = NULL , $id = NULL)
@@ -60,6 +64,12 @@ Class Ctrl_UcTableP extends Crud_UcTableP {
         //>>>validateFieldImgIndex<<<
         $oUcTableS = $this->model_lcTableP->getThumbs($oUcTableS)[0];
         //<<<validateFieldImgIndex>>>
+        //>>>setADBTablesRefFields<<<
+        $aDBTables = array_values($this->dbforge->getArrayTableNamesFromDB());
+        $this->data['aDBTables'] = array_combine($aDBTables,$aDBTables);
+        $this->data['aDBTableRef'] = isset($oUcTableS->idDBTableRef) && $oUcTableS->idDBTableRef != null ? [$oUcTableS->idDBTableRef => $oUcTableS->idDBTableRef]: [];
+        $this->data['aDBTableFields'] = isset($oUcTableS->fieldDBTableRef) && $oUcTableS->fieldDBTableRef != null ? std2array($oUcTableS->fieldDBTableRef) : [];
+        //<<<setADBTablesRefFields>>>
         $this->data["oUcTableS"] = $oUcTableS;
         $aReturn = array();
         // Se procesa el formulario

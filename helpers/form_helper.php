@@ -358,7 +358,7 @@ if ( ! function_exists('form_dropdown'))
 				unset($data['selected']); // select tags don't have a selected attribute
 			}
 
-			if (isset($data['options']))
+			if (isset($data['options']) && validateVar($data['options'],'array'))
 			{
 				$options = $data['options'];
 				unset($data['options']); // select tags don't use an options attribute
