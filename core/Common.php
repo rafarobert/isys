@@ -1318,5 +1318,6 @@ if (!function_exists('initStaticTableVars')) {
         $obj->table_hbf_sesiones = class_exists('Migration_Create_hbf_sesiones') ? Migration_Create_hbf_sesiones::tableFields : null;
         $obj->table_hbf_turnos = class_exists('Migration_Create_hbf_turnos') ? Migration_Create_hbf_turnos::tableFields : null;
         $obj->table_hbf_vasos = class_exists('Migration_Create_hbf_vasos') ? Migration_Create_hbf_vasos::tableFields : null;
+        $obj->table_hbf_ventas = class_exists('Migration_Create_hbf_ventas') ? Migration_Create_hbf_ventas::tableFields : null;
     }
 }

@@ -1160,7 +1160,7 @@ class CI_Migration
                             $data['tableRulesEditView'] = var_export($this->getPhpFieldsRules($vFieldsView,$data['pkTable'], true), true);
                             $data["validatedModelFieldsEditView"] .= $this->load->view(["template_trait" => "validatedModelFieldsEditView"],$data, true, true, true);
 
-                            list($vFieldsIniChecked, $fieldIniImg, $fieldIniPass) = $this->checkInputFields($vFieldsView);
+                            list($vFieldsIniChecked, $fieldIniImg, $fieldIniPass, $data) = $this->checkInputFields($vFieldsView, $data);
                             if (strhas($vNameView, 'ini')) {
                                 $data['editView'] = $vNameView;
                                 $data["validatedFieldsEditIni"] = var_export(array_keys($vFieldsIniChecked), true);
@@ -1962,6 +1962,12 @@ class CI_Migration
     {
         $oUcTableS = 'o' . ucfirst($subModS);
         $content = "";
+        $aPksOfTables = $this->dbforge->getPrimaryKeysOfTables();
+        $aFksOfTables = $this->dbforge->getForeignKeyOfTables();
+        $aPKorFKofTables = array_merge($aPksOfTables, $aFksOfTables);
+        $aIdsPkOrFk = array_keys($aPKorFKofTables);
+        $aTablesPkOrFk = array_values($aPKorFKofTables);
+//        $aFlipedPksOfTables = array_flip($aPKorFKofTables);
         list($vFields, $numFields) = $this->getValidatedFieldsWithTableSettings($fields, $validFields, $tableSettings);
         $numFields = $numFields == 0 ? 5 : $numFields;
         foreach ($vFields as $name => $settings) {
@@ -1969,8 +1975,23 @@ class CI_Migration
                 $content .= "<td><?= img('assets/img/$subModP/thumbs/'.\$$oUcTableS->$name"."_thumb1); ?></td>               
                 ";
             } else {
-                $content .= "<td><?= setTitleFromObject(\$$oUcTableS,'$name'); ?></td>               
+                $aFieldsSelectBy = validateArray($settings,'selectBy') ? $settings['selectBy'] : [];
+                $aFieldsToJoin = $this->analizeFieldsSelectBy($aFieldsSelectBy, $aPKorFKofTables, $aIdsPkOrFk);
+                if(validateVar($aFieldsToJoin) && in_array($name, $aPksOfTables)){
+                    $content .= "<td><?= setTitleFromObject(\$$oUcTableS,'$name"."_$aFieldsToJoin"."'); ?></td>               
                 ";
+                } else if(validateVar($aFieldsToJoin,'array')){
+                    $html = '';
+                    foreach ($aFieldsToJoin as $fieldToJoin){
+                        $html .= "'$name"."_$fieldToJoin"."',";
+                    }
+                    $html = '['.substr($html,0,strlen($html)-1).']';
+                    $content .= "<td><?= setTitleFromObject(\$$oUcTableS,$html); ?></td>               
+                                ";
+                } else {
+                    $content .= "<td><?= setTitleFromObject(\$$oUcTableS,'$name'); ?></td>               
+                    ";
+                }
             }
             if ($numFields) {
                 $numFields--;
@@ -2194,5 +2215,32 @@ class CI_Migration
         $this->createViewIndex($tableName, $pkTable, $fields, $settings, $defaultData);
         $this->createViewEdit($tableName, $pkTable, $fields, $settings, $defaultData);
 
+    }
+
+    private function analizeFieldsSelectBy($aFieldsSelectBy, $aPKorFKofTables, $aIdsPkOrFk)
+    {
+        $aFieldsToJoin=[];
+        if(validateVar($aFieldsSelectBy)){
+            if(in_array($aFieldsSelectBy, $aIdsPkOrFk)){
+                $selectByTableName = $aPKorFKofTables[$aFieldsSelectBy];
+                $aFieldsToJoin = $this->{"table_$selectByTableName"}[$aFieldsSelectBy]['selectBy'];
+            } else {
+                $aFieldsToJoin = $aFieldsSelectBy;
+            }
+            return $aFieldsToJoin;
+        } else if(validateVar($aFieldsSelectBy, 'array')){
+            foreach ($aFieldsSelectBy as $key => $fieldSelectBy){
+                if(in_array($fieldSelectBy, $aIdsPkOrFk)){
+                    $selectByTableName = $aPKorFKofTables[$fieldSelectBy];
+                    $aFieldsToJoin = $this->{"table_$selectByTableName"}[$fieldSelectBy]['selectBy'];
+                    break;
+                } else {
+                    $aFieldsToJoin[] = $fieldSelectBy;
+                }
+            }
+            return $aFieldsToJoin;
+        } else {
+            return '';
+        }
     }
 }

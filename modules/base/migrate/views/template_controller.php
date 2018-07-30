@@ -30,7 +30,7 @@ Class Ctrl_UcTableP extends Crud_UcTableP {
         // Obtiene a todos los lcTableP
         $oUcTableP = $this->model_lcTableP->get();
         //>>>setForeignTableFields<<<
-        $oUcTableP = $this->model_fkLcTableP->setForeignFields($this->fkLcTableP,'idFkLcTableP',$oUcTableP,'idLocalLcTableP', true);
+        $oUcTableP = $this->model_fkLcTableP->setForeignFields($this->lcFkObjFieldP,'idFkLcTableP',$oUcTableP,'idLocalLcTableP', true);
         //<<<setForeignTableFields>>>
         //>>>validateFieldsImgsIndex<<<
         $oUcTableP = $this->model_lcTableP->getThumbs($oUcTableP);

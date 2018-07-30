@@ -1035,6 +1035,27 @@ abstract class CI_DB_forge
         return false;
     }
 
+    public function getArrayDBTables($database = '')
+    {
+        $CI = CI_Controller::get_instance();
+
+        if ($database == '') {
+            $database = $CI->db->database;
+        }
+        $sql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='$database'";
+        $result = $CI->db->query($sql)->result();
+        if (count($result)) {
+            $results = json_decode(json_encode($result), true);
+            $results = array_column($result,'TABLE_NAME');
+            $aResult = array();
+            foreach ($results as $k => $value){
+                $aResult[] = $value;
+            }
+            return $aResult;
+        }
+        return false;
+    }
+
     public function getTableFields($table, $database = '')
     {
         $CI = CI_Controller::get_instance();
@@ -1348,5 +1369,37 @@ abstract class CI_DB_forge
             $this->create_table('migrations');
             $this->updateMigrationTable($idMigration);
         }
+    }
+
+    public function getPrimaryKeysOfTables($database = '')
+    {
+        $CI = CI_Controller::get_instance();
+        if ($database == '') {
+            $database = $CI->db->database;
+        }
+        $sql = "SELECT COLUMN_NAME, TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'herbalife_dev' AND COLUMN_KEY = 'PRI'";
+        $result = $CI->db->query($sql)->result();
+        if (count((array)$result)) {
+            $aColumnNames = array_column(json_decode(json_encode($result), true), "COLUMN_NAME");
+            $aTableNames = array_column(json_decode(json_encode($result), true), "TABLE_NAME");
+            return array_combine($aColumnNames, $aTableNames);
+        }
+        return false;
+    }
+
+    public function getForeignKeyOfTables($database = '')
+    {
+        $CI = CI_Controller::get_instance();
+        if ($database == '') {
+            $database = $CI->db->database;
+        }
+        $sql = "SELECT COLUMN_NAME, TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'herbalife_dev' AND COLUMN_KEY = 'MUL'";
+        $result = $CI->db->query($sql)->result();
+        if (count((array)$result)) {
+            $aColumnNames = array_column(json_decode(json_encode($result), true), "COLUMN_NAME");
+            $aTableNames = array_column(json_decode(json_encode($result), true), "TABLE_NAME");
+            return array_combine($aColumnNames, $aTableNames);
+        }
+        return false;
     }
 }
