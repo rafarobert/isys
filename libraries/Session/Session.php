@@ -1003,7 +1003,8 @@ class CI_Session {
             'password' => $this->hash($this->CI->input->post('password')),
             0 => 'id_opcion_role',
             1 => 'nombre',
-            2 => 'apellido'
+            2 => 'apellido',
+            3 => 'id_usuario'
 
         ), true, true);
 //        $oUsuario = CiUsuariosQuery::create()

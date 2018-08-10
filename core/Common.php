@@ -923,6 +923,19 @@ if (!function_exists('compareArrayStr')) {
     }
 }
 
+if (!function_exists('compareArrayArray')) {
+    function compareArrayArray($arrayItems, $arrayIn, $anyway = true)
+    {
+        $founds = 0;
+        foreach ($arrayItems as $item){
+            if(in_array($item, $arrayIn)){
+                $founds++;
+            }
+        }
+        return $founds > 0 ? true : false;
+    }
+}
+
 if (!function_exists('compareArrayNum')) {
     function compareArrayNum($array, $index, $num, $anyway = true)
     {
@@ -989,8 +1002,10 @@ if (!function_exists('validateVar')) {
 if (!function_exists('validateArray')) {
     function validateArray($array, $index)
     {
-        if(is_array($array) && (is_string($index) || is_numeric($index))){
-            if(count($array) && isset($array[$index]) && $array[$index] != "" && $array[$index] != []){
+        if(validateVar($array,'array') && (is_string($index) || is_numeric($index))){
+            if(isset($array[$index]) && $array[$index] != "" && $array[$index] != []){
+                return true;
+            } else if(array_column($array,$index) != null){
                 return true;
             } else {
                 return false;
@@ -1202,11 +1217,26 @@ if (!function_exists('rrmdir')) {
 
 if (!function_exists('array2std')) {
 
-    function array2std($array)
-    {
-        $stdClass = json_decode(json_encode($array));
+    function array2std($array) {
+        if(!is_array($array)) {
+            return $array;
+        }
 
-        return $stdClass;
+        $stdClass = json_decode(json_encode($array), false);
+
+        if(is_object($stdClass)) {
+            return $stdClass;
+        } else {
+            $stdClass = new stdClass();
+            if (validateVar($array,'array')){
+                foreach ($array as $name=>$value) {
+                    $stdClass->$name = array2std($value);
+                }
+                return $stdClass;
+            } else {
+                return $array;
+            }
+        }
     }
 }
 
@@ -1214,9 +1244,25 @@ if (!function_exists('std2array')) {
 
     function std2array($std)
     {
+        if(is_array($std)){
+            return $std;
+        }
+
         $array = json_decode(json_encode($std), true);
 
-        return $array;
+        if(is_array($array)){
+            return $array;
+        } else {
+            $array = array();
+            if (is_object($std)){
+                foreach ($std as $name => $value) {
+                    $array[$name] = std2array($value);
+                }
+                return $array;
+            } else {
+                return $std;
+            }
+        }
     }
 }
 
@@ -1299,11 +1345,52 @@ if (!function_exists('myEach')) {
     }
 }
 
+if (!function_exists('verifyArraysInResult')) {
+
+    function verifyArraysInResult($result){
+        if(validateVar($result, 'array')){
+            $funct = function($value){
+                if(validateVar($value) && !validateVar($value,'numeric')){
+                    if(strpos($value,'[') > -1 && strpos($value,']') > -1){
+                        $value = str_replace('"','',$value);
+                        $value = str_replace('[','',$value);
+                        $value = str_replace(']','',$value);
+                        $value = explode(',',$value);
+                        $value = array_combine($value,$value);
+                    }
+                } else if(validateVar($value, 'array')){
+                    foreach ($value as $key => $subValue){
+                        if(strpos($subValue,'[') > -1 && strpos($subValue,']') > -1){
+                            $subValue = str_replace('"','',$subValue);
+                            $subValue = str_replace('[','',$subValue);
+                            $subValue = str_replace(']','',$subValue);
+                            $subValue = explode(',',$subValue);
+                            $value[$key] = array_combine($subValue,$subValue);
+                        }
+                    }
+                }
+                if(validateVar($value, 'array')){
+                    return $value;
+                } else {
+                    return std2array($value);
+                }
+            };
+            if(validateVar($result,'array')){
+                $result = array_map($funct,$result);
+            } else {
+                $result = array_map($funct,std2array($result));
+            }
+            $result = array2std($result);
+        }
+        return $result;
+    }
+}
+
 if (!function_exists('initStaticTableVars')) {
 
     function initStaticTableVars($obj)
     {
-        $obj->table_ci_options = class_exists('Migration_Create_ci_options') ? Migration_Create_ci_options::tableFields : null;
+        $obj->table_ci_options =  class_exists('Migration_Create_ci_options') ? Migration_Create_ci_options::tableFields : null;
         $obj->table_ci_usuarios = class_exists('Migration_Create_ci_usuarios') ? Migration_Create_ci_usuarios::tableFields : null;
         $obj->table_ci_modulos = class_exists('Migration_Create_ci_modulos') ? Migration_Create_ci_modulos::tableFields : null;
         $obj->table_ci_settings = class_exists('Migration_Create_ci_settings') ? Migration_Create_ci_settings::tableFields : null;

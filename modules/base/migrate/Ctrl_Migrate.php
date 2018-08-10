@@ -190,5 +190,6 @@ class Ctrl_Migrate extends Base_Controller
             }
             $migIndex++;
         }
+//        dump(shell_exec('composer update'));
     }
 }
