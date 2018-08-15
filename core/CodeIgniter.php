@@ -619,10 +619,12 @@ if ( ! is_php('5.4'))
  *  Call the requested method
  * ------------------------------------------------------
  */
-	call_user_func_array(array(&$CI, $method), $params);
+	$response = call_user_func_array(array(&$CI, $method), $params);
 //	if(!$CI->input->post('fromModal')){
     if($ctrlClass != 'Ctrl_Ajax' && !$CI->input->post('fromAjax')){
         $CI->load->view($CI->data['layout'], $CI->data);
+    } else {
+        echo json_encode($response);
     }
 
 	// Mark a benchmark end point

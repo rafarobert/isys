@@ -1005,8 +1005,6 @@ if (!function_exists('validateArray')) {
         if(validateVar($array,'array') && (is_string($index) || is_numeric($index))){
             if(isset($array[$index]) && $array[$index] != "" && $array[$index] != []){
                 return true;
-            } else if(array_column($array,$index) != null){
-                return true;
             } else {
                 return false;
             }
@@ -1345,44 +1343,69 @@ if (!function_exists('myEach')) {
     }
 }
 
+if (!function_exists('countStd')) {
+    function countStd($std) {
+        $array = std2array($std);
+        return validateVar($array,'array') ? count($array) : false;
+    }
+}
+
+if (!function_exists('str2array')) {
+    function str2array($str){
+        if(validateVar($str) && !validateVar($str,'numeric')){
+            if(strpos($str,'[') > -1 && strpos($str,']') > -1){
+                $str = str_replace('"','',$str);
+                $str = str_replace('[','',$str);
+                $str = str_replace(']','',$str);
+                $str = explode(',',$str);
+                $str = array_combine($str,$str);
+            }
+        } else if(validateVar($str, 'array')){
+            foreach ($str as $key => $subValue){
+                if(strpos($subValue,'[') > -1 && strpos($subValue,']') > -1){
+                    $subValue = str_replace('"','',$subValue);
+                    $subValue = str_replace('[','',$subValue);
+                    $subValue = str_replace(']','',$subValue);
+                    $subValue = explode(',',$subValue);
+                    $str[$key] = array_combine($subValue,$subValue);
+                }
+            }
+        }
+        if(validateVar($str, 'array')){
+            return $str;
+        } else if(!validateVar($str) && is_object($str)){
+            return std2array($str);
+        } else {
+            return $str;
+        }
+    }
+}
+
 if (!function_exists('verifyArraysInResult')) {
 
     function verifyArraysInResult($result){
         if(validateVar($result, 'array')){
-            $funct = function($value){
-                if(validateVar($value) && !validateVar($value,'numeric')){
-                    if(strpos($value,'[') > -1 && strpos($value,']') > -1){
-                        $value = str_replace('"','',$value);
-                        $value = str_replace('[','',$value);
-                        $value = str_replace(']','',$value);
-                        $value = explode(',',$value);
-                        $value = array_combine($value,$value);
-                    }
-                } else if(validateVar($value, 'array')){
-                    foreach ($value as $key => $subValue){
-                        if(strpos($subValue,'[') > -1 && strpos($subValue,']') > -1){
-                            $subValue = str_replace('"','',$subValue);
-                            $subValue = str_replace('[','',$subValue);
-                            $subValue = str_replace(']','',$subValue);
-                            $subValue = explode(',',$subValue);
-                            $value[$key] = array_combine($subValue,$subValue);
-                        }
-                    }
-                }
-                if(validateVar($value, 'array')){
-                    return $value;
-                } else {
-                    return std2array($value);
-                }
-            };
             if(validateVar($result,'array')){
-                $result = array_map($funct,$result);
+                $result = array_map('str2array',$result);
             } else {
-                $result = array_map($funct,std2array($result));
+                $result = array_map('str2array',std2array($result));
             }
             $result = array2std($result);
         }
         return $result;
+    }
+}
+
+if (!function_exists('suprTagInStr')) {
+
+    function suprTagInStr($tag, $str){
+        if(validateVar($str) && validateVar($tag)){
+            $aStr = explode($tag,$str);
+            $str = implode('',$aStr);
+            return $str;
+        } else {
+            return $str;
+        }
     }
 }
 

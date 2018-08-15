@@ -33,12 +33,10 @@ class Ctrl_Ajax extends Base_Controller
         // **********************
         $ctrl_submod = "ctrl_".$submod;
         $model_submod = "model_".$submod;
-        list($view, $error) = $this->$ctrl_submod->$funct($subview);
+        $result = $this->$ctrl_submod->$funct($subview);
         $fields = $this->$model_submod->get_new();
         $fields = std2array($fields);
 
-        $result['view'] = $view;
-        $result['error'] = $error;
         if(isset($fieldsP)){
             $fields_diff = array_diff_assoc($fieldsP,$fields);
             $fields_intersect = array_intersect_assoc($fields,$fieldsP);

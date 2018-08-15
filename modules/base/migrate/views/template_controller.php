@@ -99,7 +99,7 @@ Class Ctrl_UcTableP extends Crud_UcTableP {
                 if($this->input->post('fromAjax')){
                     $aReturn['message'] = setMessage($data,$aFromPost,'tableTitle agregado exitosamente');
                     $aReturn['error'] = $error;
-                    $this->data['oUcTableS'] = $data = $this->model_lcTableP->get_by($data,true)[0];
+                    $this->data['oUcTableS'] = $data = $this->model_lcTableP->get_one_by($data,true);
                     $data->primary = $primary = $this->model_lcTableP->_primary_key;
                     $data->pk = $data->$primary;
                     $aReturn['view'] = $this->load->view("lcModS/lcTableP/edit",$this->data,true);

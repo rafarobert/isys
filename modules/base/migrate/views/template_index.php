@@ -62,7 +62,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <?php if (count($oUcTableP)) { ?>
+                            <?php if (countStd($oUcTableP)) { ?>
                                 <?php foreach ($oUcTableP as $oUcTableS) {
                                     $editLink = "lcModS/lcTableP/edit/";
                                     //>>>linkToEditView<<<
