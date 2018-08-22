@@ -863,7 +863,7 @@ class CI_Migration
             // *********************** Si la tabla modulos existe se agrega el modulo actual*************
             // *********** de lo contrario se redirecciona a la creacion de la tabla modulos ************
             // ******************************************************************************************
-            $idMigTable = $this->saveTableIntoModules($tableSettings, $tableName, $pkTable);
+            $idMigTable = $this->saveTable($tableSettings, $tableName, $pkTable);
 
             $defaultData = $this->setDataDefault($tableName, $pkTable, $fields, $idMigTable, $tableSettings);
             // *****************************************************************************************
@@ -881,7 +881,7 @@ class CI_Migration
         }
     }
 
-    private function saveTableIntoModules($tableSettings, $tableName, $tablePk)
+    private function saveTable($tableSettings, $tableName, $tablePk)
     {
         if (validate_modulo('base', 'tables')) {
             $sys = config_item('sys');
@@ -941,25 +941,25 @@ class CI_Migration
 
     private function getIdUserDefault()
     {
-        if ($this->db->table_exists('ci_usuarios')) {
-            $this->db->where('id_usuario', 1);
-            $oUser = $this->db->get('ci_usuarios')->row();
+        if ($this->db->table_exists('ci_user')) {
+            $this->db->where('id_user', 1);
+            $oUser = $this->db->get('ci_user')->row();
 
             if (is_object($oUser)) {
-                return $oUser->id_usuario;
+                return $oUser->id_user;
             } else {
                 $data = array(
-                    'id_usuario' => 1,
-                    'nombre' => 'Rafael',
-                    'apellido' => 'Gutierrez',
+                    'id_user' => 1,
+                    'name' => 'Rafael',
+                    'lastname' => 'Gutierrez',
                     'email' => 'rafael@herbalife.com.bo',
                     'password' => hash_sha('123'),
                     'date_created' => date('Y-m-d H:i:s'),
                     'date_modified' => date('Y-m-d H:i:s')
                 );
                 $this->db->set($data);
-                if ($this->db->insert('ci_usuarios')) {
-                    return $data['id_usuario'];
+                if ($this->db->insert('ci_users')) {
+                    return $data['id_user'];
                 };
             }
         }
@@ -1075,6 +1075,7 @@ class CI_Migration
 
     public function loadEditViews($fields, $vFieldsViews, $data, $tableName)
     {
+        $aPhpContentEditViews = array();
         $data['editView'] = '';
         $data['validatedControllerFieldsEditView'] = '';
         $data['viewLoadEditData'] = '';
@@ -1082,11 +1083,12 @@ class CI_Migration
         $data['linkToEditView'] = '';
         $data["validatedModelFieldsEditView"] = '';
         $tableTitle = $data['tableTitle'];
-        $aEditNameViewsSettings = CiSettingsQuery::create()->select(['id_setting', 'edit_tag'])->find()->getData();
-        $aIdsSettings = array_column($aEditNameViewsSettings, 'id_setting');
-        $aTagsSettings = array_column($aEditNameViewsSettings, 'edit_tag');
-        $aEditViewSettings = array_combine($aTagsSettings, $aIdsSettings);
-        $aPhpContentEditViews = array();
+        $aEditNameViewsSettings = class_exists('CiSettingsQuery') ? CiSettingsQuery::create()->select(['id_setting', 'edit_tag'])->find()->getData() : [];
+        if(validateVar($aEditNameViewsSettings, 'array')){
+            $aIdsSettings = array_column($aEditNameViewsSettings, 'id_setting');
+            $aTagsSettings = array_column($aEditNameViewsSettings, 'edit_tag');
+            $aEditViewSettings = array_combine($aTagsSettings, $aIdsSettings);
+        }
         if (validateVar($vFieldsViews, 'array')) {
             foreach ($vFieldsViews as $fieldLink => $editViews) {
                 if (validateVar($editViews, 'array')) {
@@ -2264,7 +2266,7 @@ class CI_Migration
         $vIdFieldForViews = null;
         $vFieldsViews = array();
         $aEditViews = array();
-        $sysSettings = CiSettingsQuery::create()->filterByIdTabla($idMigTable)->find();
+        $sysSettings = class_exists('CiSettingsQuery') ? CiSettingsQuery::create()->filterByIdTabla($idMigTable)->find() : [];
         foreach ($sysSettings as $sysSetting) {
             $idSetting = $sysSetting->getIdSetting();
             $aSysOptions = CiOptionsQuery::create()->filterByIdSetting($idSetting)->find();

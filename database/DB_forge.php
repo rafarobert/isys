@@ -1305,12 +1305,12 @@ abstract class CI_DB_forge
                     }
                     if (compareStrStr($colName, 'id_user_modified')) {
                         $aFields['label'] = "Nombre del usuario que modifico el registro";
-                        $aFields['selectBy'] = ["nombre", "apellido"];
+                        $aFields['selectBy'] = ["name", "lastname"];
                         $aFields['input'] = "disabled";
                     }
                     if (compareStrStr($colName, 'id_user_created')) {
                         $aFields['label'] = "Nombre del usuario que creo el registro";
-                        $aFields['selectBy'] = ["nombre", "apellido"];
+                        $aFields['selectBy'] = ["name", "lastname"];
                         $aFields['input'] = "disabled";
                     }
                     if (compareStrStr($colName, 'date_modified')) {

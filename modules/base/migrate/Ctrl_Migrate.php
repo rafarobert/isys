@@ -140,6 +140,10 @@ class Ctrl_Migrate extends Base_Controller
         // ***************** refresh *********************
 //        rrmdir('orm/migrations');
         // ***************** creating migrations ********************
+        if (createFolder($framePath."tables/")) {
+            rrmdir($framePath."tables/");
+            createFolder($framePath."tables/");
+        }
         foreach ($tables as $name => $fields){
             foreach ($fields as $fieldName => $fieldValues){
                 $aJsonFields = $this->dbforge->getFieldCommentsFromDB($fieldName,$name);
