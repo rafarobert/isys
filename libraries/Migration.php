@@ -994,6 +994,7 @@ class CI_Migration
         $data["userCreated"] = config_item('soft_user');
         $data["dateCreated"] = date('d/m/Y');
         $data["timeCreated"] = date("g:i a");
+        $data["dbName"] = $this->db->database;
         $data["tableName"] = $tableName;
         $data["UcTableP"] = ucfirst($subModP);
         $data["UcTableModel"] = ucfirst($submod);
