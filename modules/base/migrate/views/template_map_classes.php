@@ -5,10 +5,6 @@
  * Date: #dateCreated
  * Time: #timeCreated
  *
- * ctrlProperties
- *
- * modelProperties
- *
  */
 
 use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
@@ -16,12 +12,12 @@ use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 trait DB_dbName
 {
     //>>>setInitFunctions<<<
-    public function init_comandas($both = false)
+    public function init_lcTableP($both = false)
     {
         if ($both) {
-            $this->ctrl_comandas = Ctrl_Comandas::create();
+            $this->ctrl_lcTableP = Ctrl_UcTableP::create();
         }
-        $this->model_comandas = Model_Comandas::create();
+        $this->model_lcTableP = Model_UcTableP::create();
     }
     //<<<setInitFunctions>>>
 }

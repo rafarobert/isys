@@ -863,8 +863,12 @@ if (!function_exists('strhas')) {
         $strCase1 = ucfirst($obj);
         $strCase2 = strtoupper($obj);
         $strCase3 = strtolower($obj);
-
-        if(strpos($string,$obj) > -1 || strpos($string,$strCase1) > -1 || strpos($string,$strCase2) > -1 || strpos($string,$strCase3) > -1 || preg_match("/\b$obj\b/",$string)){
+        if(!validateVar($string)){
+            return false;
+        }
+        if(strpos($string,$obj) > -1 || strpos($string,$strCase1) > -1 || strpos($string,$strCase2) > -1 || strpos($string,$strCase3) > -1){
+            return true;
+        } else if(preg_match("/\b$obj\b/",$string)) {
             return true;
         } else {
             return false;

@@ -115,6 +115,9 @@ class Ctrl_Migrate extends Base_Controller
             }
         }
 
+        // Update database map for loading of classes
+        $this->setMapClasses();
+
         if ($it_worked) {
             echo "All migration has been worked";
         } else {
@@ -126,6 +129,30 @@ class Ctrl_Migrate extends Base_Controller
                 }
             }
             echo "Migration doesn't worked";
+        }
+    }
+
+    public function setMapClasses(){
+        $aDBResult = std2array($this->model_tables->get_by('tabla'));
+        $aDBTables = array_column($aDBResult, 'tabla');
+        $database = ucfirst($this->db->database);
+        $this->data['dbName'] = $database;
+        $this->data['setInitFunctions'] = '';
+        $this->data["userCreated"] = config_item('soft_user');
+        $this->data["dateCreated"] = date('d/m/Y');
+        $this->data["timeCreated"] = date("g:i a");
+        foreach ($aDBTables as $key => $dbTable){
+            list($mod, $table) = getModSubMod($dbTable);
+            list($tableS, $tableP) = setSubModSingularPlural($table);
+            $this->data['lcTableP'] = lcfirst($tableP);
+            $this->data['UcTableP'] = ucfirst($tableP);
+            $this->data['setInitFunctions'] .= $this->load->view(["template_map_classes" => "setInitFunctions"],$this->data, true, true);
+        }
+        $fileName = "DB_$database.php";
+        $framePath = "orm/map/";
+        $phpContent = $this->load->view("template_map_classes",$this->data, true, true,true);
+        if (createFolder($framePath)) {
+            write_file($framePath . "$fileName", $phpContent);
         }
     }
 
