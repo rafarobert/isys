@@ -928,7 +928,7 @@ class CI_Session {
     public function getIdUserLoggued(){
         if($this->has_userdata($this->sessKey)) {
             $aDataSession = $this->userdata($this->sessKey);
-            return validateArray($aDataSession, 'IdUsuario') ? $aDataSession['IdUsuario'] : (validateArray($aDataSession, 'id_usuario') ? $aDataSession['id_usuario'] : '');
+            return validateArray($aDataSession, 'IdUser') ? $aDataSession['IdUser'] : (validateArray($aDataSession, 'id_user') ? $aDataSession['id_user'] : '');
         }
         return '';
     }
@@ -960,7 +960,7 @@ class CI_Session {
         return true;
     }
 
-    public function signUp($mod = 'usuarios'){
+    public function signUp($mod = 'users'){
         // Redirect a user if he's already logged in
         $dashboard = "admin/dashboard";
         $this->isLoguedin() == FALSE || redirect($dashboard);
@@ -980,7 +980,7 @@ class CI_Session {
                     // *** estic - tables - fin ***
                 ));
                 $data["password"] = $this->hash($this->CI->input->post("password"));
-                $data["id_opcion_role"] = 7;
+                $data["id_role"] = 7;
 
                 $this->MI->save($data);
                 $this->login();
@@ -998,23 +998,23 @@ class CI_Session {
 //            'email' => $this->CI->input->post('email'),
 //            'password' => $this->hash($this->CI->input->post('password')),
 //        );
-        $oUsuario = $this->MI->get_by(array(
+        $oUser = $this->MI->get_by(array(
             'email' => $this->CI->input->post('email'),
             'password' => $this->hash($this->CI->input->post('password')),
-            0 => 'id_opcion_role',
-            1 => 'nombre',
-            2 => 'apellido',
-            3 => 'id_usuario'
+            0 => 'id_role',
+            1 => 'name',
+            2 => 'lastname',
+            3 => 'id_user'
 
         ), true, true);
-//        $oUsuario = CiUsuariosQuery::create()
-//            ->condition('cond1', 'CiUsuarios.Email = ?', $data['email'])
-//            ->condition('cond2', 'CiUsuarios.Password = ?', $data['password'])
+//        $oUser = CiUsersQuery::create()
+//            ->condition('cond1', 'CiUsers.Email = ?', $data['email'])
+//            ->condition('cond2', 'CiUsers.Password = ?', $data['password'])
 //            ->findOneBy(array('cond1', 'cond2'), 'and');
 
-        if(is_object($oUsuario)){
+        if(is_object($oUser)){
             // log in user
-            $data = std2array($oUsuario);
+            $data = std2array($oUser);
             $data['loggedin'] = TRUE;
             $this->set_userdata($this->sessKey,$data);
             redirect('admin/dashboard');
