@@ -8,7 +8,7 @@
 
 defined("BASEPATH") OR exit("No direct script access allowed");
 
-class Trait_UcTableP extends UcModS_Model {
+class ES_Model_UcTableP extends UcModS_Model {
 
     public $lcTableS;
 

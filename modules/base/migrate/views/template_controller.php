@@ -7,7 +7,7 @@
  */
 use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
-Class Ctrl_UcTableP extends Crud_UcTableP {
+Class Ctrl_UcTableP extends ES_Ctrl_UcTableP {
 
     private static $instance = null;
 

@@ -389,7 +389,7 @@ if ( ! is_php('5.4'))
 
         // **************** Establece el nombre del modulo *****************
         if($modulo == ''){
-            $modulo = $URI->segments[1];
+            $modulo = !in_array($RTR->module,$CONF['var_excepts']) ? $RTR->module : $URI->segments[1];
         } else {
             if(is_array($SYS[$modulo])){
                 $modulo = $SYS[$modulo]['name'];

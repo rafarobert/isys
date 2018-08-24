@@ -8,7 +8,7 @@
 
 defined("BASEPATH") OR exit("No direct script access allowed");
 
-class Model_UcTableP extends Trait_UcTableP {
+class Model_UcTableP extends ES_Model_UcTableP {
 
     protected $_order_by = "idTable desc";
     protected $_timestaps = true;

@@ -999,8 +999,8 @@ class CI_Migration
         $data["UcTableP"] = ucfirst($subModP);
         $data["UcTableModel"] = ucfirst($submod);
         $data["UcTableS"] = ucfirst($subModS);
-        $data["UcModS"] = $modS;
-        $data["UcModP"] = $modP;
+        $data["UcModS"] = ucfirst($modS);
+        $data["UcModP"] = ucfirst($modP);
         $data["idTable"] = $pkTable;
         $data["pkTable"] = $pkTable;
         $data["lcTableP"] = lcfirst($subModP);
@@ -1113,7 +1113,7 @@ class CI_Migration
                             // ********************* Para el Model ***************************
                             $data['rulesNameEditView'] = '$rules_' . str_replace('-', '_', $vNameView);
                             $data['tableRulesEditView'] = var_export($this->getPhpFieldsRules($vFieldsView, $data['pkTable'], true), true);
-                            $data["validatedModelFieldsEditView"] .= $this->load->view(["template_trait" => "validatedModelFieldsEditView"], $data, true, true, true);
+                            $data["validatedModelFieldsEditView"] .= $this->load->view(["template_ES_Model" => "validatedModelFieldsEditView"], $data, true, true, true);
 
                             list($vFieldsIniChecked, $fieldIniImg, $fieldIniPass, $data) = $this->checkInputFields($vFieldsView, $data);
                             if (strhas($vNameView, 'ini')) {
@@ -1125,7 +1125,7 @@ class CI_Migration
                                 $data['fieldsEditView'] = var_export(array_keys($vFieldsIniChecked), true);
                                 $data['editView'] = $vNameView;
                                 $data['editNameView'] = explode('-', $vNameView)[1];
-                                $data['validatedControllerFieldsEditView'] .= $this->load->view(["template_crud" => "validatedControllerFieldsEditView"], $data, true, true, true);
+                                $data['validatedControllerFieldsEditView'] .= $this->load->view(["template_ES_Ctrl" => "validatedControllerFieldsEditView"], $data, true, true, true);
                                 $data['editNameView'] = explode('-', $vNameView)[1];
                                 $data['indexEditNameView'] = validateArray($aEditViewSettings, $vNameView) ? $aEditViewSettings[$vNameView] : '';
                             }
@@ -1189,8 +1189,8 @@ class CI_Migration
             $data['lcFkModS'] = lcfirst($fModS);
             $data['lcFkModP'] = lcfirst($fModP);
 //            $data['initPropertiesVarsForeignTable'] .= $this->load->view(["template_controller" => "initPropertiesVarsForeignTable"], $data, true, true, true);
-            $data['initVarsForeignTable'] .= $this->load->view(["template_crud" => "initVarsForeignTable"], $data, true, true, true);
-            $data['loadModelsForeignTable'] .= $this->load->view(["template_crud" => "loadModelsForeignTable"], $data, true, true, true);
+            $data['initVarsForeignTable'] .= $this->load->view(["template_ES_Ctrl" => "initVarsForeignTable"], $data, true, true, true);
+            $data['loadModelsForeignTable'] .= $this->load->view(["template_ES_Ctrl" => "loadModelsForeignTable"], $data, true, true, true);
         }
         for ($ind = 0; $ind < 3; $ind++) {
             $aLoaded = [];
@@ -1242,12 +1242,12 @@ class CI_Migration
 //                    }
                     $data['fFieldsRef'] = var_export($settings['filterBy'], true);
                     if ($ind != 2) {
-                        $data[$selector] .= $this->load->view(["template_crud" => $selector], $data, true, true, true);
+                        $data[$selector] .= $this->load->view(["template_ES_Ctrl" => $selector], $data, true, true, true);
                         $aLoaded[] = $data['lcFkTableP'];
                     }
                 } else {
                     if (!in_array($data['lcFkTableP'], $aLoaded) && $ind != 2) {
-                        $data[$selector] .= $this->load->view(["template_crud" => $selector], $data, true, true, true);
+                        $data[$selector] .= $this->load->view(["template_ES_Ctrl" => $selector], $data, true, true, true);
                         $aLoaded[] = $data['lcFkTableP'];
                     }
                 }
@@ -1264,7 +1264,7 @@ class CI_Migration
                         if ($ind == 2) {
                             list($data, $aLoaded) = $this->verifySetOfSettings($data, $ind, $selector, $aLoaded);
                         } else {
-                            $data[$selector] .= $this->load->view(["template_crud" => $selector], $data, true, true, true);
+                            $data[$selector] .= $this->load->view(["template_ES_Ctrl" => $selector], $data, true, true, true);
                             $aLoaded[] = $data['lcFkTableP'];
                         }
                     } else if ($data['lcFkTableP'] == 'options') {
@@ -1288,13 +1288,13 @@ class CI_Migration
         }
         $data["extraFunctions"] = $this->getExtraFunctions($tableName);
         $mod = $sys[$mod]['dir'];
-        $phpCrudContent = $this->load->view("template_crud", $data, true, true, true);
+        $phpCrudContent = $this->load->view("template_ES_Ctrl", $data, true, true, true);
         $phpCtrlContent = $this->load->view("template_controller", $data, true, true, true);
         $framePathOrm = ROOT_PATH . 'orm/crud/' . $mod;
         $framePathApp = ROOT_PATH . 'app/modules/' . $mod;
         if (createFolder($framePathOrm)) {
             if (createFolder($framePathOrm . "$submod/")) {
-                write_file($framePathOrm . "$submod/Crud_" . ucfirst($submod) . $this->_ext_php, $phpCrudContent);
+                write_file($framePathOrm . "$submod/ES_Ctrl_" . ucfirst($submod) . $this->_ext_php, $phpCrudContent);
             }
         }
         if (createFolder($framePathApp)) {
@@ -1333,7 +1333,7 @@ class CI_Migration
             $data['t1FieldRef'] = $data['setOfFkSettings']['t1FieldRef'];
             $data['t2Contents'] = $data['setOfFkSettings']['t2Contents'];
             $data['t2FieldRef'] = $data['setOfFkSettings']['t2FieldRef'];
-            $data[$selector] .= $this->load->view(["template_crud" => $selector], $data, true, true, true);
+            $data[$selector] .= $this->load->view(["template_ES_Ctrl" => $selector], $data, true, true, true);
             $aLoaded[] = $data['lcFkTableP'];
         }
         return [$data, $aLoaded];
@@ -1356,13 +1356,13 @@ class CI_Migration
 
         $mod = $sys[$mod]['dir'];
         $phpModelContent = $this->load->view("template_model", $data, true, true, true);
-        $phpTraitContent = $this->load->view("template_trait", $data, true, true, true);
+        $phpTraitContent = $this->load->view("template_ES_Model", $data, true, true, true);
 
         $framePathOrm = ROOT_PATH . 'orm/crud/' . $mod;
         $framePathApp = ROOT_PATH . 'app/modules/' . $mod;
         if (createFolder($framePathOrm)) {
             if (createFolder($framePathOrm . "$submod/")) {
-                write_file($framePathOrm . "$submod/Trait_" . ucfirst($submod) . $this->_ext_php, $phpTraitContent);
+                write_file($framePathOrm . "$submod/ES_Model_" . ucfirst($submod) . $this->_ext_php, $phpTraitContent);
             }
         }
         if (createFolder($framePathApp)) {

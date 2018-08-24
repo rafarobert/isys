@@ -4,12 +4,11 @@
  * User: #userCreated
  * Date: #dateCreated
  * Time: #timeCreated
- *
  */
 
 use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
-trait DB_dbName
+trait ES_Table_Trait
 {
     //>>>setInitFunctions<<<
     public function init_lcTableP($both = false)

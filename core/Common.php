@@ -1413,25 +1413,7 @@ if (!function_exists('suprTagInStr')) {
     }
 }
 
-if (!function_exists('initStaticTableVars')) {
+if(file_exists(ROOT_PATH."orm/migrations/tables/ES_Table_Vars.php")) {
 
-    function initStaticTableVars($obj)
-    {
-        $obj->table_ci_options =  class_exists('Migration_Create_ci_options') ? Migration_Create_ci_options::tableFields : null;
-        $obj->table_ci_usuarios = class_exists('Migration_Create_ci_usuarios') ? Migration_Create_ci_usuarios::tableFields : null;
-        $obj->table_ci_modulos = class_exists('Migration_Create_ci_modulos') ? Migration_Create_ci_modulos::tableFields : null;
-        $obj->table_ci_settings = class_exists('Migration_Create_ci_settings') ? Migration_Create_ci_settings::tableFields : null;
-        $obj->table_ci_sessions = class_exists('Migration_Create_ci_sessions') ? Migration_Create_ci_sessions::tableFields : null;
-        $obj->table_hbf_clubs = class_exists('Migration_Create_hbf_clubs') ? Migration_Create_hbf_clubs::tableFields : null;
-        $obj->table_hbf_comandas = class_exists('Migration_Create_hbf_comandas') ? Migration_Create_hbf_comandas::tableFields : null;
-        $obj->table_hbf_detalles_pedidos = class_exists('Migration_Create_hbf_detalles_pedidos') ? Migration_Create_hbf_detalles_pedidos::tableFields : null;
-        $obj->table_hbf_ingresos = class_exists('Migration_Create_hbf_ingresos') ? Migration_Create_hbf_ingresos::tableFields : null;
-        $obj->table_hbf_porciones = class_exists('Migration_Create_hbf_porciones') ? Migration_Create_hbf_porciones::tableFields : null;
-        $obj->table_hbf_prepagos = class_exists('Migration_Create_hbf_prepagos') ? Migration_Create_hbf_prepagos::tableFields : null;
-        $obj->table_hbf_productos = class_exists('Migration_Create_hbf_productos') ? Migration_Create_hbf_productos::tableFields : null;
-        $obj->table_hbf_sesiones = class_exists('Migration_Create_hbf_sesiones') ? Migration_Create_hbf_sesiones::tableFields : null;
-        $obj->table_hbf_turnos = class_exists('Migration_Create_hbf_turnos') ? Migration_Create_hbf_turnos::tableFields : null;
-        $obj->table_hbf_vasos = class_exists('Migration_Create_hbf_vasos') ? Migration_Create_hbf_vasos::tableFields : null;
-        $obj->table_hbf_ventas = class_exists('Migration_Create_hbf_ventas') ? Migration_Create_hbf_ventas::tableFields : null;
-    }
+    include_once ROOT_PATH."orm/migrations/tables/ES_Table_Vars.php";
 }

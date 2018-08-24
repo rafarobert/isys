@@ -10,10 +10,16 @@
  */
 class Ctrl_Migrate extends Base_Controller
 {
+    public $tab_excepts;
+    public $sys;
+
     function __construct(){
         parent::__construct();
         $this->data['subLayout'] = '';
         $this->load->library('migration');
+        $this->tab_excepts = config_item('tab_excepts');
+        $this->sys = config_item('sys');
+
         set_time_limit(300);
 
     }
@@ -116,7 +122,7 @@ class Ctrl_Migrate extends Base_Controller
         }
 
         // Update database map for loading of classes
-        $this->setMapClasses();
+        $this->setTableTrait();
 
         if ($it_worked) {
             echo "All migration has been worked";
@@ -132,28 +138,68 @@ class Ctrl_Migrate extends Base_Controller
         }
     }
 
-    public function setMapClasses(){
-        $aDBResult = std2array($this->model_tables->get_by('tabla'));
-        $aDBTables = array_column($aDBResult, 'tabla');
-        $database = ucfirst($this->db->database);
-        $this->data['dbName'] = $database;
-        $this->data['setInitFunctions'] = '';
-        $this->data["userCreated"] = config_item('soft_user');
-        $this->data["dateCreated"] = date('d/m/Y');
-        $this->data["timeCreated"] = date("g:i a");
-        foreach ($aDBTables as $key => $dbTable){
-            list($mod, $table) = getModSubMod($dbTable);
-            list($tableS, $tableP) = setSubModSingularPlural($table);
-            $this->data['lcTableP'] = lcfirst($tableP);
-            $this->data['UcTableP'] = ucfirst($tableP);
-            $this->data['setInitFunctions'] .= $this->load->view(["template_map_classes" => "setInitFunctions"],$this->data, true, true);
-        }
-        $fileName = "DB_$database.php";
+    public function setTableTrait(){
+        $aDBTables = $this->dbforge->getArrayDBTables();
+        $this->data = $this->setDefaultData($this->data);
+        $fileName = "ES_Table_Trait.php";
         $framePath = "orm/map/";
-        $phpContent = $this->load->view("template_map_classes",$this->data, true, true,true);
-        if (createFolder($framePath)) {
-            write_file($framePath . "$fileName", $phpContent);
+        $this->data['setInitFunctions'] = '';
+        foreach ($aDBTables as $key => $dbTable) {
+            if(!in_array($dbTable, $this->tab_excepts)){
+                list($mod, $table) = getModSubMod($dbTable);
+                list($tableS, $tableP) = setSubModSingularPlural($table);
+                $this->data['lcMod'] = $lcMod = lcfirst($this->sys[$mod]['name']);
+                $this->data['UcMod'] = $ucMod = ucfirst($this->sys[$mod]['name']);
+                $this->data['lcTableP'] = lcfirst($tableP);
+                $this->data['UcTableP'] = ucfirst($tableP);
+                $this->data['setInitFunctions'] .= $this->load->view(["template_ES_Trait" => "setInitFunctions"], $this->data, true, true);
+            }
         }
+        if (createFolder($framePath)) {
+            $phpContent = $this->load->view("template_ES_Trait", $this->data, true, true, true);
+            if(file_exists($framePath . $fileName)){
+                deleteFile($framePath . $fileName);
+            }
+            write_file($framePath . $fileName, $phpContent);
+        }
+    }
+
+    public function setTableVars()
+    {
+        $aDBTables = $this->dbforge->getArrayDBTables();
+        $this->data = $this->setDefaultData($this->data);
+        $fileName = "ES_Table_Vars.php";
+        $framePath = "orm/map/";
+        $this->data['setInitStaticTableVars'] = '';
+        unset($this->data['tableFields']);
+        foreach ($aDBTables as $key => $dbTable) {
+            if(!in_array($dbTable, $this->tab_excepts)){
+                list($mod, $table) = getModSubMod($dbTable);
+                list($tableS, $tableP) = setSubModSingularPlural($table);
+                $this->data['lcAcMod'] = $lcAcMod = lcfirst($mod);
+                $this->data['UcAcMod'] = $lcAcMod = ucfirst($mod);
+                $this->data['lcTableP'] = lcfirst($tableP);
+                $this->data['UcTableP'] = ucfirst($tableP);
+                $this->data['setInitStaticTableVars'] .= $this->load->view(["template_ES_Table_Vars" => "setInitStaticTableVars"], $this->data, true, true);
+            }
+        }
+
+        if (createFolder($framePath)) {
+            $phpContent = $this->load->view("template_ES_Table_Vars", $this->data, true, true, true);
+            if(file_exists($framePath . $fileName)){
+                deleteFile($framePath . $fileName);
+            }
+            write_file($framePath . $fileName, $phpContent);
+        }
+    }
+
+    public function setDefaultData($data){
+        $database = ucfirst($this->db->database);
+        $data['dbName'] = $database;
+        $data["userCreated"] = config_item('soft_user');
+        $data["dateCreated"] = date('d/m/Y');
+        $data["timeCreated"] = date("g:i a");
+        return $data;
     }
 
     public function fromdatabase()
@@ -221,6 +267,7 @@ class Ctrl_Migrate extends Base_Controller
             }
             $migIndex++;
         }
+        $this->setTableVars();
 //        dump(shell_exec('composer update'));
     }
 }

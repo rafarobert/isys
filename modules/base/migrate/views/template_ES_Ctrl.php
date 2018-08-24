@@ -7,7 +7,7 @@
  */
 use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
-Class Crud_UcTableP extends UcModS_Controller {
+Class ES_Ctrl_UcTableP extends UcModS_Controller {
 
     //>>>initVarsForeignTable<<<
     public $lcFkObjFieldP;
