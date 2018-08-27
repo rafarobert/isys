@@ -1315,10 +1315,10 @@ if (!function_exists('setTitleFromObject')) {
         $title = '';
         if(validateVar($aValues, 'array')){
             foreach ($aValues as $value){
-                $title .= $object->$value . ' ';
+                $title .= isset($object->$value) ? $object->$value . ' ' : '';
             }
         } else if(validateVar($aValues)){
-            $title .= $object->$aValues . ' ';
+            $title .= isset($object->$aValues) ? $object->$aValues . ' ' : '';
         }
         return $title;
     }
@@ -1411,9 +1411,4 @@ if (!function_exists('suprTagInStr')) {
             return $str;
         }
     }
-}
-
-if(file_exists(ROOT_PATH."orm/migrations/tables/ES_Table_Vars.php")) {
-
-    include_once ROOT_PATH."orm/migrations/tables/ES_Table_Vars.php";
 }

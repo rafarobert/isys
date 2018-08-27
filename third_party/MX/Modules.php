@@ -18,7 +18,7 @@ if($CFG->item('modules_locations') == null){
         foreach ($dirs as $dir => $mods){
             foreach ($mods as $mod => $type){
                 if($type == "HMVC"){
-                    Modules::$locations[ROOT_PATH."$root/$dir/"] = "$dir/";
+                    Modules::$locations[ROOTPATH."$root/$dir/"] = "$dir/";
                 }
             }
         }

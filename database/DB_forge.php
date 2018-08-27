@@ -1371,34 +1371,40 @@ abstract class CI_DB_forge
         }
     }
 
-    public function getPrimaryKeysOfTables($database = '')
+    public function getPrimaryKeysOfTables($bJustPrimaryKeys = false)
     {
         $CI = CI_Controller::get_instance();
-        if ($database == '') {
-            $database = $CI->db->database;
-        }
+        $database = $CI->db->database;
+
         $sql = "SELECT COLUMN_NAME, TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'herbalife_dev' AND COLUMN_KEY = 'PRI'";
         $result = $CI->db->query($sql)->result();
         if (count((array)$result)) {
             $aColumnNames = array_column(json_decode(json_encode($result), true), "COLUMN_NAME");
             $aTableNames = array_column(json_decode(json_encode($result), true), "TABLE_NAME");
-            return array_combine($aColumnNames, $aTableNames);
+            if($bJustPrimaryKeys){
+                return $aColumnNames;
+            } else {
+                return array_combine($aColumnNames, $aTableNames);
+            }
         }
         return false;
     }
 
-    public function getForeignKeyOfTables($database = '')
+    public function getForeignKeyOfTables($bJustFkKeys = false)
     {
         $CI = CI_Controller::get_instance();
-        if ($database == '') {
-            $database = $CI->db->database;
-        }
+        $database = $CI->db->database;
+
         $sql = "SELECT COLUMN_NAME, TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'herbalife_dev' AND COLUMN_KEY = 'MUL'";
         $result = $CI->db->query($sql)->result();
         if (count((array)$result)) {
             $aColumnNames = array_column(json_decode(json_encode($result), true), "COLUMN_NAME");
             $aTableNames = array_column(json_decode(json_encode($result), true), "TABLE_NAME");
-            return array_combine($aColumnNames, $aTableNames);
+            if($bJustFkKeys){
+                return $aColumnNames;
+            } else {
+                return array_combine($aColumnNames, $aTableNames);
+            }
         }
         return false;
     }

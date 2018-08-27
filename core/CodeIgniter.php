@@ -76,6 +76,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 	require_once(BASEPATH.'core/Common.php');
 
+    require_once ROOTPATH."orm/map/ES_Table_Vars.php";
+
 
 /*
  * ------------------------------------------------------
@@ -408,7 +410,7 @@ if ( ! is_php('5.4'))
             foreach ($dirs as $dir => $mods){
                 foreach ($mods as $mod => $type){
                     if($type == "HMVC"){
-                        $ruta = ROOT_PATH . "$root/$dir/$modulo/$class/";
+                        $ruta = ROOTPATH . "$root/$dir/$modulo/$class/";
                         if (is_dir($ruta) && $class != '') {
                             $class = "Ctrl_".ucfirst($class);
                             $classFile = $ruta."$class.php";
@@ -422,36 +424,36 @@ if ( ! is_php('5.4'))
                                 $functions = array_map($funct,$cont_funct);
                                 if(in_array($RTR->method, $functions) && !$validating){
                                     if($subMod == ''){
-                                        return ROOT_PATH."$root/";
+                                        return ROOTPATH."$root/";
                                     } else {
-                                        $directorio = ROOT_PATH."$root/$dir/$modulo/$subMod/";
+                                        $directorio = ROOTPATH."$root/$dir/$modulo/$subMod/";
                                         if(is_dir($directorio)){
                                             return $directorio;
                                         } else {
-                                            return ROOT_PATH."$root/";
+                                            return ROOTPATH."$root/";
                                         }
                                     }
                                 } else {
                                     if($subMod == ''){
-                                        return ROOT_PATH."$root/";
+                                        return ROOTPATH."$root/";
                                     } else {
-                                        $directorio = ROOT_PATH."$root/$dir/$modulo/$subMod/";
+                                        $directorio = ROOTPATH."$root/$dir/$modulo/$subMod/";
                                         if(is_dir($directorio)){
                                             return $directorio;
                                         } else {
-                                            return ROOT_PATH."$root/";
+                                            return ROOTPATH."$root/";
                                         }
                                     }
                                 }
                             } else {
                                 if($subMod == ''){
-                                    return ROOT_PATH."$root/";
+                                    return ROOTPATH."$root/";
                                 } else {
-                                    $directorio = ROOT_PATH."$root/$dir/$modulo/$subMod/";
+                                    $directorio = ROOTPATH."$root/$dir/$modulo/$subMod/";
                                     if(is_dir($directorio)){
                                         return $directorio;
                                     } else {
-                                        return ROOT_PATH."$root/";
+                                        return ROOTPATH."$root/";
                                     }
                                 }
                             }
