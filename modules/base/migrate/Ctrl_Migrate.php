@@ -269,5 +269,6 @@ class Ctrl_Migrate extends Base_Controller
         }
         $this->setTableVars();
 //        dump(shell_exec('composer update'));
+        echo "All migration has been worked";
     }
 }
