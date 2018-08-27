@@ -6,7 +6,7 @@
  * Time: 01:29 AM
  * @property CI_Migration $migration
  */
-class Ctrl_Ajax extends Base_Controller
+class Ctrl_Ajax extends ES_Base_Controller
 {
     function __construct()
     {

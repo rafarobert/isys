@@ -296,6 +296,7 @@ class CI_Loader {
 		if ( ! class_exists('CI_Model', FALSE))
 		{
 			$app_path = APPPATH.'core'.DIRECTORY_SEPARATOR;
+			$isys_path = BASEPATH.'estic'.DIRECTORY_SEPARATOR;
 			if (file_exists($app_path.'Model.php'))
 			{
 				require_once($app_path.'Model.php');
@@ -317,7 +318,13 @@ class CI_Loader {
 				{
 					throw new RuntimeException($app_path.$class.".php exists, but doesn't declare class ".$class);
 				}
-			}
+			} else if(file_exists($isys_path.$class.'.php')){
+                require_once($isys_path.$class.'.php');
+                if ( ! class_exists($class, FALSE))
+                {
+                    throw new RuntimeException($app_path.$class.".php exists, but doesn't declare class ".$class);
+                }
+            }
 		}
         $model_path = '';
 		list($type, $modModel) = getModSubMod($model);

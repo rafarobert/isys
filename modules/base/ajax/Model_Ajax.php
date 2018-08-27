@@ -8,6 +8,6 @@
 
 defined("BASEPATH") OR exit("No direct script access allowed");
 
-class Model_Ajax extends admin_Model {
+class Model_Ajax extends ES_Admin_Model {
 
 }

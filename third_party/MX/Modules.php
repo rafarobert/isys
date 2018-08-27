@@ -75,7 +75,7 @@ class Modules
 	* Output from module is buffered and returned.
 	**/
 	public static function run($module) 
-	{	
+	{
 		$method = 'index';
 		
 		if(($pos = strrpos($module, '/')) != FALSE) 
@@ -127,7 +127,6 @@ class Modules
 			$controller = ucfirst($class);	
 			self::$registry[$alias] = new $controller($params);
 		}
-		
 		return self::$registry[$alias];
 	}
 	
@@ -135,9 +134,11 @@ class Modules
 	public static function autoload($class) 
 	{	
 		/* don't autoload CI_ prefixed classes or those using the config subclass_prefix */
-		if (strstr($class, 'CI_') OR strstr($class, config_item('subclass_prefix'))) return;
 
-		/* autoload Modular Extensions MX core classes */
+//        if (strstr($class, 'CI_') OR strstr($class, config_item('subclass_prefix'))) return;
+        if (strstr($class, 'CI_')) return;
+
+        /* autoload Modular Extensions MX core classes */
 		if (strstr($class, 'MX_')) 
 		{
 			if (is_file($location = dirname(__FILE__).'/'.substr($class, 3).EXT))
@@ -214,6 +215,7 @@ class Modules
                 $method = 'index';
             }
         }
+
 
 		$segments = explode('/', $file);
 

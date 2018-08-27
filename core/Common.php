@@ -176,7 +176,15 @@ if ( ! function_exists('load_class'))
 			{
 				require_once(APPPATH.$directory.'/'.$name.'.php');
 			}
-		} else if(file_exists($directory)){
+		} else if(file_exists(BASEPATH.'estic/'.config_item('subclass_prefix').$class.'.php'))
+		{
+            $name = config_item('subclass_prefix').$class;
+
+            if (class_exists($name, FALSE) === FALSE)
+            {
+                require_once(BASEPATH.'estic/'.$name.'.php');
+            }
+        } else if(file_exists($directory)){
             $name = $class;
 
             if (class_exists($name, FALSE) === FALSE)

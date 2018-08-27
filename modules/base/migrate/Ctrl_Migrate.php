@@ -8,7 +8,7 @@
  * @property CI_Migration $migration
  * @property Model_Modulos $model_modulos
  */
-class Ctrl_Migrate extends Base_Controller
+class Ctrl_Migrate extends ES_Controller
 {
     public $tab_excepts;
     public $sys;
