@@ -132,14 +132,21 @@ if(file_exists(DOCUMENT_ROOT . '/app/config/config.php'))
 if ($hostName == 'localhost' || $hostName == "local.$proyName.com")
 {
     define('ENVIRONMENT', 'development');
-
     define('LOCALFOLDER', "$proyName/");
     $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT . '/': DOCUMENT_ROOT . "/$proyName/";
     $webServer = $protocol . '://' . $hostName . "/$proyName/";
+
+} else if(strstr($hostName,'127.0.0.')){
+
+    define('ENVIRONMENT', 'development');
+    define('LOCALFOLDER', "$proyName/");
+    $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT . '/': DOCUMENT_ROOT . "/$proyName/";
+    $webServer = $protocol . '://' . $hostName . "/$proyName/";
+
 }
 else if ($hostName == '192.168.1.10')
 {
-    define('ENVIRONMENT', 'development');
+    define('ENVIRONMENT', 'testing');
     define('LOCALFOLDER', "$proyName/");
     $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT . '/': DOCUMENT_ROOT . "/$proyName/";
     $webServer = $protocol . '://' . $hostName . "/$proyName/";
@@ -151,12 +158,6 @@ else if ($hostName == '200.87.100.10')
     $rootPath = DOCUMENT_ROOT . '/';
     $webServer = $protocol . '://' . $hostName . '/';
 
-} else {
-
-    define('ENVIRONMENT', 'testing');
-    define('LOCALFOLDER', '');
-    $rootPath = DOCUMENT_ROOT . '/';
-    $webServer = $protocol . '://' . $hostName . '/';
 }
 
 define('DIRECTORY',$rootPath);
