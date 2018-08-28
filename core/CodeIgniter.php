@@ -129,18 +129,18 @@ if(file_exists(DOCUMENT_ROOT . '/app/config/config.php'))
  *  Defining Proyect Settings
  * ------------------------------------------------------
  */
-if ($hostName == 'localhost' || $hostName == 'local.defensor.com')
+if ($hostName == 'localhost' || $hostName == "local.$proyName.com")
 {
     define('ENVIRONMENT', 'development');
 
-    define('LOCALFOLDER', 'defensor/');
+    define('LOCALFOLDER', "$proyName/");
     $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT . '/': DOCUMENT_ROOT . "/$proyName/";
     $webServer = $protocol . '://' . $hostName . "/$proyName/";
 }
 else if ($hostName == '192.168.1.10')
 {
     define('ENVIRONMENT', 'development');
-    define('LOCALFOLDER', 'defensor/');
+    define('LOCALFOLDER', "$proyName/");
     $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT . '/': DOCUMENT_ROOT . "/$proyName/";
     $webServer = $protocol . '://' . $hostName . "/$proyName/";
 }
