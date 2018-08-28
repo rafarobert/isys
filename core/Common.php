@@ -264,6 +264,14 @@ if ( ! function_exists('get_config'))
 				require($file_path);
 			}
 
+            $file_path = BASEPATH.'estic/config.php';
+            $found = FALSE;
+            if (file_exists($file_path))
+            {
+                $found = TRUE;
+                require($file_path);
+            }
+
 			// Is the config file in the environment folder?
 			if (file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/config.php'))
 			{
