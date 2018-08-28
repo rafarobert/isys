@@ -405,7 +405,10 @@ require_once ROOTPATH . 'orm/config/config.php';
  */
 	require_once(BASEPATH.'core/Common.php');
 
-    require_once ROOTPATH."orm/map/ES_Table_Vars.php";
+	if(is_file(ROOTPATH."orm/map/ES_Table_Vars.php")){
+
+        require_once ROOTPATH."orm/map/ES_Table_Vars.php";
+    }
 
 /*
  * ------------------------------------------------------
