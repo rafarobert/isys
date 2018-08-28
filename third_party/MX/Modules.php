@@ -148,6 +148,17 @@ class Modules
 			}
 			show_error('Failed to load MX core class: '.$class);
 		}
+
+		if (strstr($class, 'ES_'))
+		{
+		    $path_info = $_SERVER['PATH_INFO'];
+			if (is_file($location = ORMPATH.'crud/'.$class.EXT))
+			{
+				include_once $location;
+				return;
+			}
+			show_error('Failed to load MX core class: '.$class);
+		}
 		
 		/* autoload core classes */
 		if(is_file($location = APPPATH.'core/'.ucfirst($class).EXT)) 

@@ -93,7 +93,7 @@ date_default_timezone_set('America/La_Paz');
  *  Defining Document Root
  * ------------------------------------------------------
  */
-define('DOCUMENT_ROOT',$_SERVER['DOCUMENT_ROOT']);
+define('DOCUMENT_ROOT',$_SERVER['DOCUMENT_ROOT'] . '/');
 
 /*
  * ------------------------------------------------------
@@ -112,9 +112,9 @@ if(is_file(DOCUMENT_ROOT."orm/map/ES_Table_Vars.php")){
  *  Defining Proyect Settings
  * ------------------------------------------------------
  */
-if(file_exists(DOCUMENT_ROOT . '/app/config/config.php'))
+if(file_exists(DOCUMENT_ROOT . 'app/config/config.php'))
 {
-    require_once DOCUMENT_ROOT . '/app/config/config.php';
+    require_once DOCUMENT_ROOT . 'app/config/config.php';
 
     $proyName = $config['proy_name'];
 
@@ -140,14 +140,14 @@ if ($hostName == 'localhost' || $hostName == "local.$proyName.com")
 {
     define('ENVIRONMENT', 'development');
     define('LOCALFOLDER', "$proyName/");
-    $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT . '/': DOCUMENT_ROOT . "/$proyName/";
+    $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT : DOCUMENT_ROOT . "$proyName/";
     $webServer = $protocol . '://' . $hostName . "/$proyName/";
 
 } else if(strstr($hostName,'127.0.0.')){
 
     define('ENVIRONMENT', 'development');
     define('LOCALFOLDER', "$proyName/");
-    $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT . '/': DOCUMENT_ROOT . "/$proyName/";
+    $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT : DOCUMENT_ROOT . "$proyName/";
     $webServer = $protocol . '://' . $hostName . "/$proyName/";
 
 }
@@ -155,14 +155,14 @@ else if ($hostName == '192.168.1.10')
 {
     define('ENVIRONMENT', 'testing');
     define('LOCALFOLDER', "$proyName/");
-    $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT . '/': DOCUMENT_ROOT . "/$proyName/";
+    $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT : DOCUMENT_ROOT . "$proyName/";
     $webServer = $protocol . '://' . $hostName . "/$proyName/";
 }
 else if ($hostName == '200.87.100.10')
 {
     define('ENVIRONMENT', 'production');
     define('LOCALFOLDER', '');
-    $rootPath = DOCUMENT_ROOT . '/';
+    $rootPath = DOCUMENT_ROOT;
     $webServer = $protocol . '://' . $hostName . '/';
 
 }
