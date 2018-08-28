@@ -65,7 +65,7 @@ define('CI_VERSION', '3.0.6');
  *
  */
 
-define('LANGUAGE', 'spanish');
+define('LANGUAGE', 'english');
 
 /*
  * ------------------------------------------------------
@@ -73,58 +73,116 @@ define('LANGUAGE', 'spanish');
  * ------------------------------------------------------
  */
 set_time_limit(300);
+
+/*
+ * ------------------------------------------------------
+ *  Defining timezone
+ * ------------------------------------------------------
+ */
 date_default_timezone_set('America/La_Paz');
 
-// Types of deployment
-$development = 'development';
-$testing = 'testing';
-$production = 'production';
+/*
+ * ------------------------------------------------------
+ *  Defining Document Root
+ * ------------------------------------------------------
+ */
+define('DOCUMENT_ROOT',$_SERVER['DOCUMENT_ROOT']);
 
-// Server WebSite
+/*
+ * ------------------------------------------------------
+ *  Load the global functions
+ * ------------------------------------------------------
+ */
+require_once(BASEPATH.'core/Common.php');
 
-// output: /myproject/index.php
-$currentPath = $_SERVER['PHP_SELF'];
+if(is_file(DOCUMENT_ROOT."orm/map/ES_Table_Vars.php")){
 
-// output: Array ( [dirname] => /myproject [basename] => index.php [extension] => php [filename] => index )
-$pathInfo = pathinfo($currentPath);
-
-// output: localhost
-$hostName = $_SERVER['HTTP_HOST'];
-$protocol = strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,5))=='https'?'https':'http';
-
-// Server Root Path
-
-if($hostName == 'localhost' || $hostName == 'local.ultracasas.com:8080') {
-    define('ENVIRONMENT', $development);
-    define('LOCALFOLDER','herbalife/');
-    $rootPath = $_SERVER['DOCUMENT_ROOT'] . '/herbalife/';
-    $webServer = $protocol.'://'.$hostName."/herbalife/";
-} else if($hostName == '192.168.1.10') {
-    define('ENVIRONMENT', $development);
-    define('LOCALFOLDER','herbalife/');
-    $rootPath = $_SERVER['DOCUMENT_ROOT'] . '/herbalife/';
-    $webServer = $protocol.'://'.$hostName."/herbalife/";
-} else if($hostName == 'local.herbalife.com'){
-    define('ENVIRONMENT', $development);
-    define('LOCALFOLDER','');
-    $rootPath = $_SERVER['DOCUMENT_ROOT'] . '/';
-    $webServer = $protocol.'://'.$hostName.'/';
-} else {
-    define('ENVIRONMENT', $production);
-    define('LOCALFOLDER','');
-    $rootPath = $_SERVER['DOCUMENT_ROOT'] . '/';
-    $webServer = $protocol.'://'.$hostName.'/';
+    require_once DOCUMENT_ROOT."orm/map/ES_Table_Vars.php";
 }
 
-// output: http://
+/*
+ * ------------------------------------------------------
+ *  Defining Proyect Settings
+ * ------------------------------------------------------
+ */
+if(file_exists(DOCUMENT_ROOT . '/app/config/config.php'))
+{
+    require_once DOCUMENT_ROOT . '/app/config/config.php';
 
-// return: http://localhost/myproject/
+    $proyName = $config['proy_name'];
+
+    $currentPath = $config['proy_current_path'];
+
+    $hostName = $config['proy_hostname'];
+
+    $protocol = $config['proy_protocol'];
+
+} else {
+
+    echo 'No se encontro el archivo de configuracion';
+
+    exit(1);
+}
+
+/*
+ * ------------------------------------------------------
+ *  Defining Proyect Settings
+ * ------------------------------------------------------
+ */
+if ($hostName == 'localhost' || $hostName == 'local.defensor.com')
+{
+    define('ENVIRONMENT', 'development');
+
+    define('LOCALFOLDER', 'defensor/');
+    $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT . '/': DOCUMENT_ROOT . "/$proyName/";
+    $webServer = $protocol . '://' . $hostName . "/$proyName/";
+}
+else if ($hostName == '192.168.1.10')
+{
+    define('ENVIRONMENT', 'development');
+    define('LOCALFOLDER', 'defensor/');
+    $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT . '/': DOCUMENT_ROOT . "/$proyName/";
+    $webServer = $protocol . '://' . $hostName . "/$proyName/";
+}
+else if ($hostName == '200.87.100.10')
+{
+    define('ENVIRONMENT', 'production');
+    define('LOCALFOLDER', '');
+    $rootPath = DOCUMENT_ROOT . '/';
+    $webServer = $protocol . '://' . $hostName . '/';
+
+} else {
+
+    define('ENVIRONMENT', 'testing');
+    define('LOCALFOLDER', '');
+    $rootPath = DOCUMENT_ROOT . '/';
+    $webServer = $protocol . '://' . $hostName . '/';
+}
 
 define('DIRECTORY',$rootPath);
 define('ROOTPATH', $rootPath);
 define('WEB_SERVER', $webServer);
 define('WEB_ROOT', $webServer);
 define('PROTOCOL', $protocol);
+
+
+/*
+|--------------------------------------------------------------------------
+| Base Site URL
+|--------------------------------------------------------------------------
+|
+| URL to your CodeIgniter root. Typically this will be your base URL,
+| WITH a trailing slash:
+|
+|	http://example.com/
+|
+| If this is not set then CodeIgniter will try guess the protocol, domain
+| and path to your installation. However, you should always configure this
+| explicitly and never rely on auto-guessing, especially in production
+| environments.
+|
+*/
+$config['base_url'] = WEB_SERVER;
 
 /*
  *---------------------------------------------------------------
@@ -397,18 +455,6 @@ require_once ROOTPATH . 'orm/config/config.php';
 	}
 
 	require_once(APPPATH.'config/constants.php');
-
-/*
- * ------------------------------------------------------
- *  Load the global functions
- * ------------------------------------------------------
- */
-	require_once(BASEPATH.'core/Common.php');
-
-	if(is_file(ROOTPATH."orm/map/ES_Table_Vars.php")){
-
-        require_once ROOTPATH."orm/map/ES_Table_Vars.php";
-    }
 
 /*
  * ------------------------------------------------------

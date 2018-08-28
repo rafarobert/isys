@@ -83,7 +83,7 @@ use ES_Table_Trait as table_trait;
  */
 class ES_Controller extends CI_Controller
 {
-    use ES_Table_Trait;
+//    use ES_Table_Trait;
 
     const STRING = 'string';
     const ARRAYS = 'array';

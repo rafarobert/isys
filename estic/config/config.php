@@ -7,6 +7,7 @@
  */
 
 $config['var_excepts'] = [null,'',""];
+$config['tab_excepts'] = ['migrations'];
 
 $config['isysDirs']= array(
     'modules' => [

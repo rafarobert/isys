@@ -256,7 +256,7 @@ if ( ! function_exists('get_config'))
 
 		if (empty($config))
 		{
-			$file_path = APPPATH.'config/config.php';
+			$file_path = APPPATH . 'config/config.php';
 			$found = FALSE;
 			if (file_exists($file_path))
 			{
@@ -264,7 +264,7 @@ if ( ! function_exists('get_config'))
 				require($file_path);
 			}
 
-            $file_path = BASEPATH.'estic/config/config.php';
+            $file_path = BASEPATH . 'estic/config/config.php';
             $found = FALSE;
             if (file_exists($file_path))
             {
@@ -273,7 +273,7 @@ if ( ! function_exists('get_config'))
             }
 
 			// Is the config file in the environment folder?
-			if (file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/config.php'))
+			if (file_exists($file_path = APPPATH . 'config/'.ENVIRONMENT.'/config.php'))
 			{
 				require($file_path);
 			}
