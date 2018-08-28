@@ -264,7 +264,7 @@ if ( ! function_exists('get_config'))
 				require($file_path);
 			}
 
-            $file_path = BASEPATH.'estic/config.php';
+            $file_path = BASEPATH.'estic/config/config.php';
             $found = FALSE;
             if (file_exists($file_path))
             {
