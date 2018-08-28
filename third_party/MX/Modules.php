@@ -154,14 +154,18 @@ class Modules
 		{
 			include_once $location;
 			return;
-		}		
-		
-		/* autoload library classes */
+		}
+        if(is_file($location = BASEPATH.'estic/'.ucfirst($class).EXT))
+        {
+            include_once $location;
+            return;
+        }
+        /* autoload library classes */
 		if(is_file($location = APPPATH.'libraries/'.ucfirst($class).EXT))
 		{
 			include_once $location;
 			return;
-		}		
+		}
 	}
 
 	/** Load a module file **/
