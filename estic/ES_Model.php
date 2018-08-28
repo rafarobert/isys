@@ -124,10 +124,10 @@ Class ES_Model extends CI_Model {
 
     function __construct() {
         parent::__construct();
-        $this->load->library('migration');
-        if(function_exists('initStaticTableVars')){
-            initStaticTableVars($this);
-        }
+//        $this->load->library('migration');
+//        if(function_exists('initStaticTableVars')){
+//            initStaticTableVars($this);
+//        }
         $this->img_path = realpath(APPPATH.'../assets/img/');
         createFolder($this->img_path);
     }

@@ -11,11 +11,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Migration_Create_#tableName extends CI_Migration
 {
-    const tableId = '#tablePrimaryKey';
-    const tableName = '#tableName';
-    const tableFields = '$tableFields';
-    const tableForeignKeys = '$tableRelations';
-    const tableSettings = '$tableSettings';
+    static $tableId = '#tablePrimaryKey';
+    static $tableName = '#tableName';
+    static $tableFields = '$tableFields';
+    static $tableForeignKeys = '$tableRelations';
+    static $tableSettings = '$tableSettings';
 
     public function up()
     {
