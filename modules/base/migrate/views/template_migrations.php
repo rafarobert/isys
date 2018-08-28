@@ -19,12 +19,12 @@ class Migration_Create_#tableName extends CI_Migration
 
     public function up()
     {
-        $this->dbforge->add_field(self::tableFields);
-        $this->dbforge->add_key(self::tableId, TRUE);
-        $this->dbforge->add_key(self::tableForeignKeys);
-        $this->create_or_alter_table(self::tableName);
-        $settings = self::tableSettings;
-        $this->set_settings($settings,self::tableName);
+        $this->dbforge->add_field(self::$tableFields);
+        $this->dbforge->add_key(self::$tableId, TRUE);
+        $this->dbforge->add_key(self::$tableForeignKeys);
+        $this->create_or_alter_table(self::$tableName);
+        $settings = self::$tableSettings;
+        $this->set_settings($settings,self::$tableName);
     }
 
     public function down()
