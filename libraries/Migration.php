@@ -941,10 +941,10 @@ class CI_Migration
 
     private function getIdUserDefault()
     {
-        if ($this->db->table_exists('ci_user')) {
+        if ($this->db->table_exists('ci_users')) {
             $this->db->where('id_user', 1);
-            $oUser = $this->db->get('ci_user')->row();
-
+            $oUser = $this->db->get('ci_users')->row();
+            $siteMailDomain = config_item('site_mail_domain');
             if (is_object($oUser)) {
                 return $oUser->id_user;
             } else {
@@ -952,15 +952,55 @@ class CI_Migration
                     'id_user' => 1,
                     'name' => 'Rafael',
                     'lastname' => 'Gutierrez',
-                    'email' => 'rafael@herbalife.com.bo',
+                    'email' => "rafael@$siteMailDomain",
                     'password' => hash_sha('123'),
                     'date_created' => date('Y-m-d H:i:s'),
                     'date_modified' => date('Y-m-d H:i:s')
                 );
                 $this->db->set($data);
                 if ($this->db->insert('ci_users')) {
-                    return $data['id_user'];
+                    $idUser =  $data['id_user'];
                 };
+                $this->updateUserRoleDefault($idUser);
+            }
+        }
+    }
+
+    private function updateUserRoleDefault($idUser = null)
+    {
+        if ($this->db->table_exists('ci_roles')) {
+            $this->db->where('id_role', 1);
+            $oRole = $this->db->get('ci_roles')->row();
+            if (is_object($oRole)) {
+                $this->db->where('id_user', $idUser);
+                $oUser = $this->db->get('ci_users')->row();
+                $data = array(
+                    'id_role' => $oRole->id_role
+                );
+                $this->db->set($data);
+                $this->db->update('ci_users', $data);
+                return $oRole->id_role;
+            } else {
+                $data = array(
+                    'id_role' => 1,
+                    'name' => 'Super Admin',
+                    'description' => 'Administrador con todos los privilegios',
+                    'id_user_created' => $idUser,
+                    'id_user_modified' => $idUser,
+                    'date_created' => date('Y-m-d H:i:s'),
+                    'date_modified' => date('Y-m-d H:i:s')
+                );
+                $this->db->set($data);
+                $this->db->insert('ci_roles');
+
+                $this->db->where('id_user', $idUser);
+                $oUser = $this->db->get('ci_users')->row();
+                $data = array(
+                    'id_user' => $idUser,
+                    'id_role' => $data['id_role']
+                );
+                $this->db->set($data);
+                $this->db->update('ci_users', $data);
             }
         }
     }

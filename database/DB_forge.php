@@ -43,6 +43,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Database
  * @author        EllisLab Dev Team
  * @link        https://codeigniter.com/user_guide/database/
+ *
+ * @var CI_Controller $CI
  */
 abstract class CI_DB_forge
 {
@@ -1407,5 +1409,23 @@ abstract class CI_DB_forge
             }
         }
         return false;
+    }
+
+    public function create_ci_sessions()
+    {
+        $CI = CI_Controller::get_instance();
+        $database = $CI->db->database;
+
+        $sql = "
+        CREATE TABLE IF NOT EXISTS `ci_sessions` (
+                `id` varchar(128) NOT NULL,
+                `ip_address` varchar(45) NOT NULL,
+                `timestamp` int(10) unsigned DEFAULT 0 NOT NULL,
+                `data` blob NOT NULL,
+                `id_user` int(10) unsigned
+                KEY `ci_sessions_timestamp` (`timestamp`)
+        );
+        ";
+        $this->db->query($sql);
     }
 }

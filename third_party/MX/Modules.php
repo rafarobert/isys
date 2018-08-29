@@ -149,34 +149,33 @@ class Modules
 			show_error('Failed to load MX core class: '.$class);
 		}
 
-		if (strstr($class, 'ES_'))
-		{
-		    $path_info = $_SERVER['PATH_INFO'];
-			if (is_file($location = ORMPATH.'crud/'.$class.EXT))
-			{
-				include_once $location;
-				return;
-			}
-			show_error('Failed to load MX core class: '.$class);
-		}
-		
-		/* autoload core classes */
-		if(is_file($location = APPPATH.'core/'.ucfirst($class).EXT)) 
-		{
-			include_once $location;
-			return;
-		}
-        if(is_file($location = BASEPATH.'estic/'.ucfirst($class).EXT))
+        /* autoload Modular Extensions ES core classes */
+        if(strstr($class, 'ES_'))
         {
-            include_once $location;
-            return;
+            if(is_file($location = APPPATH.'core/'.ucfirst($class).EXT))
+            {
+                include_once $location;
+                return;
+            }
+            else if(is_file($location = BASEPATH.'estic/'.ucfirst($class).EXT))
+            {
+                include_once $location;
+                return;
+            }
+            else if (!class_exists($class)){
+
+                show_error('Failed to load MX core class: '.$class);
+            }
         }
+
+
         /* autoload library classes */
 		if(is_file($location = APPPATH.'libraries/'.ucfirst($class).EXT))
 		{
 			include_once $location;
 			return;
 		}
+
 	}
 
 	/** Load a module file **/

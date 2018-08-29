@@ -136,61 +136,41 @@ if(file_exists(DOCUMENT_ROOT . 'app/config/config.php'))
  *  Defining Proyect Settings
  * ------------------------------------------------------
  */
-if ($hostName == 'localhost' || $hostName == "local.$proyName.com")
+
+if($hostName == '127.0.0.1' || $hostName == 'localhost')
 {
     define('ENVIRONMENT', 'development');
     define('LOCALFOLDER', "$proyName/");
     $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT : DOCUMENT_ROOT . "$proyName/";
-    $webServer = $protocol . '://' . $hostName . "/$proyName/";
-
-} else if(strstr($hostName,'127.0.0.')){
-
+    $webServer = "$protocol://$hostName/$proyName/";
+}
+else if ($hostName == "local.$proyName.com" || strstr($hostName,'127.0.0.'))
+{
     define('ENVIRONMENT', 'development');
     define('LOCALFOLDER', "$proyName/");
     $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT : DOCUMENT_ROOT . "$proyName/";
-    $webServer = $protocol . '://' . $hostName . "/$proyName/";
-
+    $webServer = "$protocol://$hostName/";
 }
 else if ($hostName == '192.168.1.10')
 {
     define('ENVIRONMENT', 'testing');
     define('LOCALFOLDER', "$proyName/");
     $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT : DOCUMENT_ROOT . "$proyName/";
-    $webServer = $protocol . '://' . $hostName . "/$proyName/";
+    $webServer = "$protocol://$hostName/$proyName/";
 }
 else if ($hostName == '200.87.100.10')
 {
     define('ENVIRONMENT', 'production');
     define('LOCALFOLDER', '');
     $rootPath = DOCUMENT_ROOT;
-    $webServer = $protocol . '://' . $hostName . '/';
-
+    $webServer = "$protocol://$hostName/";
 }
 
 define('DIRECTORY',$rootPath);
 define('ROOTPATH', $rootPath);
-define('WEB_SERVER', $webServer);
-define('WEB_ROOT', $webServer);
+define('WEBSERVER', $webServer);
+define('WEBROOT', $webServer);
 define('PROTOCOL', $protocol);
-
-
-/*
-|--------------------------------------------------------------------------
-| Base Site URL
-|--------------------------------------------------------------------------
-|
-| URL to your CodeIgniter root. Typically this will be your base URL,
-| WITH a trailing slash:
-|
-|	http://example.com/
-|
-| If this is not set then CodeIgniter will try guess the protocol, domain
-| and path to your installation. However, you should always configure this
-| explicitly and never rely on auto-guessing, especially in production
-| environments.
-|
-*/
-$config['base_url'] = WEB_SERVER;
 
 /*
  *---------------------------------------------------------------
@@ -370,7 +350,7 @@ if ( ! is_dir($system_path))
 define('SELF', pathinfo(__FILE__, PATHINFO_BASENAME));
 
 // Path to the orm folder
-define('ORMPATH', str_replace('\\', '/', $orm_folder));
+define('ORMPATH', str_replace('\\', '/', $orm_folder . '/'));
 
 // Path to the front controller (this file)
 define('FCPATH', str_replace('\\', '/', dirname(__FILE__).'/'));

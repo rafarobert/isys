@@ -37,6 +37,10 @@ class ES_Backend_Controller extends ES_Controller
                 $this->CI->data['subview'] = 'admin/dashboard/index';
                 $sessUserData = (object)$this->session->get_userdata()[config_item('sess_key_admin')];
                 $this->data['oUser'] = $sessUserData;
+                $data = array(
+                    'id_user' => $sessUserData->id_user
+                );
+                $this->session->set_userdata($data);
             } else {
                 $this->data['subLayout'] = 'start';
                 if ($this->input->post('signup') == 'Registrarse') {
@@ -57,7 +61,11 @@ class ES_Backend_Controller extends ES_Controller
                 if (is_object($sessUserData)) {
                     if($sessUserData->id_role == 1){
                         $this->data['oSysTables'] = CiTablesQuery::create()->find();
-                    } else {
+                    } else if($this->uri->segments(1) == 'admin'){
+                        $this->data['oSysTables'] = CiTablesQuery::create()->
+                        filterByIdRoles($sessUserData->id_role)->
+                        find();
+                    } else if($this->uri->segments(1) == 'base'){
                         $this->data['oSysTables'] = CiTablesQuery::create()->
                         filterByIdRoles($sessUserData->id_role)->
                         find();

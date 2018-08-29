@@ -121,9 +121,6 @@ class Ctrl_Migrate extends ES_Controller
             }
         }
 
-        // Update database map for loading of classes
-        $this->setTableTrait();
-
         if ($it_worked) {
             echo "All migration has been worked";
         } else {
@@ -268,6 +265,10 @@ class Ctrl_Migrate extends ES_Controller
             $migIndex++;
         }
         $this->setTableVars();
+
+        // Update database map for loading classes
+        $this->setTableTrait();
+
 //        dump(shell_exec('composer update'));
         echo "All migration has been worked";
     }

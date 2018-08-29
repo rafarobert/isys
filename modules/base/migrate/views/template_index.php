@@ -14,7 +14,7 @@
         <h2>Lista de tableTitle</h2>
         <ol class="breadcrumb">
             <li>
-                <?= anchor('lcModS', 'Inicio') ?>
+                <?= anchor(WEBSERVER.'lcModS', 'Inicio') ?>
             </li>
             <li class="active">
                 <strong>Lista de tableTitle</strong>
@@ -45,10 +45,10 @@
             <div class="ibox">
                 <div class="ibox-title">
                     <h5></h5>
-                        <?= anchor("lcModS/lcTableP/edit", "<i class='fa fa-plus'></i> Agregar tableTitle", "class='btn btn-primary btn-xs m-l-sm'"); ?>
+                        <?= anchor(WEBSERVER."lcModS/lcTableP/edit", "<i class='fa fa-plus'></i> Agregar tableTitle", "class='btn btn-primary btn-xs m-l-sm'"); ?>
                         <?php
                         //>>>anchorToEditView<<<
-                        echo anchor("lcModS/lcTableP/edit/editNameView", "<i class='fa fa-plus'></i> Agregar indexEditViewTitle", "class='btn btn-primary btn-xs m-l-sm'");
+                        echo anchor(WEBSERVER."lcModS/lcTableP/edit/editNameView", "<i class='fa fa-plus'></i> Agregar indexEditViewTitle", "class='btn btn-primary btn-xs m-l-sm'");
                         //<<<anchorToEditView>>>
                         ?>
                 </div>
@@ -81,8 +81,8 @@
                                         //tableBodyHtmlFields
                                         <td class="text-right">
                                             <div class="btn-group">
-                                                <?= btn_edit($editLink, "class='btn-white btn btn-xs'") ?>
-                                                <?= btn_delete("lcModS/lcTableP/delete/" . $oUcTableS->idTable, "class='btn-white btn btn-xs'") ?>
+                                                <?= btn_edit(WEBSERVER.$editLink, "class='btn-white btn btn-xs'") ?>
+                                                <?= btn_delete(WEBSERVER."lcModS/lcTableP/delete/" . $oUcTableS->idTable, "class='btn-white btn btn-xs'") ?>
                                             </div>
                                         </td>
                                     </tr>

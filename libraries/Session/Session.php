@@ -1017,7 +1017,7 @@ class CI_Session {
             $data = std2array($oUser);
             $data['loggedin'] = TRUE;
             $this->set_userdata($this->sessKey,$data);
-            redirect('admin/dashboard');
+            redirect(WEBSERVER.'admin/dashboard');
         } else {
             return false;
         }
@@ -1027,7 +1027,7 @@ class CI_Session {
         $this->sess_destroy();
         $this->CI->data['subLayout'] = '';
         $this->CI->data['subview'] = 'admin/start';
-        redirect('admin');
+        redirect(WEBSERVER.'admin');
     }
 
     public function hash($string){

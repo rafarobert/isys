@@ -247,18 +247,7 @@ Class ES_Model extends CI_Model {
     }
 
     public function create_ci_sessions(){
-        $this->db->query("
-CREATE TABLE IF NOT EXISTS `ci_sessions` (
-        `id` varchar(128) NOT NULL,
-        `ip_address` varchar(45) NOT NULL,
-        `timestamp` int(10) unsigned DEFAULT 0 NOT NULL,
-        `data` blob NOT NULL,
-        KEY `ci_sessions_timestamp` (`timestamp`)
-);
-");
-        // para devolver la informacion de la tabla ci_sessions
-        $sql = "SHOW COLUMNS FROM ci_sessions FROM `herbalife_dev`";
-
+        $this->dbforge->create_ci_sessions();
     }
 
     public function get_pk_table($table){
@@ -366,12 +355,14 @@ CREATE TABLE IF NOT EXISTS `ci_sessions` (
                         }
                     }
                 };
-                $aImgInputs = array_map($funct, $aFields);
-                foreach ($aImgInputs as $field => $imgInput) {
-                    if ($imgInput != null) {
-                        $filesFields[$field] = $obj->{$field};
-                    } else {
-                        unset($aImgInputs[$field]);
+                if(validateVar($aFields, 'array')){
+                    $aImgInputs = array_map($funct, $aFields);
+                    foreach ($aImgInputs as $field => $imgInput) {
+                        if ($imgInput != null) {
+                            $filesFields[$field] = $obj->{$field};
+                        } else {
+                            unset($aImgInputs[$field]);
+                        }
                     }
                 }
             } else {
