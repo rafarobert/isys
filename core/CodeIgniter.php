@@ -93,7 +93,7 @@ date_default_timezone_set('America/La_Paz');
  *  Defining Document Root
  * ------------------------------------------------------
  */
-define('DOCUMENT_ROOT',$_SERVER['DOCUMENT_ROOT'] . '/');
+define('DOCUMENTROOT',$_SERVER['DOCUMENT_ROOT'] . '/');
 
 /*
  * ------------------------------------------------------
@@ -102,9 +102,9 @@ define('DOCUMENT_ROOT',$_SERVER['DOCUMENT_ROOT'] . '/');
  */
 require_once(BASEPATH.'core/Common.php');
 
-if(is_file(DOCUMENT_ROOT."orm/map/ES_Table_Vars.php")){
+if(is_file(DOCUMENTROOT."orm/map/ES_Table_Vars.php")){
 
-    require_once DOCUMENT_ROOT."orm/map/ES_Table_Vars.php";
+    require_once DOCUMENTROOT."orm/map/ES_Table_Vars.php";
 }
 
 /*
@@ -112,9 +112,9 @@ if(is_file(DOCUMENT_ROOT."orm/map/ES_Table_Vars.php")){
  *  Defining Proyect Settings
  * ------------------------------------------------------
  */
-if(file_exists(DOCUMENT_ROOT . 'app/config/config.php'))
+if(file_exists(DOCUMENTROOT . 'app/config/config.php'))
 {
-    require_once DOCUMENT_ROOT . 'app/config/config.php';
+    require_once DOCUMENTROOT . 'app/config/config.php';
 
     $proyName = $config['proy_name'];
 
@@ -141,28 +141,28 @@ if($hostName == '127.0.0.1' || $hostName == 'localhost')
 {
     define('ENVIRONMENT', 'development');
     define('LOCALFOLDER', "$proyName/");
-    $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT : DOCUMENT_ROOT . "$proyName/";
+    $rootPath = strhas(DOCUMENTROOT, $proyName) ? DOCUMENTROOT : DOCUMENTROOT . "$proyName/";
     $webServer = "$protocol://$hostName/$proyName/";
 }
 else if ($hostName == "local.$proyName.com" || strstr($hostName,'127.0.0.'))
 {
     define('ENVIRONMENT', 'development');
     define('LOCALFOLDER', "$proyName/");
-    $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT : DOCUMENT_ROOT . "$proyName/";
+    $rootPath = strhas(DOCUMENTROOT, $proyName) ? DOCUMENTROOT : DOCUMENTROOT . "$proyName/";
     $webServer = "$protocol://$hostName/";
 }
 else if ($hostName == '192.168.1.10')
 {
     define('ENVIRONMENT', 'testing');
     define('LOCALFOLDER', "$proyName/");
-    $rootPath = strhas(DOCUMENT_ROOT, $proyName) ? DOCUMENT_ROOT : DOCUMENT_ROOT . "$proyName/";
+    $rootPath = strhas(DOCUMENTROOT, $proyName) ? DOCUMENTROOT : DOCUMENTROOT . "$proyName/";
     $webServer = "$protocol://$hostName/$proyName/";
 }
 else if ($hostName == '200.87.100.10')
 {
     define('ENVIRONMENT', 'production');
     define('LOCALFOLDER', '');
-    $rootPath = DOCUMENT_ROOT;
+    $rootPath = DOCUMENTROOT;
     $webServer = "$protocol://$hostName/";
 }
 
@@ -768,7 +768,7 @@ if (isset($assign_to_config) && is_array($assign_to_config))
                 $modulo = $SYS[$modulo]['name'];
             }
         }
-
+        $directory = $RTR->directory;
         // **************** Establece el nombre de la clase ****************
         if($subMod == ''){
             $class = $RTR->class;
@@ -777,12 +777,18 @@ if (isset($assign_to_config) && is_array($assign_to_config))
             $validating = true;
         }
 
+        $bIsDir = false;
         foreach ($DIRS as $root => $dirs){
             foreach ($dirs as $dir => $mods){
                 foreach ($mods as $mod => $type){
                     if($type == "HMVC"){
-                        $ruta = ROOTPATH . "$root/$dir/$modulo/$class/";
-                        if (is_dir($ruta) && $class != '') {
+                        if(is_dir($ruta = ROOTPATH . "$root/$directory/$class/") && $class != ''){
+                            $bIsDir = true;
+                        } else if (is_dir($ruta = ROOTPATH . "$root/$dir/$modulo/$class/") && $class != '') {
+                            $bIsDir = true;
+                        }
+
+                        if($bIsDir){
                             $class = "Ctrl_".ucfirst($class);
                             $classFile = $ruta."$class.php";
                             if(is_file($classFile)){

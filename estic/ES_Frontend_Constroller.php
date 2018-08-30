@@ -11,8 +11,8 @@ class ES_Frontend_Constroller extends ES_Controller
     function __construct()
     {
         parent::__construct();
-        $this->data['layout'] = 'frontend/_layout';
+        $this->data['layout'] = 'frontend/dinamic/_layout';
         $this->data['subLayout'] = 'frontend/_subLayout';
-        $this->data['meta_title'] = 'Home - Herbalife';
+        $this->data['metaTitle'] = 'Home - Herbalife';
     }
 }

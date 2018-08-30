@@ -98,11 +98,17 @@ class ES_Controller extends CI_Controller
 
     function __construct(){
         parent::__construct();
-
         $this->img_path = realpath(ROOTPATH.'assets/img/');
 
         $this->data['errors'] = array();
-        $this->data['site_name'] = config_item('site_name');
+        $this->data['siteName'] = config_item('site_name');
+        $this->data['siteDomain'] = config_item('site_domain');
+        $this->data['metaReplyTo'] = config_item('meta_reply_to');
+        $this->data['metaLanguaje'] = config_item('meta_languaje');
+        $this->data['metaViewport'] = config_item('meta_viewport');
+        $this->data['metaImage'] = config_item('meta_image');
+        $this->data['favIcon'] = config_item('fav_icon');
+
         $this->data['layout'] = $this->uri->segment(1) == 'base' || $this->uri->segment(1) == 'admin'? 'backend/_layout' : ($this->uri->segment(1) == 'front' ? 'frontend/_layout' : '');
     }
 

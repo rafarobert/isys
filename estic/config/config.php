@@ -23,7 +23,7 @@
 | environments.
 |
 */
-$config['base_url'] = isset($_SERVER['SERVER_ADMIN']) ? $_SERVER['SERVER_ADMIN'] : $_SERVER['HTTP_HOST'];
+$config['base_url'] = WEBSERVER;
 
 $config['sys_title'] = 'Estic - Admin';
 $config['sys_name'] = 'Estic Framework para desarrollo agil';

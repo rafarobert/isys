@@ -7,8 +7,8 @@
  */
 
 // ================= Base routes ====================
-$route['base'] = 'base/dashboard';
-$route['base/dashboard'] = 'base/dashboard';
+$route['base'] = 'backend/base/dashboard';
+$route['base/dashboard'] = 'backend/base/dashboard';
 // ================= Migration paths ================
 $route['base/migrate/fromdatabase'] = 'base/migrate/fromdatabase';
 $route['base/migrate/([a-zA-Z]+)/(:num)'] = 'base/migrate/run/$0/$1/$2';

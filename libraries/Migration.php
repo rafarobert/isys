@@ -944,7 +944,7 @@ class CI_Migration
         if ($this->db->table_exists('ci_users')) {
             $this->db->where('id_user', 1);
             $oUser = $this->db->get('ci_users')->row();
-            $siteMailDomain = config_item('site_mail_domain');
+            $siteDomain = config_item('site_domain');
             if (is_object($oUser)) {
                 return $oUser->id_user;
             } else {
@@ -952,7 +952,7 @@ class CI_Migration
                     'id_user' => 1,
                     'name' => 'Rafael',
                     'lastname' => 'Gutierrez',
-                    'email' => "rafael@$siteMailDomain",
+                    'email' => "rafael@$siteDomain",
                     'password' => hash_sha('123'),
                     'date_created' => date('Y-m-d H:i:s'),
                     'date_modified' => date('Y-m-d H:i:s')
