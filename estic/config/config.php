@@ -38,6 +38,8 @@ $config['sess_object'] = 'oUser';
 $config['var_excepts'] = [null,'',""];
 $config['tab_excepts'] = ['migrations'];
 
+$config['tab_titles'] = ['nombre','name','title','titulo','apellido','lastname'];
+
 $config['isysDirs']= array(
     'modules' => [
         'sys' => 'HMVC',

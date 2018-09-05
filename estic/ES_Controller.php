@@ -101,6 +101,7 @@ class ES_Controller extends CI_Controller
         $this->img_path = realpath(ROOTPATH.'assets/img/');
 
         $this->data['errors'] = array();
+        $this->data['siteTitle'] = config_item('site_title');;
         $this->data['siteName'] = config_item('site_name');
         $this->data['siteDomain'] = config_item('site_domain');
         $this->data['metaReplyTo'] = config_item('meta_reply_to');

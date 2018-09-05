@@ -481,23 +481,24 @@ class MX_Loader extends CI_Loader
                     }
                 }
                 // *********************************************************************************
-                if(strpos($file_content,$str1)>-1){
-                    $file_content = str_replace($str1,$content,$file_content);
-                } else if(strpos($file_content,$str2)>-1){
-                    $file_content = str_replace($str2,$content,$file_content);
-                } else if(strpos($file_content,$str3)>-1){
-                    $file_content = str_replace($str3,$content,$file_content);
-                } else if(strpos($file_content,$str4)>-1){
-                    $file_content = str_replace($str4,$content,$file_content);
-                    if(strpos($file_content,$str5)>-1){
+
+                if(validateVar($file_content) && validateVar($str1) && validateVar($str2) && validateVar($str3) && validateVar($str4) && validateVar($str5)){
+                    if(strpos($file_content,$str1)>-1){
+                        $file_content = str_replace($str1,$content,$file_content);
+                    } else if(strpos($file_content,$str2)>-1){
+                        $file_content = str_replace($str2,$content,$file_content);
+                    } else if(strpos($file_content,$str3)>-1){
+                        $file_content = str_replace($str3,$content,$file_content);
+                    } else if(strpos($file_content,$str4)>-1){
+                        $file_content = str_replace($str4,$content,$file_content);
+                        if(strpos($file_content,$str5)>-1){
+                            $file_content = str_replace($str5,$content,$file_content);
+                        }
+                    } else if(strpos($file_content,$str5)>-1){
                         $file_content = str_replace($str5,$content,$file_content);
                     }
-                } else if(strpos($file_content,$str5)>-1){
-                    $file_content = str_replace($str5,$content,$file_content);
                 }
-
             }
-
             return $file_content;
         }
 
