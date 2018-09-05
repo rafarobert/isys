@@ -137,7 +137,7 @@ class ES_Controller extends CI_Controller
         $path = preg_replace(['/^\//','/\/$/'],'',$path);
         if(substr_count($path,'/') == 2 ){
             list($mod, $class, $method) = explode('/',$path);
-            list($classSin, $classPlu) = setSubModSingularPlural($class);
+            list($classSin, $classPlu) = setSingularPlural($class);
             $ucClassSin = ucfirst($classSin);
             $method = validateVar($method) ? $method : $this->router->method;
             $class = validateVar($class) ? $class : $this->router->class;

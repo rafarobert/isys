@@ -1030,7 +1030,7 @@ abstract class CI_DB_forge
             $results = array_column($result,'TABLE_NAME');
             $aResult = array();
             foreach ($results as $k => $value){
-                $aResult[$value] = setTitleFromWordWithDashes($value);
+                $aResult[$value] = setLabel($value);
             }
             return $aResult;
         }

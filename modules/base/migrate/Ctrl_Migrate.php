@@ -144,7 +144,7 @@ class Ctrl_Migrate extends ES_Controller
         foreach ($aDBTables as $key => $dbTable) {
             if(!in_array($dbTable, $this->tab_excepts)){
                 list($mod, $table) = getModSubMod($dbTable);
-                list($tableS, $tableP) = setSubModSingularPlural($table);
+                list($tableS, $tableP) = setSingularPlural($table);
                 $this->data['lcMod'] = $lcMod = lcfirst($this->sys[$mod]['name']);
                 $this->data['UcMod'] = $ucMod = ucfirst($this->sys[$mod]['name']);
                 $this->data['lcTableP'] = lcfirst($tableP);
@@ -172,7 +172,7 @@ class Ctrl_Migrate extends ES_Controller
         foreach ($aDBTables as $key => $dbTable) {
             if(!in_array($dbTable, $this->tab_excepts)){
                 list($mod, $table) = getModSubMod($dbTable);
-                list($tableS, $tableP) = setSubModSingularPlural($table);
+                list($tableS, $tableP) = setSingularPlural($table);
                 $this->data['lcAcMod'] = $lcAcMod = lcfirst($mod);
                 $this->data['UcAcMod'] = $lcAcMod = ucfirst($mod);
                 $this->data['lcTableP'] = lcfirst($tableP);
