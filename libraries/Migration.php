@@ -622,7 +622,7 @@ class CI_Migration
     }
 
     // ************************************************************************************************
-    // ********************* Se agrego para la crecion dinamica de los modulos ************************
+    // ********************* Se agrego para la creacion dinamica de los modulos ************************
     // ************************************************************************************************
     public function create_or_alter_table($tableLocal)
     {
