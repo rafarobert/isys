@@ -51,7 +51,7 @@ class Ctrl_Ajax extends ES_Base_Controller
     public function exportFields($table = ''){
         $aReturn = array();
         if(validateVar($table)){
-            $fields = $this->dbforge->getArrayFieldsFromTable($table)[$table];
+            $fields = $this->dbforge->getArrayFieldsFromTable($table);
             $vFields = array();
             foreach ($fields as $field => $settings){
                 if(compareArrayStr($settings,'table','ci_options')){

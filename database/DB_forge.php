@@ -1228,16 +1228,17 @@ abstract class CI_DB_forge
         }
     }
 
-    public function getArrayFieldsFromTable($table = '', $database = '')
+    public function getArrayFieldsFromTable($table = '', $bWithTableNames = false)
     {
         $CI = CI_Controller::get_instance();
         $excepts = config_item('controlFields');
         $tables = array();
         $aTables = array();
-        if ($database == '') {
-            $database = $CI->db->database;
-        }
-        if ($table == '') {
+        $database = $CI->db->database;
+
+        if(is_bool($table)) {
+            $bWithTableNames = true;
+        } else if ($table == '') {
             $tables = $this->getArrayTableNamesFromDB();
         } else {
             $tables[] = $table;
@@ -1245,6 +1246,9 @@ abstract class CI_DB_forge
         foreach ($tables as $tab) {
             $sql = "SHOW COLUMNS FROM `$tab` FROM `$database`";
             $data = json_decode(json_encode($CI->db->query($sql)->result()), true);
+            foreach ($data as $key => $value){
+                $data[$key]['tabName'] = $tab;
+            }
             $pk = $this->getPrimaryKeyFromTable($tab);
             $callback = function ($field) {
                 $fieldName = $field['Field'];
@@ -1253,6 +1257,7 @@ abstract class CI_DB_forge
                 $fieldUnsigned = strpos($field['Type'], 'unsigned') > -1 ? TRUE : FALSE;
                 $fieldNull = $field['Null'] ? TRUE : FALSE;
                 $fieldAutoIncrement = $field['Extra'] == 'auto_increment' || strpos($field['Extra'], 'auto_increment') > -1 ? TRUE : FALSE;
+                $field['tabName'] = $field['tabName'];
                 $field['field'] = $field['Field'];
                 $field['type'] = isset($fieldType[0]) ? $fieldType[0] : "";
                 $field['constraint'] = isset($fieldConstraint[0]) ? $fieldConstraint[0] : "";
@@ -1328,7 +1333,13 @@ abstract class CI_DB_forge
                 $aTables[$tab][$colName]['pk'] = $pk;
             }
         }
-        return $aTables;
+        if($bWithTableNames){
+            return $aTables;
+        } else if(count($aTables) == 1){
+            return $aTables[$tab];
+        } else {
+            return $aTables;
+        }
     }
 
     public function getArrayTablesSettingsFromDB($table = '', $database = '')
@@ -1373,12 +1384,12 @@ abstract class CI_DB_forge
         }
     }
 
-    public function getPrimaryKeysOfTables($bJustPrimaryKeys = false)
+    public function getPrimaryKeysOfTables($bJustPrimaryKeys = false, $bInverse = true)
     {
         $CI = CI_Controller::get_instance();
         $database = $CI->db->database;
 
-        $sql = "SELECT COLUMN_NAME, TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'herbalife_dev' AND COLUMN_KEY = 'PRI'";
+        $sql = "SELECT COLUMN_NAME, TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '$database' AND COLUMN_KEY = 'PRI'";
         $result = $CI->db->query($sql)->result();
         if (count((array)$result)) {
             $aColumnNames = array_column(json_decode(json_encode($result), true), "COLUMN_NAME");
@@ -1386,7 +1397,11 @@ abstract class CI_DB_forge
             if($bJustPrimaryKeys){
                 return $aColumnNames;
             } else {
-                return array_combine($aColumnNames, $aTableNames);
+                if($bInverse){
+                    return array_combine($aColumnNames, $aTableNames);
+                } else {
+                    return array_combine($aTableNames, $aColumnNames);
+                }
             }
         }
         return false;
