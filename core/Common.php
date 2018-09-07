@@ -930,16 +930,15 @@ if (!function_exists('compareArrayStr')) {
     function compareArrayStr($array, $index, $string2, $anyway = true)
     {
         $string1 = '';
-        if(is_array($array) && (is_string($index) || is_numeric($index))){
-            if(isset($array[$index])){
+        if (validateArray($array, $index)) {
+            if (isset($array[$index])) {
                 $string1 = $array[$index];
             } else {
                 return false;
             }
-        } else {
-            return false;
+            return compareStrStr($string1, $string2, $anyway);
         }
-        return compareStrStr($string1,$string2,$anyway);
+        return false;
     }
 }
 
@@ -1131,9 +1130,9 @@ if (!function_exists('probar_sesion')) {
     }
 }
 
-if (!function_exists('setObjectFromWordWithDashes')) {
+if (!function_exists('setObject')) {
 
-    function setObjectFromWordWithDashes($nameWithDashes, $bReturnUcNames = false, $blcFirst = false)
+    function setObject($nameWithDashes, $bReturnUcNames = false, $blcFirst = false)
     {
         $aNames = explode('_',$nameWithDashes);
         if($bReturnUcNames){
@@ -1426,5 +1425,13 @@ if (!function_exists('suprTagInStr')) {
         } else {
             return $str;
         }
+    }
+}
+
+
+if(!function_exists('suprstr')){
+    function suprstr($str,$needle){
+        $letters = explode($str,$needle);
+        return implode('',$letters);
     }
 }

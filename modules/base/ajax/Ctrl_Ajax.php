@@ -120,8 +120,8 @@ class Ctrl_Ajax extends ES_Base_Controller
                 if(compareArrayNum($response,'code',1451)){
                     list($foreignMod, $foreignTable) = getModSubMod($aMessage[1][1]);
                     list($localMod, $localTable) = getModSubMod($aMessage[1][4]);
-                    list($foreignTableS, $foreignP) = setSubModSingularPlural($foreignTable);
-                    list($localTableS, $localTableP) = setSubModSingularPlural($localTable);
+                    list($foreignTableS, $foreignP) = setSingularPlural($foreignTable);
+                    list($localTableS, $localTableP) = setSingularPlural($localTable);
                     $response['SQL'] = $response['message'];
                     $response['message'] = "No se puede eliminar el registro debido a que existe un $foreignTableS que hace referencia a esta $localTableS";
                 }
