@@ -7,14 +7,15 @@
  */
 
 // ================= Base routes ====================
+$route['sys'] = 'backend/sys/dashboard';
 $route['base'] = 'backend/base/dashboard';
-$route['base/dashboard'] = 'backend/base/dashboard';
+$route['sys/dashboard'] = 'backend/sys/dashboard';
 // ================= Migration paths ================
-$route['base/migrate/fromdatabase'] = 'base/migrate/fromdatabase';
-$route['base/migrate/([a-zA-Z]+)/(:num)'] = 'base/migrate/run/$0/$1/$2';
-$route['base/migrate/([a-zA-Z]+)/(:num)'] = 'base/migrate/run/$0/$1/$2';
-$route['base/migrate/([a-zA-Z]+)'] = 'base/migrate/run/$0/$1';
-$route['base/migrate/([a-zA-Z]+)'] = 'base/migrate/run/$0/$1';
-$route['base/migrate/(:num)'] = 'base/migrate/run/$0/$1';
-$route['base/migrate/(:num)'] = 'base/migrate/run/$0/$1';
+$route['sys/migrate/fromdatasys'] = 'sys/migrate/fromdatabase';
+$route['sys/migrate/([a-zA-Z]+)/(:num)'] = 'sys/migrate/run/$0/$1/$2';
+$route['sys/migrate/([a-zA-Z]+)/(:num)'] = 'sys/migrate/run/$0/$1/$2';
+$route['sys/migrate/([a-zA-Z]+)'] = 'sys/migrate/run/$0/$1';
+$route['sys/migrate/([a-zA-Z]+)'] = 'sys/migrate/run/$0/$1';
+$route['sys/migrate/(:num)'] = 'sys/migrate/run/$0/$1';
+$route['sys/migrate/(:num)'] = 'sys/migrate/run/$0/$1';
 // ===================================================

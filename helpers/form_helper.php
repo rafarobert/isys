@@ -207,8 +207,13 @@ if ( ! function_exists('form_input'))
 			'name' => is_array($data) ? '' : $data,
 			'value' => $value
 		);
+		$toReturn =  '<input '._parse_form_attributes($data, $defaults)._attributes_to_string($extra)." />\n";
+		if(validateArray($data,'helpText')){
+		    $helpText = $data['helpText'];
+		    $toReturn .= "<span class='help-block m-b-none'>$helpText</span>\n";
+        }
 
-		return '<input '._parse_form_attributes($data, $defaults)._attributes_to_string($extra)." />\n";
+        return $toReturn;
 	}
 }
 
@@ -635,6 +640,8 @@ if ( ! function_exists('set_options'))
 	function set_options($data, $options, $checked = FALSE, $extra = '')
 	{
         list($options, $aImgs, $aData) = distribute_options($data, $options);
+        $iCheckOpen = validateArray($data,'i-checks') ? "<div class='i-checks'>" : "";
+        $iCheckClose = validateArray($data,'i-checks') ? "</div>" : "";
         if(validateArray($data,'options')){
             $options = $data['options'];
             unset($data['options']);
@@ -665,19 +672,19 @@ if ( ! function_exists('set_options'))
                 if(validateVar($checkeds,'array')){
                     foreach ($checkeds as $k => $check){
                         if($option == $check){
-                            $htmlOptions .= form_checkbox($data, $k, true, $extra).'<span>'.ucfirst($option)."</span></label>";
+                            $htmlOptions .= form_checkbox($data, $k, true, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
                         } else {
-                            $htmlOptions .= form_checkbox($data, $k, false, $extra).'<span>'.ucfirst($option)."</span></label>";
+                            $htmlOptions .= form_checkbox($data, $k, false, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
                         }
                     }
                 } else {
                     if($checked == $key){
-                        $htmlOptions .= form_checkbox($data, $key, true, $extra).'<span>'.ucfirst($option)."</span></label>";
+                        $htmlOptions .= form_checkbox($data, $key, true, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
                     } else {
-                        $htmlOptions .= form_checkbox($data, $key, false, $extra).'<span>'.ucfirst($option)."</span></label>";
+                        $htmlOptions .= form_checkbox($data, $key, false, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
                     }
                 }
-                $htmlOptions .= "<label>";
+                $htmlOptions .= "$iCheckOpen<label>";
             }
             return $htmlOptions;
         } else {
@@ -1265,7 +1272,22 @@ if ( ! function_exists('form_default'))
         if(validateVar($values,'array',false)){
             echo form_dropdown($data, $values, $selected, $extra);
         } else {
+            if(validateVar($selected) && $extra == ''){
+                $extra = $selected;
+            }
             echo form_input($data, $values, $extra);
+        }
+    }
+}
+
+if ( ! function_exists('form_static'))
+{
+    function form_static($data = '', $values = array(), $extra = '')
+    {
+        if(validateVar($values,'array',false)){
+            echo form_dropdown($data, $values, [], $extra);
+        } else if(validateVar($values)){
+            echo "<p $extra>$values</p>";
         }
     }
 }

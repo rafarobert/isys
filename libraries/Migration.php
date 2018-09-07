@@ -1511,6 +1511,8 @@ class CI_Migration
             );
             $typeForm = validateArray($settings, 'input') ? $settings['input'] : 'default';
 
+
+
             if (validateArray($settings, 'onclick')) {
                 $inputData['onclick'] = $settings['onclick'];
                 if ((strstr($settings['onclick'], 'Modal') || strstr($settings['onclick'], 'modal')) && !$modal) {
@@ -1554,6 +1556,9 @@ class CI_Migration
             if (validateArray($settings, 'insertWith')) {
                 $inputData['with'] = $settings['insertWith'];
             }
+            if (validateArray($settings, 'helpText')) {
+                $inputData['helpText'] .= $settings['helpText'];
+            }
             if (validateArray($settings, 'insertEachOne')) {
                 $aEachNames[] = $name;
             }
@@ -1563,7 +1568,7 @@ class CI_Migration
                 }
             }
             if (compareArrayStr($settings, 'input', 'disabled')) {
-                $inputData['disabled'] = true;
+                $inputData['disabled'] = '';
             }
             if (compareArrayStr($settings, 'input', 'hidden')) {
                 $inputData['class'] .= 'display-none ';
@@ -1583,7 +1588,8 @@ class CI_Migration
                     }
                 } else if (compareArrayStr($settings, 'input', 'hidden')) {
                     $typeForm = 'hidden';
-                } else if ($this->bInputHasOptions($settings)) {
+                }
+                if ($this->bInputHasOptions($settings)) {
                     list($typeForm, $inputData) = $this->getInputType($settings, $inputData);
                     if (!validateArray($settings, 'options')) {
                         $inputData['options'] = [];
@@ -1679,7 +1685,6 @@ class CI_Migration
     {
 
         $formType = 'default';
-
         if ($this->inputRadio($settings)) {
             $formType = 'radio';
         } else if ($this->inputRadios($settings)) {
@@ -1699,6 +1704,10 @@ class CI_Migration
             $formType = 'select';
         } else if ($this->inputDropdown($settings)) {
             $formType = 'dropdown';
+        } else if ($this->inputStatic($settings)) {
+            $formType = 'static';
+        } else {
+            $formType = 'default';
         }
         return [$formType, $inputData];
     }
@@ -1736,6 +1745,11 @@ class CI_Migration
     private function inputDropdown($settings)
     {
         return compareArrayStr($settings, 'input', 'dropdown');
+    }
+
+    private function inputStatic($settings)
+    {
+        return compareArrayStr($settings, 'input', 'static');
     }
 
     private function validateFkTable($data, $fields, $settings, $sys, $typeForm = null, $aMixDbPkFk = [], $tableName = '')

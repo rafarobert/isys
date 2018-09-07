@@ -295,6 +295,7 @@ Class ES_Model extends CI_Model {
                 $str = json_encode($vals);
                 return $str;
             }
+            $vals = xss_clean($vals);
             return $vals;
         };
         $funct_k = function ($key) {

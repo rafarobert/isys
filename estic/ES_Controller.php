@@ -110,7 +110,7 @@ class ES_Controller extends CI_Controller
         $this->data['metaImage'] = config_item('meta_image');
         $this->data['favIcon'] = config_item('fav_icon');
 
-        $this->data['layout'] = $this->uri->segment(1) == 'base' || $this->uri->segment(1) == 'admin'? 'backend/_layout' : ($this->uri->segment(1) == 'front' ? 'frontend/_layout' : '');
+        $this->data['layout'] = $this->uri->segment(1) == 'base' || $this->uri->segment(1) == 'admin' || $this->uri->segment(1) == 'sys' ? 'backend/_layout' : ($this->uri->segment(1) == 'front' ? 'frontend/_layout' : '');
     }
 
     public function loadTemplates($view, $data = array()){
@@ -182,8 +182,13 @@ class ES_Controller extends CI_Controller
 
     public function filterIdOrView($id, $view){
         if($id == null && (validateVar($view, 'numeric') || validateVar($view, 'string'))){
-            if(!in_array("edit-$view",$this->data['editTags'])){
-                $id = $view ;
+            if(validateArray($this->data, 'editTags')){
+                if(!in_array("edit-$view",$this->data['editTags'])){
+                    $id = $view ;
+                    $view = null;
+                }
+            } else {
+                $id = $view;
                 $view = null;
             }
         }

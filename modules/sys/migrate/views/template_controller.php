@@ -65,8 +65,8 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP {
         $oUcTableS = $this->model_lcTableP->getThumbs($oUcTableS)[0];
         //<<<validateFieldImgIndex>>>
         //>>>setADBTablesRefFields<<<
-        $aDBTables = std2array($this->model_tables->get_by(['tabla']));
-        $this->data['aDBTables'] = array_combine(array_column($aDBTables,'id_table'),array_column($aDBTables,'tabla'));
+        $aDBTables = std2array($this->model_tables->get_by(['table_name']));
+        $this->data['aDBTables'] = array_combine(array_column($aDBTables,'id_table'),array_column($aDBTables,'table_name'));
         $this->data['aDBTableRef'] = isset($oUcTableS->idDBTableRef) && $oUcTableS->idDBTableRef != null ? [$oUcTableS->idDBTableRef => $oUcTableS->idDBTableRef]: [];
         $this->data['aDBTableFields'] = isset($oUcTableS->fieldDBTableRef) && $oUcTableS->fieldDBTableRef != null ? std2array($oUcTableS->fieldDBTableRef) : [];
         //<<<setADBTablesRefFields>>>
