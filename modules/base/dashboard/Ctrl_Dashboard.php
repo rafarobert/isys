@@ -20,7 +20,7 @@ class Ctrl_Dashboard extends ES_Base_Controller {
             $oUser = $this->model_users->get($id_user);
             if (is_object($oUser)){
                 $this->data['oUser'] = $oUser;
-                $this->data['subview'] = 'dashboard/index';
+                $this->data['subview'] = 'base/dashboard/index';
             } else {
                 $this->data['subLayout'] = 'start';
             }

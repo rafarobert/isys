@@ -1587,7 +1587,7 @@ class CI_Migration
                     }
                 }
             } else if (compareArrayStr($settings, 'type', 'int') || compareArrayStr($settings, 'type', 'decimal')) {
-                if (!compareArrayStr($settings, 'type', 'decimal') && !validateArray($settings, 'idForeign')) {
+                if (compareArrayStr($settings, 'class', 'dial') && !validateArray($settings, 'idForeign')) {
                     $inputData['data-fgColor'] = !validateArray($settings, 'data') ? "#1AB394" : (validateArray($settings['data'], 'fgColor') ? $settings['data']['fgColor'] : "#1AB394");
                     $inputData['data-width'] = !validateArray($settings, 'data') ? "70" : (validateArray($settings['data'], 'width') ? $settings['data']['width'] : "70");
                     $inputData['data-height'] = !validateArray($settings, 'data') ? "70" : (validateArray($settings['data'], 'height') ? $settings['data']['height'] : "70");
