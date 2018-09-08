@@ -1431,7 +1431,7 @@ if (!function_exists('suprTagInStr')) {
 
 if(!function_exists('suprstr')){
     function suprstr($str,$needle){
-        $letters = explode($str,$needle);
+        $letters = explode($needle, $str);
         return implode('',$letters);
     }
 }
@@ -1443,13 +1443,15 @@ if (!function_exists('setLabel')) {
         $aSigns = ['-','_','*'];
         $nameSign = '';
         foreach ($aSigns as $sign){
-            $nameSign = strstr($name,$sign) ? $sign : '';
-            break;
+            if(strstr($name,$sign)){
+                $nameSign = $sign;
+                break;
+            }
         }
         if($nameSign == ''){
             return ucfirst($name);
         } else {
-            $words = explode($sign, $name);
+            $words = explode($nameSign, $name);
             if($bUcFirst){
                 $funct = function($key){
                     return ucfirst($key);
@@ -1458,7 +1460,7 @@ if (!function_exists('setLabel')) {
             }
             if($bDetectId){
                 $funct = function($key){
-                    return suprstr($key,'id_');
+                    return ucfirst(suprstr($key,'id_'));
                 };
                 $words = array_map($funct, $words);
             }

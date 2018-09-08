@@ -661,7 +661,7 @@ class CI_Migration
 
                         if (in_array($idLocal, $fields_new_table)) {
                             $fk_field = [];
-                            $fk_table = $this->db->field_data($tableForeign);
+                            $fk_table = validateVar($tableForeign) ? $this->db->field_data($tableForeign) : [];
                             foreach ($fk_table as $i => $set) {
                                 if ($set->name == $idForeign && $set->primary_key) {
                                     $fk_field = $set;
@@ -1502,6 +1502,7 @@ class CI_Migration
         $aEachNames = [];
         $modalsContent = '';
         $sys = config_item('sys');
+        $bIsTextArea = false;
         foreach ($vFields as $name => $settings) {
             $inputData = array(
                 "name" => validateArray($settings, 'name') ? $settings['name'] : "$name",
@@ -1577,6 +1578,7 @@ class CI_Migration
             if (compareArrayStr($settings, 'type', 'text')) {
                 $typeForm = 'textarea';
                 $inputData["class"] .= "textTinymce ";
+                $bIsTextArea = true;
             } else if (compareArrayStr($settings, 'type', 'varchar') || compareArrayStr($settings, 'type', 'longvarchar')) {
                 if (validateArray($settings, 'password')) {
                     $typeForm = 'password';
@@ -1585,6 +1587,7 @@ class CI_Migration
                     if($constraint >= 500){
                         $typeForm = 'textarea';
                         $inputData["class"] .= "textTinymce ";
+                        $bIsTextArea = true;
                     }
                 } else if (compareArrayStr($settings, 'input', 'hidden')) {
                     $typeForm = 'hidden';
@@ -1653,6 +1656,9 @@ class CI_Migration
                 $htmlFormContent .= $this->load->view("template_form_img", $data, true, true);
             } else if (validateArray($settings, 'options') || $bIsForeing) {
                 $htmlFormContent .= $this->load->view("template_form_with_options", $data, true, true, true);
+            } else if($bIsTextArea){
+                $htmlFormContent .= $this->load->view("template_form_textarea", $data, true, true, true);
+                $bIsTextArea = false;
             } else {
                 $htmlFormContent .= $this->load->view("template_form_default", $data, true, true);
             }
@@ -1674,7 +1680,9 @@ class CI_Migration
             compareArrayStr($settings, 'input', 'checkboxes') ||
             compareArrayStr($settings, 'input', 'select') ||
             compareArrayStr($settings, 'input', 'dropdown') ||
-            compareArrayStr($settings, 'input', 'multiselect')) {
+            compareArrayStr($settings, 'input', 'multiselect') ||
+            validateArray($settings, 'options')
+        ) {
             return true;
         } else {
             return false;
@@ -1783,6 +1791,9 @@ class CI_Migration
                         $data['objOptions'] = '$data["options"]';
                         $bIsForeing = false;
                     }
+                } else if(validateArray($fields[$idLocal], 'options')){
+                    $data['objOptions'] = '$data["options"]';
+                    $bIsForeing = false;
                 }
             }
         } else {

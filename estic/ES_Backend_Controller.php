@@ -24,7 +24,6 @@ class ES_Backend_Controller extends ES_Controller
 
         $this->initLoaded();
         parent::__construct();
-        $this->load->helper('security');
         $this->load->helper('form');
         $this->load->library('form_validation');
 //        $this->load->library('request');

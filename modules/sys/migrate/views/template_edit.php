@@ -13,13 +13,13 @@
 <div class="row wrapper border-bottom white-bg page-heading">
 
     <div class="col-lg-10">
-        <h2><?= empty($oUcTableS->idTable) ? "Agregar tableTitle" : "Actualizando datos, UcTableS #" . $oUcTableS->idTable ?></h2>
+        <h2><?= empty($oUcTableS->idTable) ? "Agregar ".setLabel('tableTitle') : "Actualizando datos, ".setLabel('UcTableS #') . $oUcTableS->idTable ?></h2>
         <ol class="breadcrumb">
             <li>
                 <?=anchor('lcModS','Inicio')?>
             </li>
             <li>
-                <a>lcTableP</a>
+                <?=anchor('lcModS/lcTableP', setLabel('lcTableP'))?>
             </li>
             <li class="active">
                 <strong>Edicion de datos</strong>

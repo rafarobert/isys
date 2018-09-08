@@ -98,8 +98,9 @@ class ES_Controller extends CI_Controller
 
     function __construct(){
         parent::__construct();
-        $this->img_path = realpath(ROOTPATH.'assets/img/');
+        $this->load->helper('security');
 
+        $this->img_path = realpath(ROOTPATH.'assets/img/');
         $this->data['errors'] = array();
         $this->data['siteTitle'] = config_item('site_title');;
         $this->data['siteName'] = config_item('site_name');
