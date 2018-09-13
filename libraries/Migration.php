@@ -2124,6 +2124,9 @@ class CI_Migration
             public function signup(){
                 $this->session->signUp();
             }
+            public function forgot_password(){
+                $this->session->forgotPassword();
+            }
             ';
             return $content;
         }

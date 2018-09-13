@@ -99,7 +99,6 @@ class ES_Controller extends CI_Controller
     function __construct(){
         parent::__construct();
         $this->load->helper('security');
-
         $this->img_path = realpath(ROOTPATH.'assets/img/');
         $this->data['errors'] = array();
         $this->data['siteTitle'] = config_item('site_title');;
@@ -110,7 +109,6 @@ class ES_Controller extends CI_Controller
         $this->data['metaViewport'] = config_item('meta_viewport');
         $this->data['metaImage'] = config_item('meta_image');
         $this->data['favIcon'] = config_item('fav_icon');
-
         $this->data['layout'] = $this->uri->segment(1) == 'base' || $this->uri->segment(1) == 'admin' || $this->uri->segment(1) == 'sys' ? 'backend/_layout' : ($this->uri->segment(1) == 'front' ? 'frontend/_layout' : '');
     }
 
@@ -176,8 +174,6 @@ class ES_Controller extends CI_Controller
                 $this->data["subview"] = "$mod/$class/$method";
 //                return $this->load->view("$mod/$class/$method", $this->data, true);
             }
-        } else {
-
         }
     }
 

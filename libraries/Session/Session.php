@@ -962,42 +962,52 @@ class CI_Session {
 
     public function signUp($mod = 'users'){
         // Redirect a user if he's already logged in
+        $this->CI->load->model('base/model_roles');
         $dashboard = "admin/dashboard";
         $this->isLoguedin() == FALSE || redirect($dashboard);
-
+        $roles = std2array($this->CI->model_roles->get_by('id_role'));
         // Set form
         $rules = $this->MI->rules_register;
         $this->CI->form_validation->set_rules($rules);
 
-        // Process form
-        if($this->CI->form_validation->run() == true){
-            // We can login and redirect
-            if($this->_unique_email()){
-                $data = $this->MI->array_from_post(array(
-                    // *** estic - tables - inicio ***
-                    "email",
-                    "password",
-                    // *** estic - tables - fin ***
-                ));
-                $data["password"] = $this->hash($this->CI->input->post("password"));
-                $data["id_role"] = 7;
+        if(validateVar($roles,'array')){
+            // Process form
+            if($this->CI->form_validation->run() == true){
+                // We can login and redirect
+                if($this->_unique_email()){
+                    $data = $this->MI->array_from_post(array(
+                        // *** estic - tables - inicio ***
+                        "email",
+                        "password",
+                        // *** estic - tables - fin ***
+                    ));
+                    $data["password"] = $this->hash($this->CI->input->post("password"));
+                    if(count($roles) == 1){
+                        $data["id_role"] = $roles[0]['id_role'];
+                    } else {
+                        foreach ($roles as $role){
+                            $data["id_role"] = $role['id_role'];
+                        }
+                    }
 
-                $this->MI->save($data);
-                $this->login();
-                redirect($dashboard);
-            } else {
-                $this->set_flashdata('error', 'El email introducido ya existe');
+                    $this->MI->save($data);
+                    $this->login();
+                    redirect($dashboard);
+                } else {
+                    $this->set_flashdata('error', 'El email introducido ya existe');
+                }
             }
         }
         // Load view
-        $this->CI->data['subLayout'] = "start";
+        $oUser = new stdClass();
+        $oUser->name = $this->CI->input->post('name');
+        $oUser->email = $this->CI->input->post('email');
+        $oUser->password = $this->CI->input->post('password');
+        $this->CI->data['subLayout'] = "register";
+        $this->CI->data['oUser'] = $oUser;
     }
 
     public function login(){
-//        $data = array(
-//            'email' => $this->CI->input->post('email'),
-//            'password' => $this->hash($this->CI->input->post('password')),
-//        );
         $oUser = $this->MI->get_by(array(
             'email' => $this->CI->input->post('email'),
             'password' => $this->hash($this->CI->input->post('password')),
@@ -1007,10 +1017,6 @@ class CI_Session {
             3 => 'id_user'
 
         ), true, true);
-//        $oUser = CiUsersQuery::create()
-//            ->condition('cond1', 'CiUsers.Email = ?', $data['email'])
-//            ->condition('cond2', 'CiUsers.Password = ?', $data['password'])
-//            ->findOneBy(array('cond1', 'cond2'), 'and');
 
         if(is_object($oUser)){
             // log in user
@@ -1021,6 +1027,10 @@ class CI_Session {
         } else {
             return false;
         }
+    }
+
+    public function forgotPassword(){
+        $this->CI->data['subLayout'] = "forgot-password";
     }
 
     public function logout(){

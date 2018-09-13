@@ -65,7 +65,7 @@ define('CI_VERSION', '3.0.6');
  *
  */
 
-define('LANGUAGE', 'english');
+define('LANGUAGE', 'spanish');
 
 /*
  * ------------------------------------------------------

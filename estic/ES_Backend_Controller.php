@@ -50,7 +50,7 @@ class ES_Backend_Controller extends ES_Controller
                 );
                 $this->session->set_userdata($data);
             } else {
-                $this->data['subLayout'] = 'start';
+                $this->data['subLayout'] = 'login';
                 if ($this->input->post('signup') == 'Registrarse') {
                     $this->session->signUp();
                 } else if ($this->input->post('login') == 'Ingresar') {

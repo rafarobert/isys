@@ -140,4 +140,38 @@ class Ctrl_Ajax extends ES_Base_Controller
         }
         echo json_encode($response);
     }
+
+    public function delete(){
+        $dir = $this->input->post('dir');
+        $dir = preg_replace(['/^\//','/\/$/'],'',$dir);
+        list($mod, $table, $method, $pk) = substr_count($dir,'/') == 3 ? explode('/',$dir) : [];
+        $this->{"init_$table"}(true);
+        $response = $this->{"model_$table"}->{$method}($pk);
+        if(validateArray($response,'message') && validateArray($response,'code')){
+            preg_match_all("/`(.*?)`/",$response['message'],$aMessage);
+            if(validateArray($aMessage,1)){
+                $response['constraints'] = $aMessage[1];
+                if(compareArrayNum($response,'code',1451)){
+                    list($foreignMod, $foreignTable) = getModSubMod($aMessage[1][1]);
+                    list($localMod, $localTable) = getModSubMod($aMessage[1][4]);
+                    list($foreignTableS, $foreignP) = setSingularPlural($foreignTable);
+                    list($localTableS, $localTableP) = setSingularPlural($localTable);
+                    $response['SQL'] = $response['message'];
+                    $response['message'] = "No se puede eliminar el registro debido a que existe un $foreignTableS que hace referencia a esta $localTableS";
+                }
+            }
+            $response['error'] = 'Hubo un error al eliminar el registro';
+        } else {
+            $response = array();
+            $view = $this->{"ctrl_$table"}->index();
+            if(validateVar($view,'array')){
+                list($response['view'], $response['error']) = $view;
+            } else {
+                $response['error'] = 'ok';
+                $response['view'] = $view;
+            }
+            $response['message'] = 'El registro fue eliminado de forma definitiva exitosamente';
+        }
+        echo json_encode($response);
+    }
 }

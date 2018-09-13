@@ -217,6 +217,33 @@ if ( ! function_exists('form_input'))
 	}
 }
 
+if ( ! function_exists('form_email'))
+{
+	/**
+	 * Text Input Field
+	 *
+	 * @param	mixed
+	 * @param	string
+	 * @param	mixed
+	 * @return	string
+	 */
+	function form_email($data = '', $value = '', $extra = '')
+	{
+		$defaults = array(
+			'type' => 'email',
+			'name' => is_array($data) ? '' : $data,
+			'value' => $value
+		);
+		$toReturn =  '<input '._parse_form_attributes($data, $defaults)._attributes_to_string($extra)." />\n";
+		if(validateArray($data,'helpText')){
+		    $helpText = $data['helpText'];
+		    $toReturn .= "<span class='help-block m-b-none'>$helpText</span>\n";
+        }
+
+        return $toReturn;
+	}
+}
+
 // ------------------------------------------------------------------------
 
 if ( ! function_exists('form_password'))
