@@ -773,6 +773,11 @@ if ( ! function_exists('html_escape'))
 			return $var;
 		}
 
+        if(is_object($var))
+        {
+            $var = std2array($var);
+        }
+
 		if (is_array($var))
 		{
 			foreach (array_keys($var) as $key)
@@ -782,6 +787,7 @@ if ( ! function_exists('html_escape'))
 
 			return $var;
 		}
+
 
 		return htmlspecialchars($var, ENT_QUOTES, config_item('charset'), $double_encode);
 	}
@@ -977,7 +983,7 @@ if (!function_exists('validateVar')) {
     {
         switch ($type) {
             case 'string':
-                if (is_string($val) && !is_numeric($val)) {
+                if (is_string($val)) {
                     if($bEmpty){
                         if ($val != '') {
                             return true;
@@ -1012,6 +1018,11 @@ if (!function_exists('validateVar')) {
                     } else {
                         return true;
                     }
+                }
+                break;
+            case 'object':
+                if (is_object($val)) {
+                    return true;
                 }
                 break;
         }
@@ -1261,10 +1272,11 @@ if (!function_exists('std2array')) {
 
     function std2array($std)
     {
-        if(is_array($std)){
-            return $std;
+        if(validateVar($std,'array')){
+            if(validateVar($std[0])){
+                return $std;
+            }
         }
-
         $array = json_decode(json_encode($std), true);
 
         if(is_array($array)){
@@ -1330,10 +1342,26 @@ if (!function_exists('setTitleFromObject')) {
         $title = '';
         if(validateVar($aValues, 'array')){
             foreach ($aValues as $value){
-                $title .= isset($object->$value) ? $object->$value . ' ' : '';
+                if(validateVar($object->$value)){
+                    $title .= $object->$value . ' ';
+                } else if(validateVar($object->$value, 'array') || validateVar($object->$value, 'object')){
+                    foreach ($object->$value as $val){
+                        $title .= $val . ' ';
+                    }
+                } else {
+                    $title .= $object->$value . ' ';
+                }
             }
         } else if(validateVar($aValues)){
-            $title .= isset($object->$aValues) ? $object->$aValues . ' ' : '';
+            if(validateVar($object->$aValues)){
+                $title .= $object->$aValues . ' ';
+            } else if(validateVar($object->$aValues, 'array') || validateVar($object->$aValues, 'object')){
+                foreach ($object->$aValues as $val){
+                    $title .= $val . ' ';
+                }
+            } else {
+                $title .= $object->$aValues . ' ';
+            }
         }
         return $title;
     }

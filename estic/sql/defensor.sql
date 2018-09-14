@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS `ci_cities`;
 CREATE TABLE `ci_cities`
 (
     `id_city` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(500),
+    `name` VARCHAR(300),
     `description` VARCHAR(500),
     `abbreviation` VARCHAR(200),
     `id_capital` int(10) unsigned,
@@ -59,7 +59,7 @@ CREATE TABLE `ci_files`
 (
     `id_file` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(256),
-    `url` VARCHAR(600),
+    `url` VARCHAR(450),
     `extention` VARCHAR(100),
     `width` INTEGER,
     `height` INTEGER,
@@ -76,6 +76,7 @@ CREATE TABLE `ci_files`
     `date_published` DATETIME,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
+    `id_city` int(10) unsigned,
     PRIMARY KEY (`id_file`),
     UNIQUE INDEX `ci_files_id_file_uindex` (`id_file`),
     INDEX `ci_files_ibfk_1` (`id_user_created`),
@@ -179,6 +180,7 @@ CREATE TABLE `ci_roles`
     `id_user_created` int(11) unsigned,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
+    `id_provincia` int(10) unsigned,
     PRIMARY KEY (`id_role`),
     UNIQUE INDEX `ci_roles_id_role_uindex` (`id_role`),
     INDEX `ci_roles_ibfk_1` (`id_user_created`),
@@ -222,13 +224,13 @@ CREATE TABLE `ci_tables`
 (
     `id_table` int(11) unsigned NOT NULL,
     `id_module` int(10) unsigned,
-    `id_roles` int(10) unsigned,
+    `id_nivel_role` int(10) unsigned,
     `title` VARCHAR(100) NOT NULL,
     `table_name` VARCHAR(255),
     `listed` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `description` TEXT,
     `icon` VARCHAR(200) NOT NULL,
-    `url` VARCHAR(600) NOT NULL,
+    `url` VARCHAR(400) NOT NULL,
     `status` VARCHAR(255) DEFAULT 'ENABLED',
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -237,10 +239,10 @@ CREATE TABLE `ci_tables`
     `date_created` DATETIME NOT NULL,
     PRIMARY KEY (`id_table`),
     UNIQUE INDEX `ci_tables_id_table_uindex` (`id_table`),
-    INDEX `ci_tables_ibfk_3` (`id_roles`),
     INDEX `ci_tables_ibfk_4` (`id_module`),
     INDEX `id_user_created` (`id_user_created`),
     INDEX `id_user_modified` (`id_user_modified`),
+    INDEX `ci_tables_ibfk_3` (`id_nivel_role`),
     CONSTRAINT `ci_tables_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -248,7 +250,7 @@ CREATE TABLE `ci_tables`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `ci_tables_ibfk_3`
-        FOREIGN KEY (`id_roles`)
+        FOREIGN KEY (`id_nivel_role`)
         REFERENCES `ci_roles` (`id_role`),
     CONSTRAINT `ci_tables_ibfk_4`
         FOREIGN KEY (`id_module`)
@@ -307,7 +309,6 @@ CREATE TABLE `dfa_archivos`
     `id_historia` int(10) unsigned,
     `id_delegacion` int(10) unsigned,
     `id_publicacion` int(10) unsigned,
-    `id_vulnerabilidad` int(10) unsigned,
     `detalle` VARCHAR(300),
     `descripcion` VARCHAR(300),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
@@ -326,7 +327,6 @@ CREATE TABLE `dfa_archivos`
     INDEX `dfa_archivos_ibfk_6` (`id_historia`),
     INDEX `dfa_archivos_ibfk_7` (`id_delegacion`),
     INDEX `dfa_archivos_ibfk_8` (`id_publicacion`),
-    INDEX `dfa_archivos_ibfk_9` (`id_vulnerabilidad`),
     CONSTRAINT `dfa_archivos_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -350,10 +350,7 @@ CREATE TABLE `dfa_archivos`
         REFERENCES `dfa_delegaciones` (`id_delegacion`),
     CONSTRAINT `dfa_archivos_ibfk_8`
         FOREIGN KEY (`id_publicacion`)
-        REFERENCES `dfa_publicaciones` (`id_publicacion`),
-    CONSTRAINT `dfa_archivos_ibfk_9`
-        FOREIGN KEY (`id_vulnerabilidad`)
-        REFERENCES `dfa_vulnerabilidades` (`id_vulnerabilidad`)
+        REFERENCES `dfa_publicaciones` (`id_publicacion`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -370,9 +367,10 @@ CREATE TABLE `dfa_conceptos`
     `id_historia` int(10) unsigned,
     `titulo` VARCHAR(300),
     `titular` VARCHAR(500),
-    `ids_archivos` VARCHAR(500),
+    `ids_archivos` VARCHAR(400),
     `id_tipo_concepto` int(10) unsigned,
     `id_unidad` int(10) unsigned,
+    `tipo` VARCHAR(300),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -425,6 +423,7 @@ CREATE TABLE `dfa_convocatorias`
     `id_user_created` int(11) unsigned NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
+    `id_concepto` int(10) unsigned,
     PRIMARY KEY (`id_convocatoria`),
     UNIQUE INDEX `dfa_convocatorias_id_convocatoria_uindex` (`id_convocatoria`),
     INDEX `dfa_convocatorias_ibfk_1` (`id_user_created`),
@@ -471,6 +470,7 @@ CREATE TABLE `dfa_delegaciones`
     `id_user_created` int(11) unsigned NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
+    `id_convocatoria` int(10) unsigned,
     PRIMARY KEY (`id_delegacion`),
     UNIQUE INDEX `dfa_delegaciones_id_delegacion_uindex` (`id_delegacion`),
     INDEX `dfa_delegaciones_ibfk_1` (`id_user_created`),
@@ -522,6 +522,7 @@ CREATE TABLE `dfa_denuncias`
     `id_user_created` int(11) unsigned NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
+    `id_delegacion` int(10) unsigned,
     PRIMARY KEY (`id_denuncia`),
     UNIQUE INDEX `dfa_denuncias_id_denuncia_uindex` (`id_denuncia`),
     INDEX `dfa_denuncias_ibfk_1` (`id_user_created`),
@@ -767,7 +768,6 @@ CREATE TABLE `dfa_procedimientos`
     `id_user_created` int(11) unsigned NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
-    `column_10` INTEGER,
     PRIMARY KEY (`id_procedimiento`),
     UNIQUE INDEX `dfa_procedimientos_id_procedimiento_uindex` (`id_procedimiento`),
     INDEX `dfa_procedimientos_ibfk_1` (`id_user_created`),
@@ -839,6 +839,7 @@ CREATE TABLE `dfa_publicaciones`
     `id_delegacion` int(10) unsigned,
     `id_unidad` int(10) unsigned,
     `id_categoria_publicacion` int(10) unsigned,
+    `tipo` VARCHAR(250),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -916,7 +917,6 @@ CREATE TABLE `dfa_tipos_conceptos`
     `id_user_created` int(11) unsigned NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
-    `tipo` VARCHAR(20),
     PRIMARY KEY (`id_tipo_concepto`),
     UNIQUE INDEX `dfa_tipos_conceptos_id_tipo_concepto_uindex` (`id_tipo_concepto`),
     INDEX `dfa_tipos_conceptos_ibfk_1` (`id_user_created`),
@@ -946,6 +946,7 @@ CREATE TABLE `dfa_tipos_contratos`
     `id_user_created` int(11) unsigned NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
+    `tipo` VARCHAR(300),
     PRIMARY KEY (`id_tipo_contrato`),
     UNIQUE INDEX `dfa_tipos_contratos_id_tipo_contrato_uindex` (`id_tipo_contrato`),
     INDEX `dfa_tipos_contratos_ibfk_1` (`id_user_created`),
@@ -1144,36 +1145,6 @@ CREATE TABLE `dfa_unidades`
     CONSTRAINT `dfa_unidades_ibfk_4`
         FOREIGN KEY (`id_direccion`)
         REFERENCES `dfa_unidades` (`id_unidad`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- dfa_vulnerabilidades
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `dfa_vulnerabilidades`;
-
-CREATE TABLE `dfa_vulnerabilidades`
-(
-    `id_vulnerabilidad` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `categoria` VARCHAR(200),
-    `titulo` VARCHAR(300),
-    `descripcion` VARCHAR(500),
-    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
-    `change_count` INTEGER DEFAULT 0 NOT NULL,
-    `id_user_modified` int(11) unsigned NOT NULL,
-    `id_user_created` int(11) unsigned NOT NULL,
-    `date_modified` DATETIME NOT NULL,
-    `date_created` DATETIME NOT NULL,
-    PRIMARY KEY (`id_vulnerabilidad`),
-    UNIQUE INDEX `dfa_vulnerabilidades_id_vulnerabilidad_uindex` (`id_vulnerabilidad`),
-    INDEX `dfa_vulnerabilidades_ibfk_1` (`id_user_created`),
-    INDEX `dfa_vulnerabilidades_ibfk_2` (`id_user_modified`),
-    CONSTRAINT `dfa_vulnerabilidades_ibfk_1`
-        FOREIGN KEY (`id_user_created`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_vulnerabilidades_ibfk_2`
-        FOREIGN KEY (`id_user_modified`)
-        REFERENCES `ci_users` (`id_user`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

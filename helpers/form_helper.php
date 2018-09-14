@@ -481,7 +481,7 @@ if ( ! function_exists('form_checkbox'))
             $value = array_keys($value)[0];
         }
 		$defaults = array('type' => 'checkbox', 'name' => ( ! is_array($data) ? $data : ''), 'value' => $value);
-
+        $data['value'] = $value;
 		if (is_array($data) && array_key_exists('checked', $data))
 		{
 		    if(validateArray($data,'checked')){
@@ -705,10 +705,20 @@ if ( ! function_exists('set_options'))
                         }
                     }
                 } else {
-                    if($checked == $key){
-                        $htmlOptions .= form_checkbox($data, $key, true, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
+                    if(is_object($checked)){
+                        foreach ($checked as $chk){
+                            if($chk == $key){
+                                $htmlOptions .= form_checkbox($data, $key, true, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
+                            } else {
+                                $htmlOptions .= form_checkbox($data, $key, false, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
+                            }
+                        }
                     } else {
-                        $htmlOptions .= form_checkbox($data, $key, false, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
+                        if($checked == $key){
+                            $htmlOptions .= form_checkbox($data, strval($key), true, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
+                        } else {
+                            $htmlOptions .= form_checkbox($data, strval($key), false, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
+                        }
                     }
                 }
                 $htmlOptions .= "$iCheckOpen<label>";
@@ -928,6 +938,9 @@ if ( ! function_exists('set_value'))
 	{
 		$CI =& get_instance();
 
+		if(validateVar($default,'array') || validateVar($default,'object')){
+
+        }
 		$value = (isset($CI->form_validation) && is_object($CI->form_validation) && $CI->form_validation->has_rule($field))
 			? $CI->form_validation->set_value($field, $default)
 			: $CI->input->post($field, FALSE);
@@ -1167,7 +1180,7 @@ if ( ! function_exists('_parse_form_attributes'))
 
 			if (count($attributes) > 0)
 			{
-				$default = array_merge($default, $attributes);
+				$default = array_merge($attributes, $default);
 			}
 		}
 
@@ -1183,7 +1196,10 @@ if ( ! function_exists('_parse_form_attributes'))
 			{
 				continue;
 			}
-            if(!validateVar($val,'array')){
+			if(is_object($val)){
+			    $val = std2array($val);
+            }
+            if(validateVar($val)){
                 $att .= $key.'="'.$val.'" ';
             }
 		}

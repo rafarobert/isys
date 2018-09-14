@@ -11,7 +11,7 @@
         ?>
     </div>
 </div>
-<?php echo form_error("lcField"); ?>
+<?php echo form_error("lcErrorForField"); ?>
 
 
 

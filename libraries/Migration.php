@@ -654,53 +654,55 @@ class CI_Migration
         if (is_array($keys) && count($keys)) {
             foreach ($keys as $i => $key) {
                 foreach ($key as $constraintName => $settings) {
-                    if (is_array($settings) && $this->dbforge->tableExists($settings['table'])) {
-                        $tableForeign = $settings['table'];
-                        $idForeign = $settings['idForeign'];
-                        $idLocal = $settings['idLocal'];
+                    if(validateArray($settings, 'table')){
+                        if (validateVar($settings,'array') && $this->dbforge->tableExists($settings['table'])) {
+                            $tableForeign = $settings['table'];
+                            $idForeign = $settings['idForeign'];
+                            $idLocal = $settings['idLocal'];
 
-                        if (in_array($idLocal, $fields_new_table)) {
-                            $fk_field = [];
-                            $fk_table = validateVar($tableForeign) ? $this->db->field_data($tableForeign) : [];
-                            foreach ($fk_table as $i => $set) {
-                                if ($set->name == $idForeign && $set->primary_key) {
-                                    $fk_field = $set;
-                                    break;
+                            if (in_array($idLocal, $fields_new_table)) {
+                                $fk_field = [];
+                                $fk_table = validateVar($tableForeign) ? $this->db->field_data($tableForeign) : [];
+                                foreach ($fk_table as $i => $set) {
+                                    if ($set->name == $idForeign && $set->primary_key) {
+                                        $fk_field = $set;
+                                        break;
+                                    }
                                 }
-                            }
-                            if (count((array)$fk_field)) {
-                                if ($fields[$idLocal]['type'] == $fk_field->type ||
-                                    $fields[$idLocal]['type'] == strtoupper($fk_field->type) ||
-                                    $fields[$idLocal]['type'] == ucfirst($fk_field->type) &&
-                                    $fields[$idLocal]['default'] == $fk_field->default ||
-                                    $fields[$idLocal]['default'] == strtoupper($fk_field->default) ||
-                                    $fields[$idLocal]['default'] == ucfirst($fk_field->default) &&
-                                    intval($fields[$idLocal]['constraint']) == intval($fk_field->max_length)
-                                ) {
-                                    if (!$this->dbforge->hasRelation($localTable, $idLocal, $tableForeign, $idForeign, $constraintName)) {
-                                        if ($this->dbforge->fieldExistsInDB($localTable, $idLocal)) {
-                                            $this->dbforge->setRelation($localTable, $idLocal, $tableForeign, $idForeign, $constraintName);
-                                        } else {
-                                            header("Refresh:0");
+                                if (count((array)$fk_field)) {
+                                    if ($fields[$idLocal]['type'] == $fk_field->type ||
+                                        $fields[$idLocal]['type'] == strtoupper($fk_field->type) ||
+                                        $fields[$idLocal]['type'] == ucfirst($fk_field->type) &&
+                                        $fields[$idLocal]['default'] == $fk_field->default ||
+                                        $fields[$idLocal]['default'] == strtoupper($fk_field->default) ||
+                                        $fields[$idLocal]['default'] == ucfirst($fk_field->default) &&
+                                        intval($fields[$idLocal]['constraint']) == intval($fk_field->max_length)
+                                    ) {
+                                        if (!$this->dbforge->hasRelation($localTable, $idLocal, $tableForeign, $idForeign, $constraintName)) {
+                                            if ($this->dbforge->fieldExistsInDB($localTable, $idLocal)) {
+                                                $this->dbforge->setRelation($localTable, $idLocal, $tableForeign, $idForeign, $constraintName);
+                                            } else {
+                                                header("Refresh:0");
+                                            }
                                         }
+                                    } else {
+                                        show_error('Verifica que el campo ' . $idLocal . ' de la actual tabla ' . $localTable . ' tenga las mismas propiedades en la tabla ' . $tableForeign);
                                     }
                                 } else {
-                                    show_error('Verifica que el campo ' . $idLocal . ' de la actual tabla ' . $localTable . ' tenga las mismas propiedades en la tabla ' . $tableForeign);
+                                    show_error('Verifica que el campo ' . $idLocal . ' ha sido instanciado de la misma manera en la tabla:' . $tableForeign);
                                 }
-                            } else {
-                                show_error('Verifica que el campo ' . $idLocal . ' ha sido instanciado de la misma manera en la tabla ' . $tableForeign);
-                            }
-                        } else if ($this->db->field_exists($idLocal, $localTable)) {
-                            if ($this->dbforge->hasRelation($localTable, $idLocal, $tableForeign, $idForeign, $constraintName)) {
-                                if ($this->dbforge->fieldExistsInDB($localTable, $idLocal)) {
-                                    $this->dbforge->removeRelation($localTable, $constraintName);
+                            } else if ($this->db->field_exists($idLocal, $localTable)) {
+                                if ($this->dbforge->hasRelation($localTable, $idLocal, $tableForeign, $idForeign, $constraintName)) {
+                                    if ($this->dbforge->fieldExistsInDB($localTable, $idLocal)) {
+                                        $this->dbforge->removeRelation($localTable, $constraintName);
+                                    }
                                 }
                             }
+                        } else {
+                            $migIndex = $this->getMigrationIndexFromTableName($settings['table']);
+                            list($mod, $submod) = getModSubMod($settings['table']);
+                            redirect("base/migrate/$mod/$migIndex");
                         }
-                    } else {
-                        $migIndex = $this->getMigrationIndexFromTableName($settings['table']);
-                        list($mod, $submod) = getModSubMod($settings['table']);
-                        redirect("base/migrate/$mod/$migIndex");
                     }
                 }
             }
@@ -1191,7 +1193,6 @@ class CI_Migration
         $excepts = array_merge(config_item('controlFields'), [$pkTable]);
         list($mod, $submod, $subModS, $subModP, $data, $vFields) = $default;
         list($vFieldsChecked, $fieldImg, $fieldPass, $data) = $this->checkInputFields($vFields, $data);
-
         $aFieldsNames = array_keys($vFieldsChecked);
         $data["validatedFieldsNames"] = var_export($aFieldsNames, true);
         $data['initVarsForeignTable'] = '';
@@ -1201,7 +1202,6 @@ class CI_Migration
         $data['setFieldsForeignTable'] = '';
         $data['setForeignTableFields'] = '';
         $data['compareFieldsForeignTable'] = '';
-
         $relationsUnique = $this->getTableRelations($fields, true);
         $relationsWithOutExcepts = $this->getTableRelations($fields, false, true, true);
 
@@ -1209,25 +1209,12 @@ class CI_Migration
             list($fMod, $fSubmod) = getModSubMod($settings['table']);
             list($fSubModS, $fSubModP) = setSingularPlural($fSubmod);
             list($fModS, $fModP) = setSingularPlural($sys[$fMod]['name']);
-
-//            if ($fSubModP == "options") {
-//                if (validateArray($settings, 'field')) {
-//                    $object = strhas($settings['field'], 'id_') ? explode('id_', $settings['field'])[1] : $settings['field'];
-//                } else {
-//                    $object = $fSubModP;
-//                }
-//                $data['lcFkObjFieldP'] = '$' . lcfirst(setObject($object, true));
-//                $data['UcFkObjFieldP'] = ucfirst(setObject($object, true));
-//            } else {
-                $data['lcFkObjFieldP'] = '$' . lcfirst(setObject($fSubModP, true));
-                $data['UcFkObjFieldP'] = ucfirst(setObject($fSubModP, true));
-//            }
-
+            $data['lcFkObjFieldP'] = '$' . lcfirst(setObject($fSubModP, true));
+            $data['UcFkObjFieldP'] = ucfirst(setObject($fSubModP, true));
             $data['lcFkTableP'] = lcfirst($fSubModP);
             $data['UcFkTableP'] = ucfirst($fSubModP);
             $data['lcFkModS'] = lcfirst($fModS);
             $data['lcFkModP'] = lcfirst($fModP);
-//            $data['initPropertiesVarsForeignTable'] .= $this->load->view(["template_controller" => "initPropertiesVarsForeignTable"], $data, true, true, true);
             $data['initVarsForeignTable'] .= $this->load->view(["template_ES_Ctrl" => "initVarsForeignTable"], $data, true, true, true);
             $data['loadModelsForeignTable'] .= $this->load->view(["template_ES_Ctrl" => "loadModelsForeignTable"], $data, true, true, true);
         }
@@ -1243,7 +1230,7 @@ class CI_Migration
 
             foreach ($relationsWithOutExcepts as $fkName => $settings) {
 
-                // ------------------------------------- Template Controller ------------------------------------------------
+                // --------------------------------------- Template Controller ------------------------------------------------
                 if (isset($settings['divider'])) {
                     $data['divider'] = $settings['divider'];
                 } else {
@@ -1312,12 +1299,10 @@ class CI_Migration
                     unset($data['setOfFkSettings']);
                 }
                 // -------------------------------------------------------------------------------------------------------------
-
             }
         }
         if ($fieldImg != '') {
             $data['lcField'] = $fieldImg;
-//            $data["initFieldImg"] = $this->load->view(["template_controller" => "initFieldImg"], $data, true, true);
             $data["validateFieldsImgsIndex"] = $this->load->view(["template_controller" => "validateFieldsImgsIndex"], $data, true, true);
             $data["validateFieldImgIndex"] = $this->load->view(["template_controller" => "validateFieldImgIndex"], $data, true, true);
             $data["validateFieldImgUpload"] = $this->load->view(["template_controller" => "validateFieldImgUpload"], $data, true, true);
@@ -1503,7 +1488,9 @@ class CI_Migration
         $modalsContent = '';
         $sys = config_item('sys');
         $bIsTextArea = false;
+
         foreach ($vFields as $name => $settings) {
+
             $inputData = array(
                 "name" => validateArray($settings, 'name') ? $settings['name'] : "$name",
                 "id" => validateArray($settings, 'id') ? $settings['id'] : "field" . ucfirst($name),
@@ -1511,8 +1498,10 @@ class CI_Migration
                 "placeholder" => validateArray($settings, 'placeholder') ? $settings['placeholder'] : '',
             );
             $typeForm = validateArray($settings, 'input') ? $settings['input'] : 'default';
-
-
+            $data['lcInputId'] = "field" . ucfirst($name);
+            $data['lcInputName'] = lcfirst($name);
+            $data['lcField'] = lcfirst($name);
+            $data['lcErrorForField'] = lcfirst($name);
 
             if (validateArray($settings, 'onclick')) {
                 $inputData['onclick'] = $settings['onclick'];
@@ -1593,7 +1582,7 @@ class CI_Migration
                     $typeForm = 'hidden';
                 }
                 if ($this->bInputHasOptions($settings)) {
-                    list($typeForm, $inputData) = $this->getInputType($settings, $inputData);
+                    list($typeForm, $inputData, $data) = $this->getInputType($settings, $inputData, $data);
                     if (!validateArray($settings, 'options')) {
                         $inputData['options'] = [];
                     }
@@ -1610,7 +1599,7 @@ class CI_Migration
                     $inputData['class'] .= 'dial m-r-sm';
                 }
                 if ($this->bInputHasOptions($settings)) {
-                    list($typeForm, $inputData) = $this->getInputType($settings, $inputData);
+                    list($typeForm, $inputData, $data) = $this->getInputType($settings, $inputData, $data);
                     if (validateArray($settings, 'options')) {
                         $inputData['options'] = $settings['options'];
                     }
@@ -1624,9 +1613,7 @@ class CI_Migration
                 $typeForm = 'input';
                 $inputData["class"] .= "datepicker ";
             }
-            $data['lcInputId'] = "field" . ucfirst($name);
-            $data['lcInputName'] = lcfirst($name);
-            $data['lcField'] = lcfirst($name);
+
             list($data, $typeForm, $bIsForeing) = $this->validateFkTable($data, $fields, $settings, $sys, $typeForm,$tableName);
             $data['lcInputFormType'] = $typeForm;
             if (compareArrayStr($settings, 'input', 'hidden')) {
@@ -1634,7 +1621,6 @@ class CI_Migration
             } else {
                 $data['UcInputLabel'] = validateArray($settings, 'label') ? $settings['label'] : setLabel($name,true);
             }
-
             if (compareArrayStr($settings, 'options', 'db_tabs')) {
                 $data['objOptions'] = '$aDBTables';
             }
@@ -1681,7 +1667,8 @@ class CI_Migration
             compareArrayStr($settings, 'input', 'select') ||
             compareArrayStr($settings, 'input', 'dropdown') ||
             compareArrayStr($settings, 'input', 'multiselect') ||
-            validateArray($settings, 'options')
+            validateArray($settings, 'options') ||
+            validateArray($settings, 'idForeign')
         ) {
             return true;
         } else {
@@ -1689,35 +1676,40 @@ class CI_Migration
         }
     }
 
-    private function getInputType($settings, $inputData)
+    private function getInputType($settings, $inputData, $data)
     {
 
         $formType = 'default';
-        if ($this->inputRadio($settings)) {
-            $formType = 'radio';
-        } else if ($this->inputRadios($settings)) {
+        if ($this->inputRadios($settings)) {
             $formType = 'radios';
-        } else if ($this->inputCheckbox($settings)) {
-            $formType = 'checkbox';
-        } else if ($this->inputCheckboxes($settings)) {
+        } else if ($this->inputRadio($settings)) {
+            $formType = 'radio';
+        }else if ($this->inputCheckboxes($settings)) {
             $inputData['name'] = $inputData['name'] . '[]';
             $formType = 'checkboxes';
+            $data['lcErrorForField'] .= '[]';
+        } else if ($this->inputCheckbox($settings)) {
+            $formType = 'checkbox';
+            $inputData['name'] .= '[]';
+            $data['lcErrorForField'] .= '[]';
         } else if ($this->inputMultiselect($settings)) {
-            $inputData['name'] = $inputData['name'] . '[]';
+            $inputData['name'] .= '[]';
             $inputData['multiple'] = '';
             $inputData['class'] = 'chosen-select';
             $formType = 'multiselect';
+            $data['lcErrorForField'] .= '[]';
         } else if ($this->inputSelect($settings)) {
             $inputData['class'] = 'chosen-select';
             $formType = 'select';
         } else if ($this->inputDropdown($settings)) {
             $formType = 'dropdown';
+            $inputData['class'] = 'chosen-select';
         } else if ($this->inputStatic($settings)) {
             $formType = 'static';
         } else {
             $formType = 'default';
         }
-        return [$formType, $inputData];
+        return [$formType, $inputData, $data];
     }
 
     private function inputRadio($settings)
@@ -1742,7 +1734,7 @@ class CI_Migration
 
     private function inputSelect($settings)
     {
-        return compareArrayStr($settings, 'input', 'select');
+        return compareArrayStr($settings, 'input', 'select') || validateArray($settings, 'idForeign');
     }
 
     private function inputMultiselect($settings)

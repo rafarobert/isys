@@ -66,7 +66,7 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP {
         //<<<validateFieldImgIndex>>>
         //>>>setADBTablesRefFields<<<
         $aDBTables = std2array($this->model_tables->get_by(['table_name']));
-        $this->data['aDBTables'] = array_combine(array_column($aDBTables,'id_table'),array_column($aDBTables,'table_name'));
+        $this->data['aDBTables'] = array_combine(array_column($aDBTables,'table_name'),array_column($aDBTables,'table_name'));
         $this->data['aDBTableRef'] = isset($oUcTableS->idDBTableRef) && $oUcTableS->idDBTableRef != null ? [$oUcTableS->idDBTableRef => $oUcTableS->idDBTableRef]: [];
         $this->data['aDBTableFields'] = isset($oUcTableS->fieldDBTableRef) && $oUcTableS->fieldDBTableRef != null ? std2array($oUcTableS->fieldDBTableRef) : [];
         //<<<setADBTablesRefFields>>>
@@ -121,6 +121,7 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP {
                 }
             }
         } else {
+            $this->resetData('oUcTableS');
             $aReturn['error'] = $error = "tableTitle con datos incompletos, porfavor revisa los datos";;
         }
         // Se carga la vista
