@@ -1143,7 +1143,7 @@ if (!function_exists('probar_sesion')) {
 
 if (!function_exists('setObject')) {
 
-    function setObject($nameWithDashes, $bReturnUcNames = false, $blcFirst = false)
+    function setObject($nameWithDashes, $blcFirst = true, $bReturnUcNames = true)
     {
         $aNames = explode('_',$nameWithDashes);
         if($bReturnUcNames){

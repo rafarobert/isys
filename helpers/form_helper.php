@@ -1347,3 +1347,31 @@ if ( ! function_exists('form_disabled'))
         }
     }
 }
+
+if ( ! function_exists('form_image'))
+{
+    /**
+     * Upload Field
+     *
+     * Identical to the input function but adds the "file" type
+     *
+     * @param	mixed
+     * @param	string
+     * @param	mixed
+     * @return	string
+     */
+    function form_image($data = '', $value = '', $extra = '')
+    {
+        $data['accept'] = 'image/';
+        $data['class'] = validateArray($data,'class') ? $data['class'].' hide' : 'hide';
+        if($value != ''){
+            $data['value'] = $value;
+        }
+        $defaults = array('type' => 'file', 'name' => '');
+        is_array($data) OR $data = array('name' => $data);
+        $data['type'] = 'file';
+
+
+        return '<input '._parse_form_attributes($data, $defaults)._attributes_to_string($extra)." />\n";
+    }
+}

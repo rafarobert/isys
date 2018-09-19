@@ -166,8 +166,14 @@ class Ctrl_Migrate extends ES_Controller
         $aDBTables = $this->dbforge->getArrayDBTables();
         $this->data = $this->setDefaultData($this->data);
         $fileName = "ES_Table_Vars.php";
+        $fileModelVarsName = "ES_Model_Vars.php";
+        $fileCtrlVarsName = "ES_Ctrl_Vars.php";
         $framePath = "orm/map/";
+
         $this->data['setInitStaticTableVars'] = '';
+        $this->data['setInitStaticVars'] = '';
+        $this->data['setInitGlobalVars'] = '';
+
         unset($this->data['tableFields']);
         foreach ($aDBTables as $key => $dbTable) {
             if(!in_array($dbTable, $this->tab_excepts)){
@@ -177,16 +183,39 @@ class Ctrl_Migrate extends ES_Controller
                 $this->data['UcAcMod'] = $lcAcMod = ucfirst($mod);
                 $this->data['lcTableP'] = lcfirst($tableP);
                 $this->data['UcTableP'] = ucfirst($tableP);
+
+                $this->data['setInitStaticVars'] .= $this->load->view(["template_ES_Mvc_Vars" => "setInitStaticVars"], $this->data, true, true, true);
+                $this->data['setInitGlobalVars'] .= $this->load->view(["template_ES_Mvc_Vars" => "setInitGlobalVars"], $this->data, true, true, true);
+
                 $this->data['setInitStaticTableVars'] .= $this->load->view(["template_ES_Table_Vars" => "setInitStaticTableVars"], $this->data, true, true);
             }
         }
 
         if (createFolder($framePath)) {
-            $phpContent = $this->load->view("template_ES_Table_Vars", $this->data, true, true, true);
+            $this->data['UcClassType'] = 'Model';
+            $this->data['UcClassAcron'] = 'Model';
+            $phpModelContent = $this->load->view("template_ES_Mvc_Vars", $this->data, true, true,true);
+
+            $this->data['UcClassType'] = 'Controller';
+            $this->data['UcClassAcron'] = 'Ctrl';
+            $phpCtrlContent = $this->load->view("template_ES_Mvc_Vars", $this->data, true, true,true);
+
+            $phpContent = $this->load->view("template_ES_Table_Vars", $this->data, true, true,true);
+
             if(file_exists($framePath . $fileName)){
                 deleteFile($framePath . $fileName);
             }
             write_file($framePath . $fileName, $phpContent);
+
+            if(file_exists($framePath . $fileModelVarsName)){
+                deleteFile($framePath . $fileModelVarsName);
+            }
+            write_file($framePath . $fileModelVarsName, $phpModelContent);
+
+            if(file_exists($framePath . $fileCtrlVarsName)){
+                deleteFile($framePath . $fileCtrlVarsName);
+            }
+            write_file($framePath . $fileCtrlVarsName, $phpCtrlContent);
         }
     }
 

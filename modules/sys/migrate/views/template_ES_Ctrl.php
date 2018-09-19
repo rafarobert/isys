@@ -1,16 +1,19 @@
-<?php 
+<?php
 /**
  * Created by Estic.
  * User: #userCreated
  * Date: #dateCreated
  * Time: #timeCreated
  */
+
 use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
-Class ES_Ctrl_UcTableP extends ES_UcModS_Controller {
+Class ES_Ctrl_UcTableP extends ES_UcModS_Controller
+{
 
     //>>>initVarsForeignTable<<<
     public $lcFkObjFieldP;
+
     //<<<initVarsForeignTable>>>
 
     public function __construct()
@@ -25,28 +28,40 @@ Class ES_Ctrl_UcTableP extends ES_UcModS_Controller {
         $this->lcFkObjFieldP = $this->model_lcFkTableP->get_by('$fFieldsRef', true);
         //<<<initFieldsForeignTable>>>
         //>>>compareFieldsForeignTable<<<
-        $this->lcFkObjFieldP = $this->model_lcFkTableP->setForeignValues($this->t1Contents,'t1FieldRef',$this->t2Contents,'t2FieldRef');
+        $this->lcFkObjFieldP = $this->model_lcFkTableP->setForeignValues($this->t1Contents, 't1FieldRef', $this->t2Contents, 't2FieldRef');
         //<<<compareFieldsForeignTable>>>
-        $this->data['table_name'] = $this->model_lcTableP->_table_name;
+        $this->data['tableName'] = $this->model_lcTableP->_table_name;
         //>>>setFieldsForeignTable<<<
-        $this->data['oUcFkObjFieldP'] = $this->model_lcFkTableP->setOptions($this->lcFkObjFieldP,'divider');
+        $this->data['oUcFkObjFieldP'] = $this->model_lcFkTableP->setOptions($this->lcFkObjFieldP, 'divider');
         //<<<setFieldsForeignTable>>>
     }
 
-    public function dataFromPost($view){
-        if(!validateVar($view)){
+    public function getUcObjTableP(){
+        // Obtiene a todos los lcTableP
+        $oUcTableP = $this->model_lcTableP->get();
+        //>>>setForeignTableFields<<<
+        $oUcTableP = $this->model_fkLcTableP->setForeignFields($this->lcFkObjFieldP, 'idFkLcTableP', $oUcTableP, 'idLocalLcTableP', true);
+        //<<<setForeignTableFields>>>
+        //>>>validateFieldsImgsIndex<<<
+        $oUcTableP = $this->model_lcTableP->getThumbs($oUcTableP);
+        //<<<validateFieldsImgsIndex>>>
+        return $oUcTableP;
+    }
+
+    public function dataFromPost($view)
+    {
+        if (!validateVar($view)) {
             $data = $this->model_lcTableP->array_from_post(
                 $aFromPost = '$validatedFieldsNames'
             );
-        }
-        //>>>validatedControllerFieldsEditView<<<
-        else if(compareStrStr($view, 'editNameView')){
+        } //>>>validatedControllerFieldsEditView<<<
+        else if (compareStrStr($view, 'editNameView')) {
             $data = $this->model_lcTableP->array_from_post(
                 $aFromPost = '$fieldsEditView'
             );
         }
         //<<<validatedControllerFieldsEditView>>>
-        return [$data,$aFromPost];
+        return [$data, $aFromPost];
     }
     //extraFunctions
 }

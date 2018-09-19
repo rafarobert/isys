@@ -4,7 +4,7 @@
     <div class="col-sm-10 two-columns">
         <?php
         $data = '$inputData';
-        echo form_lcInputFormType($data,$objOptions,$oUcTableS->lcField);
+        echo form_lcInputFormType($data, $objOptions, $oUcTableS->lcField);
         //>>>printSecondItem<<<
         echo form_lcSecondInputFormType($data['lcSecondInputFormType']);
         //<<<printSecondItem>>>

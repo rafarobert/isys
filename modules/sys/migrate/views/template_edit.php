@@ -13,13 +13,13 @@
 <div class="row wrapper border-bottom white-bg page-heading">
 
     <div class="col-lg-10">
-        <h2><?= empty($oUcTableS->idTable) ? "Agregar ".setLabel('tableTitle') : "Actualizando datos, ".setLabel('UcTableS #') . $oUcTableS->idTable ?></h2>
+        <h2><?= empty($oUcTableS->idTable) ? "Agregar " . setLabel('tableTitle') : "Actualizando datos, " . setLabel('UcTableS #') . $oUcTableS->idTable ?></h2>
         <ol class="breadcrumb">
             <li>
-                <?=anchor('lcModS','Inicio')?>
+                <?= anchor('lcModS', 'Inicio') ?>
             </li>
             <li>
-                <?=anchor('lcModS/lcTableP', setLabel('lcTableP'))?>
+                <?= anchor('lcModS/lcTableP', setLabel('lcTableP')) ?>
             </li>
             <li class="active">
                 <strong>Edicion de datos</strong>
@@ -61,11 +61,11 @@
                 <div class="ibox-content">
                     <?php
                     //>>>startInsertEachOne<<<
-                    foreach ($oUcEachTableP as $idEachTable => $oUcEachTableS){
+                    foreach ($oUcEachTableP as $idEachTable => $oUcEachTableS) {
                         //<<<startInsertEachOne>>>
                         ?>
 
-                        <?= form_open_multipart("lcModS/lcTableP/edit/$editView".$oUcTableS->idTable,["id" => "lcTablePEdit", "class" => "form-horizontal"]) ?>
+                        <?= form_open_multipart("lcModS/lcTableP/edit/$editView" . $oUcTableS->idTable, ["id" => "lcTablePEdit", "class" => "form-horizontal"]) ?>
 
                         #htmlFieldsEditForm
 
@@ -75,7 +75,7 @@
 
                             <div class="col-sm-4 col-sm-offset-2">
                                 <?php
-                                echo anchor('lcModS/lcTableP','Cancelar','class="btn btn-white"');
+                                echo anchor('lcModS/lcTableP', 'Cancelar', 'class="btn btn-white"');
                                 $data = array(
                                     "name" => "save",
                                     "value" => "Guardar",
@@ -86,15 +86,16 @@
                             </div>
                         </div>
                         <?php echo form_close();
-                        if(validateArray($errors,'error')){?>
+                        if (validateArray($errors, 'error')) {
+                            ?>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <?=$errors['error']?>
+                                    <?= $errors['error'] ?>
                                 </div>
                             </div>
                         <?php } ?>
                         <?php
-                    //>>>endInsertEachOne<<<
+                        //>>>endInsertEachOne<<<
                     }
                     //<<<endInsertEachOne>>>
                     ?>

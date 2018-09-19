@@ -1,11 +1,8 @@
+<div class="hr-line-dashed"></div>
 <div class="form-group">
     <label for="lcInputId" class="col-sm-2 control-label">UcInputLabel</label>
-    <div class="col-sm-10">
-        <?php
-        $data = '$inputData';
-        echo isset($oUcTableS->lcField_thumb2) ? img('assets/img/lcTableP/thumbs/'.$oUcTableS->lcField_thumb2) : '';
-        echo form_upload($data,set_value("lcInputName", $oUcTableS->lcField),"");
-        ?>
+    <div id="lcInputId" class="col-sm-10 dropzone" action="#">
+        <div class="dropzone-previews"></div>
+        <button id="uploadUcInputId" type="submit" class="btn btn-primary pull-right">Cargar Imagenes</button>
     </div>
 </div>
-<?php echo form_error("lcField"); ?>

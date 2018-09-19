@@ -14,7 +14,7 @@
         <h2>Lista de tableTitle</h2>
         <ol class="breadcrumb">
             <li>
-                <?= anchor(WEBSERVER.'lcModS', 'Inicio') ?>
+                <?= anchor(WEBSERVER . 'lcModS', 'Inicio') ?>
             </li>
             <li class="active">
                 <strong>Lista de tableTitle</strong>
@@ -45,12 +45,12 @@
             <div class="ibox">
                 <div class="ibox-title">
                     <h5></h5>
-                        <?= anchor(WEBSERVER."lcModS/lcTableP/edit", "<i class='fa fa-plus'></i> Agregar tableTitle", "class='btn btn-primary btn-xs m-l-sm'"); ?>
-                        <?php
-                        //>>>anchorToEditView<<<
-                        echo anchor(WEBSERVER."lcModS/lcTableP/edit/editNameView", "<i class='fa fa-plus'></i> Agregar indexEditViewTitle", "class='btn btn-primary btn-xs m-l-sm'");
-                        //<<<anchorToEditView>>>
-                        ?>
+                    <?= anchor(WEBSERVER . "lcModS/lcTableP/edit", "<i class='fa fa-plus'></i> Agregar tableTitle", "class='btn btn-primary btn-xs m-l-sm'"); ?>
+                    <?php
+                    //>>>anchorToEditView<<<
+                    echo anchor(WEBSERVER . "lcModS/lcTableP/edit/editNameView", "<i class='fa fa-plus'></i> Agregar indexEditViewTitle", "class='btn btn-primary btn-xs m-l-sm'");
+                    //<<<anchorToEditView>>>
+                    ?>
                 </div>
                 <div class="ibox-content">
                     <div class="table-responsive">
@@ -66,13 +66,13 @@
                                 <?php foreach ($oUcTableP as $oUcTableS) {
                                     $editLink = "lcModS/lcTableP/edit/";
                                     //>>>linkToEditView<<<
-                                    if(validateVar($oUcTableS->fieldEditView, 'numeric')){
-                                        if($table_name == 'ci_options'){
+                                    if (validateVar($oUcTableS->fieldEditView, 'numeric')) {
+                                        if ($table_name == 'ci_options') {
                                             $editTag = CiSettingsQuery::create()->findOneByIdSetting($oUcTableS->fieldEditView)->getEditTag();
                                         } else {
                                             $editTag = CiOptionsQuery::create()->findOneByIdOption($oUcTableS->fieldEditView)->getEditTag();
                                         }
-                                        $editLink .= explode('edit-',$editTag)[1].'/';
+                                        $editLink .= explode('edit-', $editTag)[1] . '/';
                                     }
                                     //<<<linkToEditView>>>
                                     $editLink .= $oUcTableS->idTable;
@@ -81,8 +81,8 @@
                                         //tableBodyHtmlFields
                                         <td class="text-right">
                                             <div class="btn-group">
-                                                <?= btn_edit(WEBSERVER.$editLink, "class='btn-white btn btn-xs'") ?>
-                                                <?= btn_delete(WEBSERVER."lcModS/lcTableP/delete/" . $oUcTableS->idTable, "class='btn-white btn btn-xs'") ?>
+                                                <?= btn_edit(WEBSERVER . $editLink, "class='btn-white btn btn-xs'") ?>
+                                                <?= btn_delete(WEBSERVER . "lcModS/lcTableP/delete/" . $oUcTableS->idTable, "class='btn-white btn btn-xs'") ?>
                                             </div>
                                         </td>
                                     </tr>
@@ -91,7 +91,7 @@
                                 <tr>
                                     <td colspan="3">No se pudo encontrar lcTableP registrados</td>
                                 </tr>
-                            <?php }?>
+                            <?php } ?>
                             </tbody>
                             <tfoot>
                             <tr>

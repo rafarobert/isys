@@ -24,7 +24,7 @@ class Migration_Create_#tableName extends CI_Migration
         $this->dbforge->add_key(self::$tableForeignKeys);
         $this->create_or_alter_table(self::$tableName);
         $settings = self::$tableSettings;
-        $this->set_settings($settings,self::$tableName);
+        $this->set_settings($settings, self::$tableName);
     }
 
     public function down()

@@ -1,5 +1,5 @@
 <div class="hr-line-dashed"></div>
-<?php if (!validateVar($oUcTableS->lcTableId,'numeric')) { ?>
+<?php if (!validateVar($oUcTableS->lcTableId, 'numeric')) { ?>
     <div class="form-group">
         <label for="lcInputId" class="col-sm-2 control-label">UcInputLabel </label>
         <div class="col-sm-10">
