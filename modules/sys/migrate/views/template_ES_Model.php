@@ -24,7 +24,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
     //>>>globalLocalWithForeignFieldsVars<<<
     /**
-     * The value for the lcLocalField field related with lcFkField.
+     * Value for lcLocalField field related with lcFkField.
      *
      * @var        dataType
      */
@@ -66,11 +66,11 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     //>>>packSettersFunctions<<<
     public function setUcObjField($lcField = '')
     {
-        return $this->$lcField = $lcField;
+        return $this->lcField = $lcField;
     }
     //<<<packSettersFunctions>>>
 
-    public function setFromResult($oResult){
+    public function setFromObject($oResult){
 
         $oResult = verifyArraysInResult(std2array($oResult));
 

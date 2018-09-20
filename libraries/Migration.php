@@ -1040,6 +1040,8 @@ class CI_Migration
         $data["tableName"] = $tableName;
         $data["UcTableP"] = ucfirst($subModP);
         $data["UcObjTableP"] = ucfirst(setObject($subModP));
+        $data["UcObjTableS"] = ucfirst(setObject($subModS));
+        $data["lcObjTableS"] = '$'.ucfirst(setObject($subModS));
         $data["UcTableModel"] = ucfirst($submod);
         $data["UcTableS"] = ucfirst($subModS);
         $data["UcModS"] = ucfirst($modS);
@@ -1078,7 +1080,7 @@ class CI_Migration
                 $fieldPass = $name;
                 unset($vFieldsBackup[$name]);
             }
-            if (compareArrayStr($settings, 'input', 'image')) {
+            if (compareArrayStr($settings, 'input', 'image') || compareArrayStr($settings, 'input', 'file')) {
                 $fieldImg = $name;
                 unset($vFieldsBackup[$name]);
             } else if (strpos($name, 'img') > -1) {
@@ -1303,13 +1305,15 @@ class CI_Migration
             }
         }
         if ($fieldImg != '') {
-            $data['lcField'] = setObject($fieldImg);
+            $data['lcField'] = $fieldImg;
+            $data['lcObjField'] = setObject($fieldImg);
             $data["validateFieldsImgsIndex"] = $this->load->view(["template_ES_Ctrl" => "validateFieldsImgsIndex"], $data, true, true);
             $data["validateFieldImgIndex"] = $this->load->view(["template_controller" => "validateFieldImgIndex"], $data, true, true);
             $data["validateFieldImgUpload"] = $this->load->view(["template_controller" => "validateFieldImgUpload"], $data, true, true);
         }
         if ($fieldPass != '') {
-            $data['lcField'] = setObject($fieldPass);
+            $data['lcField'] = $fieldPass;
+            $data['lcObjField'] = setObject($fieldPass);
             $data["validateFieldPassword"] = $this->load->view(["template_controller" => "validateFieldPassword"], $data, true, true);
         }
         $data["extraFunctions"] = $this->getExtraFunctions($tableName);
@@ -1496,7 +1500,8 @@ class CI_Migration
             $data['lcInputId'] = "input" . ucfirst(setObject($name));
             $data['UcInputId'] = "input" . ucfirst(setObject($name));
             $data['lcInputName'] = setObject(lcfirst($name));
-            $data['lcField'] = setObject(lcfirst($name));
+            $data['lcField'] = lcfirst($name);
+            $data['lcObjField'] = setObject(lcfirst($name));
             $data['lcErrorForField'] = setObject(lcfirst($name));
 
             if (validateArray($settings, 'onclick')) {
@@ -1634,7 +1639,7 @@ class CI_Migration
                 $data['UcInputPassConfLabel'] = "Confirmar " . ucfirst($name);
                 $data['UcInputPassConfPlaceholder'] = "Confirmar contraseña";
                 $htmlFormContent .= $this->load->view("template_form_password", $data, true, true);
-            } else if (compareArrayStr($settings, 'input', 'image')) {
+            } else if (compareArrayStr($settings, 'input', 'image') || compareArrayStr($settings, 'input', 'file')) {
                 $htmlFormContent .= $this->load->view("template_form_img", $data, true, true);
             } else if (validateArray($settings, 'options') || $bIsForeing) {
                 $htmlFormContent .= $this->load->view("template_form_with_options", $data, true, true, true);
@@ -1903,6 +1908,7 @@ class CI_Migration
     private function setHtmlBodyFields($fields, $validFields, $tableSettings, $subModS, $subModP)
     {
         $oUcTableS = 'o' . ucfirst($subModS);
+        $oUcObjTableS = 'o' . ucfirst(setObject($subModS));
         $content = "";
         $aPksOfTables = $this->dbforge->getPrimaryKeysOfTables();
         $aFksOfTables = $this->dbforge->getForeignKeyOfTables();
@@ -1913,14 +1919,14 @@ class CI_Migration
         list($vFields, $numFields) = $this->getValidatedFieldsWithTableSettings($fields, $validFields, $tableSettings);
         $numFields = $numFields == 0 ? 5 : $numFields;
         foreach ($vFields as $name => $settings) {
-            if (compareArrayStr($settings, 'input', 'image') || compareArrayStr($settings, 'input', 'img')) {
-                $content .= "<td><?= img('assets/img/$subModP/thumbs/'.\$$oUcTableS->$name" . "_thumb1); ?></td>               
+            if (compareArrayStr($settings, 'input', 'image') || compareArrayStr($settings, 'input', 'img') || compareArrayStr($settings, 'input', 'file')) {
+                $content .= "<td><?= img('assets/img/$subModP/thumbs/'.\$$oUcObjTableS->$name" . "_thumb1); ?></td>               
                 ";
             } else {
                 $aFieldsSelectBy = validateArray($settings, 'selectBy') ? $settings['selectBy'] : [];
                 $aFieldsToJoin = $this->analizeFieldsSelectBy($aFieldsSelectBy, $aPKorFKofTables, $aIdsPkOrFk);
                 if (validateVar($aFieldsToJoin) && in_array($name, $aPksOfTables)) {
-                    $content .= "<td><?= setTitleFromObject(\$$oUcTableS,'$name" . "_$aFieldsToJoin" . "'); ?></td>               
+                    $content .= "<td><?= setTitleFromObject(\$$oUcObjTableS,'$name" . "_$aFieldsToJoin" . "'); ?></td>               
                 ";
                 } else if (validateVar($aFieldsToJoin, 'array')) {
                     $html = '';
@@ -1928,10 +1934,10 @@ class CI_Migration
                         $html .= "'$name" . "_$fieldToJoin" . "',";
                     }
                     $html = '[' . substr($html, 0, strlen($html) - 1) . ']';
-                    $content .= "<td><?= setTitleFromObject(\$$oUcTableS,$html); ?></td>               
+                    $content .= "<td><?= setTitleFromObject(\$$oUcObjTableS,$html); ?></td>               
                                 ";
                 } else {
-                    $content .= "<td><?= setTitleFromObject(\$$oUcTableS,'$name'); ?></td>               
+                    $content .= "<td><?= setTitleFromObject(\$$oUcObjTableS,'$name'); ?></td>               
                     ";
                 }
             }
@@ -1942,7 +1948,7 @@ class CI_Migration
             }
         }
         if (!validateArray($tableSettings, 'no_date_created') && validateArray($fields, 'date_created')) {
-            $content .= "<td><?= \$$oUcTableS->" . "date_created; ?></td>
+            $content .= "<td><?= \$$oUcObjTableS->" . "date_created; ?></td>
             ";
         }
         return $content;
@@ -2040,10 +2046,12 @@ class CI_Migration
 
             // ------------------- Setting Getters and Setters ----------------------
             $data['UcObjField'] = ucfirst(setObject($name));
-            $data['lcField'] = lcfirst(setObject($name));
+            $data['lcField'] = lcfirst($name);
+            $data['lcObjField'] = lcfirst(setObject($name));
             $data["packGettersFunctions"] .= $this->load->view(["template_ES_Model" => "packGettersFunctions"], $data, true, true, true);
             unset($data['lcField']);
-            $data['$lcField'] = '$'.lcfirst(setObject($name));
+            $data['$lcField'] = '$'.lcfirst($name);
+            $data['$lcObjField'] = '$'.lcfirst(setObject($name));
             $data["packSettersFunctions"] .= $this->load->view(["template_ES_Model" => "packSettersFunctions"], $data, true, true, true);
             // ----------------------------------------------------------------------
 
@@ -2059,14 +2067,16 @@ class CI_Migration
                         $data['lcFkField'] = lcfirst($nameSelect);
                         $data["globalLocalWithForeignFieldsVars"] .= $this->load->view(["template_ES_Model" => "globalLocalWithForeignFieldsVars"], $data, true, true, true);
                         $data['UcObjField'] = ucfirst(setObject($name.'_'.$nameSelect));
-                        $data['lcField'] = lcfirst(setObject($nameSelect));
+                        $data['lcField'] = lcfirst($nameSelect);
+                        $data['lcObjField'] = lcfirst(setObject($nameSelect));
                         $data["packGettersFunctions"] .= $this->load->view(["template_ES_Model" => "packGettersFunctions"], $data, true, true, true);
                     }
                 } else if(validateVar($settings['selectBy'])){
                     $data['lcFkField'] = lcfirst($settings['selectBy']);
                     $data["globalLocalWithForeignFieldsVars"] .= $this->load->view(["template_ES_Model" => "globalLocalWithForeignFieldsVars"], $data, true, true, true);
                     $data['UcObjField'] = ucfirst(setObject($name.'_'.$settings['selectBy']));
-                    $data['lcField'] = lcfirst(setObject($settings['selectBy']));
+                    $data['lcField'] = lcfirst($settings['selectBy']);
+                    $data['lcObjField'] = lcfirst(setObject($settings['selectBy']));
                     $data["packGettersFunctions"] .= $this->load->view(["template_ES_Model" => "packGettersFunctions"], $data, true, true, true);
                 }
             } else {
@@ -2093,7 +2103,7 @@ class CI_Migration
                         ),
                     );
                 } else {
-                    if (!compareArrayStr($settings, 'input', 'image') && !compareArrayStr($settings, 'input', 'password')) {
+                    if (!compareArrayStr($settings, 'input', 'image') || !compareArrayStr($settings, 'input', 'file') && !compareArrayStr($settings, 'input', 'password')) {
                         $rules[$name] = array(
                             "field" => $name,
                             "label" => validateArray($settings, 'label') ? $settings['label'] : setLabel($name,true),

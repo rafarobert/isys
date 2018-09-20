@@ -1,11 +1,11 @@
 <div class="hr-line-dashed"></div>
-<?php if (!validateVar($oUcTableS->lcTableId, 'numeric')) { ?>
+<?php if (!validateVar($oUcObjTableS->lcTableId, 'numeric')) { ?>
     <div class="form-group">
         <label for="lcInputId" class="col-sm-2 control-label">UcInputLabel </label>
         <div class="col-sm-10">
             <?php
             $data = '$inputData';
-            echo form_password($data, set_value("lcInputName", $oUcTableS->lcField));
+            echo form_password($data, set_value("lcInputName", $oUcObjTableS->lcField));
             ?>
         </div>
     </div>

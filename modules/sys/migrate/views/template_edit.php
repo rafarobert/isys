@@ -5,15 +5,15 @@
  * Date: #dateCreated
  * Time: #timeCreated
  * @var Model_UcTableP $model_lcTableP
- * @var Model_UcTableP $lcTableP
- * @var Model_UcTableP $lcTableS
+ * @var Model_UcTableP $oUcObjTableP
+ * @var ES_Model_UcTableP $oUcObjTableS
  */
 ?>
 
 <div class="row wrapper border-bottom white-bg page-heading">
 
     <div class="col-lg-10">
-        <h2><?= empty($oUcTableS->idTable) ? "Agregar " . setLabel('tableTitle') : "Actualizando datos, " . setLabel('UcTableS #') . $oUcTableS->idTable ?></h2>
+        <h2><?= empty($oUcObjTableS->idTable) ? "Agregar " . setLabel('tableTitle') : "Actualizando datos, " . setLabel('UcTableS #') . $oUcObjTableS->idTable ?></h2>
         <ol class="breadcrumb">
             <li>
                 <?= anchor('lcModS', 'Inicio') ?>
@@ -65,7 +65,7 @@
                         //<<<startInsertEachOne>>>
                         ?>
 
-                        <?= form_open_multipart("lcModS/lcTableP/edit/$editView" . $oUcTableS->idTable, ["id" => "lcTablePEdit", "class" => "form-horizontal"]) ?>
+                        <?= form_open_multipart("lcModS/lcTableP/edit/$editView" . $oUcObjTableS->idTable, ["id" => "lcTablePEdit", "class" => "form-horizontal"]) ?>
 
                         #htmlFieldsEditForm
 

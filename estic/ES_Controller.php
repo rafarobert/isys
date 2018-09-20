@@ -98,15 +98,6 @@ class ES_Controller extends ES_Ctrl_Vars
         }
     }
 
-    public function resetData($tableRef){
-        $oTableRef = $this->data[$tableRef];
-        $post = $this->input->post();
-        $aToReturn = std2array($oTableRef);
-        $aToReturn = array_merge($aToReturn,$post);
-        $oTableRef = array2std($aToReturn);
-        $this->data[$tableRef] = $oTableRef;
-    }
-
     public function filterIdOrView($id, $view){
         if($id == null && (validateVar($view, 'numeric') || validateVar($view, 'string'))){
             if(validateArray($this->data, 'editTags')){

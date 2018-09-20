@@ -63,26 +63,26 @@
                             </thead>
                             <tbody>
                             <?php if (countStd($oUcTableP)) { ?>
-                                <?php foreach ($oUcTableP as $oUcTableS) {
+                                <?php foreach ($oUcTableP as $oUcObjTableS) {
                                     $editLink = "lcModS/lcTableP/edit/";
                                     //>>>linkToEditView<<<
-                                    if (validateVar($oUcTableS->fieldEditView, 'numeric')) {
+                                    if (validateVar($oUcObjTableS->fieldEditView, 'numeric')) {
                                         if ($table_name == 'ci_options') {
-                                            $editTag = CiSettingsQuery::create()->findOneByIdSetting($oUcTableS->fieldEditView)->getEditTag();
+                                            $editTag = CiSettingsQuery::create()->findOneByIdSetting($oUcObjTableS->fieldEditView)->getEditTag();
                                         } else {
-                                            $editTag = CiOptionsQuery::create()->findOneByIdOption($oUcTableS->fieldEditView)->getEditTag();
+                                            $editTag = CiOptionsQuery::create()->findOneByIdOption($oUcObjTableS->fieldEditView)->getEditTag();
                                         }
                                         $editLink .= explode('edit-', $editTag)[1] . '/';
                                     }
                                     //<<<linkToEditView>>>
-                                    $editLink .= $oUcTableS->idTable;
+                                    $editLink .= $oUcObjTableS->idTable;
                                     ?>
                                     <tr>
                                         //tableBodyHtmlFields
                                         <td class="text-right">
                                             <div class="btn-group">
                                                 <?= btn_edit(WEBSERVER . $editLink, "class='btn-white btn btn-xs'") ?>
-                                                <?= btn_delete(WEBSERVER . "lcModS/lcTableP/delete/" . $oUcTableS->idTable, "class='btn-white btn btn-xs'") ?>
+                                                <?= btn_delete(WEBSERVER . "lcModS/lcTableP/delete/" . $oUcObjTableS->idTable, "class='btn-white btn btn-xs'") ?>
                                             </div>
                                         </td>
                                     </tr>

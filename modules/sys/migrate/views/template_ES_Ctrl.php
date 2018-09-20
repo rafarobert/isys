@@ -30,7 +30,7 @@ Class ES_Ctrl_UcTableP extends ES_UcModS_Controller
         //>>>compareFieldsForeignTable<<<
         $this->lcFkObjFieldP = $this->model_lcFkTableP->setForeignValues($this->t1Contents, 't1FieldRef', $this->t2Contents, 't2FieldRef');
         //<<<compareFieldsForeignTable>>>
-        $this->data['tableName'] = $this->model_lcTableP->_table_name;
+        $this->data['tabName'] = $this->model_lcTableP->_table_name;
         //>>>setFieldsForeignTable<<<
         $this->data['oUcFkObjFieldP'] = $this->model_lcFkTableP->setOptions($this->lcFkObjFieldP, 'divider');
         //<<<setFieldsForeignTable>>>
@@ -38,15 +38,43 @@ Class ES_Ctrl_UcTableP extends ES_UcModS_Controller
 
     public function getUcObjTableP(){
         // Obtiene a todos los lcTableP
-        $oUcTableP = $this->model_lcTableP->get();
+        $oUcObjTableP = $this->model_lcTableP->get();
         //>>>setForeignTableFields<<<
-        $oUcTableP = $this->model_fkLcTableP->setForeignFields($this->lcFkObjFieldP, 'idFkLcTableP', $oUcTableP, 'idLocalLcTableP', true);
+        $oUcObjTableP = $this->model_fkLcTableP->setForeignFields($this->lcFkObjFieldP, 'idFkLcTableP', $oUcObjTableP, 'idLocalLcTableP', true);
         //<<<setForeignTableFields>>>
         //>>>validateFieldsImgsIndex<<<
-        $oUcTableP = $this->model_lcTableP->getThumbs($oUcTableP);
+        $oUcObjTableP = $this->model_lcTableP->getThumbs($oUcObjTableP);
         //<<<validateFieldsImgsIndex>>>
-        return $oUcTableP;
+
+        return $this->setUcObjTableP($oUcObjTableP);
     }
+
+
+    public function setUcObjTableP($oData, $oUcObjTableP = null){
+        if(validateVar($oData,'array')){
+            $oModelUcObjTableP = array();
+            foreach ($oData as $key => $lcObjTableS){
+                if(validateVar($oUcObjTableP,'object')){
+                    $oModelUcObjTableP[$key] = $oUcObjTableP;
+                } else {
+                    $oModelUcObjTableP[$key] = new ES_Model_UcTableP();
+                }
+                $oModelUcObjTableP[$key] = $oModelUcObjTableP[$key]->setFromObject($lcObjTableS);
+            }
+            return $oModelUcObjTableP;
+        } else if(validateVar($oData,'object')){
+            if(validateVar($oUcObjTableP,'object')){
+                $oModelUcObjTableS = $oUcObjTableP;
+            } else {
+                $oModelUcObjTableS = new ES_Model_UcTableP();
+            }
+            $oModelUcObjTableS = $oModelUcObjTableS->setFromObject($oData);
+            return $oModelUcObjTableS;
+        } else {
+            return new ES_Model_Conceptos();
+        }
+    }
+
 
     public function dataFromPost($view)
     {

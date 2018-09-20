@@ -4,7 +4,7 @@
  * User: #userCreated
  * Date: #dateCreated
  * Time: #timeCreated
- * @property Model_UcTableP $oUcTableS
+ * @property Model_UcTableP $oUcObjTableS
  */
 
 use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
@@ -45,14 +45,14 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
         // Optiene un lcTableS o crea uno nuevo
         // Se construye las reglas de validacion del formulario
         if (validateVar($id, 'numeric') || validateVar($id, 'string')) {
-            $oUcTableS = $this->model_lcTableP->get($id);
-            if (!count((array)$oUcTableS)) {
+            $oUcObjTableS = $this->model_lcTableP->get($id);
+            if (!count((array)$oUcObjTableS)) {
                 $this->data["errors"][] = "El lcTableS no pudo ser encontrado";
             }
             $rules = $this->model_lcTableP->rules_edit;
         } else {
             $rules = $this->model_lcTableP->rules;
-            $oUcTableS = $this->model_lcTableP->get_new();
+            $oUcObjTableS = $this->model_lcTableP->get_new();
         }
 
         if (validateVar($view)) {
@@ -60,16 +60,14 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
         } else {
             $this->form_validation->set_rules($rules);
         }
-        //>>>validateFieldImgIndex<<<
-        $oUcTableS = $this->model_lcTableP->getThumbs($oUcTableS);
-        //<<<validateFieldImgIndex>>>
+
         //>>>setADBTablesRefFields<<<
         $aDBTables = std2array($this->model_tables->get_by(['table_name']));
         $this->data['aDBTables'] = array_combine(array_column($aDBTables, 'table_name'), array_column($aDBTables, 'table_name'));
-        $this->data['aDBTableRef'] = isset($oUcTableS->idDBTableRef) && $oUcTableS->idDBTableRef != null ? [$oUcTableS->idDBTableRef => $oUcTableS->idDBTableRef] : [];
-        $this->data['aDBTableFields'] = isset($oUcTableS->fieldDBTableRef) && $oUcTableS->fieldDBTableRef != null ? std2array($oUcTableS->fieldDBTableRef) : [];
+        $this->data['aDBTableRef'] = isset($oUcObjTableS->idDBTableRef) && $oUcObjTableS->idDBTableRef != null ? [$oUcObjTableS->idDBTableRef => $oUcObjTableS->idDBTableRef] : [];
+        $this->data['aDBTableFields'] = isset($oUcObjTableS->fieldDBTableRef) && $oUcObjTableS->fieldDBTableRef != null ? std2array($oUcObjTableS->fieldDBTableRef) : [];
         //<<<setADBTablesRefFields>>>
-        $this->data["oUcTableS"] = $oUcTableS;
+        $this->data["oUcObjTableS"] = $oUcObjTableS;
         $aReturn = array();
         // Se procesa el formulario
         if ($this->form_validation->run() == true) {
@@ -120,8 +118,8 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                 }
             }
         } else {
-            $this->resetData('oUcTableS');
-            $aReturn['error'] = $error = "tableTitle con datos incompletos, porfavor revisa los datos";;
+            $this->data['oUcObjTableS'] = $this->setUcObjTableP($this->input->post(),$oUcObjTableS);
+            $this->data['error'] = $error = "tableTitle con datos incompletos, porfavor revisa los datos";;
         }
         // Se carga la vista
         return $this->loadView('lcModS/lcTableP/edit', $view, 'fieldEditView', $error);

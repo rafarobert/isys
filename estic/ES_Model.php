@@ -421,6 +421,9 @@ Class ES_Model extends ES_Model_Vars {
 
     public function setForeignFields($t1Contents, $t1FieldRef, $t2Contents, $t2FieldRef, $bWithAllFields = false){
         $primary_key = $this->_primary_key;
+        if(validateVar($t2Contents,'object')){
+            $t2Contents = [$t2Contents];
+        }
         foreach ($t2Contents as $j => $t2Content){
             foreach ($t1Contents as $i => $t1Content){
                 if($t2Content->$t2FieldRef == $t1Content->$t1FieldRef && is_object($t1Content)){
