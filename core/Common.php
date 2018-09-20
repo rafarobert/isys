@@ -1029,12 +1029,118 @@ if (!function_exists('validateVar')) {
         return false;
     }
 }
+
+if (!function_exists('isArray')) {
+    function isArray($array, $bEmpty = true)
+    {
+        return validateVar($array, 'array', $bEmpty);
+    }
+}
+if (!function_exists('isString')) {
+    function isString($str, $bEmpty = true)
+    {
+        return validateVar($str, 'string', $bEmpty = true);
+    }
+}
+if (!function_exists('isObject')) {
+    function isObject($object, $bEmpty = true)
+    {
+        return validateVar($object, 'object', $bEmpty);
+    }
+}
+if (!function_exists('isNumeric')) {
+    function isNumeric($num, $bEmpty = true)
+    {
+        return validateVar($num, 'numeric', $bEmpty);
+    }
+}
+if (!function_exists('isBoolean')) {
+    function isBoolean($bool, $bEmpty = true)
+    {
+        return validateVar($bool, 'bool', $bEmpty);
+    }
+}
+if (!function_exists('isCollection')) {
+    function isCollection($data)
+    {
+        $bToReturn =false;
+
+        $array = $data;
+
+        if (isObject($data)){
+
+            $array = std2array($data);
+
+        }
+
+        if(isArray($array)){
+
+            $dataKeys = array_keys($array);
+
+            foreach ($dataKeys as $key){
+
+                if(!isNumeric($key, false)){
+
+                    $bToReturn = false;
+
+                    break;
+
+                } else {
+
+                    $bToReturn = true;
+                }
+            }
+
+            return $bToReturn;
+
+        }
+    }
+}
+
 if (!function_exists('validateArray')) {
     function validateArray($array, $index)
     {
         if(validateVar($array,'array') && (is_string($index) || is_numeric($index))){
             if(isset($array[$index]) && $array[$index] != "" && $array[$index] != []){
                 return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+}
+
+if (!function_exists('arrayHas')) {
+    function arrayHas($array, $index, $bEmpty = true)
+    {
+        if(isArray($array,$bEmpty) && (isString($index,$bEmpty) || isNumeric($index,$bEmpty))){
+            if(isset($array[$index]) && $array[$index] != "" && $array[$index] != []){
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+}
+
+if (!function_exists('objectHas')) {
+    function objectHas($object, $index, $bEmpty = true)
+    {
+        if(isObject($object,$bEmpty) && (isString($index,$bEmpty) || isNumeric($index,$bEmpty))){
+            if(isset($object->$index)){
+                if($bEmpty){
+                    if($object->$index != "" && $object->$index != [] && $object->$index != null){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
             } else {
                 return false;
             }
@@ -1399,7 +1505,7 @@ if (!function_exists('countStd')) {
 
 if (!function_exists('str2array')) {
     function str2array($str){
-        if(validateVar($str) && !validateVar($str,'numeric')){
+        if(isString($str) && !isNumeric($str)){
             if(strpos($str,'[') > -1 && strpos($str,']') > -1){
                 $str = str_replace('"','',$str);
                 $str = str_replace('[','',$str);
@@ -1407,20 +1513,32 @@ if (!function_exists('str2array')) {
                 $str = explode(',',$str);
                 $str = array_combine($str,$str);
             }
-        } else if(validateVar($str, 'array')){
+        } else if(isArray($str)){
             foreach ($str as $key => $subValue){
-                if(strpos($subValue,'[') > -1 && strpos($subValue,']') > -1){
-                    $subValue = str_replace('"','',$subValue);
-                    $subValue = str_replace('[','',$subValue);
-                    $subValue = str_replace(']','',$subValue);
-                    $subValue = explode(',',$subValue);
-                    $str[$key] = array_combine($subValue,$subValue);
+                if(isArray($subValue)){
+                    foreach ($subValue as $key2 => $subValue2){
+                        if(strpos($subValue2,'[') > -1 && strpos($subValue2,']') > -1){
+                            $subValue2 = str_replace('"','',$subValue2);
+                            $subValue2 = str_replace('[','',$subValue2);
+                            $subValue2 = str_replace(']','',$subValue2);
+                            $subValue2 = explode(',',$subValue2);
+                            $str[$key][$key2] = array_combine($subValue2,$subValue2);
+                        }
+                    }
+                } else {
+                    if(strpos($subValue,'[') > -1 && strpos($subValue,']') > -1){
+                        $subValue = str_replace('"','',$subValue);
+                        $subValue = str_replace('[','',$subValue);
+                        $subValue = str_replace(']','',$subValue);
+                        $subValue = explode(',',$subValue);
+                        $str[$key] = array_combine($subValue,$subValue);
+                    }
                 }
             }
         }
-        if(validateVar($str, 'array')){
+        if(isArray($str)){
             return $str;
-        } else if(!validateVar($str) && is_object($str)){
+        } else if(!isString($str) && isObject($str)){
             return std2array($str);
         } else {
             return $str;

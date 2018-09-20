@@ -62,8 +62,8 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <?php if (countStd($oUcTableP)) { ?>
-                                <?php foreach ($oUcTableP as $oUcObjTableS) {
+                            <?php if (countStd($oUcObjTableP)) { ?>
+                                <?php foreach ($oUcObjTableP as $oUcObjTableS) {
                                     $editLink = "lcModS/lcTableP/edit/";
                                     //>>>linkToEditView<<<
                                     if (validateVar($oUcObjTableS->fieldEditView, 'numeric')) {

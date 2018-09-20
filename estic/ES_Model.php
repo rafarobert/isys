@@ -106,31 +106,32 @@ Class ES_Model extends ES_Model_Vars {
         return $this->get(null, $single);
     }
     public function get_by($where, $bSelecting = false, $single = false){
-        $select = validateVar($where) ? '' : $this->_primary_key;
+        $select = isString($where) ? '' : $this->_primary_key;
         $aWheres = [];
         $i = 0;
-        if(!validateVar($where, 'array')){
+        if(!isArray($where)){
             $where = [$where];
         }
         foreach ($where as $k => $wh){
-            if(validateVar($k,'numeric',false)){
-                if($i == 0 && validateVar($wh)){
-                    $aWheres = !validateVar($k,'numeric', false) ? [$k => $wh] : [];
+            if(isNumeric($k,false)){
+                if($i == 0 && isString($wh)){
+                    $aWheres = !isNumeric($k, false) ? [$k => $wh] : [];
                 }
-                if(validateVar($wh,'array')){
+                if(isArray($wh)){
                     foreach ($wh as $j => $wh_interno){
-                        if(validateVar($j,'numeric',false)){
-                            $select .= validateVar($select) ? ', '.$wh_interno : $wh_interno;
+                        if(isNumeric($j,false)){
+                            $select .= isString($select) ? ', '.$wh_interno : $wh_interno;
                         }
                     }
-                } else if(validateVar($wh)){
-                    $select .= validateVar($select) ? ', '.$wh : $wh;
+                } else if(isString($wh)){
+                    $select .= isString($select) ? ', '.$wh : $wh;
                 }
             } else if($bSelecting){
-                $select .= validateVar($select) ? ', '.$k : $k;
-                $aWheres[] = !validateVar($k,'numeric') ? [$k => $wh] : [];
+                $select .= isString($select) ? ', '.$k : $k;
+                $aWheres[] = !isNumeric($k,'numeric') ? [$k => $wh] : [];
             } else {
-                $aWheres[] = !validateVar($k,'numeric') ? [$k => $wh] : [];
+                $select = '';
+                $aWheres[] = !isNumeric($k,'numeric') ? [$k => $wh] : [];
             }
             $i++;
         }
@@ -151,7 +152,7 @@ Class ES_Model extends ES_Model_Vars {
         }
     }
 
-    public function setOptions($fields, $delimiter){
+    public function setOptions($fields, $delimiter = ' '){
         $options = [];
         if(!isset($delimiter)){
             $delimiter = ', ';

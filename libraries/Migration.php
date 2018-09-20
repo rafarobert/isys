@@ -1022,7 +1022,6 @@ class CI_Migration
         }
 
         $vFieldsViews = $this->getEditViews($idMigTable, $fields, $allFields, $excepts);
-
         $vFieldsNames = array_diff($allFields, $excepts);
         $vFields = [];
         foreach ((array)$vFieldsNames as $name) {
@@ -1033,6 +1032,10 @@ class CI_Migration
         list($subModS, $subModP) = setSingularPlural($submod);
         list($modS, $modP) = setSingularPlural($sys[$mod]['name']);
         $data = array();
+
+        list($vFieldsChecked, $fieldImg, $fieldPass, $data) = $this->checkInputFields($vFields, $data);
+        $aFieldsNames = array_keys($vFieldsChecked);
+        $data["validatedFieldsNames"] = var_export($aFieldsNames, true);
         $data["userCreated"] = config_item('soft_user');
         $data["dateCreated"] = date('d/m/Y');
         $data["timeCreated"] = date("g:i a");
@@ -1056,9 +1059,10 @@ class CI_Migration
         $data["tableTitle"] = validateArray($tableSettings, 'title') ? $tableSettings['title'] : setLabel($subModS);
         $data['editView'] = '';
 
+
         list($data, $aEditViewsPhpContent) = $this->loadEditViews($fields, $vFieldsViews, $data, $tableName);
 
-        return [$mod, $submod, $subModS, $subModP, $data, $vFields, $aEditViewsPhpContent];
+        return [$mod, $submod, $subModS, $subModP, $data, $vFields, $aEditViewsPhpContent, $fieldImg, $fieldPass];
     }
 
     public function checkInputFields($vFields, $data)
@@ -1194,10 +1198,8 @@ class CI_Migration
         $aMixDbPkFk = array_merge($aDBTablesPks,$aDBTablesFks);
         $sys = config_item('sys');
         $excepts = array_merge(config_item('controlFields'), [$pkTable]);
-        list($mod, $submod, $subModS, $subModP, $data, $vFields) = $default;
-        list($vFieldsChecked, $fieldImg, $fieldPass, $data) = $this->checkInputFields($vFields, $data);
-        $aFieldsNames = array_keys($vFieldsChecked);
-        $data["validatedFieldsNames"] = var_export($aFieldsNames, true);
+        list($mod, $submod, $subModS, $subModP, $data, $vFields, $aEditViewsPhpContent, $fieldImg, $fieldPass) = $default;
+
         $data['initVarsForeignTable'] = '';
         $data['loadModelsForeignTable'] = '';
         $data['setObjectForeignTable'] = '';
@@ -1372,7 +1374,9 @@ class CI_Migration
     public function createModel2($tableName, $pkTable, $fields, $tableSettings = [], $default = [])
     {
         $sys = config_item('sys');
+
         list($mod, $submod, $subModS, $subModP, $data, $vFields) = $default;
+
 //        $data = $this->getPhpFieldsProperties($fields, $data);
         $data = $this->getPhpFieldsRules($fields, $pkTable, $data);
 //        $data = $this->getPhpFieldsRules($vFields, $pkTable, $data,true);
@@ -1402,6 +1406,7 @@ class CI_Migration
     public function createViewIndex($tableName, $pkTable, $fields, $tableSettings = [], $default = [])
     {
         $sys = config_item('sys');
+
         list($mod, $submod, $subModS, $subModP, $data, $vFields) = $default;
         $data["tableHeaderHtmlTitles"] = $this->setHtmlHeaderTitles($fields, $vFields, $tableSettings);
         $data["tableBodyHtmlFields"] = $this->setHtmlBodyFields($fields, $vFields, $tableSettings, $subModS, $subModP);

@@ -32,27 +32,32 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
     {
         list($id, $view) = $this->filterIdOrView($id, $view);
 
-        $oUcTableP = $this->getUcObjTableP();
+        $oUcObjTableP = $this->model_lcTableP->find();
 
-        $this->data["oUcTableP"] = $oUcTableP;
-        // Carga la vista
+        $this->data["oUcObjTableP"] = $oUcObjTableP;
+
         return $this->loadView('lcModS/lcTableP/index', $view);
     }
 
     public function edit($view = NULL, $id = NULL)
     {
         list($id, $view) = $this->filterIdOrView($id, $view);
-        // Optiene un lcTableS o crea uno nuevo
-        // Se construye las reglas de validacion del formulario
-        if (validateVar($id, 'numeric') || validateVar($id, 'string')) {
-            $oUcObjTableS = $this->model_lcTableP->get($id);
+
+        if (isNumeric($id) || isString($id)) {
+
+            $rules = $this->model_lcTableP->rules_edit;
+
+            $oUcObjTableS = $this->model_lcTableP->findOneByIdUcTableS($id);
+
             if (!count((array)$oUcObjTableS)) {
+
                 $this->data["errors"][] = "El lcTableS no pudo ser encontrado";
             }
-            $rules = $this->model_lcTableP->rules_edit;
         } else {
+
             $rules = $this->model_lcTableP->rules;
-            $oUcObjTableS = $this->model_lcTableP->get_new();
+
+            $oUcObjTableS = $this->model_lcTableP->getNewUcTableS();
         }
 
         if (validateVar($view)) {
@@ -67,18 +72,26 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
         $this->data['aDBTableRef'] = isset($oUcObjTableS->idDBTableRef) && $oUcObjTableS->idDBTableRef != null ? [$oUcObjTableS->idDBTableRef => $oUcObjTableS->idDBTableRef] : [];
         $this->data['aDBTableFields'] = isset($oUcObjTableS->fieldDBTableRef) && $oUcObjTableS->fieldDBTableRef != null ? std2array($oUcObjTableS->fieldDBTableRef) : [];
         //<<<setADBTablesRefFields>>>
-        $this->data["oUcObjTableS"] = $oUcObjTableS;
+
+        $this->data['oUcObjTableS'] = $oUcObjTableS;
+
         $aReturn = array();
-        // Se procesa el formulario
+
         if ($this->form_validation->run() == true) {
+
             $error = 'ok';
+
             list($data, $aFromPost) = $this->dataFromPost($view);
 
             //>>>validateFieldImgUpload<<<
             if (!$this->model_lcTableP->do_upload("lcField", $id) && $id == null) {
+
                 $error = array('error' => $this->upload->display_errors());
+
                 $this->data['errors'] = $error;
+
                 show_error($error);
+
             } else {
                 $file_info = $this->upload->data();
                 $this->data["lcField"] = $file_info['file_name'];
@@ -96,8 +109,8 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                 if ($this->input->post('fromAjax')) {
                     $aReturn['message'] = setMessage($data, $aFromPost, 'tableTitle agregado exitosamente');
                     $aReturn['error'] = $error;
-                    $this->data['oUcTableS'] = $data = $this->model_lcTableP->get_one_by($data, true);
-                    $data->primary = $primary = $this->model_lcTableP->_primary_key;
+                    $this->data['oUcTableS'] = $data = $this->model_lcTableP->findOneBy($data, true);
+                    $data->primary = $primary = $this->model_lcTableP->getPrimaryKey;
                     $data->pk = $data->$primary;
                     $aReturn['view'] = $this->load->view("lcModS/lcTableP/edit", $this->data, true);
                     $aReturn['redirect'] = 'lcModS/lcTableP';
@@ -118,7 +131,6 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                 }
             }
         } else {
-            $this->data['oUcObjTableS'] = $this->setUcObjTableP($this->input->post(),$oUcObjTableS);
             $this->data['error'] = $error = "tableTitle con datos incompletos, porfavor revisa los datos";;
         }
         // Se carga la vista

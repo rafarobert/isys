@@ -19,7 +19,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
      *
      * @var        dataType
      */
-    public $lcLocalField;
+    public $lcLocalField = '';
     //<<<globalLocalFieldsVars>>>
 
     //>>>globalLocalWithForeignFieldsVars<<<
@@ -28,7 +28,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
      *
      * @var        dataType
      */
-    public $lcLocalField_lcFkField;
+    public $lcLocalField_lcFkField = '';
     //<<<globalLocalWithForeignFieldsVars>>>
 
     public $rules = '$tableRules';
@@ -70,15 +70,59 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     }
     //<<<packSettersFunctions>>>
 
+    public function getNewUcTableS()
+    {
+        $this->lcTableS = new ES_Model_UcTableP();
+        return $this->lcTableS;
+    }
+
+    public function find(){
+
+        $oUcTableP = $this->model_lcTableP->get();
+
+        $oModelConceptos = array();
+
+        foreach ($oUcTableP as $lcTableS){
+
+            $oModelUcTableP[] = $this->setFromObject($lcTableS);
+        }
+        return $oModelUcTableP;
+    }
+
+    public function findOneBy($data){
+
+        $oUcTableS = $data = $this->model_lcTableP->get_one_by($data, true);
+
+        return $this->setFromObject($oUcTableS);
+    }
+
+    public function findOneByIdUcTableS($idUcTableS){
+
+        $oUcTableS = $this->model_lcTableS->get_by(['id_lcTableS' => $idUcTableS])[0];
+
+        return $this->setFromObject($oUcTableS);
+
+    }
+
+    public function getDataFromPost()
+    {
+        $data = $this->model_lcTableP->array_from_post(
+            $aFromPost = '$validatedFieldsNames'
+        );
+        return [$data, $aFromPost];
+    }
+
     public function setFromObject($oResult){
 
         $oResult = verifyArraysInResult(std2array($oResult));
 
         foreach ($oResult as $key => $result){
 
-            $this->$key = $result;
-        }
+            if(objectHas($this,$key,false)){
 
+                $this->$key = $result;
+            }
+        }
         return $this;
     }
 }
