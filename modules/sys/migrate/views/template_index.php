@@ -75,14 +75,14 @@
                                         $editLink .= explode('edit-', $editTag)[1] . '/';
                                     }
                                     //<<<linkToEditView>>>
-                                    $editLink .= $oUcObjTableS->idTable;
+                                    $editLink .= $oUcObjTableS->idObjTable;
                                     ?>
                                     <tr>
                                         //tableBodyHtmlFields
                                         <td class="text-right">
                                             <div class="btn-group">
                                                 <?= btn_edit(WEBSERVER . $editLink, "class='btn-white btn btn-xs'") ?>
-                                                <?= btn_delete(WEBSERVER . "lcModS/lcTableP/delete/" . $oUcObjTableS->idTable, "class='btn-white btn btn-xs'") ?>
+                                                <?= btn_delete(WEBSERVER . "lcModS/lcTableP/delete/" . $oUcObjTableS->idObjTable, "class='btn-white btn btn-xs'") ?>
                                             </div>
                                         </td>
                                     </tr>

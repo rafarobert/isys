@@ -4,14 +4,14 @@
     <div class="col-sm-10 two-columns">
         <?php
         $data = '$inputData';
-        echo form_lcInputFormType($data, $objOptions, $oUcObjTableS->lcField);
+        echo form_lcInputFormType($data, $objOptions, $oUcObjTableS->lcObjField);
         //>>>printSecondItem<<<
         echo form_lcSecondInputFormType($data['lcSecondInputFormType']);
         //<<<printSecondItem>>>
         ?>
     </div>
 </div>
-<?php echo form_error("lcErrorForField"); ?>
+<?php echo form_error("lcObjField"); ?>
 
 
 

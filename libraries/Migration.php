@@ -1050,6 +1050,7 @@ class CI_Migration
         $data["UcModS"] = ucfirst($modS);
         $data["UcModP"] = ucfirst($modP);
         $data["idTable"] = $pkTable;
+        $data["idObjTable"] = setObject($pkTable);
         $data["pkTable"] = $pkTable;
         $data["lcTableP"] = lcfirst($subModP);
         $data['$lcTableS'] = '$' . lcfirst($subModS);
@@ -1306,12 +1307,16 @@ class CI_Migration
                 // -------------------------------------------------------------------------------------------------------------
             }
         }
+
+        if($tableName == 'ci_files'){
+            $data["validateFieldImgUpload"] = $this->load->view(["template_controller" => "validateFieldImgUpload"], $data, true, true);
+        }
+
         if ($fieldImg != '') {
             $data['lcField'] = $fieldImg;
             $data['lcObjField'] = setObject($fieldImg);
             $data["validateFieldsImgsIndex"] = $this->load->view(["template_ES_Ctrl" => "validateFieldsImgsIndex"], $data, true, true);
             $data["validateFieldImgIndex"] = $this->load->view(["template_controller" => "validateFieldImgIndex"], $data, true, true);
-            $data["validateFieldImgUpload"] = $this->load->view(["template_controller" => "validateFieldImgUpload"], $data, true, true);
         }
         if ($fieldPass != '') {
             $data['lcField'] = $fieldPass;
@@ -1496,7 +1501,7 @@ class CI_Migration
         foreach ($vFields as $name => $settings) {
 
             $inputData = array(
-                "name" => validateArray($settings, 'name') ? setObject($settings['name'],false) : setObject($name,false),
+                "name" => validateArray($settings, 'name') ? setObject(lcfirst($settings['name'])) : lcfirst(setObject($name)),
                 "id" => validateArray($settings, 'id') ? $settings['id'] : "input" . ucfirst(setObject($name)),
                 "class" => "form-control " . (validateArray($settings, 'class') ? $settings['class'] : ""),
                 "placeholder" => validateArray($settings, 'placeholder') ? $settings['placeholder'] : '',
@@ -1506,7 +1511,8 @@ class CI_Migration
             $data['UcInputId'] = "input" . ucfirst(setObject($name));
             $data['lcInputName'] = setObject(lcfirst($name));
             $data['lcField'] = lcfirst($name);
-            $data['lcObjField'] = setObject(lcfirst($name));
+            $data['lcObjField'] = lcfirst(setObject($name));
+            $data['UcObjField'] = ucfirst(setObject($name));
             $data['lcErrorForField'] = setObject(lcfirst($name));
 
             if (validateArray($settings, 'onclick')) {
@@ -2037,6 +2043,7 @@ class CI_Migration
         $phpGlobalVars = '';
         $data["packGettersFunctions"] = '';
         $data["packSettersFunctions"] = '';
+        $data["packQueryFunctions"] = '';
         $data["globalLocalWithForeignFieldsVars"] = '';
         $data["globalLocalFieldsVars"]  = '';
         foreach ($fields as $name => $settings) {
@@ -2052,34 +2059,37 @@ class CI_Migration
             // ------------------- Setting Getters and Setters ----------------------
             $data['UcObjField'] = ucfirst(setObject($name));
             $data['lcField'] = lcfirst($name);
-            $data['lcObjField'] = lcfirst(setObject($name));
-            $data["packGettersFunctions"] .= $this->load->view(["template_ES_Model" => "packGettersFunctions"], $data, true, true, true);
-            unset($data['lcField']);
             $data['$lcField'] = '$'.lcfirst($name);
-            $data['$lcObjField'] = '$'.lcfirst(setObject($name));
+            $data['lcObjField'] = '$'.lcfirst(setObject($name));
+            $data["packGettersFunctions"] .= $this->load->view(["template_ES_Model" => "packGettersFunctions"], $data, true, true, true);
             $data["packSettersFunctions"] .= $this->load->view(["template_ES_Model" => "packSettersFunctions"], $data, true, true, true);
+            $data["packQueryFunctions"] .= $this->load->view(["template_ES_Model" => "packQueryFunctions"], $data, true, true, true);
             // ----------------------------------------------------------------------
 
             // --------------------- setting Global Vars ---------------------------------------
             $data['lcLocalField'] = '$'.lcfirst($name);
+            $data['lcObjLocalField'] = '$'.setObject(lcfirst($name));
             $data['dataType'] = $type;
             $data["globalLocalFieldsVars"] .= $this->load->view(["template_ES_Model" => "globalLocalFieldsVars"], $data, true, true, true);
             if(validateArray($settings,'idForeign') && validateArray($settings,'selectBy')){
-                $data['lcLocalField'] = '$'.lcfirst($name);
                 $data['dataType'] = $type;
                 if(validateVar($settings['selectBy'],'array')){
                     foreach ($settings['selectBy'] as $nameSelect){
                         $data['lcFkField'] = lcfirst($nameSelect);
+                        $data['UcObjFkField'] = setObject(ucfirst($nameSelect));
+                        $data['lcObjFkField'] = setObject(lcfirst($nameSelect));
                         $data["globalLocalWithForeignFieldsVars"] .= $this->load->view(["template_ES_Model" => "globalLocalWithForeignFieldsVars"], $data, true, true, true);
-                        $data['UcObjField'] = ucfirst(setObject($name.'_'.$nameSelect));
+                        $data['UcObjField'] = ucfirst(setObject($name.'_'.ucfirst($nameSelect)));
                         $data['lcField'] = lcfirst($nameSelect);
                         $data['lcObjField'] = lcfirst(setObject($nameSelect));
                         $data["packGettersFunctions"] .= $this->load->view(["template_ES_Model" => "packGettersFunctions"], $data, true, true, true);
                     }
                 } else if(validateVar($settings['selectBy'])){
                     $data['lcFkField'] = lcfirst($settings['selectBy']);
+                    $data['lcObjFkField'] = setObject(lcfirst($settings['selectBy']));
+                    $data['UcObjFkField'] = setObject(ucfirst($settings['selectBy']));
                     $data["globalLocalWithForeignFieldsVars"] .= $this->load->view(["template_ES_Model" => "globalLocalWithForeignFieldsVars"], $data, true, true, true);
-                    $data['UcObjField'] = ucfirst(setObject($name.'_'.$settings['selectBy']));
+                    $data['UcObjField'] = ucfirst(setObject($name.'_'.ucfirst($settings['selectBy'])));
                     $data['lcField'] = lcfirst($settings['selectBy']);
                     $data['lcObjField'] = lcfirst(setObject($settings['selectBy']));
                     $data["packGettersFunctions"] .= $this->load->view(["template_ES_Model" => "packGettersFunctions"], $data, true, true, true);
@@ -2098,11 +2108,11 @@ class CI_Migration
                 if (strhas($name, 'password')) {
                     $rulesWithPass[$name] = array(
                         "password" => array(
-                            "field" => $name,
+                            "field" => ucfirst(setObject($name)),
                             "label" => validateArray($settings, 'label') ? $settings['label'] : setLabel($name, true),
                             "rules" => $this->getRulesByField($settings),),
                         "password_confirm" => array(
-                            "field" => "password_confirm",
+                            "field" => ucfirst(setObject("password_confirm")),
                             "label" => setLabel("password_confirm",true),
                             "rules" => "trim|matches[$name]",
                         ),
@@ -2110,12 +2120,12 @@ class CI_Migration
                 } else {
                     if (!compareArrayStr($settings, 'input', 'image') || !compareArrayStr($settings, 'input', 'file') && !compareArrayStr($settings, 'input', 'password')) {
                         $rules[$name] = array(
-                            "field" => $name,
+                            "field" => ucfirst(setObject($name)),
                             "label" => validateArray($settings, 'label') ? $settings['label'] : setLabel($name,true),
                             "rules" => $this->getRulesByField($settings)
                         );
                         $rulesWithPass[$name] = array(
-                            "field" => $name,
+                            "field" => ucfirst(setObject($name)),
                             "label" => validateArray($settings, 'label') ? $settings['label'] : setLabel($name,true),
                             "rules" => $this->getRulesByField($settings)
                         );

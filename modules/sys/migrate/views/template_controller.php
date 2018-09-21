@@ -47,7 +47,7 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
 
             $rules = $this->model_lcTableP->rules_edit;
 
-            $oUcObjTableS = $this->model_lcTableP->findOneByIdUcTableS($id);
+            $oUcObjTableS = $this->model_lcTableP->findOneByIdUcObjTableS($id);
 
             if (!count((array)$oUcObjTableS)) {
 
@@ -57,7 +57,7 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
 
             $rules = $this->model_lcTableP->rules;
 
-            $oUcObjTableS = $this->model_lcTableP->getNewUcTableS();
+            $oUcObjTableS = $this->model_lcTableP->getNewUcObjTableS();
         }
 
         if (validateVar($view)) {

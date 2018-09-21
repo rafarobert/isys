@@ -1112,6 +1112,13 @@ if (!function_exists('validateArray')) {
     }
 }
 
+if (!function_exists('keyInArray')) {
+    function keyInArray($key,$array)
+    {
+        return validateArray($array,$key);
+    }
+}
+
 if (!function_exists('arrayHas')) {
     function arrayHas($array, $index, $bEmpty = true)
     {
@@ -1378,18 +1385,16 @@ if (!function_exists('std2array')) {
 
     function std2array($std)
     {
-        if(validateVar($std,'array')){
-            if(validateVar($std[0])){
-                return $std;
-            }
+        if(isArray($std)){
+            return $std;
         }
         $array = json_decode(json_encode($std), true);
 
-        if(is_array($array)){
+        if(isArray($array)){
             return $array;
         } else {
             $array = array();
-            if (is_object($std)){
+            if (isObject($std)){
                 foreach ($std as $name => $value) {
                     $array[$name] = std2array($value);
                 }

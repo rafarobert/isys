@@ -19,16 +19,16 @@ class ES_Model_UcTableP extends ES_UcModS_Model
      *
      * @var        dataType
      */
-    public $lcLocalField = '';
+    public $lcObjLocalField = '';
     //<<<globalLocalFieldsVars>>>
 
     //>>>globalLocalWithForeignFieldsVars<<<
     /**
-     * Value for lcLocalField field related with lcFkField.
+     * Value for lcLocalField field related with UcFkField.
      *
      * @var        dataType
      */
-    public $lcLocalField_lcFkField = '';
+    public $lcObjLocalFieldUcObjFkField = '';
     //<<<globalLocalWithForeignFieldsVars>>>
 
     public $rules = '$tableRules';
@@ -64,15 +64,29 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     //<<<packGettersFunctions>>>
 
     //>>>packSettersFunctions<<<
-    public function setUcObjField($lcField = '')
+    public function setUcObjField($lcObjField = '')
     {
-        return $this->lcField = $lcField;
+        if(objectHas($this,'lcField', false)){
+            return $this->lcField = $lcObjField;
+        }
     }
     //<<<packSettersFunctions>>>
 
+    //>>>packQueryFunctions<<<
+    public function findOneByUcObjField($lcObjField){
+
+        $oData = $this->model_lcTableP->get_by(['lcField' => $lcObjField])[0];
+
+        return $this->setFromObject($oData);
+    }
+    //<<<packQueryFunctions>>>
+
     public function getNewUcTableS()
     {
-        $this->lcTableS = new ES_Model_UcTableP();
+        $post = $this->input->post();
+
+        $this->lcTableS = $this->setFromObject($post);
+
         return $this->lcTableS;
     }
 
@@ -80,7 +94,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
         $oUcTableP = $this->model_lcTableP->get();
 
-        $oModelConceptos = array();
+        $oModelUcTableP = array();
 
         foreach ($oUcTableP as $lcTableS){
 
@@ -89,19 +103,11 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         return $oModelUcTableP;
     }
 
-    public function findOneBy($data){
+    public function findOneBy($arrayData){
 
-        $oUcTableS = $data = $this->model_lcTableP->get_one_by($data, true);
-
-        return $this->setFromObject($oUcTableS);
-    }
-
-    public function findOneByIdUcTableS($idUcTableS){
-
-        $oUcTableS = $this->model_lcTableS->get_by(['id_lcTableS' => $idUcTableS])[0];
+        $oUcTableS = $this->model_lcTableP->get_one_by($arrayData, true);
 
         return $this->setFromObject($oUcTableS);
-
     }
 
     public function getDataFromPost()
@@ -112,17 +118,26 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         return [$data, $aFromPost];
     }
 
-    public function setFromObject($oResult){
+    public function setFromObject($oResult, $oUcTableS = null){
 
         $oResult = verifyArraysInResult(std2array($oResult));
+
+        if(isObject($oUcTableS)){
+
+            $oModelUcObjTableP = $oUcTableS;
+
+        } else {
+
+            $oModelUcObjTableP = new ES_Model_UcTableP();
+        }
 
         foreach ($oResult as $key => $result){
 
             if(objectHas($this,$key,false)){
 
-                $this->$key = $result;
+                $oModelUcObjTableP->$key = $result;
             }
         }
-        return $this;
+        return $oModelUcObjTableP;
     }
 }

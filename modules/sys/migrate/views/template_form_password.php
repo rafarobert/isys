@@ -5,7 +5,7 @@
         <div class="col-sm-10">
             <?php
             $data = '$inputData';
-            echo form_password($data, set_value("lcInputName", $oUcObjTableS->lcField));
+            echo form_password($data, set_value("lcObjField", $oUcObjTableS->lcObjField));
             ?>
         </div>
     </div>
@@ -22,5 +22,5 @@
             echo form_password($data, "", "") ?>
         </div>
     </div>
-    <?php echo form_error("lcField"); ?>
+    <?php echo form_error("lcObjField"); ?>
 <?php } ?>

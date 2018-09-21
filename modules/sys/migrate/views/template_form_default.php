@@ -4,8 +4,8 @@
     <div class="col-sm-10">
         <?php
         $data = '$inputData';
-        echo form_lcInputFormType($data, set_value("lcInputName", $oUcObjTableS->lcField), "")
+        echo form_lcInputFormType($data, set_value("lcObjField", $oUcObjTableS->lcObjField), "")
         ?>
     </div>
 </div>
-<?php echo form_error("lcField"); ?>
+<?php echo form_error("lcObjField"); ?>

@@ -341,7 +341,7 @@ Class ES_Model extends ES_Model_Vars {
 
     public function do_upload($field, $id){
         list($mod,$submod) = getModSubMod($this->_table_name);
-        $dirPictures = FCPATH."assets/img/$submod/";
+        $dirPictures = ROOTPATH."assets/img/$submod/";
         $dirPicturesThumb = $dirPictures."thumbs/";
         createFolder($dirPictures);
         createFolder($dirPicturesThumb);
