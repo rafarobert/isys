@@ -65,16 +65,7 @@
                             <?php if (countStd($oUcObjTableP)) { ?>
                                 <?php foreach ($oUcObjTableP as $oUcObjTableS) {
                                     $editLink = "lcModS/lcTableP/edit/";
-                                    //>>>linkToEditView<<<
-                                    if (validateVar($oUcObjTableS->fieldEditView, 'numeric')) {
-                                        if ($table_name == 'ci_options') {
-                                            $editTag = CiSettingsQuery::create()->findOneByIdSetting($oUcObjTableS->fieldEditView)->getEditTag();
-                                        } else {
-                                            $editTag = CiOptionsQuery::create()->findOneByIdOption($oUcObjTableS->fieldEditView)->getEditTag();
-                                        }
-                                        $editLink .= explode('edit-', $editTag)[1] . '/';
-                                    }
-                                    //<<<linkToEditView>>>
+
                                     $editLink .= $oUcObjTableS->idObjTable;
                                     ?>
                                     <tr>

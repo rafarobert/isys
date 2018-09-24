@@ -1936,19 +1936,19 @@ class CI_Migration
             } else {
                 $aFieldsSelectBy = validateArray($settings, 'selectBy') ? $settings['selectBy'] : [];
                 $aFieldsToJoin = $this->analizeFieldsSelectBy($aFieldsSelectBy, $aPKorFKofTables, $aIdsPkOrFk);
-                if (validateVar($aFieldsToJoin) && in_array($name, $aPksOfTables)) {
+                if (isString($aFieldsToJoin) && in_array($name, $aPksOfTables)) {
                     $content .= "<td><?= setTitleFromObject(\$$oUcObjTableS,'$name" . "_$aFieldsToJoin" . "'); ?></td>               
                 ";
-                } else if (validateVar($aFieldsToJoin, 'array')) {
+                } else if (isArray($aFieldsToJoin)) {
                     $html = '';
                     foreach ($aFieldsToJoin as $fieldToJoin) {
-                        $html .= "'$name" . "_$fieldToJoin" . "',";
+                        $html .= "'$name" . ucfirst(setObject($fieldToJoin)) . "',";
                     }
                     $html = '[' . substr($html, 0, strlen($html) - 1) . ']';
-                    $content .= "<td><?= setTitleFromObject(\$$oUcObjTableS,$html); ?></td>               
+                    $content .= "<td><?= setTitleFromObject(\$$oUcObjTableS,".$html."); ?></td>               
                                 ";
                 } else {
-                    $content .= "<td><?= setTitleFromObject(\$$oUcObjTableS,'$name'); ?></td>               
+                    $content .= "<td><?= setTitleFromObject(\$$oUcObjTableS,'".setObject($name)."'); ?></td>               
                     ";
                 }
             }
@@ -1959,7 +1959,7 @@ class CI_Migration
             }
         }
         if (!validateArray($tableSettings, 'no_date_created') && validateArray($fields, 'date_created')) {
-            $content .= "<td><?= \$$oUcObjTableS->" . "date_created; ?></td>
+            $content .= "<td><?= \$$oUcObjTableS->" . "dateCreated; ?></td>
             ";
         }
         return $content;
