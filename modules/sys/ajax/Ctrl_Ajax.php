@@ -6,7 +6,7 @@
  * Time: 01:29 AM
  * @property CI_Migration $migration
  */
-use ES_Table_Trait as table_trait;
+
 
 class Ctrl_Ajax extends ES_Base_Controller
 {
@@ -168,7 +168,7 @@ class Ctrl_Ajax extends ES_Base_Controller
         $method = isString($method) ? $method : $this->router->method;
         $class = isString($class) ? $class : $this->router->class;
         $mod = isString($mod) ? $mod : $this->router->module;
-        $pk = isString($pk) ? $pk : '';
+        $pk = isString($pk) || isNumeric($pk) ? $pk : '';
         $acr = $sys[$mod];
 
         $this->{"init_$class"}(true);
@@ -196,8 +196,9 @@ class Ctrl_Ajax extends ES_Base_Controller
                 $response['error'] = 'ok';
                 $response['view'] = $view;
             }
-            $response['message'] = 'El registro fue eliminado de forma definitiva exitosamente';
+            $response['message'] = 'El registro fue eliminado de forma exitosa';
         }
         echo json_encode($response);
+        exit;
     }
 }

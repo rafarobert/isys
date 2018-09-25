@@ -13,7 +13,7 @@
 <div class="row wrapper border-bottom white-bg page-heading">
 
     <div class="col-lg-10">
-        <h2><?= empty($oUcObjTableS->idObjTable) ? "Agregar " . setLabel('tableTitle') : "Actualizando datos, " . setLabel('UcTableS #') . $oUcObjTableS->idObjTable ?></h2>
+        <h2><?= empty($oUcObjTableS->getUcIdObjTable()) ? "Agregar " . setLabel('tableTitle') : "Actualizando datos, " . setLabel('UcTableS #') . $oUcObjTableS->getUcIdObjTable() ?></h2>
         <ol class="breadcrumb">
             <li>
                 <?= anchor('lcModS', 'Inicio') ?>
@@ -65,7 +65,7 @@
                         //<<<startInsertEachOne>>>
                         ?>
 
-                        <?= form_open_multipart("lcModS/lcTableP/edit/$editView" . $oUcObjTableS->idObjTable, ["id" => "lcTablePEdit", "class" => "form-horizontal"]) ?>
+                        <?= form_open_multipart("lcModS/lcTableP/edit/$editView" . $oUcObjTableS->getUcIdObjTable(), ["id" => "lcTablePEdit", "class" => "form-horizontal"]) ?>
 
                         #htmlFieldsEditForm
 

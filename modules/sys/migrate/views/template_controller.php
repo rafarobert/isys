@@ -73,7 +73,7 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
 
             $error = 'ok';
 
-            list($data, $aFromPost) = $this->model_lcTableP->dataFromPost();
+            list($oUcObjTableS, $aFromPost) = $this->model_lcTableP->getDataFromPost();
             //>>>validateFieldImgUpload<<<
             if (!$this->model_lcTableP->do_upload("file", $id) && $id == null) {
                 $error = array('error' => $this->upload->display_errors());
@@ -91,7 +91,7 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
             }
             //<<<validateFieldPassword>>>
             if ($error == 'ok') {
-                $data = $this->model_lcTableP->save($data, $id);
+                $data = $this->model_lcTableP->saveOrUpdate($oUcObjTableS, $id);
                 if ($this->fromAjax) {
                     $aReturn['message'] = setMessage($data, $aFromPost, 'tableTitle agregado exitosamente');
                     $aReturn['error'] = $error;

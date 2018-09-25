@@ -380,12 +380,11 @@ CREATE TABLE `dfa_conceptos`
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
     PRIMARY KEY (`id_concepto`),
-    UNIQUE INDEX `dfa_conceptos_id_concepto_uindex` (`id_concepto`),
-    INDEX `dfa_conceptos_ibfk_1` (`id_historia`),
     INDEX `dfa_conceptos_ibfk_2` (`id_user_created`),
     INDEX `dfa_conceptos_ibfk_3` (`id_user_modified`),
     INDEX `dfa_conceptos_ibfk_4` (`id_tipo_concepto`),
     INDEX `dfa_conceptos_ibfk_5` (`id_unidad`),
+    INDEX `dfa_conceptos_ibfk_1` (`id_historia`),
     CONSTRAINT `dfa_conceptos_ibfk_1`
         FOREIGN KEY (`id_historia`)
         REFERENCES `dfa_conceptos` (`id_concepto`),
@@ -1130,7 +1129,6 @@ CREATE TABLE `dfa_unidades`
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
     PRIMARY KEY (`id_unidad`),
-    UNIQUE INDEX `dfa_unidades_id_unidad_uindex` (`id_unidad`),
     INDEX `dfa_unidades_ibfk_1` (`id_user_created`),
     INDEX `dfa_unidades_ibfk_2` (`id_user_modified`),
     INDEX `dfa_unidades_ibfk_3` (`id_adjuntoria`),

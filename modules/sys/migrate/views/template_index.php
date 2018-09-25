@@ -66,14 +66,14 @@
                                 <?php foreach ($oUcObjTableP as $oUcObjTableS) {
                                     $editLink = "lcModS/lcTableP/edit/";
 
-                                    $editLink .= $oUcObjTableS->idObjTable;
+                                    $editLink .= $oUcObjTableS->getUcIdObjTable();
                                     ?>
                                     <tr>
                                         //tableBodyHtmlFields
                                         <td class="text-right">
                                             <div class="btn-group">
                                                 <?= btn_edit(WEBSERVER . $editLink, "class='btn-white btn btn-xs'") ?>
-                                                <?= btn_delete(WEBSERVER . "lcModS/lcTableP/delete/" . $oUcObjTableS->idObjTable, "class='btn-white btn btn-xs'") ?>
+                                                <?= btn_delete(WEBSERVER . "lcModS/lcTableP/delete/" . $oUcObjTableS->getUcIdObjTable(), "class='btn-white btn btn-xs'") ?>
                                             </div>
                                         </td>
                                     </tr>

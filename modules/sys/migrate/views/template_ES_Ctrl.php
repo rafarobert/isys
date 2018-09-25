@@ -36,20 +36,6 @@ Class ES_Ctrl_UcTableP extends ES_UcModS_Controller
         //<<<setFieldsForeignTable>>>
     }
 
-    public function getUcObjTableP()
-    {
-        // Obtiene a todos los lcTableP
-        $oUcObjTableP = $this->model_lcTableP->get();
-        //>>>setForeignTableFields<<<
-        $oUcObjTableP = $this->model_fkLcTableP->setForeignFields($this->lcFkObjFieldP, 'idFkLcTableP', $oUcObjTableP, 'idLocalLcTableP', true);
-        //<<<setForeignTableFields>>>
-        //>>>validateFieldsImgsIndex<<<
-        $oUcObjTableP = $this->model_lcTableP->getThumbs($oUcObjTableP);
-        //<<<validateFieldsImgsIndex>>>
-
-        return $this->setUcObjTableP($oUcObjTableP);
-    }
-
     public function setUcObjTableP($oData, $oUcObjTableP = null)
     {
         $oModelUcObjTableP = array();

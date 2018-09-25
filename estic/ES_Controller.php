@@ -1,10 +1,9 @@
 <?php (defined('BASEPATH')) OR exit('No direct script access allowed');
 use Propel\Runtime\Exception\PropelException;
-use ES_Table_Trait as table_trait;
 
 class ES_Controller extends ES_Ctrl_Vars
 {
-//    use ES_Table_Trait;
+    use ES_Table_Trait;
 
     const STRING = 'string';
     const ARRAYS = 'array';

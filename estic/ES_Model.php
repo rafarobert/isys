@@ -184,6 +184,7 @@ Class ES_Model extends ES_Model_Vars {
     }
 
     public function save($data, $id = null, $with_id = true){
+        $this->load->library('session');
         // set timesatamps
         $now = date('Y-m-d H:i:s');
         if($this->db->field_exists('date_created',$this->_table_name)){
@@ -202,22 +203,23 @@ Class ES_Model extends ES_Model_Vars {
         }
         if($this->db->field_exists('id_user_modified', $this->_table_name)){
             if($this->db->table_exists('ci_users') && $this->db->field_exists('id_user','ci_users')){
-                $idUserModified = keyInArray('id_user_modified', $data) ? $data['id_user_modified'] : show_error('No se pudo guardar el registro debido a que no existe una sesion iniciada');
+                $idUserModified = $this->session->getIdUserLoggued();
                 $userAdmin = CiUsersQuery::create()
                     ->filterByIdRole(1)
                     ->findOneByIdUser($idUserModified);
                 if (is_object($userAdmin)){
-                    $data['id_user_modified'] = 1;
+                    $data['id_user_modified'] = $idUserModified;
                 }
             }
         }
         if($this->db->field_exists('id_user_created', $this->_table_name)){
             if($this->db->table_exists('ci_users') && $this->db->field_exists('id_user','ci_users')){
-                $idUserCreated = keyInArray('id_user_created', $data) ? $data['id_user_created'] : show_error('No se pudo guardar el registro debido a que no existe una sesion iniciada');
+                $idUserCreated = $this->session->getIdUserLoggued();
                 $userAdmin = CiUsersQuery::create()
                     ->filterByIdRole(1)
                     ->findOneByIdUser($idUserCreated);
                 if (isObject($userAdmin)){
+
                     $data['id_user_created'] = $idUserCreated;
                 }
             }
@@ -460,5 +462,13 @@ Class ES_Model extends ES_Model_Vars {
             $response['localTable'] = $this->_table_name;
         }
         return $response;
+    }
+
+    /**
+     * @var ES_Model $object
+     */
+    public function saveOrUpdate($object, $id = null){
+        $data = $object->getData();
+        $object->save($data,$id);
     }
 }

@@ -19,16 +19,16 @@ class ES_Model_UcTableP extends ES_UcModS_Model
      *
      * @var        dataType
      */
-    public $lcObjLocalField = '';
+    public $lcVarLocalField = '';
     //<<<globalLocalFieldsVars>>>
 
     //>>>globalLocalWithForeignFieldsVars<<<
     /**
-     * Value for lcLocalField field related with UcFkField.
+     * Value for lcLocalField field related with lcForeignField.
      *
      * @var        dataType
      */
-    public $lcObjLocalFieldUcObjFkField = '';
+    public $lcVarLocalField_lcForeignField = '';
     //<<<globalLocalWithForeignFieldsVars>>>
 
     public $rules = '$tableRules';
@@ -59,15 +59,22 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     //>>>packGettersFunctions<<<
     public function getUcObjField()
     {
-        return $this->lcField;
+        return $this->lcLocalField;
     }
     //<<<packGettersFunctions>>>
+
+    //>>>packLocalForeignGettersFunctions<<<
+    public function getUcObjLocalFieldUcObjForeignField()
+    {
+        return $this->lcLocalField_lcForeignField;
+    }
+    //<<<packLocalForeignGettersFunctions>>>
 
     //>>>packSettersFunctions<<<
     public function setUcObjField($lcObjField = '')
     {
         if(objectHas($this,'lcField', false)){
-            return $this->lcField = $lcObjField;
+            return $this->lcLocalField = $lcObjField;
         }
     }
     //<<<packSettersFunctions>>>
@@ -91,16 +98,22 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     }
 
     public function find(){
+        // Obtiene a todos los lcTableP
+        $oUcObjTableP = $this->model_lcTableP->get();
+        //>>>setForeignTableFields<<<
+        $oUcObjTableP = $this->model_fkLcTableP->setForeignFields($this->lcFkObjFieldP, 'idFkLcTableP', $oUcObjTableP, 'idLocalLcTableP', true);
+        //<<<setForeignTableFields>>>
+        //>>>validateFieldsImgsIndex<<<
+        $oUcObjTableP = $this->model_lcTableP->getThumbs($oUcObjTableP);
+        //<<<validateFieldsImgsIndex>>>
 
-        $oUcTableP = $this->model_lcTableP->get();
+        $oModelUcObjTableP = array();
 
-        $oModelUcTableP = array();
+        foreach ($oUcObjTableP as $lcTableS){
 
-        foreach ($oUcTableP as $lcTableS){
-
-            $oModelUcTableP[] = $this->setFromObject($lcTableS);
+            $oModelUcObjTableP[] = $this->setFromObject($lcTableS);
         }
-        return $oModelUcTableP;
+        return $oModelUcObjTableP;
     }
 
     public function findOneBy($arrayData){
@@ -108,14 +121,6 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         $oUcTableS = $this->model_lcTableP->get_one_by($arrayData, true);
 
         return $this->setFromObject($oUcTableS);
-    }
-
-    public function getDataFromPost()
-    {
-        $data = $this->model_lcTableP->array_from_post(
-            $aFromPost = '$validatedFieldsNames'
-        );
-        return [$data, $aFromPost];
     }
 
     public function setFromObject($oResult, $oUcTableS = null){
@@ -130,22 +135,37 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
             $oModelUcObjTableP = new ES_Model_UcTableP();
         }
+        $aFields = $this->getData();
 
-        foreach ($oResult as $key => $result){
+        foreach ($aFields as $key => $value){
 
-            if(objectHas($this,$key,false)){
+            if(objectHas($oResult,$key,false)){
 
-                $oModelUcObjTableP->$key = $result;
+                $oModelUcObjTableP->$key = $oResult->$key;
+
+            } else if(objectHas($oResult,setObject($key),false)){
+
+                $oModelUcObjTableP->$key = $oResult->{setObject($key)};
             }
         }
         return $oModelUcObjTableP;
     }
 
-    public function dataFromPost()
+    public function getDataFromPost()
     {
         $data = $this->model_lcTableP->array_from_post(
             $aFromPost = '$validatedFieldsNames'
         );
-        return [$data, $aFromPost];
+        $oModelUcObjTableS = $this->setFromObject($data);
+        return [$oModelUcObjTableS, $aFromPost];
+    }
+
+    public function getData(){
+        $data = array(
+            //>>>packForGetData<<<
+            'lcField' => $this->lcField,
+            //<<<packForGetData>>>
+        );
+        return $data;
     }
 }
