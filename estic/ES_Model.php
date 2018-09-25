@@ -15,7 +15,7 @@ Class ES_Model extends ES_Model_Vars {
     protected $_order_by = '';
     public $rules = array();
     protected $_timestaps = true;
-    protected $_num_thumbs = 5;
+//    protected $_num_thumbs = 5;
 
     public $rules_login = array(
         'email' => array(
@@ -55,10 +55,6 @@ Class ES_Model extends ES_Model_Vars {
 
     function __construct() {
         parent::__construct();
-//        $this->load->library('migration');
-//        if(function_exists('initStaticTableVars')){
-//            initStaticTableVars($this);
-//        }
         $this->img_path = realpath(APPPATH.'../assets/img/');
         createFolder($this->img_path);
     }
@@ -128,16 +124,16 @@ Class ES_Model extends ES_Model_Vars {
                 }
             } else if($bSelecting){
                 $select .= isString($select) ? ', '.$k : $k;
-                $aWheres[] = !isNumeric($k,'numeric') ? [$k => $wh] : [];
+                $aWheres[$k] = $wh;
             } else {
                 $select = '';
-                $aWheres[] = !isNumeric($k,'numeric') ? [$k => $wh] : [];
+                $aWheres[$k] = $wh;
             }
             $i++;
         }
         $this->db->select($select);
-        foreach($aWheres as $where){
-            $this->db->where($where);
+        foreach($aWheres as $k => $where){
+            $this->db->where($k,$where);
         }
         return $this->get(null, $single);
     }
@@ -206,7 +202,10 @@ Class ES_Model extends ES_Model_Vars {
         }
         if($this->db->field_exists('id_user_modified', $this->_table_name)){
             if($this->db->table_exists('ci_users') && $this->db->field_exists('id_user','ci_users')){
-                $userAdmin = CiUsersQuery::create()->findOneByIdUser(1);
+                $idUserModified = keyInArray('id_user_modified', $data) ? $data['id_user_modified'] : show_error('No se pudo guardar el registro debido a que no existe una sesion iniciada');
+                $userAdmin = CiUsersQuery::create()
+                    ->filterByIdRole(1)
+                    ->findOneByIdUser($idUserModified);
                 if (is_object($userAdmin)){
                     $data['id_user_modified'] = 1;
                 }
@@ -214,9 +213,12 @@ Class ES_Model extends ES_Model_Vars {
         }
         if($this->db->field_exists('id_user_created', $this->_table_name)){
             if($this->db->table_exists('ci_users') && $this->db->field_exists('id_user','ci_users')){
-                $userAdmin = CiUsersQuery::create()->findOneByIdUser(1);
-                if (is_object($userAdmin)){
-                    $data['id_user_created'] = 1;
+                $idUserCreated = keyInArray('id_user_created', $data) ? $data['id_user_created'] : show_error('No se pudo guardar el registro debido a que no existe una sesion iniciada');
+                $userAdmin = CiUsersQuery::create()
+                    ->filterByIdRole(1)
+                    ->findOneByIdUser($idUserCreated);
+                if (isObject($userAdmin)){
+                    $data['id_user_created'] = $idUserCreated;
                 }
             }
         }
@@ -342,21 +344,17 @@ Class ES_Model extends ES_Model_Vars {
     public function do_upload($field, $id){
         list($mod,$submod) = getModSubMod($this->_table_name);
         $dirPictures = ROOTPATH."assets/img/$submod/";
-        $dirPicturesThumb = $dirPictures."thumbs/";
         createFolder($dirPictures);
-        createFolder($dirPicturesThumb);
         // Settings for images
         $config = array(
-            'upload_path'       => $dirPictures,
-            'allowed_types'     => 'gif|jpg|png|jpeg',
+            'allowed_types'     => 'gif|jpg|png|jpeg|pdf|docx|xlsx',
             'max_size'          => 1000,
             'max_width'         => 2024,
             'max_height'        => 1008,
-            'new_image'         => $dirPicturesThumb,
             'maintain_ratio'    => true,
             'image_library'     => 'gd2',
             'create_thumb'      => TRUE,
-            'num_thumbs'        => $this->_num_thumbs,
+            'num_thumbs'        => 3,
             'width'             => 50,
             'height'            => 50,
             'thumb_marker'      => '-thumb_50',
@@ -364,29 +362,32 @@ Class ES_Model extends ES_Model_Vars {
         $this->load->library('upload', $config);
         $this->load->library('image_lib');
 
-        if(validateArray($_FILES,$field)){
-            if(validateVar($_FILES[$field],'array')){
-                if(!file_exists($dirPictures.$_FILES[$field]['name'])){
-                    if ( ! $this->upload->do_upload($field) && $id == null)
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        $file = $this->upload->data();
-                        $config['source_image'] = $file['full_path'];
-                        for ($i=0;$i<$config['num_thumbs'];$i++){
-                            $this->image_lib->initialize($config);
-                            $this->image_lib->resize();
-                            $config['width'] = $config['width']+100;
-                            $config['height'] = $config['height']+100;
-                            $config['thumb_marker'] = '-thumb_'.$config['width'];
-                        }
-                    }
+        foreach ($_FILES as $fName => $fSettings){
+            $dirPictures .= "$fName/";
+            createFolder($dirPictures);
+            $dirPicturesThumb = $dirPictures."thumbs/";
+            createFolder($dirPicturesThumb);
+            $this->upload->upload_path = $dirPictures;
+            $config['new_image'] = $dirPicturesThumb;
+            $files = $_FILES;
+
+            if (isArray($files[$fName])) {
+                if (!$this->upload->do_upload($fName) && $id == null) {
+                    return false;
                 } else {
-                    $this->upload->file_name = $_FILES[$field]['name'];
-                    $this->upload->file_type = $_FILES[$field]['type'];
+                    $this->upload->bFileUploaded = true;
+                    $file = $this->upload->data();
+                    $config['source_image'] = $file['full_path'];
+                    for ($i = 0; $i < $config['num_thumbs']; $i++) {
+                        $this->image_lib->initialize($config);
+                        $this->image_lib->resize();
+                        $config['width'] = $config['width'] + 150;
+                        $config['height'] = $config['height'] + 150;
+                        $config['thumb_marker'] = '-thumb_' . $config['width'];
+                    }
                 }
+                $this->upload->file_name = $files[$fName]['name'];
+                $this->upload->file_type = $files[$fName]['type'];
             }
         }
         return true;

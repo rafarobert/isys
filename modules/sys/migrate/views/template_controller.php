@@ -39,10 +39,8 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
         return $this->loadView('lcModS/lcTableP/index', $view);
     }
 
-    public function edit($view = NULL, $id = NULL)
+    public function edit($id = NULL)
     {
-        list($id, $view) = $this->filterIdOrView($id, $view);
-
         if (isNumeric($id) || isString($id)) {
 
             $rules = $this->model_lcTableP->rules_edit;
@@ -59,13 +57,7 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
 
             $oUcObjTableS = $this->model_lcTableP->getNewUcObjTableS();
         }
-
-        if (validateVar($view)) {
-            $this->form_validation->set_rules($this->model_lcTableP->{"rules_edit_$view"});
-        } else {
-            $this->form_validation->set_rules($rules);
-        }
-
+        $this->form_validation->set_rules($rules);
         //>>>setADBTablesRefFields<<<
         $aDBTables = std2array($this->model_tables->get_by(['table_name']));
         $this->data['aDBTables'] = array_combine(array_column($aDBTables, 'table_name'), array_column($aDBTables, 'table_name'));
@@ -81,21 +73,15 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
 
             $error = 'ok';
 
-            list($data, $aFromPost) = $this->dataFromPost($view);
-
+            list($data, $aFromPost) = $this->model_lcTableP->dataFromPost();
             //>>>validateFieldImgUpload<<<
-            if (!$this->model_lcTableP->do_upload("lcField", $id) && $id == null) {
-
+            if (!$this->model_lcTableP->do_upload("file", $id) && $id == null) {
                 $error = array('error' => $this->upload->display_errors());
-
                 $this->data['errors'] = $error;
-
                 show_error($error);
-
             } else {
-                $file_info = $this->upload->data();
-                $this->data["lcField"] = $file_info['file_name'];
-                $data['lcField'] = $file_info['file_name'];
+                $this->data["file"] = $data = $this->upload->data();
+                $this->fromAjax = true;
             }
             //<<<validateFieldImgUpload>>>
             //>>>validateFieldPassword<<<
@@ -106,7 +92,7 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
             //<<<validateFieldPassword>>>
             if ($error == 'ok') {
                 $data = $this->model_lcTableP->save($data, $id);
-                if ($this->input->post('fromAjax')) {
+                if ($this->fromAjax) {
                     $aReturn['message'] = setMessage($data, $aFromPost, 'tableTitle agregado exitosamente');
                     $aReturn['error'] = $error;
                     $this->data['oUcTableS'] = $data = $this->model_lcTableP->findOneBy($data, true);
@@ -121,7 +107,7 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                     redirect("lcModS/lcTableP");
                 }
             } else {
-                if ($this->input->post('fromAjax')) {
+                if ($this->fromAjax) {
                     $aReturn['error'] = $error = "tableTitle con datos incompletos, porfavor revisa los datos";;
                     $aReturn['view'] = $this->load->view("lcModS/lcTableP/edit", $this->data, true);
                     echo json_encode($aReturn);
@@ -134,7 +120,7 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
             $this->data['error'] = $error = "tableTitle con datos incompletos, porfavor revisa los datos";;
         }
         // Se carga la vista
-        return $this->loadView('lcModS/lcTableP/edit', $view, 'fieldEditView', $error);
+        return $this->loadView('lcModS/lcTableP/edit', $error);
     }
     //extraFunctions
 }

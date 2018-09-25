@@ -254,7 +254,20 @@ class CI_Input {
 
 	// --------------------------------------------------------------------
 
-	/**
+
+    /**
+     * Fetch an item from the POST array
+     *
+     * @param	mixed	$index		Index for item to be fetched from $_POST
+     * @param	bool	$xss_clean	Whether to apply XSS filtering
+     * @return	mixed
+     */
+    public function file($index = 'name', $xss_clean = NULL)
+    {
+        return $this->_fetch_from_array($_FILE, $index, $xss_clean);
+    }
+
+    /**
 	 * Fetch an item from the POST array
 	 *
 	 * @param	mixed	$index		Index for item to be fetched from $_POST

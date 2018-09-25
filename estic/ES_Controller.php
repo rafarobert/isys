@@ -9,6 +9,7 @@ class ES_Controller extends ES_Ctrl_Vars
     const STRING = 'string';
     const ARRAYS = 'array';
     const NUMERIC = 'numeric';
+    public $fromAjax = false;
 
     public $request;
     public $response;
@@ -54,47 +55,31 @@ class ES_Controller extends ES_Ctrl_Vars
         }
     }
 
-    public function loadView($path, $view = '', $idFieldEditView = '', $error = ''){
+    public function loadView($path, $error = ''){
         $path = preg_replace(['/^\//','/\/$/'],'',$path);
+        $mod = null;
+        $class = null;
+        $method = null;
+
         if(substr_count($path,'/') == 2 ){
             list($mod, $class, $method) = explode('/',$path);
-            list($classSin, $classPlu) = setSingularPlural($class);
-            $ucClassSin = ucfirst($classSin);
-            $method = validateVar($method) ? $method : $this->router->method;
-            $class = validateVar($class) ? $class : $this->router->class;
-            $mod = validateVar($mod) ? $mod : $this->router->module;
-            if (($this->input->post('fromAjax') || compareStrStr($this->router->class,'ajax'))) {
-                if (validateVar($error)){
-                    if(validateVar($view)){
-                        return ['view' => $this->load->view("$mod/$class/$method-$view", $this->data, true),'error'=>$error];
-                    } else {
-                        return ['view' => $this->load->view("$mod/$class/$method", $this->data, true), 'error' => $error];
-                    }
-                } else {
-                    if(validateVar($view)){
-                        return $this->load->view("$mod/$class/$method-$view", $this->data, true);
-                    } else {
-                        return $this->load->view("$mod/$class/$method", $this->data, true);
-                    }
-                }
-            } else if (!$this->input->post('fromAjax') && validateVar($idFieldEditView)) {
-                if (validateVar($view)) {
-                    $this->{"init_$class"}(true);
-                    if ($this->{"model_$class"}->_table_name == 'ci_options' || $view == 'tipo_usuario') {
-                        $this->data["o$ucClassSin"]->$idFieldEditView = CiSettingsQuery::create()->findOneByEditTag("edit-$view")->getIdSetting();
-                    } else {
-                        $this->data["o$ucClassSin"]->$idFieldEditView = CiOptionsQuery::create()->findOneByEditTag("edit-$view")->getIdSetting();
-                    }
-                    $this->data["subview"] = "$mod/$class/$method-$view";
-                        return $this->load->view("$mod/$class/$method-$view", $this->data, true);
-                } else {
-                    $this->data["subview"] = "$mod/$class/$method";
-//                    return $this->load->view("$mod/$class/$method", $this->data, true);
-                }
+        } else if(substr_count($path,'/') == 1 ){
+            list($class, $method) = explode('/',$path);
+        } else if(substr_count($path,'/') == 0){
+            list($method) = explode('/',$path);
+        }
+        $method = isString($method) ? $method : $this->router->method;
+        $class = isString($class) ? $class : $this->router->class;
+        $mod = isString($mod) ? $mod : $this->router->module;
+        if (($this->input->post('fromAjax') || compareStrStr($this->router->class,'ajax'))) {
+            if (validateVar($error)){
+                return ['view' => $this->load->view("$mod/$class/$method", $this->data, true), 'error' => $error];
             } else {
-                $this->data["subview"] = "$mod/$class/$method";
-//                return $this->load->view("$mod/$class/$method", $this->data, true);
+                return $this->load->view("$mod/$class/$method", $this->data, true);
             }
+            $this->data["subview"] = "$mod/$class/$method";
+        } else {
+            $this->data["subview"] = "$mod/$class/$method";
         }
     }
 

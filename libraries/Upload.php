@@ -46,7 +46,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @author		EllisLab Dev Team
  * @link		https://codeigniter.com/user_guide/libraries/file_uploading.html
  */
+
 class CI_Upload {
+    /**
+     * @var ES_Model $CI
+     */
+    private $CI;
 
 	/**
 	 * Maximum file size
@@ -54,6 +59,13 @@ class CI_Upload {
 	 * @var	int
 	 */
 	public $max_size = 0;
+
+	/**
+	 * Maximum file size
+	 *
+	 * @var	boolean
+	 */
+	public $bFileUploaded = false;
 
 	/**
 	 * Maximum image width
@@ -295,6 +307,7 @@ class CI_Upload {
 
 		$this->_mimes =& get_mimes();
 		$this->_CI =& get_instance();
+		$this->CI =& get_instance();
 
 		log_message('info', 'Upload Class Initialized');
 	}
@@ -456,7 +469,7 @@ class CI_Upload {
 
 		$this->file_type = preg_replace('/^(.+?);.*$/', '\\1', $this->file_type);
 		$this->file_type = strtolower(trim(stripslashes($this->file_type), '"'));
-		$this->file_name = $this->_prep_filename($_file['name']);
+		$this->file_name = time().'_'.$this->_prep_filename($_file['name']);
 		$this->file_ext	 = $this->get_extension($this->file_name);
 		$this->client_name = $this->file_name;
 
@@ -597,20 +610,21 @@ class CI_Upload {
 	public function data($index = NULL)
 	{
 		$data = array(
-				'file_name'		=> $this->file_name,
-				'file_type'		=> $this->file_type,
-				'file_path'		=> $this->upload_path,
+				'name'		=> $this->orig_name,
+				'type'		=> $this->file_type,
+				'path'		=> $this->upload_path,
 				'full_path'		=> $this->upload_path.$this->file_name,
 				'raw_name'		=> str_replace($this->file_ext, '', $this->file_name),
-				'orig_name'		=> $this->orig_name,
-				'client_name'		=> $this->client_name,
-				'file_ext'		=> $this->file_ext,
-				'file_size'		=> $this->file_size,
-				'is_image'		=> $this->is_image(),
-				'image_width'		=> $this->image_width,
-				'image_height'		=> $this->image_height,
-				'image_type'		=> $this->image_type,
-				'image_size_str'	=> $this->image_size_str,
+//				'orig_name'		=> $this->orig_name,
+				'id_user_created'		=> $this->CI->session->getIdUserLoggued(),
+				'id_user_modified'		=> $this->CI->session->getIdUserLoggued(),
+				'ext'		=> $this->file_ext,
+				'size'		=> $this->file_size,
+//				'is_image'		=> $this->is_image(),
+				'width'		=> $this->image_width,
+				'height'		=> $this->image_height,
+				'type'		=> $this->image_type,
+//				'image_size_str'	=> $this->image_size_str,
 			);
 
 		if ( ! empty($index))
@@ -1311,4 +1325,7 @@ class CI_Upload {
 		$this->file_type = $file['type'];
 	}
 
+	public function done(){
+	    return $this->bFileUploaded;
+    }
 }

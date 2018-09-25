@@ -96,12 +96,5 @@ Class ES_Ctrl_UcTableP extends ES_UcModS_Controller
         }
     }
 
-    public function dataFromPost()
-    {
-        $data = $this->model_lcTableP->array_from_post(
-            $aFromPost = '$validatedFieldsNames'
-        );
-        return [$data, $aFromPost];
-    }
     //extraFunctions
 }

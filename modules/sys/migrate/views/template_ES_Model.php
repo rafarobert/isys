@@ -81,7 +81,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     }
     //<<<packQueryFunctions>>>
 
-    public function getNewUcTableS()
+    public function getNewUcObjTableS()
     {
         $post = $this->input->post();
 
@@ -139,5 +139,13 @@ class ES_Model_UcTableP extends ES_UcModS_Model
             }
         }
         return $oModelUcObjTableP;
+    }
+
+    public function dataFromPost()
+    {
+        $data = $this->model_lcTableP->array_from_post(
+            $aFromPost = '$validatedFieldsNames'
+        );
+        return [$data, $aFromPost];
     }
 }

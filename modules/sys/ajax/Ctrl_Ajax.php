@@ -6,12 +6,14 @@
  * Time: 01:29 AM
  * @property CI_Migration $migration
  */
+use ES_Table_Trait as table_trait;
+
 class Ctrl_Ajax extends ES_Base_Controller
 {
     function __construct()
     {
         parent::__construct();
-        $this->load->model('base/model_ajax');
+        $this->load->model('sys/model_ajax');
     }
 
     public function export($table = '', $funct = 'edit', $subview = ''){
@@ -141,12 +143,36 @@ class Ctrl_Ajax extends ES_Base_Controller
         echo json_encode($response);
     }
 
-    public function delete(){
+    public function remove(){
+        $this->load->library('migration');
+        if(function_exists('initStaticTableVars')){
+            initStaticTableVars($this);
+        }
+
         $dir = $this->input->post('dir');
-        $dir = preg_replace(['/^\//','/\/$/'],'',$dir);
-        list($mod, $table, $method, $pk) = substr_count($dir,'/') == 3 ? explode('/',$dir) : [];
-        $this->{"init_$table"}(true);
-        $response = $this->{"model_$table"}->{$method}($pk);
+        $path = preg_replace(['/^\//','/\/$/'],'',$dir);
+        $sys = config_item('sys');
+        $mod = null;
+        $class = null;
+        $method = null;
+        $pk = null;
+        if(substr_count($path,'/') == 3 ){
+            list($mod, $class, $method, $pk) = explode('/',$path);
+        } else if(substr_count($path,'/') == 2 ){
+            list($mod, $class, $method) = explode('/',$path);
+        } else if(substr_count($path,'/') == 1 ){
+            list($class, $method) = explode('/',$path);
+        } else if(substr_count($path,'/') == 0){
+            list($method) = explode('/',$path);
+        }
+        $method = isString($method) ? $method : $this->router->method;
+        $class = isString($class) ? $class : $this->router->class;
+        $mod = isString($mod) ? $mod : $this->router->module;
+        $pk = isString($pk) ? $pk : '';
+        $acr = $sys[$mod];
+
+        $this->{"init_$class"}(true);
+        $response = $this->{"model_$class"}->{$method}($pk);
         if(validateArray($response,'message') && validateArray($response,'code')){
             preg_match_all("/`(.*?)`/",$response['message'],$aMessage);
             if(validateArray($aMessage,1)){
@@ -163,7 +189,7 @@ class Ctrl_Ajax extends ES_Base_Controller
             $response['error'] = 'Hubo un error al eliminar el registro';
         } else {
             $response = array();
-            $view = $this->{"ctrl_$table"}->index();
+            $view = $this->{"ctrl_$class"}->index();
             if(validateVar($view,'array')){
                 list($response['view'], $response['error']) = $view;
             } else {
