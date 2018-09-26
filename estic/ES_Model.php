@@ -5,7 +5,8 @@
  * Date: 6/11/2017
  * Time: 12:27 AM
  */
-use Propel\Runtime\Exception\PropelException;
+
+use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
 Class ES_Model extends ES_Model_Vars {
 
@@ -187,50 +188,52 @@ Class ES_Model extends ES_Model_Vars {
         $this->load->library('session');
         // set timesatamps
         $now = date('Y-m-d H:i:s');
-        if($this->db->field_exists('date_created',$this->_table_name)){
-            if($this->_timestaps == true){
-                if($id == null){
+        if($this->_timestaps == true){
+            if($id == null){
+                if($this->db->field_exists('date_created',$this->_table_name) && $this->db->field_exists('date_modified',$this->_table_name) && $this->db->field_exists('change_count',$this->_table_name)){
                     $data['date_created'] = $now;
-                } else {
                     $data['date_modified'] = $now;
+                    $data['change_count'] = 0;
                 }
-            }
-        }
-        if($this->db->field_exists('date_modified', $this->_table_name)){
-            if($this->_timestaps == true){
-                $data['date_modified'] = $now;
+            } else {
+                if($this->db->field_exists('date_modified', $this->_table_name) && $this->db->field_exists('change_count', $this->_table_name)){
+                    $data['date_modified'] = $now;
+                    $data['change_count'] += 1;
+                }
             }
         }
         if($this->db->field_exists('id_user_modified', $this->_table_name)){
             if($this->db->table_exists('ci_users') && $this->db->field_exists('id_user','ci_users')){
                 $idUserModified = $this->session->getIdUserLoggued();
                 $userAdmin = CiUsersQuery::create()
-                    ->filterByIdRole(1)
                     ->findOneByIdUser($idUserModified);
-                if (is_object($userAdmin)){
+                if (is_object($userAdmin) && $id == null){
+                    $data['id_user_created'] = $idUserModified;
+                    $data['id_user_modified'] = $idUserModified;
+                } else if(is_object($userAdmin) && $id != null){
                     $data['id_user_modified'] = $idUserModified;
                 }
             }
         }
-        if($this->db->field_exists('id_user_created', $this->_table_name)){
-            if($this->db->table_exists('ci_users') && $this->db->field_exists('id_user','ci_users')){
-                $idUserCreated = $this->session->getIdUserLoggued();
-                $userAdmin = CiUsersQuery::create()
-                    ->filterByIdRole(1)
-                    ->findOneByIdUser($idUserCreated);
-                if (isObject($userAdmin)){
 
-                    $data['id_user_created'] = $idUserCreated;
-                }
-            }
-        }
+//        if($this->db->field_exists('id_user_created', $this->_table_name)){
+//            if($this->db->table_exists('ci_users') && $this->db->field_exists('id_user','ci_users')){
+//                $idUserCreated = $this->session->getIdUserLoggued();
+//                $userAdmin = CiUsersQuery::create()
+//                    ->filterByIdRole(1)
+//                    ->findOneByIdUser($idUserCreated);
+//                if (isObject($userAdmin)){
+//
+//                    $data['id_user_created'] = $idUserCreated;
+//                }
+//            }
+//        }
 
         $funct_v = function ($vals) {
             if(is_array($vals)){
                 $str = json_encode($vals);
                 return $str;
             }
-            $vals = xss_clean($vals);
             return $vals;
         };
         $funct_k = function ($key) {
@@ -254,13 +257,14 @@ Class ES_Model extends ES_Model_Vars {
             }
             $this->db->set($data);
             $this->db->insert($this->_table_name);
-        } else if(isset($data[$this->_primary_key]) ){
+        } else if(keyInArray($this->_primary_key,$data) ){
             $this->db->set($data);
-            $this->db->insert($this->_table_name);
+            $this->db->update($this->_table_name);
         }
         // update
         else {
             $filter = $this->_primary_filter;
+            unset($data[$this->_primary_key]);
             $id = $filter($id);
             $this->db->set($data);
             $this->db->where($this->_primary_key, $id);

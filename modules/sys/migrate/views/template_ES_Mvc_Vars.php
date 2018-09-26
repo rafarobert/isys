@@ -6,7 +6,7 @@
  * Time: #timeCreated
  */
 
-use Propel\Runtime\Exception\PropelException;
+use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
 /**
  * @property CI_DB_query_builder $db                     This is the platform-independent base Active Record implementation class.
@@ -57,7 +57,7 @@ use Propel\Runtime\Exception\PropelException;
  * //<<<setInitStaticVars>>>
  *
  */
-Class ES_UcClassAcron_Vars extends CI_UcClassType
+class ES_UcClassAcron_Vars extends CI_UcClassType
 {
 
     // **************** tables Charged ****************

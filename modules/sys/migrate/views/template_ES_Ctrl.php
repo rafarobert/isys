@@ -6,9 +6,9 @@
  * Time: #timeCreated
  */
 
-use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
+defined("BASEPATH") OR exit("No direct script access allowed");
 
-Class ES_Ctrl_UcTableP extends ES_UcModS_Controller
+class ES_Ctrl_UcTableP extends ES_UcModS_Controller
 {
 
     //>>>initVarsForeignTable<<<

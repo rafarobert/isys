@@ -5,12 +5,17 @@
  * Date: #dateCreated
  * Time: #timeCreated
  */
+use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
 defined("BASEPATH") OR exit("No direct script access allowed");
 
 class ES_Model_UcTableP extends ES_UcModS_Model
 {
-
+    protected $_timestaps = true;
+    protected $_order_by = "idTable desc";
+    public $_primary_key = "idTable";
+    public $_table_name = "lcmodType_lcTableP";
+    public $_es_class = "ES_Model_UcTableP";
     public $lcTableS;
 
     //>>>globalLocalFieldsVars<<<
@@ -19,7 +24,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
      *
      * @var        dataType
      */
-    public $lcVarLocalField = '';
+    public $lcVarLocalField = '$defaultDataVal';
     //<<<globalLocalFieldsVars>>>
 
     //>>>globalLocalWithForeignFieldsVars<<<
@@ -28,7 +33,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
      *
      * @var        dataType
      */
-    public $lcVarLocalField_lcForeignField = '';
+    public $lcVarLocalField_lcForeignField = null;
     //<<<globalLocalWithForeignFieldsVars>>>
 
     public $rules = '$tableRules';
@@ -135,7 +140,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
             $oModelUcObjTableP = new ES_Model_UcTableP();
         }
-        $aFields = $this->getData();
+        $aFields = $this->getArrayData();
 
         foreach ($aFields as $key => $value){
 
@@ -160,7 +165,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         return [$oModelUcObjTableS, $aFromPost];
     }
 
-    public function getData(){
+    public function getArrayData(){
         $data = array(
             //>>>packForGetData<<<
             'lcField' => $this->lcField,

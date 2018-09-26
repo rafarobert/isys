@@ -150,6 +150,7 @@ class Ctrl_Ajax extends ES_Base_Controller
         }
 
         $dir = $this->input->post('dir');
+        $dir = str_replace(WEBSERVER,'',$dir);
         $path = preg_replace(['/^\//','/\/$/'],'',$dir);
         $sys = config_item('sys');
         $mod = null;

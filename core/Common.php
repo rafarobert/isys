@@ -917,6 +917,21 @@ if (!function_exists('compareStrStr')) {
     }
 }
 
+if (!function_exists('compareBoolBool')) {
+    function compareBoolBool($string1, $bool, $anyway = true)
+    {
+        if ($anyway) {
+            if ($string1 == $bool) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return $string1 == $bool ? true : false;
+        }
+    }
+}
+
 if (!function_exists('compareStrNum')) {
     function compareStrNum($string1, $num, $anyway = true)
     {
@@ -943,6 +958,22 @@ if (!function_exists('compareArrayStr')) {
                 return false;
             }
             return compareStrStr($string1, $string2, $anyway);
+        }
+        return false;
+    }
+}
+
+if (!function_exists('compareArrayBool')) {
+    function compareArrayBool($array, $index, $bool2, $anyway = true)
+    {
+        $bool1 = '';
+        if (validateArray($array, $index)) {
+            if (isset($array[$index])) {
+                $bool1 = $array[$index];
+            } else {
+                return false;
+            }
+            return compareBoolBool($bool1, $bool2, $anyway);
         }
         return false;
     }
@@ -1054,6 +1085,18 @@ if (!function_exists('isNumeric')) {
         return validateVar($num, 'numeric', $bEmpty);
     }
 }
+if (!function_exists('valNumeric')) {
+    function valNumeric($num)
+    {
+        if(is_float((float)$num)){
+            return floatval((float)$num);
+        } else if(is_int((int)$num)){
+            return intval((int)$num);
+        } else {
+            return $num;
+        }
+    }
+}
 if (!function_exists('isBoolean')) {
     function isBoolean($bool, $bEmpty = true)
     {
@@ -1101,7 +1144,7 @@ if (!function_exists('validateArray')) {
     function validateArray($array, $index)
     {
         if(validateVar($array,'array') && (is_string($index) || is_numeric($index))){
-            if(isset($array[$index]) && $array[$index] != "" && $array[$index] != []){
+            if(isset($array[$index]) && $array[$index] != "" && $array[$index] != [] && $array[$index] != null){
                 return true;
             } else {
                 return false;

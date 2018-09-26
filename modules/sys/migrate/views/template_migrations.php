@@ -6,8 +6,9 @@
  * Time: $timeCreated
  */
 
-
 defined('BASEPATH') OR exit('No direct script access allowed');
+
+use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
 class Migration_Create_#tableName extends CI_Migration
 {

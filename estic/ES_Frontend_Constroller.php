@@ -6,6 +6,8 @@
  * Time: 2:27 AM
  */
 
+use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
+
 class ES_Frontend_Constroller extends ES_Controller
 {
     function __construct()

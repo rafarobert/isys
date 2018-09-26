@@ -11,12 +11,7 @@ defined("BASEPATH") OR exit("No direct script access allowed");
 class Model_UcTableP extends ES_Model_UcTableP
 {
 
-    protected $_timestaps = true;
     private static $instance = null;
-    protected $_order_by = "idTable desc";
-    public $_primary_key = "idTable";
-    public $_table_name = "lcmodType_lcTableP";
-    public $_es_class = "ES_Model_UcTableP";
 
     function __construct()
     {

@@ -90,6 +90,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @property CI_Jquery $jquery                    Jquery Class
  * @property CI_Utf8 $utf8                        Provides support for UTF-8 environments
  * @property CI_Security $security                Security Class, xss, csrf, etc...
+ * @property ES_Model_Tables $model_tables
+ * @property ES_Model_Tables $oTable
  */
 class CI_Migration
 {
@@ -902,7 +904,7 @@ class CI_Migration
                 $oMigrations = $this->db->get('migrations')->result();
                 $id_migration = $oMigrations[0]->version + 1;
             }
-            $idMigTable = $modModId . $id_migration;
+            $idMigTable = valNumeric($modModId . $id_migration);
 
             if (validate_modulo($modModName, $modSubmod)) {
                 $exists = false;
@@ -918,16 +920,19 @@ class CI_Migration
                     $exists = false;
                 }
 
+                $oTable = $this->model_tables->findOneByIdTable($idMigTable);
+
                 $data = array(
                     'title' => validateArray($tableSettings, 'title') ? $tableSettings['title'] : setLabel($submod,true),
                     'table_name' => $tableName,
                     'icon' => validateArray($tableSettings, 'icon') ? $tableSettings['icon'] : '',
                     'url' => validateArray($tableSettings, 'url') ? $tableSettings['url'] : config_item('sys')[$mod]['dir'] . "$submod",
                     'description' => validateArray($tableSettings, 'descripcion') ? $tableSettings['descripcion'] : '',
-                    'status' => validateArray($tableSettings, 'estado') ? $tableSettings['estado'] : '',
+                    'status' => validateArray($tableSettings, 'estado') ? $tableSettings['estado'] : 'enabled',
                     'listed' => validateArray($tableSettings, 'bIsListed') ? $tableSettings['bIsListed'] : 'enabled',
-                    'id_user_created' => $this->getIdUserDefault(),
-                    'id_user_modified' => $this->getIdUserDefault()
+                    'id_user_created' => isObject($oTable) ? $oTable->getIdUserCreated() : $this->getIdUserDefault(),
+                    'id_user_modified' => isObject($oTable) ? $oTable->getIdUserModified() : $this->getIdUserDefault(),
+                    'change_count' => isObject($oTable) ? $oTable->getChangeCount() : 0
                 );
                 if ($exists) {
                     $this->{$modelTables}->save($data, $idMigTable);
@@ -948,7 +953,7 @@ class CI_Migration
             $oUser = $this->db->get('ci_users')->row();
             $siteDomain = config_item('site_domain');
             if (is_object($oUser)) {
-                return $oUser->id_user;
+                return valNumeric($oUser->id_user);
             } else {
                 $data = array(
                     'id_user' => 1,
@@ -2043,6 +2048,7 @@ class CI_Migration
         $rulesWithPass = array();
 
         $excepts = array_merge(config_item('controlFields'), [$pkTable]);
+
         $phpGlobalVars = '';
         $data["packForGetData"] = '';
         $data["packQueryFunctions"] = '';
@@ -2054,12 +2060,23 @@ class CI_Migration
         foreach ($fields as $name => $settings) {
 
             // ========================================= inicio - getPhpFieldsProperties ======================================
-            $type =
-                compareStrStr($settings['type'], 'datetime') ||
+            if(compareStrStr($settings['type'], 'datetime') ||
                 compareStrStr($settings['type'], 'date') ||
                 compareStrStr($settings['type'], 'text') ||
-                compareStrStr($settings['type'], 'varchar') ? "string" :
-                    (compareStrStr($settings['type'], 'int') ? "int" : "");
+                compareStrStr($settings['type'], 'varchar')){
+                $type = "string";
+                $data['defaultDataVal'] = "''";
+            } else if(compareArrayStr($settings,'type', 'int')){
+                $type = "int";
+                if(keyInArray('idForeign',$settings) || compareArrayBool($settings,'auto_increment',true)){
+                    $data['defaultDataVal'] = 'null';
+                } else {
+                    $data['defaultDataVal'] = 0;
+                }
+            } else {
+                $type = "";
+                $data['defaultDataVal'] = "''";
+            }
 
             // ------------------- Setting Getters and Setters ----------------------
             $data['UcObjField'] = ucfirst(setObject($name));

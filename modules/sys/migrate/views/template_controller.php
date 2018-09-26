@@ -6,10 +6,11 @@
  * Time: #timeCreated
  * @property Model_UcTableP $oUcObjTableS
  */
-
 use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
-Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
+defined("BASEPATH") OR exit("No direct script access allowed");
+
+class Ctrl_UcTableP extends ES_Ctrl_UcTableP
 {
 
     private static $instance = null;
@@ -91,7 +92,7 @@ Class Ctrl_UcTableP extends ES_Ctrl_UcTableP
             }
             //<<<validateFieldPassword>>>
             if ($error == 'ok') {
-                $data = $this->model_lcTableP->saveOrUpdate($oUcObjTableS, $id);
+                $data = $this->model_lcTableP->save($oUcObjTableS->getArrayData(), $id);
                 if ($this->fromAjax) {
                     $aReturn['message'] = setMessage($data, $aFromPost, 'tableTitle agregado exitosamente');
                     $aReturn['error'] = $error;

@@ -63,17 +63,13 @@
                             </thead>
                             <tbody>
                             <?php if (countStd($oUcObjTableP)) { ?>
-                                <?php foreach ($oUcObjTableP as $oUcObjTableS) {
-                                    $editLink = "lcModS/lcTableP/edit/";
-
-                                    $editLink .= $oUcObjTableS->getUcIdObjTable();
-                                    ?>
+                                <?php foreach ($oUcObjTableP as $oUcObjTableS) {?>
                                     <tr>
                                         //tableBodyHtmlFields
                                         <td class="text-right">
                                             <div class="btn-group">
-                                                <?= btn_edit(WEBSERVER . $editLink, "class='btn-white btn btn-xs'") ?>
-                                                <?= btn_delete(WEBSERVER . "lcModS/lcTableP/delete/" . $oUcObjTableS->getUcIdObjTable(), "class='btn-white btn btn-xs'") ?>
+                                                <?= btn_edit("lcModS/lcTableP/edit/".$oUcObjTableS->getUcIdObjTable(), "class='btn-white btn btn-xs'") ?>
+                                                <?= btn_delete("lcModS/lcTableP/delete/" . $oUcObjTableS->getUcIdObjTable(), "class='btn-white btn btn-xs'") ?>
                                             </div>
                                         </td>
                                     </tr>

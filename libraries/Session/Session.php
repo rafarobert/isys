@@ -926,11 +926,15 @@ class CI_Session {
     }
 
     public function getIdUserLoggued(){
+	    $this->sessKey = config_item('sess_key_admin');
         if($this->has_userdata($this->sessKey)) {
             $aDataSession = $this->userdata($this->sessKey);
             return validateArray($aDataSession, 'IdUser') ? $aDataSession['IdUser'] : (validateArray($aDataSession, 'id_user') ? $aDataSession['id_user'] : '');
+        } else if(keyInArray($this->sessKey, $this->userdata)){
+            return $this->userdata[$this->sessKey]['id_user'];
+        } else {
+            return '';
         }
-        return '';
     }
 
     public function isLoguedin(){
