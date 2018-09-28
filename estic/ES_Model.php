@@ -87,15 +87,15 @@ Class ES_Model extends ES_Model_Vars {
             $id = $filter($id);
             $this->db->where($this->_primary_key, $id);
             $method = 'row';
-        } else if ($single == true) {
+        } else if ($single) {
             $method = 'row';
         } else {
             $method = 'result';
         }
         if($this->db->field_exists('estado',$this->_table_name)){
-            $this->db->or_where_in('estado', ['ENABLED','enabled']);
+            $this->db->where_in('estado', ['ENABLED','enabled']);
         } else if($this->db->field_exists('status',$this->_table_name)){
-            $this->db->or_where_in('status', ['ENABLED','enabled']);
+            $this->db->where_in('status', ['ENABLED','enabled']);
         }
         $this->db->order_by($this->_order_by);
         $oResult = $this->db->get($this->_table_name)->$method();
@@ -128,15 +128,19 @@ Class ES_Model extends ES_Model_Vars {
                 } else if(isString($wh)){
                     $select .= isString($select) ? ', '.$wh : $wh;
                 }
-            } else if($bSelecting){
-                $select .= isString($select) ? ', '.$k : $k;
+            } else if(isString($k)){
+                $select .= strhas($select,$k) ? "" : ", $k" ;
                 $aWheres[$k] = $wh;
             } else {
-                $select = '';
+                $select = "";
                 $aWheres[$k] = $wh;
+            }
+            if(!$bSelecting){
+                $select = '' ;
             }
             $i++;
         }
+
         $this->db->select($select);
         foreach($aWheres as $k => $where){
             $this->db->where($k,$where);
@@ -365,9 +369,9 @@ Class ES_Model extends ES_Model_Vars {
         // Settings for images
         $config = array(
             'allowed_types'     => 'gif|jpg|png|jpeg|pdf|docx|xlsx',
-            'max_size'          => 1000,
-            'max_width'         => 2024,
-            'max_height'        => 1008,
+            'max_size'          => config_item('img_max_size'),
+            'max_width'         => config_item('img_max_width'),
+            'max_height'        => config_item('img_max_heigth'),
             'maintain_ratio'    => true,
             'image_library'     => 'gd2',
             'create_thumb'      => TRUE,

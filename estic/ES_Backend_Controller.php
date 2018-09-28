@@ -18,6 +18,11 @@ class ES_Backend_Controller extends ES_Controller
         $this->data['metaThemeColor'] = config_item('meta_theme-color"');
         $this->data['metaDescription'] = config_item('meta_descripcion');
 
+        // ------------- img configurations ----------------
+        $this->data['imgMaxHeight'] = config_item('img_max_height');
+        $this->data['imgMaxWidth'] = config_item('img_max_width');;
+        $this->data['imgMaxSize'] = config_item('img_max_size');;
+        // -------------------------------------------------
 
         $this->initLoaded();
         parent::__construct();

@@ -939,7 +939,7 @@ class CI_Session {
     }
 
     public function getIdUserLoggued(){
-	    $this->CI->init_users(true);
+	    $this->CI->initUsers(true);
 	    $this->sessKey = config_item('sess_key_admin');
         if($this->has_userdata($this->sessKey)) {
             $aDataSession = $this->userdata($this->sessKey);

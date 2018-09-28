@@ -87,9 +87,11 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     //>>>packQueryFunctions<<<
     public function findOneByUcObjField($lcObjField){
 
-        $aData = $this->get_by(['lcField' => $lcObjField]);
+        $aData = $this->get_by(['lcField' => $lcObjField],false,true);
         if(isArray($aData)){
             return $this->setFromData($aData[0]);
+        } else if(isObject($aData)){
+            return $this->setFromData($aData);
         } else {
             return null;
         }
@@ -169,7 +171,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
         } else {
 
-            return new ES_Model_Conceptos();
+            return new ES_Model_UcTableP();
         }
     }
 

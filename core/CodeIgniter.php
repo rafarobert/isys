@@ -218,6 +218,23 @@ switch (ENVIRONMENT)
         exit(1); // EXIT_ERROR
 }
 
+
+/*
+ * ------------------------------------------------------
+ *  Defining Proyect Front Settings
+ * ------------------------------------------------------
+ */
+if(file_exists(DOCUMENTROOT . 'app/config/config_frt.php'))
+{
+    require_once DOCUMENTROOT . 'app/config/config_frt.php';
+
+} else {
+
+    echo 'No se encontro el archivo de configuracion';
+
+    exit(1);
+}
+
 /*
  *---------------------------------------------------------------
  * APPLICATION FOLDER NAME

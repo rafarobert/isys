@@ -1044,6 +1044,7 @@ class CI_Migration
 
         list($vFieldsChecked, $fieldImg, $fieldPass, $data) = $this->checkInputFields($vFields, $data);
         $aFieldsNames = array_keys($vFieldsChecked);
+        list($pkTableS,$pkTableP) = setSingularPlural($pkTable);
         $data["validatedFieldsNames"] = var_export($aFieldsNames, true);
         $data["userCreated"] = config_item('soft_user');
         $data["dateCreated"] = date('d/m/Y');
@@ -1061,6 +1062,8 @@ class CI_Migration
         $data["idTable"] = $pkTable;
         $data["idObjTable"] = setObject($pkTable);
         $data["UcIdObjTable"] = ucfirst(setObject($pkTable));
+        $data["UcIdObjTableS"] = ucfirst(setObject($pkTableS));
+        $data["lcIdObjTable"] = lcfirst(setObject($pkTable));
         $data["pkTable"] = $pkTable;
         $data["lcTableP"] = lcfirst($subModP);
         $data['$lcTableS'] = '$' . lcfirst($subModS);
@@ -1511,7 +1514,7 @@ class CI_Migration
         $modalsContent = '';
         $sys = config_item('sys');
         $bIsTextArea = false;
-
+        $aRdsChks = ['radios','radio','checkbox','checkboxes'];
         foreach ($vFields as $name => $settings) {
 
             $inputData = array(
@@ -1614,6 +1617,7 @@ class CI_Migration
                     }
                     if (validateArray($settings, 'options')) {
                         $inputData['options'] = $settings['options'];
+                        $inputData['class'] = inArray($typeForm,array_flip($aRdsChks),false) ? 'form-control' : 'chosen-select';
                     }
                 }
             } else if (compareArrayStr($settings, 'type', 'int') || compareArrayStr($settings, 'type', 'decimal')) {
@@ -1628,6 +1632,7 @@ class CI_Migration
                     list($typeForm, $inputData, $data) = $this->getInputType($settings, $inputData, $data);
                     if (validateArray($settings, 'options')) {
                         $inputData['options'] = $settings['options'];
+                        $inputData['class'] = !inArray($typeForm,array_flip($aRdsChks),false) ? 'form-control' : 'chosen-select';
                     }
                 } else {
                     $typeForm = 'number';

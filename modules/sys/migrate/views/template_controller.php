@@ -52,7 +52,7 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
 
             $rules = $this->model_lcTableP->rules_edit;
 
-            $oUcObjTableS = $this->model_lcTableP->findOneByIdUcObjTableS($id);
+            $oUcObjTableS = $this->model_lcTableP->findOneByUcIdObjTable($id);
 
             if (!count((array)$oUcObjTableS)) {
 
@@ -85,9 +85,10 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
             if (!$this->model_lcTableP->do_upload("file", $id) && $id == null) {
                 $error = array('error' => $this->upload->display_errors());
                 $this->data['errors'] = $error;
-                show_error($error);
+                $this->fromAjax = true;
             } else {
                 $this->data["file"] = $data = $this->upload->data();
+                $oUcObjTableS = $this->model_lcTableP->setFromData($this->upload->data(),$oUcObjTableS);
                 $this->fromAjax = true;
             }
             //<<<validateFieldImgUpload>>>
@@ -103,7 +104,7 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                     $aReturn['message'] = setMessage($data, $aFromPost, 'tableTitle agregado exitosamente');
                     $aReturn['error'] = $error;
                     $this->data['oUcTableS'] = $data = $this->model_lcTableP->findOneBy($data, true);
-                    $data->primary = $primary = $this->model_lcTableP->getPrimaryKey;
+                    $data->primary = $primary = $this->model_lcTableP->getPrimaryKey();
                     $data->pk = $data->$primary;
                     $aReturn['view'] = $this->load->view("lcModS/lcTableP/edit", $this->data, true);
                     $aReturn['redirect'] = 'lcModS/lcTableP';
