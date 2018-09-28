@@ -83,8 +83,8 @@ class ES_Controller extends ES_Ctrl_Vars
 
     public function filterIdOrView($id, $view){
         if($id == null && (isNumeric($view) || isString($view))){
-            if(keyInArray('editTags',$this->data )){
-                if(!keyInArray("edit-$view",$this->data['editTags'])){
+            if(inArray('editTags',$this->data )){
+                if(!inArray("edit-$view",$this->data['editTags'])){
                     $id = $view ;
                     $view = null;
                 }

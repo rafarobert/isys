@@ -94,8 +94,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @property ES_Model_Tables $oTable
  */
 class CI_Migration
-{
+{/**
+     * @var ES_Controller $CI
+     */
     protected $CI;
+
+    /**
+     * @var ES_Controller $CI
+     */
+    protected $MI;
 
     public $settings;
     public $_ext_php = '.php';
@@ -907,20 +914,19 @@ class CI_Migration
             $idMigTable = valNumeric($modModId . $id_migration);
 
             if (validate_modulo($modModName, $modSubmod)) {
-                $exists = false;
-                $this->load->model("$modModName/model_$modSubmod");
+                $this->CI->initTables(true);
+//                $oTables = $this->CI->model_tables->find(true);
+
                 $modelTables = "model_$modSubmod";
+//                foreach ($oTables as $table) {
+//                    if ($table->$modIdTable == $idMigTable) {
+//                        $exists = true;
+//                        break;
+//                    }
+//                    $exists = false;
+//                }
 
-                $oTables = $this->db->get($modTable)->result_object();
-                foreach ($oTables as $table) {
-                    if ($table->$modIdTable == $idMigTable) {
-                        $exists = true;
-                        break;
-                    }
-                    $exists = false;
-                }
-
-                $oTable = $this->model_tables->findOneByIdTable($idMigTable);
+                $oTable = $this->CI->model_tables->findOneByIdTable($idMigTable);
 
                 $data = array(
                     'title' => validateArray($tableSettings, 'title') ? $tableSettings['title'] : setLabel($submod,true),
@@ -930,17 +936,15 @@ class CI_Migration
                     'description' => validateArray($tableSettings, 'descripcion') ? $tableSettings['descripcion'] : '',
                     'status' => validateArray($tableSettings, 'estado') ? $tableSettings['estado'] : 'enabled',
                     'listed' => validateArray($tableSettings, 'bIsListed') ? $tableSettings['bIsListed'] : 'enabled',
-                    'id_user_created' => isObject($oTable) ? $oTable->getIdUserCreated() : $this->getIdUserDefault(),
-                    'id_user_modified' => isObject($oTable) ? $oTable->getIdUserModified() : $this->getIdUserDefault(),
                     'change_count' => isObject($oTable) ? $oTable->getChangeCount() : 0
                 );
-                if ($exists) {
-                    $this->{$modelTables}->save($data, $idMigTable);
+                if (isObject($oTable)) {
+                    $this->CI->model_tables->save($data, $idMigTable);
                 } else {
-                    $this->{$modelTables}->save($data, null, $idMigTable);
+                    $this->CI->model_tables->save($data, null, $idMigTable);
                 }
             } else if ($tableName != $modTable) {
-                redirect("base/migrate/ci/$modMigIndex");
+                redirect("sys/migrate/ci/$modMigIndex");
             }
             return $idMigTable;
         }
@@ -1388,8 +1392,9 @@ class CI_Migration
         $sys = config_item('sys');
 
         list($mod, $submod, $subModS, $subModP, $data, $vFields) = $default;
-        $data['setForeignTableFields'] = keyInArray('setForeignTableFields',$ctrlData) ? $ctrlData['setForeignTableFields'] : null;
-        $data['validateFieldsImgsIndex'] = keyInArray('validateFieldsImgsIndex', $ctrlData) ? $ctrlData['validateFieldsImgsIndex'] : null;
+        $data['setForeignTableFields'] = inArray('setForeignTableFields',$ctrlData) ? $ctrlData['setForeignTableFields'] : null;
+        $data['validateFieldsImgsIndex'] = inArray('validateFieldsImgsIndex', $ctrlData) ? $ctrlData['validateFieldsImgsIndex'] : null;
+        $data['loadModelsForeignTable'] = inArray('loadModelsForeignTable', $ctrlData) ? $ctrlData['loadModelsForeignTable'] : null;
 //        $data = $this->getPhpFieldsProperties($fields, $data);
         $data = $this->getPhpFieldsRules($fields, $pkTable, $data);
 //        $data = $this->getPhpFieldsRules($vFields, $pkTable, $data,true);
@@ -1414,6 +1419,7 @@ class CI_Migration
                 }
             }
         }
+        return $data;
     }
 
     public function createViewIndex($tableName, $pkTable, $fields, $tableSettings = [], $default = [])
@@ -2050,7 +2056,8 @@ class CI_Migration
         $excepts = array_merge(config_item('controlFields'), [$pkTable]);
 
         $phpGlobalVars = '';
-        $data["packForGetData"] = '';
+        $data["localPackForGetData"] = '';
+        $data["foreignPackForGetData"] = '';
         $data["packQueryFunctions"] = '';
         $data["packGettersFunctions"] = '';
         $data["packSettersFunctions"] = '';
@@ -2068,7 +2075,7 @@ class CI_Migration
                 $data['defaultDataVal'] = "''";
             } else if(compareArrayStr($settings,'type', 'int')){
                 $type = "int";
-                if(keyInArray('idForeign',$settings) || compareArrayBool($settings,'auto_increment',true)){
+                if(inArray('idForeign',$settings) || compareArrayBool($settings,'auto_increment',true)){
                     $data['defaultDataVal'] = 'null';
                 } else {
                     $data['defaultDataVal'] = 0;
@@ -2085,7 +2092,7 @@ class CI_Migration
             $data['$lcField'] = '$'.lcfirst($name);
             $data['lcObjField'] = '$'.lcfirst(setObject($name));
             $data["packGettersFunctions"] .= $this->load->view(["template_ES_Model" => "packGettersFunctions"], $data, true, true, true);
-            $data["packForGetData"] .= $this->load->view(["template_ES_Model" => "packForGetData"], $data, true, true, true);
+            $data["localPackForGetData"] .= $this->load->view(["template_ES_Model" => "localPackForGetData"], $data, true, true, true);
             $data["packSettersFunctions"] .= $this->load->view(["template_ES_Model" => "packSettersFunctions"], $data, true, true, true);
             $data["packQueryFunctions"] .= $this->load->view(["template_ES_Model" => "packQueryFunctions"], $data, true, true, true);
             // ----------------------------------------------------------------------
@@ -2111,6 +2118,7 @@ class CI_Migration
                         $data['lcField'] = lcfirst($nameSelect);
                         $data['lcObjField'] = lcfirst(setObject($nameSelect));
                         $data["packLocalForeignGettersFunctions"] .= $this->load->view(["template_ES_Model" => "packLocalForeignGettersFunctions"], $data, true, true, true);
+                        $data["foreignPackForGetData"] .= $this->load->view(["template_ES_Model" => "foreignPackForGetData"], $data, true, true, true);
                     }
                 } else if(validateVar($settings['selectBy'])){
                     $data['lcForeignField'] = lcfirst($settings['selectBy']);
@@ -2120,6 +2128,7 @@ class CI_Migration
                     $data['UcObjField'] = ucfirst(setObject($name.'_'.ucfirst($settings['selectBy'])));
                     $data['lcField'] = lcfirst($settings['selectBy']);
                     $data['lcObjField'] = lcfirst(setObject($settings['selectBy']));
+                    $data["foreignPackForGetData"] .= $this->load->view(["template_ES_Model" => "foreignPackForGetData"], $data, true, true, true);
 //                    $data["packGettersFunctions"] .= $this->load->view(["template_ES_Model" => "packGettersFunctions"], $data, true, true, true);
                 }
             } else {

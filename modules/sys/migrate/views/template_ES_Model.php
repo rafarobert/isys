@@ -87,9 +87,13 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     //>>>packQueryFunctions<<<
     public function findOneByUcObjField($lcObjField){
 
-        $oData = $this->model_lcTableP->get_by(['lcField' => $lcObjField])[0];
+        $aData = $this->get_by(['lcField' => $lcObjField]);
+        if(isArray($aData)){
+            return $this->setFromData($aData[0]);
+        } else {
+            return null;
+        }
 
-        return $this->setFromObject($oData);
     }
     //<<<packQueryFunctions>>>
 
@@ -97,80 +101,98 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     {
         $post = $this->input->post();
 
-        $this->lcTableS = $this->setFromObject($post);
+        $this->lcTableS = $this->setFromData($post);
 
         return $this->lcTableS;
     }
 
-    public function find(){
+    public function find($bCreateCtrl = false){
+        if($bCreateCtrl){
+            Ctrl_Tables::create($bCreateCtrl);
+        }
         // Obtiene a todos los lcTableP
-        $oUcObjTableP = $this->model_lcTableP->get();
-        //>>>setForeignTableFields<<<
-        $oUcObjTableP = $this->model_fkLcTableP->setForeignFields($this->lcFkObjFieldP, 'idFkLcTableP', $oUcObjTableP, 'idLocalLcTableP', true);
+        $oUcObjTableP = $this->get();
+       //>>>setForeignTableFields<<<
+        $oUcObjTableP = $this->setForeignFields($this->lcFkObjFieldP, 'idFkLcTableP', $oUcObjTableP, 'idLocalLcTableP', true);
         //<<<setForeignTableFields>>>
         //>>>validateFieldsImgsIndex<<<
-        $oUcObjTableP = $this->model_lcTableP->getThumbs($oUcObjTableP);
+        $oUcObjTableP = $this->getThumbs($oUcObjTableP);
         //<<<validateFieldsImgsIndex>>>
 
         $oModelUcObjTableP = array();
 
         foreach ($oUcObjTableP as $lcTableS){
 
-            $oModelUcObjTableP[] = $this->setFromObject($lcTableS);
+            $oModelUcObjTableP[] = $this->setFromData($lcTableS);
         }
         return $oModelUcObjTableP;
     }
 
     public function findOneBy($arrayData){
 
-        $oUcTableS = $this->model_lcTableP->get_one_by($arrayData, true);
+        $oUcTableS = $this->get_one_by($arrayData, true);
 
-        return $this->setFromObject($oUcTableS);
+        return $this->setFromData($oUcTableS);
     }
 
-    public function setFromObject($oResult, $oUcTableS = null){
+    public function setFromData($oData, $oUcTableS = null){
 
-        $oResult = verifyArraysInResult(std2array($oResult));
+        if(isArray($oData)){
+            $oData = array2std($oData);
+        }
+        if(isObject($oData)){
 
-        if(isObject($oUcTableS)){
+            $oData = verifyArraysInResult($oData);
 
-            $oModelUcObjTableP = $oUcTableS;
+            if(isObject($oUcTableS)){
+
+                $oModelUcObjTableP = $oUcTableS;
+
+            } else {
+
+                $oModelUcObjTableP = new ES_Model_UcTableP();
+            }
+            $aFields = $this->getArrayData(true);
+
+            foreach ($aFields as $key => $value){
+
+                if(objectHas($oData,$key,false)){
+
+                    $oModelUcObjTableP->$key = isNumeric($oData->$key) ? valNumeric($oData->$key) : $oData->$key;
+
+                } else if(objectHas($oData,setObject($key),false)){
+
+                    $oModelUcObjTableP->$key = isNumeric($oData->{setObject($key)}) ? valNumeric($oData->{setObject($key)}) : $oData->{setObject($key)};
+                }
+            }
+            return $oModelUcObjTableP;
 
         } else {
 
-            $oModelUcObjTableP = new ES_Model_UcTableP();
+            return new ES_Model_Conceptos();
         }
-        $aFields = $this->getArrayData();
-
-        foreach ($aFields as $key => $value){
-
-            if(objectHas($oResult,$key,false)){
-
-                $oModelUcObjTableP->$key = $oResult->$key;
-
-            } else if(objectHas($oResult,setObject($key),false)){
-
-                $oModelUcObjTableP->$key = $oResult->{setObject($key)};
-            }
-        }
-        return $oModelUcObjTableP;
     }
 
-    public function getDataFromPost()
+    public function getDataFromPost($object = null)
     {
-        $data = $this->model_lcTableP->array_from_post(
+        $data = $this->array_from_post(
             $aFromPost = '$validatedFieldsNames'
         );
-        $oModelUcObjTableS = $this->setFromObject($data);
+        $oModelUcObjTableS = $this->setFromData($data,$object);
         return [$oModelUcObjTableS, $aFromPost];
     }
 
-    public function getArrayData(){
+    public function getArrayData($bWithForeign = false){
         $data = array(
-            //>>>packForGetData<<<
+            //>>>localPackForGetData<<<
             'lcField' => $this->lcField,
-            //<<<packForGetData>>>
+            //<<<localPackForGetData>>>
         );
+        if($bWithForeign){
+            //>>>foreignPackForGetData<<<
+            $data['lcLocalField_lcForeignField'] = $this->lcLocalField_lcForeignField;
+            //<<<foreignPackForGetData>>>
+        }
         return $data;
     }
 }

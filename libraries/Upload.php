@@ -49,9 +49,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class CI_Upload {
     /**
-     * @var ES_Model $CI
+     * @var ES_Model $MI
      */
-    private $CI;
+    private $MI;
 
 	/**
 	 * Maximum file size
@@ -307,7 +307,7 @@ class CI_Upload {
 
 		$this->_mimes =& get_mimes();
 		$this->_CI =& get_instance();
-		$this->CI =& get_instance();
+		$this->MI =& get_instance();
 
 		log_message('info', 'Upload Class Initialized');
 	}
@@ -616,8 +616,8 @@ class CI_Upload {
 				'full_path'		=> $this->upload_path.$this->file_name,
 				'raw_name'		=> str_replace($this->file_ext, '', $this->file_name),
 //				'orig_name'		=> $this->orig_name,
-				'id_user_created'		=> $this->CI->session->getIdUserLoggued(),
-				'id_user_modified'		=> $this->CI->session->getIdUserLoggued(),
+				'id_user_created'		=> $this->MI->session->getIdUserLoggued(),
+				'id_user_modified'		=> $this->MI->session->getIdUserLoggued(),
 				'ext'		=> $this->file_ext,
 				'size'		=> $this->file_size,
 //				'is_image'		=> $this->is_image(),

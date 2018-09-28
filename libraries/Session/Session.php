@@ -57,6 +57,7 @@ class CI_Session {
 	 * Userdata array
 	 *
 	 * Just a reference to $_SESSION, for BC purposes.
+     * @property ES_Model $MI
 	 */
 	public $userdata;
 	public $userTable;
@@ -67,130 +68,142 @@ class CI_Session {
 
 	protected $_driver = 'files';
 	protected $_config;
+
+    /**
+     * @var ES_Controller $CI
+     */
     protected $CI;
+
+    /**
+     * @var ES_Model $MI
+     */
     protected $MI;
+
+    /**
+     * @var CI_DB_driver $db
+     */
     protected $db;
 	// ------------------------------------------------------------------------
 
-	/**
-	 * Class constructor
-	 *
-	 * @param	array	$params	Configuration parameters
-	 * @return	void
-	 */
-	public function __construct(array $params = array())
-	{
+    /**
+     * Class constructor
+     *
+     * @param	array	$params	Configuration parameters
+     * @return	void
+     */
+    public function __construct(array $params = array())
+    {
         // Load migration language
         $this->CI = class_exists('CI_Controller') ? CI_Controller::get_instance() : null;
         $this->MI = class_exists('CI_Model') ? CI_Model::get_instance() : null;
         // They'll probably be using dbforge
-		// No sessions under CLI
-		if (is_cli())
-		{
-			log_message('debug', 'Session: Initialization under CLI aborted.');
-			return;
-		}
-		elseif ((bool) ini_get('session.auto_start'))
-		{
-			log_message('error', 'Session: session.auto_start is enabled in php.ini. Aborting.');
-			return;
-		}
-		elseif ( ! empty($params['driver']))
-		{
-			$this->_driver = $params['driver'];
-			unset($params['driver']);
-		}
-		elseif ($driver = config_item('sess_driver'))
-		{
-			$this->_driver = $driver;
-		}
-		// Note: BC workaround
-		elseif (config_item('sess_use_database'))
-		{
-			$this->_driver = 'database';
-		}
-		$class = $this->_ci_load_classes($this->_driver);
+        // No sessions under CLI
+        if (is_cli())
+        {
+            log_message('debug', 'Session: Initialization under CLI aborted.');
+            return;
+        }
+        elseif ((bool) ini_get('session.auto_start'))
+        {
+            log_message('error', 'Session: session.auto_start is enabled in php.ini. Aborting.');
+            return;
+        }
+        elseif ( ! empty($params['driver']))
+        {
+            $this->_driver = $params['driver'];
+            unset($params['driver']);
+        }
+        elseif ($driver = config_item('sess_driver'))
+        {
+            $this->_driver = $driver;
+        }
+        // Note: BC workaround
+        elseif (config_item('sess_use_database'))
+        {
+            $this->_driver = 'database';
+        }
+        $class = $this->_ci_load_classes($this->_driver);
 
-		// Configuration ...
-		$this->_configure($params);
-		$class = new $class($this->_config);
+        // Configuration ...
+        $this->_configure($params);
+        $class = new $class($this->_config);
 
         if ($class instanceof SessionHandlerInterface)
-		{
-			if (is_php('5.4'))
-			{
-				session_set_save_handler($class, TRUE);
-			}
-			else
-			{
-				session_set_save_handler(
-					array($class, 'open'),
-					array($class, 'close'),
-					array($class, 'read'),
-					array($class, 'write'),
-					array($class, 'destroy'),
-					array($class, 'gc')
-				);
+        {
+            if (is_php('5.4'))
+            {
+                session_set_save_handler($class, TRUE);
+            }
+            else
+            {
+                session_set_save_handler(
+                    array($class, 'open'),
+                    array($class, 'close'),
+                    array($class, 'read'),
+                    array($class, 'write'),
+                    array($class, 'destroy'),
+                    array($class, 'gc')
+                );
 
-				register_shutdown_function('session_write_close');
-			}
-		}
-		else
-		{
-			log_message('error', "Session: Driver '".$this->_driver."' doesn't implement SessionHandlerInterface. Aborting.");
-			return;
-		}
+                register_shutdown_function('session_write_close');
+            }
+        }
+        else
+        {
+            log_message('error', "Session: Driver '".$this->_driver."' doesn't implement SessionHandlerInterface. Aborting.");
+            return;
+        }
 
-		// Sanitize the cookie, because apparently PHP doesn't do that for userspace handlers
-		if (isset($_COOKIE[$this->_config['cookie_name']])
-			&& (
-				! is_string($_COOKIE[$this->_config['cookie_name']])
-				OR ! preg_match('/^[0-9a-f]{40}$/', $_COOKIE[$this->_config['cookie_name']])
-			)
-		)
-		{
-			//unset($_COOKIE[$this->_config['cookie_name']]);
-		}
+        // Sanitize the cookie, because apparently PHP doesn't do that for userspace handlers
+        if (isset($_COOKIE[$this->_config['cookie_name']])
+            && (
+                ! is_string($_COOKIE[$this->_config['cookie_name']])
+                OR ! preg_match('/^[0-9a-f]{40}$/', $_COOKIE[$this->_config['cookie_name']])
+            )
+        )
+        {
+            //unset($_COOKIE[$this->_config['cookie_name']]);
+        }
 //        probar_sesion();
 
-         session_start();
+        session_start();
 
-		// Is session ID auto-regeneration configured? (ignoring ajax requests)
-		if ((empty($_SERVER['HTTP_X_REQUESTED_WITH']) OR strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest')
-			&& ($regenerate_time = config_item('sess_time_to_update')) > 0
-		)
-		{
-			if ( ! isset($_SESSION['__ci_last_regenerate']))
-			{
-				$_SESSION['__ci_last_regenerate'] = time();
-			}
-			elseif ($_SESSION['__ci_last_regenerate'] < (time() - $regenerate_time))
-			{
-				$this->sess_regenerate((bool) config_item('sess_regenerate_destroy'));
-			}
-		}
-		// Another work-around ... PHP doesn't seem to send the session cookie
-		// unless it is being currently created or regenerated
-		elseif (isset($_COOKIE[$this->_config['cookie_name']]) && $_COOKIE[$this->_config['cookie_name']] === session_id())
-		{
-			setcookie(
-				$this->_config['cookie_name'],
-				session_id(),
-				(empty($this->_config['cookie_lifetime']) ? 0 : time() + $this->_config['cookie_lifetime']),
-				$this->_config['cookie_path'],
-				$this->_config['cookie_domain'],
-				$this->_config['cookie_secure'],
-				TRUE
-			);
-		}
+        // Is session ID auto-regeneration configured? (ignoring ajax requests)
+        if ((empty($_SERVER['HTTP_X_REQUESTED_WITH']) OR strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest')
+            && ($regenerate_time = config_item('sess_time_to_update')) > 0
+        )
+        {
+            if ( ! isset($_SESSION['__ci_last_regenerate']))
+            {
+                $_SESSION['__ci_last_regenerate'] = time();
+            }
+            elseif ($_SESSION['__ci_last_regenerate'] < (time() - $regenerate_time))
+            {
+                $this->sess_regenerate((bool) config_item('sess_regenerate_destroy'));
+            }
+        }
+        // Another work-around ... PHP doesn't seem to send the session cookie
+        // unless it is being currently created or regenerated
+        elseif (isset($_COOKIE[$this->_config['cookie_name']]) && $_COOKIE[$this->_config['cookie_name']] === session_id())
+        {
+            setcookie(
+                $this->_config['cookie_name'],
+                session_id(),
+                (empty($this->_config['cookie_lifetime']) ? 0 : time() + $this->_config['cookie_lifetime']),
+                $this->_config['cookie_path'],
+                $this->_config['cookie_domain'],
+                $this->_config['cookie_secure'],
+                TRUE
+            );
+        }
 
-		$this->_ci_init_vars();
-		log_message('info', "Session: Class initialized using '".$this->_driver."' driver.");
-	}
+        $this->_ci_init_vars();
+        log_message('info', "Session: Class initialized using '".$this->_driver."' driver.");
+    }
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
-	/**
+    /**
 	 * CI Load Classes
 	 *
 	 * An internal method to load all possible dependency and extension
@@ -926,12 +939,29 @@ class CI_Session {
     }
 
     public function getIdUserLoggued(){
+	    $this->CI->init_users(true);
 	    $this->sessKey = config_item('sess_key_admin');
         if($this->has_userdata($this->sessKey)) {
             $aDataSession = $this->userdata($this->sessKey);
             return validateArray($aDataSession, 'IdUser') ? $aDataSession['IdUser'] : (validateArray($aDataSession, 'id_user') ? $aDataSession['id_user'] : '');
-        } else if(keyInArray($this->sessKey, $this->userdata)){
+        } else if(inArray($this->sessKey, $this->userdata)){
             return $this->userdata[$this->sessKey]['id_user'];
+        } else {
+            return '';
+        }
+    }
+
+    public function getUserLoggued(){
+        $this->sessKey = config_item('sess_key_admin');
+        if($this->CI->initUsers(true)){
+            if($this->has_userdata($this->sessKey)) {
+                $aDataSession = $this->userdata($this->sessKey);
+                return $this->CI->model_users->setFromData($aDataSession);
+            } else {
+                return null;
+            }
+        } else if(inArray($this->sessKey, $this->userdata)){
+            return array2std($this->userdata[$this->sessKey]);
         } else {
             return '';
         }
@@ -1048,3 +1078,4 @@ class CI_Session {
         return hash('sha512', $string . config_item('encryption_key'));
     }
 }
+

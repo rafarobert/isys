@@ -92,6 +92,11 @@ Class ES_Model extends ES_Model_Vars {
         } else {
             $method = 'result';
         }
+        if($this->db->field_exists('estado',$this->_table_name)){
+            $this->db->or_where_in('estado', ['ENABLED','enabled']);
+        } else if($this->db->field_exists('status',$this->_table_name)){
+            $this->db->or_where_in('status', ['ENABLED','enabled']);
+        }
         $this->db->order_by($this->_order_by);
         $oResult = $this->db->get($this->_table_name)->$method();
         return $oResult;
@@ -188,6 +193,13 @@ Class ES_Model extends ES_Model_Vars {
         $this->load->library('session');
         // set timesatamps
         $now = date('Y-m-d H:i:s');
+
+        if($this->db->field_exists('estado', $this->_table_name) && $id == null){
+            $data['estado'] = 'ENABLED';
+        } else if($this->db->field_exists('status', $this->_table_name) && $id == null){
+            $data['status'] = 'ENABLED';
+        }
+
         if($this->_timestaps == true){
             if($id == null){
                 if($this->db->field_exists('date_created',$this->_table_name) && $this->db->field_exists('date_modified',$this->_table_name) && $this->db->field_exists('change_count',$this->_table_name)){
@@ -198,20 +210,19 @@ Class ES_Model extends ES_Model_Vars {
             } else {
                 if($this->db->field_exists('date_modified', $this->_table_name) && $this->db->field_exists('change_count', $this->_table_name)){
                     $data['date_modified'] = $now;
-                    $data['change_count'] += 1;
+                    $data['change_count'] = inArray('change_count', $data, false) ? (int)$data['change_count']+1 : 0;
                 }
             }
         }
+
         if($this->db->field_exists('id_user_modified', $this->_table_name)){
             if($this->db->table_exists('ci_users') && $this->db->field_exists('id_user','ci_users')){
-                $idUserModified = $this->session->getIdUserLoggued();
-                $userAdmin = CiUsersQuery::create()
-                    ->findOneByIdUser($idUserModified);
-                if (is_object($userAdmin) && $id == null){
-                    $data['id_user_created'] = $idUserModified;
-                    $data['id_user_modified'] = $idUserModified;
-                } else if(is_object($userAdmin) && $id != null){
-                    $data['id_user_modified'] = $idUserModified;
+                $oUserLoggued = $this->session->getUserLoggued();
+                if (is_object($oUserLoggued) && $id == null){
+                    $data['id_user_created'] = $oUserLoggued->id_user;
+                    $data['id_user_modified'] = $oUserLoggued->id_user;
+                } else if(is_object($oUserLoggued) && $id != null){
+                    $data['id_user_modified'] = $oUserLoggued->id_user;
                 }
             }
         }
@@ -246,23 +257,23 @@ Class ES_Model extends ES_Model_Vars {
         $vals = array_map($funct_v, array_values($data));
         $data = array_combine($keys,$vals);
 
+        if(inArray($this->_primary_key,$data) ){
+            unset($data[$this->_primary_key]);
+        }
+
         // insert
-        if (($id == null || $id == 0) && !isset($data[$this->_primary_key])){
+        if (($id == null || $id == 0) && !isset($data[$this->_primary_key])) {
             $data[$this->_primary_key] = null;
-            if(is_numeric($with_id) || is_string($with_id)){
+            if (is_numeric($with_id) || is_string($with_id)) {
                 $id = $with_id;
                 $data[$this->_primary_key] = $with_id;
-            } else if(is_bool($with_id)){
+            } else if (is_bool($with_id)) {
                 $this->db->insert_id();
             }
             $this->db->set($data);
             $this->db->insert($this->_table_name);
-        } else if(keyInArray($this->_primary_key,$data) ){
-            $this->db->set($data);
-            $this->db->update($this->_table_name);
-        }
-        // update
-        else {
+            // update
+        } else {
             $filter = $this->_primary_filter;
             unset($data[$this->_primary_key]);
             $id = $filter($id);
@@ -459,9 +470,17 @@ Class ES_Model extends ES_Model_Vars {
         if(!$id){
             return false;
         }
+//        $this->db->where($this->_primary_key, $id);
+//        $this->db->limit(1);
+//        $response = $this->db->delete($this->_table_name);
+        if($this->db->field_exists('estado',$this->_table_name)){
+            $this->db->set('estado','DELETED');
+        } else if($this->db->field_exists('status',$this->_table_name)){
+            $this->db->set('status','DELETED');
+        }
         $this->db->where($this->_primary_key, $id);
-        $this->db->limit(1);
-        $response = $this->db->delete($this->_table_name);
+        $response = $this->db->update($this->_table_name);
+
         if(validateVar($response, 'array')){
             $response['localTable'] = $this->_table_name;
         }

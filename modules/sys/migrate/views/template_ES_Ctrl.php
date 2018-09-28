@@ -13,12 +13,14 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
 
     //>>>initVarsForeignTable<<<
     public $lcFkObjFieldP;
-
     //<<<initVarsForeignTable>>>
 
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function init(){
         $this->load->model("lcModS/model_lcTableP");
         //>>>loadModelsForeignTable<<<
         $this->load->model("lcFkModS/model_lcFkTableP");
@@ -53,7 +55,7 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
 
                         $oModelUcObjTableP[$key] = new ES_Model_UcTableP();
                     }
-                    $oModelUcObjTableP[$key] = $oModelUcObjTableP[$key]->setFromObject($data);
+                    $oModelUcObjTableP[$key] = $oModelUcObjTableP[$key]->setFromData($data);
                 }
             } else {
 
@@ -65,7 +67,7 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
 
                     $oModelUcObjTableP[0] = new ES_Model_UcTableP();
                 }
-                $oModelUcObjTableP[0] = $oModelUcObjTableP[0]->setFromObject($oData);
+                $oModelUcObjTableP[0] = $oModelUcObjTableP[0]->setFromData($oData);
             }
 
             return $oModelUcObjTableP;

@@ -172,7 +172,7 @@ class Ctrl_Ajax extends ES_Base_Controller
         $pk = isString($pk) || isNumeric($pk) ? $pk : '';
         $acr = $sys[$mod];
 
-        $this->{"init_$class"}(true);
+        $this->{"init".ucfirst($class)}(true);
         $response = $this->{"model_$class"}->{$method}($pk);
         if(validateArray($response,'message') && validateArray($response,'code')){
             preg_match_all("/`(.*?)`/",$response['message'],$aMessage);

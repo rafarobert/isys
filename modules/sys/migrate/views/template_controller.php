@@ -20,10 +20,12 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
         parent::__construct();
     }
 
-    public static function create()
+    public static function create($bWithInit = false)
     {
         if (!self::$instance) {
             self::$instance = new self();
+        }
+        if($bWithInit){
             self::$instance->init();
         }
         return self::$instance;
@@ -31,6 +33,8 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
 
     public function index($view = NULL, $id = NULL)
     {
+        $this->init();
+
         list($id, $view) = $this->filterIdOrView($id, $view);
 
         $oUcObjTableP = $this->model_lcTableP->find();
@@ -42,6 +46,8 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
 
     public function edit($id = NULL)
     {
+        $this->init();
+
         if (isNumeric($id) || isString($id)) {
 
             $rules = $this->model_lcTableP->rules_edit;
@@ -74,7 +80,7 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
 
             $error = 'ok';
 
-            list($oUcObjTableS, $aFromPost) = $this->model_lcTableP->getDataFromPost();
+            list($oUcObjTableS, $aFromPost) = $this->model_lcTableP->getDataFromPost($oUcObjTableS);
             //>>>validateFieldImgUpload<<<
             if (!$this->model_lcTableP->do_upload("file", $id) && $id == null) {
                 $error = array('error' => $this->upload->display_errors());

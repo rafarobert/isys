@@ -1141,24 +1141,30 @@ if (!function_exists('isCollection')) {
 }
 
 if (!function_exists('validateArray')) {
-    function validateArray($array, $index)
+    function validateArray($array, $index, $bIsEmpty = true)
     {
+        $excepts = ['',[],null];
         if(validateVar($array,'array') && (is_string($index) || is_numeric($index))){
-            if(isset($array[$index]) && $array[$index] != "" && $array[$index] != [] && $array[$index] != null){
-                return true;
+            if($bIsEmpty){
+                if(isset($array[$index]) && !in_array($array[$index],$excepts)){
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
-                return false;
+                return true;
             }
+
         } else {
             return false;
         }
     }
 }
 
-if (!function_exists('keyInArray')) {
-    function keyInArray($key,$array)
+if (!function_exists('inArray')) {
+    function inArray($key,$array,$bEmpty = true)
     {
-        return validateArray($array,$key);
+        return validateArray($array,$key, $bEmpty);
     }
 }
 
@@ -1597,6 +1603,7 @@ if (!function_exists('str2array')) {
 if (!function_exists('verifyArraysInResult')) {
 
     function verifyArraysInResult($result){
+        $result = std2array($result);
         if(validateVar($result, 'array')){
             if(validateVar($result,'array')){
                 $result = array_map('str2array',$result);

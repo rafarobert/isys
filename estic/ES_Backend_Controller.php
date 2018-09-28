@@ -9,10 +9,6 @@ use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
 class ES_Backend_Controller extends ES_Controller
 {
-    public function init(){
-
-    }
-
     function __construct()
     {
         $this->data['siteTitle'] = config_item('site_title');

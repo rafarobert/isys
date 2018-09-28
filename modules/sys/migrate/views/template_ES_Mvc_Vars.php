@@ -54,12 +54,13 @@ use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
  *
  * //>>>setInitStaticVars<<<
  * @property Model_UcTableP $model_lcTableP
+ * @property Ctrl_UcTableP $ctrl_lcTableP
  * //<<<setInitStaticVars>>>
  *
  */
 class ES_UcClassAcron_Vars extends CI_UcClassType
 {
-
+    use ES_Table_Trait;
     // **************** tables Charged ****************
     //>>>setInitGlobalVars<<<
     public $table_lcAcMod_lcTableP;
