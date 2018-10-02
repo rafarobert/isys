@@ -81,7 +81,7 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
             $error = 'ok';
 
             list($oUcObjTableS, $aFromPost) = $this->model_lcTableP->getDataFromPost($oUcObjTableS);
-            //>>>validateFieldImgUpload<<<
+            //>>>validateFieldImgUpload1<<<
             if (!$this->model_lcTableP->do_upload("file", $id) && $id == null) {
                 $error = array('error' => $this->upload->display_errors());
                 $this->data['errors'] = $error;
@@ -91,7 +91,7 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                 $oUcObjTableS = $this->model_lcTableP->setFromData($this->upload->data(),$oUcObjTableS);
                 $this->fromAjax = true;
             }
-            //<<<validateFieldImgUpload>>>
+            //<<<validateFieldImgUpload1>>>
             //>>>validateFieldPassword<<<
             if ($id == NULL) {
                 $data["lcField"] = $this->input->post('lcField');
@@ -100,6 +100,14 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
             //<<<validateFieldPassword>>>
             if ($error == 'ok') {
                 $data = $this->model_lcTableP->save($oUcObjTableS->getArrayData(), $id);
+                //>>>validateFieldImgUpload2<<<
+                if(isset($this->upload->data_thumbs)){
+                    foreach ($this->upload->data_thumbs as $index => $thumb){
+                        $thumb['id_parent'] = $data['id_file'];
+                        $data[$index] = $this->model_files->save($thumb);
+                    }
+                }
+                //<<<validateFieldImgUpload2>>>
                 if ($this->fromAjax) {
                     $aReturn['message'] = setMessage($data, $aFromPost, 'tableTitle agregado exitosamente');
                     $aReturn['error'] = $error;

@@ -270,6 +270,13 @@ class CI_Upload {
 	 */
 	public $client_name = '';
 
+	/**
+	 * Thumbs data for saving in database
+	 *
+	 * @var	bool
+	 */
+	public $data_thumbs = '';
+
 	// --------------------------------------------------------------------
 
 	/**

@@ -1217,10 +1217,12 @@ class CI_Migration
         $data['initVarsForeignTable'] = '';
         $data['loadModelsForeignTable'] = '';
         $data['setObjectForeignTable'] = '';
-        $data['initFieldsForeignTable'] = '';
+        $data['initFieldsSelectBy'] = '';
+        $data['initFieldsFilterBy'] = '';
         $data['setFieldsForeignTable'] = '';
         $data['setForeignTableFields'] = '';
         $data['compareFieldsForeignTable'] = '';
+        $data['setObjFieldsFilterBy'] = '';
         $relationsUnique = $this->getTableRelations($fields, true);
         $relationsWithOutExcepts = $this->getTableRelations($fields, false, true, true);
 
@@ -1244,11 +1246,10 @@ class CI_Migration
             } else if ($ind == 1) {
                 $selector = 'setFieldsForeignTable';
             } else if ($ind == 0) {
-                $selector = 'initFieldsForeignTable';
+                $selector = 'initFieldsSelectBy';
             }
 
             foreach ($relationsWithOutExcepts as $fkName => $settings) {
-
                 // --------------------------------------- Template Controller ------------------------------------------------
                 if (isset($settings['divider'])) {
                     $data['divider'] = $settings['divider'];
@@ -1287,9 +1288,21 @@ class CI_Migration
 
                 // ---------------------------------------- Template ES_Controller ----------------------------------------
                 if (validateArray($settings, 'filterBy') && validateArray($settings, 'idForeign')) {
-                    $data['fFieldsRef'] = var_export($settings['filterBy'], true);
                     if ($ind != 2) {
                         $data[$selector] .= $this->load->view(["template_ES_Ctrl" => $selector], $data, true, true, true);
+                        $aLoaded[] = $data['lcFkTableP'];
+                    }
+                    if ($ind == 0) {
+//                        $data['fFieldsRef'] = inArray('selectBy',$settings) ? var_export($settings['selectBy'], true) : [];
+                        foreach ($settings['filterBy'] as $field => $filter) {
+                            list($filterS,$filterP) = setSingularPlural($filter);
+                            $data['UcObjField'] = ucfirst(setObject($field));
+                            $data['indexFilterBy'] = $filter;
+                            $data['lcObjFilterByP'] = lcfirst(setObject($filterP));
+                            $data['UcObjFilterByP'] = ucfirst(setObject($filterP));
+                            $data['initFieldsFilterBy'] .= $this->load->view(["template_ES_Ctrl" => 'initFieldsFilterBy'], $data, true, true, true);
+                            $data['setObjFieldsFilterBy'] .= $this->load->view(["template_ES_Ctrl" => 'setObjFieldsFilterBy'], $data, true, true, true);
+                        }
                         $aLoaded[] = $data['lcFkTableP'];
                     }
                 } else {
@@ -1322,7 +1335,8 @@ class CI_Migration
         }
 
         if($tableName == 'ci_files'){
-            $data["validateFieldImgUpload"] = $this->load->view(["template_controller" => "validateFieldImgUpload"], $data, true, true);
+            $data["validateFieldImgUpload1"] = $this->load->view(["template_controller" => "validateFieldImgUpload1"], $data, true, true);
+            $data["validateFieldImgUpload2"] = $this->load->view(["template_controller" => "validateFieldImgUpload2"], $data, true, true);
         }
 
         if ($fieldImg != '') {
@@ -2063,7 +2077,9 @@ class CI_Migration
         $phpGlobalVars = '';
         $data["localPackForGetData"] = '';
         $data["foreignPackForGetData"] = '';
-        $data["packQueryFunctions"] = '';
+        $data["packFindOneByFunctions"] = '';
+        $data["packFilterByFunctions"] = '';
+        $data["packSelectByFunctions"] = '';
         $data["packGettersFunctions"] = '';
         $data["packSettersFunctions"] = '';
         $data["globalLocalFieldsVars"]  = '';
@@ -2099,7 +2115,9 @@ class CI_Migration
             $data["packGettersFunctions"] .= $this->load->view(["template_ES_Model" => "packGettersFunctions"], $data, true, true, true);
             $data["localPackForGetData"] .= $this->load->view(["template_ES_Model" => "localPackForGetData"], $data, true, true, true);
             $data["packSettersFunctions"] .= $this->load->view(["template_ES_Model" => "packSettersFunctions"], $data, true, true, true);
-            $data["packQueryFunctions"] .= $this->load->view(["template_ES_Model" => "packQueryFunctions"], $data, true, true, true);
+            $data["packFindOneByFunctions"] .= $this->load->view(["template_ES_Model" => "packFindOneByFunctions"], $data, true, true, true);
+            $data["packFilterByFunctions"] .= $this->load->view(["template_ES_Model" => "packFilterByFunctions"], $data, true, true, true);
+            $data["packSelectByFunctions"] .= $this->load->view(["template_ES_Model" => "packSelectByFunctions"], $data, true, true, true);
             // ----------------------------------------------------------------------
 
             // --------------------- setting Global Vars ---------------------------------------
@@ -2659,7 +2677,7 @@ class CI_Migration
                 $typeForm = validateArray($settings, 'input') ? $settings['input'] : (validateArray($fkTableFieldRefSettings, 'input') ? $fkTableFieldRefSettings['input'] : 'select');
             } else {
 //                $fields[$idLocal]['selectBy'] = $vFkTableFieldRefArray;
-                $fields[$idLocal]['selectBy'] = [$originFkTableFieldRef];
+                $fields[$idLocal]['selectBy'] = isArray($originFkTableFieldRef) ? $originFkTableFieldRef : [$originFkTableFieldRef];
 
 //                    if (validateVar($fields[$idLocal]['selectBy'])) {
 //                        $fields[$idLocal]['selectBy'] = [$fields[$idLocal]['selectBy']];
@@ -2673,7 +2691,18 @@ class CI_Migration
                 if (validateArray($settings, 'insertEachOne')) {
                     $data['objOptions'] = var_export(['/$id_' . $fSubModS => '/$o' . setObject($fSubModS, false)], true);
                 } else {
-                    $data['objOptions'] = '$o' . setObject($fSubModP, false);
+                    if(inArray('filterBy',$settings)){
+                        if(isArray($settings['filterBy'])){
+                            foreach ($settings['filterBy'] as $field => $value){
+                                list($filterS, $filterP) = setSingularPlural($value);
+                                $data['objOptions'] = '$o' . setObject($filterP, false);
+                            }
+                        } else {
+                            $data['objOptions'] = '$o' . setObject($fSubModP, false);
+                        }
+                    } else {
+                        $data['objOptions'] = '$o' . setObject($fSubModP, false);
+                    }
                 }
             }
         }

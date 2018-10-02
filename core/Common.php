@@ -1152,7 +1152,11 @@ if (!function_exists('validateArray')) {
                     return false;
                 }
             } else {
-                return true;
+                if(isset($array[$index])){
+                    return true;
+                } else {
+                    return false;
+                }
             }
 
         } else {

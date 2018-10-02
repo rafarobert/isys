@@ -114,23 +114,42 @@ Class ES_Model extends ES_Model_Vars {
         if(!isArray($where)){
             $where = [$where];
         }
+        $bSelectAdded = false;
         foreach ($where as $k => $wh){
             if(isNumeric($k,false)){
                 if($i == 0 && isString($wh)){
                     $aWheres = !isNumeric($k, false) ? [$k => $wh] : [];
                 }
                 if(isArray($wh)){
-                    foreach ($wh as $j => $wh_interno){
-                        if(isNumeric($j,false)){
-                            $select .= isString($select) ? ', '.$wh_interno : $wh_interno;
+                    if(inArray(1,$wh, false)){
+                        if(isBoolean($wh[1]) && $wh[1] && !strhas($select,$wh[0])){
+                            $select .= ", $wh[0]";
+                            $bSelectAdded = true;
+                        } else {
+                            $select .= "";
+                            $bSelectAdded = false;
+                        }
+                    }
+                    if(!$bSelectAdded){
+                        foreach ($wh as $j => $wh_interno){
+                            if(isNumeric($j,false)){
+                                $select .= isString($select) ? ', '.$wh_interno : $wh_interno;
+                            }
                         }
                     }
                 } else if(isString($wh)){
-                    $select .= isString($select) ? ', '.$wh : $wh;
+                    $select .= !strhas($select,$wh) ? ", $wh" : "";
                 }
             } else if(isString($k)){
-                $select .= strhas($select,$k) ? "" : ", $k" ;
-                $aWheres[$k] = $wh;
+                if(isArray($wh)){
+                    if (inArray(1,$wh, false)){
+                        $select .= isBoolean($wh[1]) && $wh[1] && !strhas($select,$k) ? ", $k" : "";
+                    }
+                    $aWheres[$k] = $wh[0];
+                } else if(isString($wh)){
+                    $aWheres[$k] = $wh;
+                    $select .= !strhas($select,$k) ? ", $k" : "";
+                }
             } else {
                 $select = "";
                 $aWheres[$k] = $wh;
@@ -152,7 +171,7 @@ Class ES_Model extends ES_Model_Vars {
         $result = $this->get_by($where, $bSelecting, $single);
 
         if(countStd($result) == 1){
-            return $result->{0};
+            return isset($result->{0}) ? $result->{0} : isset($result[0]) ? $result[0] : null;
         } else {
             return $result;
         }
@@ -271,11 +290,10 @@ Class ES_Model extends ES_Model_Vars {
             if (is_numeric($with_id) || is_string($with_id)) {
                 $id = $with_id;
                 $data[$this->_primary_key] = $with_id;
-            } else if (is_bool($with_id)) {
-                $this->db->insert_id();
             }
             $this->db->set($data);
             $this->db->insert($this->_table_name);
+            $id = $this->db->insert_id();
             // update
         } else {
             $filter = $this->_primary_filter;
@@ -285,7 +303,7 @@ Class ES_Model extends ES_Model_Vars {
             $this->db->where($this->_primary_key, $id);
             $this->db->update($this->_table_name);
         }
-        unset($data[$this->_primary_key]);
+        $data[$this->_primary_key] = $id;
         return $data;
     }
 //    public function getThumbs($obj,$file = '',$field = ''){
@@ -391,7 +409,7 @@ Class ES_Model extends ES_Model_Vars {
             $this->upload->upload_path = $dirPictures;
             $config['new_image'] = $dirPicturesThumb;
             $files = $_FILES;
-
+            $aThumbs = array();
             if (isArray($files[$fName])) {
                 if (!$this->upload->do_upload($fName) && $id == null) {
                     return false;
@@ -400,12 +418,19 @@ Class ES_Model extends ES_Model_Vars {
                     $file = $this->upload->data();
                     $config['source_image'] = $file['full_path'];
                     for ($i = 0; $i < $config['num_thumbs']; $i++) {
+                        $aThumbs[$i] = $fSettings;
+                        unset($aThumbs[$i]['error']);
+                        unset($aThumbs[$i]['tmp_name']);
+                        $aThumbs[$i]['width'] = $config['width'];
+                        $aThumbs[$i]['height'] = $config['height'];
                         $this->image_lib->initialize($config);
                         $this->image_lib->resize();
+                        $aThumbs[$i]['name'] = $this->image_lib->full_dst_path;
                         $config['width'] = $config['width'] + 150;
                         $config['height'] = $config['height'] + 150;
                         $config['thumb_marker'] = '-thumb_' . $config['width'];
                     }
+                    $this->upload->data_thumbs = $aThumbs;
                 }
                 $this->upload->file_name = $files[$fName]['name'];
                 $this->upload->file_type = $files[$fName]['type'];
@@ -465,6 +490,26 @@ Class ES_Model extends ES_Model_Vars {
                 }
             }
         } return $t2Contents;
+    }
+
+    public function findOneBy($arrayData){
+
+        $oField = $this->get_one_by($arrayData, true);
+
+        return $this->setFromData($oField);
+    }
+
+    public function selectBy($selects = null){
+        $aSelects = array();
+        if(isArray($selects)){
+            $aSelects = $selects;
+        } else if(isString($selects)){
+            $aSelects[] = $selects;
+        }
+        $aData = $this->get_by(array (
+            0 => $aSelects,
+        ),true);
+        return $aData;
     }
 
     public function delete($id){

@@ -26,9 +26,12 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
         $this->load->model("lcFkModS/model_lcFkTableP");
         //<<<loadModelsForeignTable>>>
         $this->initLoaded();
-        //>>>initFieldsForeignTable<<<
-        $this->lcFkObjFieldP = $this->model_lcFkTableP->get_by('$fFieldsRef', true);
-        //<<<initFieldsForeignTable>>>
+        //>>>initFieldsFilterBy<<<
+        $this->lcObjFilterByP = $this->model_lcFkTableP->filterByUcObjField('indexFilterBy','$fFieldsRef');
+        //<<<initFieldsFilterBy>>>
+        //>>>initFieldsSelectBy<<<
+        $this->lcFkObjFieldP = $this->model_lcFkTableP->selectBy('$fFieldsRef');
+        //<<<initFieldsSelectBy>>>
         //>>>compareFieldsForeignTable<<<
         $this->lcFkObjFieldP = $this->model_lcFkTableP->setForeignValues($this->t1Contents, 't1FieldRef', $this->t2Contents, 't2FieldRef');
         //<<<compareFieldsForeignTable>>>
@@ -36,6 +39,9 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
         //>>>setFieldsForeignTable<<<
         $this->data['oUcFkObjFieldP'] = $this->model_lcFkTableP->setOptions($this->lcFkObjFieldP);
         //<<<setFieldsForeignTable>>>
+        //>>>setObjFieldsFilterBy<<<
+        $this->data['oUcObjFilterByP'] =  $this->model_lcFkTableP->setOptions($this->lcObjFilterByP);
+        //<<<setObjFieldsFilterBy>>>
     }
 
     public function setUcObjTableP($oData, $oUcObjTableP = null)

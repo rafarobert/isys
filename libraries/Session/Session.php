@@ -1048,7 +1048,8 @@ class CI_Session {
             0 => 'id_role',
             1 => 'name',
             2 => 'lastname',
-            3 => 'id_user'
+            3 => 'id_user',
+            4 => 'email'
 
         ), true, true);
 
