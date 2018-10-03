@@ -166,9 +166,12 @@ else if ($hostName == '200.87.100.10')
     $webServer = "$protocol://$hostName/";
 }
 
+$assets = $webServer.'assets/';
+
 define('DIRECTORY',$rootPath);
 define('ROOTPATH', $rootPath);
 define('WEBSERVER', $webServer);
+define('WEBASSETS', $assets);
 define('WEBROOT', $webServer);
 define('PROTOCOL', $protocol);
 

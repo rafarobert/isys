@@ -111,12 +111,12 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                 if ($this->fromAjax) {
                     $aReturn['message'] = setMessage($data, $aFromPost, 'tableTitle agregado exitosamente');
                     $aReturn['error'] = $error;
-                    $this->data['oUcTableS'] = $data = $this->model_lcTableP->findOneBy($data, true);
-                    $data->primary = $primary = $this->model_lcTableP->getPrimaryKey();
-                    $data->pk = $data->$primary;
+                    $this->data['oUcTableS'] = $oUcObjTableS = $this->model_lcTableP->setFromData($data, $oUcObjTableS);
+                    $aReturn['primary'] = $primary = $this->model_lcTableP->getPrimaryKey();
+                    $aReturn['pk'] = $oUcObjTableS->$primary;
                     $aReturn['view'] = $this->load->view("lcModS/lcTableP/edit", $this->data, true);
                     $aReturn['redirect'] = 'lcModS/lcTableP';
-                    $aReturn = array_merge($aReturn, std2array($data));
+                    $aReturn['data'] = $data;
                     echo json_encode($aReturn);
                     exit;
                 } else {

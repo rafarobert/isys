@@ -159,6 +159,13 @@ class CI_Upload {
 	public $file_ext = '';
 
 	/**
+	 * Filename Url
+	 *
+	 * @var	string
+	 */
+	public $file_url = '';
+
+	/**
 	 * Force filename extension to lowercase
 	 *
 	 * @var	string
@@ -276,6 +283,13 @@ class CI_Upload {
 	 * @var	bool
 	 */
 	public $data_thumbs = '';
+
+	/**
+	 * Number of Thumbs for saving in database
+	 *
+	 * @var	bool
+	 */
+	public $num_thumbs = '';
 
 	// --------------------------------------------------------------------
 
@@ -618,7 +632,6 @@ class CI_Upload {
 	{
 		$data = array(
 				'name'		=> $this->orig_name,
-				'type'		=> $this->file_type,
 				'path'		=> $this->upload_path,
 				'full_path'		=> $this->upload_path.$this->file_name,
 				'raw_name'		=> str_replace($this->file_ext, '', $this->file_name),
@@ -627,10 +640,12 @@ class CI_Upload {
 				'id_user_modified'		=> $this->MI->session->getIdUserLoggued(),
 				'ext'		=> $this->file_ext,
 				'size'		=> $this->file_size,
+                'url'       => $this->file_url,
+                'nro_thumbs'       => $this->num_thumbs,
 //				'is_image'		=> $this->is_image(),
 				'width'		=> $this->image_width,
 				'height'		=> $this->image_height,
-				'type'		=> $this->image_type,
+				'type'		=> $this->image_type == '' ? explode('.',$this->file_ext)[1] : $this->image_type,
 //				'image_size_str'	=> $this->image_size_str,
 			);
 

@@ -1466,8 +1466,8 @@ if (!function_exists('setMessage')) {
         $message = '';
         foreach ($aData as $key => $data){
             foreach ($aSearched as $search){
-                if($key == $search && validateVar($data)){
-                    $message .= $data .' ';
+                if($key == $search && validateVar($data) && !strstr($data,'/')){
+                    $message .= "$key: $data | ";
                 }
             }
         }

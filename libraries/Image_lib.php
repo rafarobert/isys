@@ -379,7 +379,27 @@ class CI_Image_lib {
 	 */
 	public $wm_use_truetype	= FALSE;
 
-	/**
+    /**
+     * Thumb Extention
+     *
+     * @var bool
+     */
+    public  $dest_ext;
+
+    /**
+     * Thumb Name
+     *
+     * @var bool
+     */
+    public $dest_name;
+
+    /**
+     * Thumb Name
+     *
+     * @var bool
+     */
+    public $dest_raw_name;
+    /**
 	 * Initialize Image Library
 	 *
 	 * @param	array	$props
@@ -593,6 +613,9 @@ class CI_Image_lib {
 
 		$this->full_src_path = $this->source_folder.$this->source_image;
 		$this->full_dst_path = $this->dest_folder.$filename.$this->thumb_marker.$file_ext;
+		$this->dest_name = $filename.$this->thumb_marker.$file_ext;
+		$this->dest_raw_name = $filename.$this->thumb_marker;
+		$this->dest_ext = $file_ext;
 
 		/* Should we maintain image proportions?
 		 *
