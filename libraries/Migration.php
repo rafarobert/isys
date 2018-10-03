@@ -1623,6 +1623,8 @@ class CI_Migration
                     }
                 } else if (compareArrayStr($settings, 'input', 'hidden')) {
                     $typeForm = 'hidden';
+                } else if (compareArrayStr($settings,'input','image') || compareArrayStr($settings,'input','file')){
+                    $typeForm = 'hidden';
                 }
                 if ($this->bInputHasOptions($settings)) {
                     list($typeForm, $inputData, $data) = $this->getInputType($settings, $inputData, $data);
@@ -1970,18 +1972,18 @@ class CI_Migration
                 $aFieldsSelectBy = validateArray($settings, 'selectBy') ? $settings['selectBy'] : [];
                 $aFieldsToJoin = $this->analizeFieldsSelectBy($aFieldsSelectBy, $aPKorFKofTables, $aIdsPkOrFk);
                 if (isString($aFieldsToJoin) && in_array($name, $aPksOfTables)) {
-                    $content .= "<td><?= setTitleFromObject(\$$oUcObjTableS,'$name" . "_$aFieldsToJoin" . "'); ?></td>               
+                    $content .= "<td><?= \$$oUcObjTableS->".'get'.ucfirst(setObject($name)).ucfirst(setObject($aFieldsToJoin))."(); ?></td>               
                 ";
                 } else if (isArray($aFieldsToJoin)) {
                     $html = '';
                     foreach ($aFieldsToJoin as $fieldToJoin) {
-                        $html .= "'$name" . ucfirst(setObject($fieldToJoin)) . "',";
+                        $html .= "\$$oUcObjTableS->".'get'.ucfirst(setObject($name)).ucfirst(setObject($fieldToJoin)).'() ." ".';
                     }
-                    $html = '[' . substr($html, 0, strlen($html) - 1) . ']';
-                    $content .= "<td><?= setTitleFromObject(\$$oUcObjTableS,".$html."); ?></td>               
+                    $html = substr($html, 0, strlen($html) - 6);
+                    $content .= "<td><?= $html; ?></td>               
                                 ";
                 } else {
-                    $content .= "<td><?= setTitleFromObject(\$$oUcObjTableS,'".setObject($name)."'); ?></td>               
+                    $content .= "<td><?= \$$oUcObjTableS->".'get'.ucfirst(setObject($name))."(); ?></td>               
                     ";
                 }
             }

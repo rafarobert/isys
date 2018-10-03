@@ -149,7 +149,11 @@ class Ctrl_Ajax extends ES_Base_Controller
             initStaticTableVars($this);
         }
 
-        $dir = $this->input->post('dir');
+        $post = $this->input->post();
+        $dir = '';
+        if(inArray('dir',$post)){
+            $dir = $post['dir'];
+        }
         $dir = str_replace(WEBSERVER,'',$dir);
         $path = preg_replace(['/^\//','/\/$/'],'',$dir);
         $sys = config_item('sys');

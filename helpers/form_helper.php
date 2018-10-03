@@ -163,12 +163,23 @@ if ( ! function_exists('form_hidden'))
 
 		if (is_array($name))
 		{
-			foreach ($name as $key => $val)
-			{
-				form_hidden($key, $val, TRUE);
-			}
+//			foreach ($name as $key => $val)
+//			{
+//				form_hidden($key, $val, TRUE);
+//            }
+//
+//            return $form;
+            $name['type'] = 'hidden';
 
-			return $form;
+            if(inArray('class',$name)){
+
+                $name['class'] .= ' display-none';
+
+            } else {
+
+                $name['class'] = 'display-none';
+            }
+            return form_input($name,$value);
 		}
 
 		if ( ! is_array($value))

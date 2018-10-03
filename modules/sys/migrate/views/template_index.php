@@ -6,7 +6,9 @@
  * Time: #timeCreated
  * @var Model_lcTableP $model_lcTableP
  * @var Model_lcTableP $lcTableP
- * @var Model_lcTableP $lcTableS
+ * @var Model_lcTableP $lcObjTableS
+ * @var Model_UcTableP $oUcObjTableP
+ * @var ES_Model_UcTableP $oUcObjTableS
  */
 ?>
 <div class="row wrapper border-bottom white-bg page-heading">

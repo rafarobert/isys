@@ -427,7 +427,7 @@ Class ES_Model extends ES_Model_Vars {
                                 $this->upload->num_thumbs = 0;
                             } else {
                                 $aThumbs['thumb_'.$config['width']] = $file;
-                                unset($aThumbs[$i]['nro_thumbs']);
+                                unset($aThumbs['thumb_'.$config['width']]['nro_thumbs']);
                                 $this->image_lib->resize();
                                 $aThumbs['thumb_'.$config['width']]['width'] = $this->image_lib->width;
                                 $aThumbs['thumb_'.$config['width']]['height'] = $this->image_lib->height;
