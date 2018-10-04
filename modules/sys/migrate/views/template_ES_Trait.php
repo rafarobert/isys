@@ -11,7 +11,7 @@ use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 trait ES_Table_Trait
 {
     //>>>setInitFunctions<<<
-    public function initUcTableP($both = false, $bWithInit = false)
+    public function initUcObjTableP($both = false, $bWithInit = false)
     {
         if(validate_modulo('lcMod','lcTableP')){
 

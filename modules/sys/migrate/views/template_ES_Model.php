@@ -98,14 +98,17 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
     //>>>packFilterByFunctions<<<
     public function filterByUcObjField($lcObjField, $selecting = null){
+        $bSelecting = true;
         $aSetttings = array();
         if(isArray($selecting)){
             $aSetttings = $selecting;
         } else if(isString($selecting)){
             $aSetttings[] = $selecting;
+        } else if(isBoolean($selecting) || $selecting == null){
+            $bSelecting = false;
         }
         $aSetttings['lcField'] = $lcObjField;
-        $aData = $this->get_by($aSetttings,true);
+        $aData = $this->get_by($aSetttings,$bSelecting);
         return $aData;
     }
     //<<<packFilterByFunctions>>>

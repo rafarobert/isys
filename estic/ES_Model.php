@@ -139,6 +139,8 @@ Class ES_Model extends ES_Model_Vars {
                     }
                 } else if(isString($wh)){
                     $select .= !strhas($select,$wh) ? ", $wh" : "";
+                } else if(isNumeric($wh)){
+                    $select .= !strhas($select,$wh) ? ", $wh" : "";
                 }
             } else if(isString($k)){
                 if(isArray($wh)){
@@ -147,6 +149,9 @@ Class ES_Model extends ES_Model_Vars {
                     }
                     $aWheres[$k] = $wh[0];
                 } else if(isString($wh)){
+                    $aWheres[$k] = $wh;
+                    $select .= !strhas($select,$k) ? ", $k" : "";
+                } else if(isNumeric($wh)){
                     $aWheres[$k] = $wh;
                     $select .= !strhas($select,$k) ? ", $k" : "";
                 }
@@ -534,16 +539,16 @@ Class ES_Model extends ES_Model_Vars {
         if(!$id){
             return false;
         }
-//        $this->db->where($this->_primary_key, $id);
-//        $this->db->limit(1);
-//        $response = $this->db->delete($this->_table_name);
-        if($this->db->field_exists('estado',$this->_table_name)){
-            $this->db->set('estado','DELETED');
-        } else if($this->db->field_exists('status',$this->_table_name)){
-            $this->db->set('status','DELETED');
+        $response = $this->dbforge->setDeleted($this->_table_name,$this->_primary_key,$id);
+        // ------------------ se aplica a archivos con thumbnails ---------------------
+        if($this->_table_name == 'ci_files'){
+            $oFilesData = $this->filterByIdParent($id);
+            $oFiles = $this->setFromData($oFilesData);
+            foreach ($oFiles as $file){
+
+            }
         }
-        $this->db->where($this->_primary_key, $id);
-        $response = $this->db->update($this->_table_name);
+        // ----------------------------------------------------------------------------
 
         if(validateVar($response, 'array')){
             $response['localTable'] = $this->_table_name;

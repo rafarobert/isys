@@ -1443,4 +1443,14 @@ abstract class CI_DB_forge
         ";
         $this->db->query($sql);
     }
+
+    public function setDeleted($tableName, $pk, $id){
+        if($this->db->field_exists('estado',$tableName)){
+            $this->db->set('estado','DELETED');
+        } else if($this->db->field_exists('status',$tableName)){
+            $this->db->set('status','DELETED');
+        }
+        $this->db->where($pk, $id);
+        return $this->db->update($tableName);
+    }
 }

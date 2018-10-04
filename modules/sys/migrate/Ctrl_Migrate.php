@@ -8,6 +8,11 @@
  * @property CI_Migration $migration
  * @property Model_Modulos $model_modulos
  */
+
+use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
+
+defined("BASEPATH") OR exit("No direct script access allowed");
+
 class Ctrl_Migrate extends ES_Controller
 {
     public $tab_excepts;
@@ -148,7 +153,9 @@ class Ctrl_Migrate extends ES_Controller
                 $this->data['lcMod'] = $lcMod = lcfirst($this->sys[$mod]['name']);
                 $this->data['UcMod'] = $ucMod = ucfirst($this->sys[$mod]['name']);
                 $this->data['lcTableP'] = lcfirst($tableP);
+                $this->data['lcObjTableP'] = lcfirst(setObject($tableP));
                 $this->data['UcTableP'] = ucfirst($tableP);
+                $this->data['UcObjTableP'] = ucfirst(setObject($tableP));
                 $this->data['setInitFunctions'] .= $this->load->view(["template_ES_Trait" => "setInitFunctions"], $this->data, true, true);
             }
         }

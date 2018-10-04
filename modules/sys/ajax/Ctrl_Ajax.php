@@ -7,9 +7,14 @@
  * @property CI_Migration $migration
  */
 
+use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
+
+defined("BASEPATH") OR exit("No direct script access allowed");
 
 class Ctrl_Ajax extends ES_Base_Controller
 {
+
+
     function __construct()
     {
         parent::__construct();
@@ -145,10 +150,9 @@ class Ctrl_Ajax extends ES_Base_Controller
 
     public function remove(){
         $this->load->library('migration');
-        if(function_exists('initStaticTableVars')){
-            initStaticTableVars($this);
-        }
-
+//        if(function_exists('initStaticTableVars')){
+//            initStaticTableVars($this);
+//        }
         $post = $this->input->post();
         $dir = '';
         if(inArray('dir',$post)){

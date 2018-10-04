@@ -11,6 +11,9 @@ class ES_Backend_Controller extends ES_Controller
 {
     function __construct()
     {
+        $this->initLoaded();
+        parent::__construct();
+
         $this->data['siteTitle'] = config_item('site_title');
         $this->data['metaTitle'] = config_item('meta_title');
         $this->data['metaName'] = config_item('meta_name');
@@ -25,8 +28,6 @@ class ES_Backend_Controller extends ES_Controller
         $this->data['fileTypes'] = config_item('file_types');;
         // -------------------------------------------------
 
-        $this->initLoaded();
-        parent::__construct();
         $this->load->helper('form');
         $this->load->library('form_validation');
 //        $this->load->library('request');
