@@ -80,7 +80,7 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
 
             $error = 'ok';
 
-            list($oUcObjTableS, $aFromPost) = $this->model_lcTableP->getDataFromPost($oUcObjTableS);
+            $oUcObjTableS = $this->model_lcTableP->getDataFromPost($oUcObjTableS);
             //>>>validateFieldImgUpload1<<<
             if (!$this->model_lcTableP->do_upload("file", $id) && $id == null) {
                 $error = array('error' => $this->upload->display_errors());
@@ -109,7 +109,7 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                 }
                 //<<<validateFieldImgUpload2>>>
                 if ($this->fromAjax) {
-                    $aReturn['message'] = setMessage($data, $aFromPost, 'tableTitle agregado exitosamente');
+                    $aReturn['message'] = setMessage($data, 'tableTitle agregado exitosamente');
                     $aReturn['error'] = $error;
                     $this->data['oUcTableS'] = $oUcObjTableS = $this->model_lcTableP->setFromData($data, $oUcObjTableS);
                     $aReturn['primary'] = $primary = $this->model_lcTableP->getPrimaryKey();

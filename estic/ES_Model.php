@@ -102,6 +102,14 @@ Class ES_Model extends ES_Model_Vars {
         return $oResult;
     }
 
+    public function setResultsFromData($oResults){
+        $aReturn = array();
+        foreach ($oResults as $key => $result){
+            $aReturn[$key] = $this->setFromData($result);
+        }
+        return $aReturn;
+    }
+
     public function get_by_selecting($where, $select, $single = false){
         $this->db->select($this->_primary_key.', '.$select);
         $this->db->where($where);
@@ -314,6 +322,13 @@ Class ES_Model extends ES_Model_Vars {
 //    public function getThumbs($obj,$file = '',$field = ''){
 //
 //    }
+
+    public function getDataFromPost($object = null)
+    {
+        $data = $this->input->post();
+        $oModelUcObjTableS = $this->setFromData($data,$object);
+        return $oModelUcObjTableS;
+    }
 
     public function getThumbs($objs, $file = '', $field = ''){
         if(isset($objs->{$this->_primary_key})){
@@ -539,16 +554,16 @@ Class ES_Model extends ES_Model_Vars {
         if(!$id){
             return false;
         }
-        $response = $this->dbforge->setDeleted($this->_table_name,$this->_primary_key,$id);
-        // ------------------ se aplica a archivos con thumbnails ---------------------
-        if($this->_table_name == 'ci_files'){
-            $oFilesData = $this->filterByIdParent($id);
-            $oFiles = $this->setFromData($oFilesData);
-            foreach ($oFiles as $file){
-
+        if($response = $this->dbforge->setDeleted($this->_table_name,$this->_primary_key,$id)){
+            // ------------------ se aplica a archivos con thumbnails ---------------------
+            if($this->_table_name == 'ci_files'){
+                $oData = $this->filterByIdParent($id);
+                foreach ($oData as $file){
+                    $this->dbforge->setDeleted($this->_table_name,$this->_primary_key,$file->id_file);
+                }
             }
+            // ----------------------------------------------------------------------------
         }
-        // ----------------------------------------------------------------------------
 
         if(validateVar($response, 'array')){
             $response['localTable'] = $this->_table_name;

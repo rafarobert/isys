@@ -169,7 +169,7 @@ if ( ! function_exists('form_hidden'))
 //            }
 //
 //            return $form;
-            $name['type'] = 'hidden';
+//            $name['type'] = 'hidden';
 
             if(inArray('class',$name)){
 
@@ -184,7 +184,7 @@ if ( ! function_exists('form_hidden'))
 
 		if ( ! is_array($value))
 		{
-			$form .= '<input type="hidden" name="'.$name.'" value="'.html_escape($value)."\" />\n";
+			$form .= '<input type="text" name="'.$name.'" value="'.html_escape($value)."\" />\n";
 		}
 		else
 		{

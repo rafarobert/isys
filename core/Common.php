@@ -1461,13 +1461,19 @@ if (!function_exists('std2array')) {
 
 if (!function_exists('setMessage')) {
 
-    function setMessage($aData, $aSearched,$added)
+    function setMessage($aData, $added, $aSearched = [])
     {
         $message = '';
         foreach ($aData as $key => $data){
-            foreach ($aSearched as $search){
-                if($key == $search && validateVar($data) && !strstr($data,'/')){
-                    $message .= "$key: $data | ";
+            if(isArray($aSearched)){
+                foreach ($aSearched as $search){
+                    if($key == $search && validateVar($data) && !strstr($data,'/')){
+                        $message .= "$key: $data | ";
+                    }
+                }
+            } else {
+                if(validateVar($data) && !strstr($data,'/')){
+                    $message .= "$key: $data, ";
                 }
             }
         }

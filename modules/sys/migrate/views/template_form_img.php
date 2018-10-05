@@ -2,7 +2,7 @@
 <div class="form-group">
     <script>oDropZone.dataName = 'lcTableS'</script>
     <label for="lcInputId" class="col-sm-2 control-label">UcInputLabel</label>
-    <div id="lcInputId" class="col-sm-10 dropzone" action="#">
+    <div class="col-sm-10 dropzone" action="#">
         <div class="dropzone-previews"></div>
     </div>
     <script>

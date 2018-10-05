@@ -182,15 +182,6 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         }
     }
 
-    public function getDataFromPost($object = null)
-    {
-        $data = $this->array_from_post(
-            $aFromPost = '$validatedFieldsNames'
-        );
-        $oModelUcObjTableS = $this->setFromData($data,$object);
-        return [$oModelUcObjTableS, $aFromPost];
-    }
-
     public function getArrayData($bWithForeign = false){
         $data = array(
             //>>>localPackForGetData<<<
