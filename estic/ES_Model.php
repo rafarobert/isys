@@ -10,6 +10,20 @@ use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
 Class ES_Model extends ES_Model_Vars {
 
+    /**
+     * Value for virtual field files.
+     *
+     * @var        array
+     */
+    public $files = null;
+
+    /**
+     * Value for virtual thumb files files.
+     *
+     * @var        array
+     */
+    public $thumbFiles = null;
+
     protected $_table_name = '';
     protected $_primary_key = "id";
     protected $_primary_filter = "intval";
@@ -218,12 +232,12 @@ Class ES_Model extends ES_Model_Vars {
     public function create_ci_sessions(){
         $this->dbforge->create_ci_sessions();
     }
-
-    public function get_pk_table($table){
-        $sql = "show columns from `$table` where `Key` = 'PRI'";
-        $pkTable = $this->db->query($sql)->row();
-
-    }
+//
+//    public function get_pk_table($table){
+//        $sql = "show columns from `$table` where `Key` = 'PRI'";
+//        $pkTable = $this->db->query($sql)->row();
+//
+//    }
 
     public function save($data, $id = null, $with_id = true){
         $this->load->library('session');
@@ -532,6 +546,46 @@ Class ES_Model extends ES_Model_Vars {
         $oField = $this->get_one_by($arrayData, true);
 
         return $this->setFromData($oField);
+    }
+
+    public function setFiles($oModel,$aIdsFiles){
+        $this->load->model("base/model_files");
+        if(isArray($aIdsFiles)){
+            foreach ($aIdsFiles as $key => $idFile){
+                $oFile = $this->model_files->findOneByIdFile($idFile);
+                $oModel->files[$key] = $oFile;
+                if(isObject($oFile)){
+                    $oThumbFiles = $this->model_files->filterByIdParent($oFile->getIdFile());
+                    if (isObject($oThumbFiles) || isArray($oThumbFiles)){
+                        /**
+                         * @var ES_Model_Files $thumb
+                         */
+                        $oModel->files[$key]->{'thumbs'} = array();
+                        foreach ($oThumbFiles as $thumb){
+                            $mark = strReplace(['-','_','thumb'],'',$thumb->getThumbMarker());
+                            $oModel->thumbFiles[$mark] = $thumb->getArrayData();
+                            $oModel->files[$key]->{'thumbs'}[$mark] = $thumb->getArrayData();
+                        }
+                    }
+                }
+            }
+        }
+        return $oModel;
+    }
+
+    public function getArrayDataWithThumbs($model){
+        $aData = $model->getArrayData();
+        if(isArray($model->thumbs)){
+            $aData['thumbs'] = $model->thumbs;
+        }
+        return $aData;
+    }
+
+    public function getFiles($oModel){
+        if (isset($oModel->files)){
+            return $oModel->files;
+        }
+        return [];
     }
 
     public function selectBy($selects = null){

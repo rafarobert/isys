@@ -8,6 +8,14 @@
     <script>
         oDropZone.inputName = 'lcObjField';
         oDropZone.inputId = 'inputUcObjField';
+        <?php foreach ($oUcObjTableS->getFiles($oUcObjTableS) as $ind => $file){ ?>
+        oDropZone.uploads['<?=$ind?>'] = {};
+        oDropZone.uploads['<?=$ind?>'].data = JSON.parse(`<?=json_encode($file->getArrayDataWithThumbs($file))?>`);
+        oDropZone.uploads['<?=$ind?>'].dir = '<?=$file->getUrl()?>';
+        oDropZone.uploads['<?=$ind?>'].error = 'ok';
+        oDropZone.uploads['<?=$ind?>'].fromAjax = true;
+        oDropZone.uploads['<?=$ind?>'].pk= '<?=$file->getIdFile()?>';
+        <?php }?>
     </script>
     <?php
     $data = '$inputData';

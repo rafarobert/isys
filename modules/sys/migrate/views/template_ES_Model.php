@@ -97,7 +97,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     //<<<packFindOneByFunctions>>>
 
     //>>>packFilterByFunctions<<<
-    public function filterByUcObjField($lcObjField, $selecting = null){
+    public function filterByUcObjField($lcObjField, $selecting = null, $bAsModel = true){
         $bSelecting = true;
         $aSetttings = array();
         if(isArray($selecting)){
@@ -109,6 +109,9 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         }
         $aSetttings['lcField'] = $lcObjField;
         $aData = $this->get_by($aSetttings,$bSelecting);
+        if($bAsModel){
+            return $this->setFromData($aData);
+        }
         return $aData;
     }
     //<<<packFilterByFunctions>>>
@@ -193,6 +196,10 @@ class ES_Model_UcTableP extends ES_UcModS_Model
             $data['lcLocalField_lcForeignField'] = $this->lcLocalField_lcForeignField;
             //<<<foreignPackForGetData>>>
         }
+        $funct = function($val){
+            return isNumeric($val,false) ? valNumeric($val) : $val;
+        };
+        $data = array_map($funct,$data);
         return $data;
     }
 }

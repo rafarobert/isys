@@ -1165,6 +1165,15 @@ if (!function_exists('validateArray')) {
     }
 }
 
+if (!function_exists('strReplace')) {
+    function strReplace($searchs,$replace,$str){
+        $strReplaced = $str;
+        foreach ($searchs as $char){
+            $strReplaced = str_replace($char,$replace,$strReplaced);
+        }
+        return $strReplaced;
+    }
+}
 if (!function_exists('inArray')) {
     function inArray($key,$array,$bEmpty = true)
     {
@@ -1604,6 +1613,15 @@ if (!function_exists('str2array')) {
             return $str;
         } else if(!isString($str) && isObject($str)){
             return std2array($str);
+        } else if(strstr($str,'|') && substr_count($str,'|') > 1){
+            $aIds = array();
+            $aParts = explode('|',$str);
+           foreach ($aParts as $part){
+               if(isNumeric($part)){
+                   $aIds[] = $part;
+               }
+           }
+           return $aIds;
         } else {
             return $str;
         }
