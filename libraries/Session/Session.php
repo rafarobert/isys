@@ -1020,7 +1020,7 @@ class CI_Session {
                         $data["id_role"] = $roles[0]['id_role'];
                     } else {
                         foreach ($roles as $role){
-                            $data["id_role"] = $role['id_role'];
+                            $data["id_role"] = $role->id_role;
                         }
                     }
 
