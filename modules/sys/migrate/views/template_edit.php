@@ -6,7 +6,9 @@
  * Time: #timeCreated
  * @var Model_UcTableP $model_lcTableP
  * @var Model_UcTableP $oUcObjTableP
- * @var ES_Model_UcTableP $oUcObjTableS
+ * @var Model_UcTableP $oUcObjTableS
+ *
+ * @var Model_Files $file
  */
 ?>
 

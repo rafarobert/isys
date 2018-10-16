@@ -153,9 +153,14 @@ class Ctrl_Ajax extends ES_Base_Controller
 //        }
         $post = $this->input->post();
         $dir = '';
+        $tableRef = '';
+        $classRefMod = '';
+        $classRefName = '';
+        $idTableRef = '';
         if(inArray('dir',$post)){
             $dir = $post['dir'];
         }
+
         $dir = str_replace(WEBSERVER,'',$dir);
         $path = preg_replace(['/^\//','/\/$/'],'',$dir);
         $sys = config_item('sys');
@@ -163,6 +168,7 @@ class Ctrl_Ajax extends ES_Base_Controller
         $class = null;
         $method = null;
         $pk = null;
+
         if(substr_count($path,'/') == 3 ){
             list($mod, $class, $method, $pk) = explode('/',$path);
         } else if(substr_count($path,'/') == 2 ){
@@ -179,7 +185,24 @@ class Ctrl_Ajax extends ES_Base_Controller
         $acr = $sys[$mod];
 
         $this->{"init".ucfirst($class)}(true);
-        $response = $this->{"model_$class"}->{$method}($pk);
+        if($response = $this->{"model_$class"}->{$method}($pk)){
+            if(inArray('tableRef',$post) && inArray('idTableRef',$post) && inArray('fieldTableRef',$post)){
+                $tableRef = $post['tableRef'];
+                $pkTableRef = ucfirst($post['pkTableRef']);
+                $idTableRef = ucfirst($post['idTableRef']);
+                $fieldTableRef = $post['fieldTableRef'];
+                list($classRefMod,$classRefName) = getModSubMod($tableRef);
+                $this->{"init".ucfirst($classRefName)}(true);
+                $objRef = $this->{"model_$classRefName"}->{"findOneBy$pkTableRef"}($idTableRef);
+                $aIdsFiles = std2array($objRef->{"get$fieldTableRef"}());
+                if(in_array($pk,$aIdsFiles)){
+                    $key = array_search($pk,$aIdsFiles);
+                    unset($aIdsFiles[$key]);
+                    $objRef->{"set$fieldTableRef"}($aIdsFiles);
+                    $data = $objRef->save();
+                }
+            }
+        }
         if(validateArray($response,'message') && validateArray($response,'code')){
             preg_match_all("/`(.*?)`/",$response['message'],$aMessage);
             if(validateArray($aMessage,1)){

@@ -239,7 +239,12 @@ Class ES_Model extends ES_Model_Vars {
 //
 //    }
 
-    public function save($data, $id = null, $with_id = true){
+    public function save($data = null, $id = null, $with_id = true){
+        if($data == null){
+            $data = $this->getArrayData();
+            $pk = ucfirst(setObject($this->getPrimaryKey()));
+            $id = $this->{"get$pk"}();
+        }
         $this->load->library('session');
         // set timesatamps
         $now = date('Y-m-d H:i:s');
@@ -291,6 +296,9 @@ Class ES_Model extends ES_Model_Vars {
 //        }
 
         $funct_v = function ($vals) {
+            if (isObject($vals)){
+                $vals = std2array($vals);
+            }
             if(is_array($vals)){
                 $str = json_encode($vals);
                 return $str;
@@ -522,20 +530,22 @@ Class ES_Model extends ES_Model_Vars {
             $t2Contents = [$t2Contents];
         }
         foreach ($t2Contents as $j => $t2Content){
-            foreach ($t1Contents as $i => $t1Content){
-                if($t2Content->$t2FieldRef == $t1Content->$t1FieldRef && is_object($t1Content)){
-                    $ref = $t1Content->$t1FieldRef;
-                    unset($t1Content->$t1FieldRef);
-                    foreach ($t1Content as $t1Name => $t1Value){
-                        if(isset($t2Contents->$j)){
-                            $t2Contents->$j->{$t2FieldRef.'_'.$t1Name} = $t1Value;
-                        } else if(isset($t2Contents[$j])){
-                            $t2Contents[$j]->{$t2FieldRef.'_'.$t1Name} = $t1Value;
-                        } else if(isset($t2Contents->{$t2FieldRef.'_'.$t1Name} )){
-                            $t2Contents->{$t2FieldRef.'_'.$t1Name} = $t1Value;
+            if(isArray($t1Contents ) || isObject($t1Contents )){
+                foreach ($t1Contents as $i => $t1Content){
+                    if($t2Content->$t2FieldRef == $t1Content->$t1FieldRef && is_object($t1Content)){
+                        $ref = $t1Content->$t1FieldRef;
+                        unset($t1Content->$t1FieldRef);
+                        foreach ($t1Content as $t1Name => $t1Value){
+                            if(isset($t2Contents->$j)){
+                                $t2Contents->$j->{$t2FieldRef.'_'.$t1Name} = $t1Value;
+                            } else if(isset($t2Contents[$j])){
+                                $t2Contents[$j]->{$t2FieldRef.'_'.$t1Name} = $t1Value;
+                            } else if(isset($t2Contents->{$t2FieldRef.'_'.$t1Name} )){
+                                $t2Contents->{$t2FieldRef.'_'.$t1Name} = $t1Value;
+                            }
                         }
+                        $t1Content->$t1FieldRef = $ref;
                     }
-                    $t1Content->$t1FieldRef = $ref;
                 }
             }
         } return $t2Contents;
@@ -550,21 +560,23 @@ Class ES_Model extends ES_Model_Vars {
 
     public function setFiles($oModel,$aIdsFiles){
         $this->load->model("base/model_files");
-        if(isArray($aIdsFiles)){
+        if(isArray($aIdsFiles) || isObject($aIdsFiles)){
             foreach ($aIdsFiles as $key => $idFile){
-                $oFile = $this->model_files->findOneByIdFile($idFile);
-                $oModel->files[$key] = $oFile;
-                if(isObject($oFile)){
-                    $oThumbFiles = $this->model_files->filterByIdParent($oFile->getIdFile());
-                    if (isObject($oThumbFiles) || isArray($oThumbFiles)){
-                        /**
-                         * @var ES_Model_Files $thumb
-                         */
-                        $oModel->files[$key]->{'thumbs'} = array();
-                        foreach ($oThumbFiles as $thumb){
-                            $mark = strReplace(['-','_','thumb'],'',$thumb->getThumbMarker());
-                            $oModel->thumbFiles[$mark] = $thumb->getArrayData();
-                            $oModel->files[$key]->{'thumbs'}[$mark] = $thumb->getArrayData();
+                if(isNumeric($idFile) || isString($idFile)){
+                    $oFile = $this->model_files->findOneByIdFile($idFile);
+                    $oModel->files[$key] = $oFile;
+                    if(isObject($oFile)){
+                        $oThumbFiles = $this->model_files->filterByIdParent($oFile->getIdFile());
+                        if (isObject($oThumbFiles) || isArray($oThumbFiles)){
+                            /**
+                             * @var ES_Model_Files $thumb
+                             */
+                            $oModel->files[$key]->{'thumbs'} = array();
+                            foreach ($oThumbFiles as $thumb){
+                                $mark = strReplace(['-','_','thumb'],'',$thumb->getThumbMarker());
+                                $oModel->thumbFiles[$mark] = $thumb->getArrayData();
+                                $oModel->files[$key]->{'thumbs'}[$mark] = $thumb->getArrayData();
+                            }
                         }
                     }
                 }

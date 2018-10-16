@@ -1085,6 +1085,15 @@ if (!function_exists('isNumeric')) {
         return validateVar($num, 'numeric', $bEmpty);
     }
 }
+if (!function_exists('isJson')) {
+    function isJson($string) {
+        if(isString($string)){
+            json_decode($string);
+            return (json_last_error() == JSON_ERROR_NONE);
+        }
+        return false;
+    }
+}
 if (!function_exists('valNumeric')) {
     function valNumeric($num)
     {
@@ -1578,38 +1587,46 @@ if (!function_exists('countStd')) {
 
 if (!function_exists('str2array')) {
     function str2array($str){
-        if(isString($str) && !isNumeric($str)){
-            if(strpos($str,'[') > -1 && strpos($str,']') > -1){
-                $str = str_replace('"','',$str);
-                $str = str_replace('[','',$str);
-                $str = str_replace(']','',$str);
-                $str = explode(',',$str);
-                $str = array_combine($str,$str);
-            }
-        } else if(isArray($str)){
-            foreach ($str as $key => $subValue){
-                if(isArray($subValue)){
-                    foreach ($subValue as $key2 => $subValue2){
-                        if(strpos($subValue2,'[') > -1 && strpos($subValue2,']') > -1){
-                            $subValue2 = str_replace('"','',$subValue2);
-                            $subValue2 = str_replace('[','',$subValue2);
-                            $subValue2 = str_replace(']','',$subValue2);
-                            $subValue2 = explode(',',$subValue2);
-                            $str[$key][$key2] = array_combine($subValue2,$subValue2);
-                        }
+        if(isJson($str)){
+            $str = std2array(json_decode($str));
+        } else {
+            if(isString($str) && !isNumeric($str)){
+                if(strpos($str,'[') > -1 && strpos($str,']') > -1){
+                    $str = str_replace('"','',$str);
+                    $str = str_replace('[','',$str);
+                    $str = str_replace(']','',$str);
+                    if (isString($str)){
+                        $str = explode(',',$str);
+                        $str = array_combine($str,$str);
+                    } else {
+                        $str = [$str];
                     }
-                } else {
-                    if(strpos($subValue,'[') > -1 && strpos($subValue,']') > -1){
-                        $subValue = str_replace('"','',$subValue);
-                        $subValue = str_replace('[','',$subValue);
-                        $subValue = str_replace(']','',$subValue);
-                        $subValue = explode(',',$subValue);
-                        $str[$key] = array_combine($subValue,$subValue);
+                }
+            } else if(isArray($str)){
+                foreach ($str as $key => $subValue){
+                    if(isArray($subValue)){
+                        foreach ($subValue as $key2 => $subValue2){
+                            if(strpos($subValue2,'[') > -1 && strpos($subValue2,']') > -1){
+                                $subValue2 = str_replace('"','',$subValue2);
+                                $subValue2 = str_replace('[','',$subValue2);
+                                $subValue2 = str_replace(']','',$subValue2);
+                                $subValue2 = explode(',',$subValue2);
+                                $str[$key][$key2] = array_combine($subValue2,$subValue2);
+                            }
+                        }
+                    } else {
+                        if(strpos($subValue,'[') > -1 && strpos($subValue,']') > -1){
+                            $subValue = str_replace('"','',$subValue);
+                            $subValue = str_replace('[','',$subValue);
+                            $subValue = str_replace(']','',$subValue);
+                            $subValue = explode(',',$subValue);
+                            $str[$key] = array_combine($subValue,$subValue);
+                        }
                     }
                 }
             }
         }
-        if(isArray($str)){
+        if(isArray($str,false)){
             return $str;
         } else if(!isString($str) && isObject($str)){
             return std2array($str);

@@ -49,7 +49,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
     public function get_new()
     {
-        $this->lcTableS = new ES_Model_UcTableP();
+        $this->lcTableS = new Model_UcTableP();
         return $this->lcTableS;
     }
 
@@ -109,8 +109,13 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         }
         $aSetttings['lcField'] = $lcObjField;
         $aData = $this->get_by($aSetttings,$bSelecting);
+
         if($bAsModel){
-            return $this->setFromData($aData);
+            $oDatas = array();
+            foreach ($aData as $data){
+                $oDatas[] = $this->setFromData($data);
+            }
+            return $oDatas;
         }
         return $aData;
     }
@@ -162,7 +167,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
             } else {
 
-                $oModelUcObjTableP = new ES_Model_UcTableP();
+                $oModelUcObjTableP = new Model_UcTableP();
             }
             $aFields = $this->getArrayData(true);
 
@@ -181,7 +186,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
         } else {
 
-            return new ES_Model_UcTableP();
+            return new Model_UcTableP();
         }
     }
 

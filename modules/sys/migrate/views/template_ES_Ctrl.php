@@ -59,7 +59,7 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
 
                     } else {
 
-                        $oModelUcObjTableP[$key] = new ES_Model_UcTableP();
+                        $oModelUcObjTableP[$key] = new Model_UcTableP();
                     }
                     $oModelUcObjTableP[$key] = $oModelUcObjTableP[$key]->setFromData($data);
                 }
@@ -71,7 +71,7 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
 
                 } else {
 
-                    $oModelUcObjTableP[0] = new ES_Model_UcTableP();
+                    $oModelUcObjTableP[0] = new Model_UcTableP();
                 }
                 $oModelUcObjTableP[0] = $oModelUcObjTableP[0]->setFromData($oData);
             }
@@ -84,7 +84,7 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
 
         } else {
 
-            $oModelUcObjTableP[] = new ES_Model_UcTableP();
+            $oModelUcObjTableP[] = new Model_UcTableP();
 
             return $oModelUcObjTableP;
         }
