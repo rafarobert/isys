@@ -151,12 +151,19 @@ else if ($hostName == "local.$proyName.com" || strstr($hostName,'127.0.0.'))
     $rootPath = strhas(DOCUMENTROOT, $proyName) ? DOCUMENTROOT : DOCUMENTROOT . "$proyName/";
     $webServer = "$protocol://$hostName/";
 }
-else if ($hostName == '192.168.1.10')
+else if ($hostName == "test.$proyName.com")
 {
-    define('ENVIRONMENT', 'testing');
-    define('LOCALFOLDER', "$proyName/");
-    $rootPath = strhas(DOCUMENTROOT, $proyName) ? DOCUMENTROOT : DOCUMENTROOT . "$proyName/";
-    $webServer = "$protocol://$hostName/$proyName/";
+    define('ENVIRONMENT', 'development');
+    define('LOCALFOLDER', '');
+    $rootPath = DOCUMENTROOT;
+    $webServer = "$protocol://$hostName/";
+}
+else if ($hostName == '192.168.1.10' || $hostName == '192.168.2.103')
+{
+    define('ENVIRONMENT', 'development');
+    define('LOCALFOLDER', '');
+    $rootPath = DOCUMENTROOT;
+    $webServer = "$protocol://$hostName/";
 }
 else if ($hostName == '200.87.100.10')
 {
@@ -164,6 +171,9 @@ else if ($hostName == '200.87.100.10')
     define('LOCALFOLDER', '');
     $rootPath = DOCUMENTROOT;
     $webServer = "$protocol://$hostName/";
+} else {
+    echo "<h2>Ocurrio un error con la direccion IP o el nombre del hostname: $hostName, verifica que el mismo este configurado en el servidor</h2>";
+    exit();
 }
 
 $assets = $webServer.'assets/';
