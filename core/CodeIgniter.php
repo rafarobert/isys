@@ -389,7 +389,7 @@ if ( ! is_php('5.4'))
 
         // **************** Establece el nombre del modulo *****************
         if($modulo == ''){
-            $modulo = $URI->segments[1];
+            $modulo = isset($RTR->module) ? $RTR->module : $URI->segments[1];
         } else {
             if(is_array($SYS[$modulo])){
                 $modulo = $SYS[$modulo]['name'];
@@ -403,7 +403,6 @@ if ( ! is_php('5.4'))
             $class = $subMod;
             $validating = true;
         }
-
         foreach ($DIRS as $root => $dirs){
             foreach ($dirs as $dir => $mods){
                 foreach ($mods as $mod => $type){
@@ -485,7 +484,6 @@ if ( ! is_php('5.4'))
  */
 
 	$e404 = FALSE;
-
 
     if(isset($URI->segments[1])) {
         $framePath = getframePath();

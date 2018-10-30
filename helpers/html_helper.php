@@ -434,8 +434,8 @@ if ( ! function_exists('modal'))
        
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button id="btnAction" type="button" class="btn btn-primary">Send message</button>
+        <button onclick="oComanda.resetValues()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button onclick="oComanda.resetValues()" id="btnAction" type="button" class="btn btn-primary">Send message</button>
       </div>
     </div>
   </div>
