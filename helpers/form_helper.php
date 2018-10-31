@@ -709,6 +709,7 @@ if ( ! function_exists('set_options'))
                 unset($data['option']);
                 if(validateVar($checkeds,'array')){
                     foreach ($checkeds as $k => $check){
+                        $data['id'] = 'input'.ucfirst($data['name']).ucfirst(cleanWhiteSpaces($option));
                         if($option == $check){
                             $htmlOptions .= form_checkbox($data, $k, true, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
                         } else {
@@ -718,6 +719,7 @@ if ( ! function_exists('set_options'))
                 } else {
                     if(is_object($checked)){
                         foreach ($checked as $chk){
+                            $data['id'] = 'input'.ucfirst($data['name']).ucfirst(cleanWhiteSpaces($option));
                             if($chk == $key){
                                 $htmlOptions .= form_checkbox($data, $key, true, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
                             } else {
@@ -725,6 +727,7 @@ if ( ! function_exists('set_options'))
                             }
                         }
                     } else {
+                        $data['id'] = 'input'.ucfirst($data['name']).ucfirst(cleanWhiteSpaces($option));
                         if($checked == $key){
                             $htmlOptions .= form_checkbox($data, strval($key), true, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
                         } else {

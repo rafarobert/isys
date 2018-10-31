@@ -28,6 +28,6 @@
         <?php } ?>
     <?php
     $data = '$inputData';
-    echo form_hidden($data, set_value("lcObjField", $oConcepto->getUcObjField()), "")
+    echo form_hidden($data, set_value("lcObjField", $oUcObjTableS->getUcObjField()), "")
     ?>
 </div>

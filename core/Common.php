@@ -1830,3 +1830,10 @@ if (!function_exists('getModSubMod')) {
         }
     }
 }
+
+if (!function_exists('cleanWhiteSpaces')) {
+    function cleanWhiteSpaces($str)
+    {
+        return str_replace(' ', '', strval(trim($str," \t\n\r")));
+    }
+}

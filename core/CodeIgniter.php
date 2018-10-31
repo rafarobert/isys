@@ -36,6 +36,8 @@
  * @filesource
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
+header('Access-Control-Allow-Origin: http://localhost:4200');
+
 
 /**
  * System Initialization File

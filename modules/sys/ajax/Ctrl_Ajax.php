@@ -19,6 +19,27 @@ class Ctrl_Ajax extends ES_Base_Controller
         $this->load->model('sys/model_ajax');
     }
 
+    public function set_global_vars(){
+        $aResponse = array(
+            'ROOTPATH' => ROOTPATH,
+            'WEB_SERVER' => WEBSERVER,
+            'WEB_ROOT' => WEBROOT,
+            'PROTOCOL' => PROTOCOL,
+            'BASEPATH' => BASEPATH,
+            'APPPATH' => APPPATH,
+            'ORMPATH' => ORMPATH,
+            'FCPATH' => FCPATH,
+            'SYSDIR' => SYSDIR,
+        );
+        echo json_encode($aResponse);
+
+        exit();
+    }
+
+    public function save_user(){
+        
+    }
+
     public function export($table = '', $funct = 'edit', $subview = ''){
         $SYS = config_item('sys');
         $data = $this->input->post('data');
