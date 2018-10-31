@@ -981,8 +981,8 @@ class CI_Session {
         if($id == ''){
             $id = $this->CI->uri->segment(4);
         }
-
         $this->CI->db->where('email', $this->CI->input->post('email'));
+        $this->CI->db->where('signin_method', $this->CI->input->post('signin_method'));
 
         !$id || $this->CI->db->where("$this->userIdTable !=", $id);
 
@@ -1009,13 +1009,8 @@ class CI_Session {
             if($this->CI->form_validation->run() == true){
                 // We can login and redirect
                 if($this->_unique_email()){
-                    $data = $this->MI->array_from_post(array(
-                        // *** estic - tables - inicio ***
-                        "email",
-                        "password",
-                        // *** estic - tables - fin ***
-                    ));
-                    $data["password"] = $this->hash($this->CI->input->post("password"));
+                    $data = $this->CI->input->post();
+                    $data["password"] = $this->CI->input->post("password");
                     if(count($roles) == 1){
                         $data["id_role"] = $roles[0]['id_role'];
                     } else {
@@ -1042,9 +1037,14 @@ class CI_Session {
     }
 
     public function login(){
+	    $emailPost = $this->CI->input->post('email');
+	    $ngEmailPost = $this->CI->input->post('ngemail');
+	    $passwordPost = $this->hash($this->CI->input->post('password'));
+	    $ngPasswordPost = $this->hash($this->CI->input->post('ngpassword'));
+
         $oUser = $this->MI->get_by(array(
-            'email' => $this->CI->input->post('email'),
-            'password' => $this->hash($this->CI->input->post('password')),
+            'email' => $emailPost ? $emailPost : ($ngEmailPost ? $ngEmailPost : ''),
+            'password' => $passwordPost ? $passwordPost : ($ngPasswordPost ? $ngPasswordPost : ''),
             0 => 'id_role',
             1 => 'name',
             2 => 'lastname',
@@ -1058,7 +1058,8 @@ class CI_Session {
             $data = std2array($oUser);
             $data['loggedin'] = TRUE;
             $this->set_userdata($this->sessKey,$data);
-            redirect(WEBSERVER.'admin/dashboard');
+            $uri = $this->CI->input->post('uri_string') ? WEBSERVER.$this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? WEBSERVER.$this->CI->uri->uri_string() : WEBSERVER.'admin/dashboard');
+            redirect($uri);
         } else {
             return false;
         }

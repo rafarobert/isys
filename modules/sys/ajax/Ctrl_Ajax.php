@@ -37,7 +37,7 @@ class Ctrl_Ajax extends ES_Base_Controller
     }
 
     public function save_user(){
-        
+
     }
 
     public function export($table = '', $funct = 'edit', $subview = ''){

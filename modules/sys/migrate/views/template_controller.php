@@ -95,7 +95,6 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
             //>>>validateFieldPassword<<<
             if ($id == NULL) {
                 $data["lcField"] = $this->input->post('lcField');
-                $data["lcField"] = $this->session->hash($data['lcField']);
             }
             //<<<validateFieldPassword>>>
             if ($error == 'ok') {

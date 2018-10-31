@@ -23,10 +23,12 @@ class ES_Backend_Controller extends ES_Controller
 
         // ------------- img configurations ----------------
         $this->data['imgMaxHeight'] = config_item('img_max_height');
-        $this->data['imgMaxWidth'] = config_item('img_max_width');;
-        $this->data['imgMaxSize'] = config_item('img_max_size');;
-        $this->data['fileTypes'] = config_item('file_types');;
+        $this->data['imgMaxWidth'] = config_item('img_max_width');
+        $this->data['imgMaxSize'] = config_item('img_max_size');
+        $this->data['fileTypes'] = config_item('file_types');
         // -------------------------------------------------
+        $this->fromAjax = $this->input->post('fromAjax') ? true : false;
+        $this->data['uri_string'] = $this->uri->uri_string();
 
         $this->load->helper('form');
         $this->load->library('form_validation');
@@ -53,6 +55,8 @@ class ES_Backend_Controller extends ES_Controller
                     'id_user' => $sessUserData->id_user
                 );
                 $this->session->set_userdata($data);
+            } else if($this->input->post('login') == 'Ingresar'){
+                $this->session->login();
             } else {
                 $this->data['subLayout'] = 'login';
                 if ($this->input->post('signup') == 'Registrarse') {

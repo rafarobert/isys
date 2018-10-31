@@ -184,7 +184,7 @@ if ( ! function_exists('form_hidden'))
 
 		if ( ! is_array($value))
 		{
-			$form .= '<input type="text" name="'.$name.'" value="'.html_escape($value)."\" />\n";
+			$form .= '<input type="text" name="'.$name.'" value="'.html_escape($value)."\" class=\"display-none\"/>\n";
 		}
 		else
 		{

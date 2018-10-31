@@ -11,6 +11,16 @@ use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 Class ES_Model extends ES_Model_Vars {
 
     /**
+     * @var ES_Controller $CI
+     */
+    protected $CI;
+
+    /**
+     * @var ES_Model $MI
+     */
+    protected $MI;
+
+    /**
      * Value for virtual field files.
      *
      * @var        array
@@ -255,6 +265,17 @@ Class ES_Model extends ES_Model_Vars {
             $data['status'] = 'ENABLED';
         }
 
+        if($this->db->field_exists('password', $this->_table_name) && $id == null){
+            $data['password'] = $this->session->hash($data['password']);
+        }
+        if($this->db->field_exists('email', $this->_table_name) && $this->_table_name == 'ci_users'){
+            if(!$this->session->_unique_email()){
+                echo 'El email ya se encuentra registrado';
+                exit();
+            };
+        }
+
+
         if($this->_timestaps == true){
             if($id == null){
                 if($this->db->field_exists('date_created',$this->_table_name) && $this->db->field_exists('date_modified',$this->_table_name) && $this->db->field_exists('change_count',$this->_table_name)){
@@ -295,26 +316,34 @@ Class ES_Model extends ES_Model_Vars {
 //            }
 //        }
 
-        $funct_v = function ($vals) {
-            if (isObject($vals)){
-                $vals = std2array($vals);
-            }
-            if(is_array($vals)){
-                $str = json_encode($vals);
-                return $str;
-            }
-            return $vals;
+        $funct_v = function ($key, $vals) {
+
+            $this->CI = class_exists('CI_Controller') ? CI_Controller::get_instance() : null;
+            if($this->CI->db->field_exists($key,$this->_table_name)){
+                if (isObject($vals)){
+                    $vals = std2array($vals);
+                }
+                if(is_array($vals)){
+                    $str = json_encode($vals);
+                    return $str;
+                }
+                return $vals;
+            } return null;
+
         };
         $funct_k = function ($key) {
-            if(strpos($key,'[]')){
-                $key = substr($key,0,strlen($key)-2);
-            }
-            return $key;
+            $this->CI = class_exists('CI_Controller') ? CI_Controller::get_instance() : null;
+            if($this->CI->db->field_exists($key,$this->_table_name)){
+                if(strpos($key,'[]')){
+                    $key = substr($key,0,strlen($key)-2);
+                }
+                return $key;
+            } return null;
         };
         $keys = array_map($funct_k, array_keys($data));
-        $vals = array_map($funct_v, array_values($data));
+        $vals = array_map($funct_v, array_keys($data), array_values($data));
         $data = array_combine($keys,$vals);
-
+        unset($data[null]);
         if(inArray($this->_primary_key,$data) ){
             unset($data[$this->_primary_key]);
         }

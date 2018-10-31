@@ -186,6 +186,7 @@ define('WEBSERVER', $webServer);
 define('WEBASSETS', $assets);
 define('WEBROOT', $webServer);
 define('PROTOCOL', $protocol);
+define('SERVERNAME', $_SERVER['SERVER_NAME']);
 
 /*
  *---------------------------------------------------------------
