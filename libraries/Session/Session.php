@@ -982,7 +982,12 @@ class CI_Session {
             $id = $this->CI->uri->segment(4);
         }
         $this->CI->db->where('email', $this->CI->input->post('email'));
-        $this->CI->db->where('signin_method', $this->CI->input->post('signin_method'));
+
+        if($this->CI->input->post('signinMethod')){
+            $this->CI->db->where('signin_method', $this->CI->input->post('signinMethod'));
+        } else if($this->CI->input->post('signin_method')){
+            $this->CI->db->where('signin_method', $this->CI->input->post('signin_method'));
+        }
 
         !$id || $this->CI->db->where("$this->userIdTable !=", $id);
 

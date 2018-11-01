@@ -188,13 +188,13 @@ define('WEBROOT', $webServer);
 define('PROTOCOL', $protocol);
 define('SERVERNAME', $_SERVER['SERVER_NAME']);
 
-echo DIRECTORY;
-echo ROOTPATH;
-echo WEBSERVER;
-echo WEBASSETS;
-echo WEBROOT;
-echo PROTOCOL;
-echo SERVERNAME;
+echo DIRECTORY.'<br>';
+echo ROOTPATH.'<br>';
+echo WEBSERVER.'<br>';
+echo WEBASSETS.'<br>';
+echo WEBROOT.'<br>';
+echo PROTOCOL.'<br>';
+echo SERVERNAME.'<br>';
 
 /*
  *---------------------------------------------------------------
