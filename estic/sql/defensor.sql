@@ -66,7 +66,7 @@ CREATE TABLE `ci_files`
     `path` VARCHAR(400),
     `width` INTEGER,
     `height` INTEGER,
-    `size` INTEGER,
+    `size` DECIMAL,
     `library` VARCHAR(20),
     `nro_thumbs` INTEGER,
     `id_parent` int(10) unsigned,
@@ -91,7 +91,7 @@ CREATE TABLE `ci_files`
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `ci_files_ibfk_3`
         FOREIGN KEY (`id_parent`)
-        REFERENCES `ci_users` (`id_user`)
+        REFERENCES `ci_files` (`id_file`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -285,6 +285,7 @@ CREATE TABLE `ci_users`
     `picture` int(11) unsigned,
     `id_role` int(10) unsigned,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `signin_method` VARCHAR(100),
     `status` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
@@ -971,7 +972,6 @@ CREATE TABLE `dfa_tipos_publicaciones`
     `id_tipos_publicacion` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(200),
     `descripcion` VARCHAR(500),
-    `categoria` VARCHAR(256),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -1007,7 +1007,6 @@ CREATE TABLE `dfa_tipos_puestos`
     `id_user_created` int(11) unsigned NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
-    `column_10` INTEGER,
     PRIMARY KEY (`id_puesto`),
     UNIQUE INDEX `dfa_puestos_id_puesto_uindex` (`id_puesto`),
     INDEX `dfa_puestos_ibfk_1` (`id_user_created`),
