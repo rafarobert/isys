@@ -175,8 +175,8 @@ else if ($hostName == '200.87.100.10')
     $webServer = "$protocol://$hostName/";
 } else {
     echo "<h2>Ocurrio un error con la direccion IP o el nombre del hostname: $hostName, verifica que el mismo este configurado en el servidor</h2>";
+    echo dump($_SERVER);
 
-    echo var_dump($_SERVER);
     echo $rootPath.'<br>';
     echo $proyName.'<br>';
     echo $currentPath.'<br>';
@@ -185,6 +185,7 @@ else if ($hostName == '200.87.100.10')
 
     exit();
 }
+echo dump($_SERVER);
 
 $assets = $webServer.'assets/';
 
