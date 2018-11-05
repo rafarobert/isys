@@ -175,6 +175,13 @@ else if ($hostName == '200.87.100.10')
     $webServer = "$protocol://$hostName/";
 } else {
     echo "<h2>Ocurrio un error con la direccion IP o el nombre del hostname: $hostName, verifica que el mismo este configurado en el servidor</h2>";
+
+    echo $rootPath.'<br>';
+    echo $proyName.'<br>';
+    echo $currentPath.'<br>';
+    echo $hostName.'<br>';
+    echo $protocol.'<br>';
+
     exit();
 }
 
@@ -188,13 +195,7 @@ define('WEBROOT', $webServer);
 define('PROTOCOL', $protocol);
 define('SERVERNAME', $_SERVER['SERVER_NAME']);
 
-echo DIRECTORY.'<br>';
-echo ROOTPATH.'<br>';
-echo WEBSERVER.'<br>';
-echo WEBASSETS.'<br>';
-echo WEBROOT.'<br>';
-echo PROTOCOL.'<br>';
-echo SERVERNAME.'<br>';
+
 
 /*
  *---------------------------------------------------------------
