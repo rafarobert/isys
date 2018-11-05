@@ -160,6 +160,13 @@ else if ($hostName == "test.$proyName.com")
     $rootPath = DOCUMENTROOT;
     $webServer = "$protocol://$hostName/";
 }
+else if ($hostName == "desarrollo.defensoria.gob.bo")
+{
+    define('ENVIRONMENT', 'testing');
+    define('LOCALFOLDER', '');
+    $rootPath = DOCUMENTROOT;
+    $webServer = "$protocol://$hostName/";
+}
 else if ($hostName == '192.168.1.10' || $hostName == '192.168.2.103' || $hostName == '192.168.2.21')
 {
     define('ENVIRONMENT', 'development');
