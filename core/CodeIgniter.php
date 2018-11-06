@@ -915,6 +915,8 @@ if (isset($assign_to_config) && is_array($assign_to_config))
         $framePath = APPPATH;
     }
 
+    echo $framePath;
+
     if ($RTR->directory == null )
     {
         $RTR->directory = 'testFrame/';
