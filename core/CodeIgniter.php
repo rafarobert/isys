@@ -185,7 +185,6 @@ else if ($hostName == '200.87.100.10')
     echo dump($_SERVER);
     exit();
 }
-echo dump($_SERVER);
 
 $assets = $webServer.'assets/';
 
