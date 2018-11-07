@@ -139,7 +139,7 @@ if(file_exists(DOCUMENTROOT . 'app/config/config.php'))
  * ------------------------------------------------------
  */
 
-// ----------------------- Configuraciones para development ---------------------------
+// ----------------------- Configuraciones para desarrollo ---------------------------
 if($hostName == '127.0.0.1' || $hostName == 'localhost')
 {
     define('ENVIRONMENT', 'development');
