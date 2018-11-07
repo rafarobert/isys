@@ -139,6 +139,7 @@ if(file_exists(DOCUMENTROOT . 'app/config/config.php'))
  * ------------------------------------------------------
  */
 
+// ----------------------- Configuraciones para development ---------------------------
 if($hostName == '127.0.0.1' || $hostName == 'localhost')
 {
     define('ENVIRONMENT', 'development');
@@ -153,34 +154,34 @@ else if ($hostName == "local.$proyName.com" || strstr($hostName,'127.0.0.'))
     $rootPath = strhas(DOCUMENTROOT, $proyName) ? DOCUMENTROOT : DOCUMENTROOT . "$proyName/";
     $webServer = "$protocol://$hostName/";
 }
-else if ($hostName == "test.$proyName.com")
+else if ($hostName == '192.168.1.10' || $hostName == '192.168.2.103' )
 {
     define('ENVIRONMENT', 'development');
     define('LOCALFOLDER', '');
     $rootPath = DOCUMENTROOT;
     $webServer = "$protocol://$hostName/";
 }
-else if ($hostName == "desarrollo.defensoria.gob.bo")
+// ------------------------------------------------------------------------------------
+// ------------------------ Configuraciones para Testing ------------------------------
+else if ($hostName == "test.$proyName.com")
 {
     define('ENVIRONMENT', 'testing');
     define('LOCALFOLDER', '');
     $rootPath = DOCUMENTROOT;
     $webServer = "$protocol://$hostName/";
 }
-else if ($hostName == '192.168.1.10' || $hostName == '192.168.2.103' || $hostName == '192.168.2.21')
-{
-    define('ENVIRONMENT', 'development');
-    define('LOCALFOLDER', '');
-    $rootPath = DOCUMENTROOT;
-    $webServer = "$protocol://$hostName/";
-}
-else if ($hostName == '200.87.100.10')
+// ------------------------------------------------------------------------------
+// ------------------ Configuraciones para produccion --------------------------
+else if ($hostName == "desarrollo.defensoria.gob.bo" || $hostName == '192.168.2.21')
 {
     define('ENVIRONMENT', 'production');
     define('LOCALFOLDER', '');
     $rootPath = DOCUMENTROOT;
     $webServer = "$protocol://$hostName/";
-} else {
+}
+// ------------------------------------------------------------------------------
+
+else {
     echo "<h2>Ocurrio un error con la direccion IP o el nombre del hostname: $hostName, verifica que el mismo este configurado en el servidor</h2>";
     echo dump($_SERVER);
     exit();
