@@ -174,7 +174,7 @@ else if ($hostName == "test.$proyName.com")
 // ------------------ Configuraciones para produccion --------------------------
 else if ($hostName == "desarrollo.defensoria.gob.bo" || $hostName == '192.168.2.21')
 {
-    define('ENVIRONMENT', 'development');
+    define('ENVIRONMENT', 'production');
     define('LOCALFOLDER', '');
     $rootPath = DOCUMENTROOT;
     $webServer = "$protocol://$hostName/";
