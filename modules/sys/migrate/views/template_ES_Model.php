@@ -131,10 +131,9 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     }
 
     public function find($bCreateCtrl = false){
-        if(!Ctrl_UcTableP::$initialized || $bCreateCtrl){
-            Ctrl_UcTableP::create()->init();
+        if($bCreateCtrl){
+            Ctrl_Tables::create($bCreateCtrl);
         }
-
         // Obtiene a todos los lcTableP
         $oUcObjTableP = $this->get();
        //>>>setForeignTableFields<<<

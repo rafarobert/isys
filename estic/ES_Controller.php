@@ -7,8 +7,6 @@ class ES_Controller extends ES_Ctrl_Vars
     const STRING = 'string';
     const ARRAYS = 'array';
     const NUMERIC = 'numeric';
-
-    public $CI;
     public $fromAjax = false;
 
     public $request;
@@ -41,16 +39,10 @@ class ES_Controller extends ES_Ctrl_Vars
     }
 
     public function initLoaded(){
-        $this->CI=CI_Controller::get_instance();
-        if($this->CI != null){
-            foreach ($this->CI as $instance => $value) {
-                if($instance == 'data'){
-                    foreach ($this->$instance as $keyData => $valData){
-                        $this->$instance[$keyData] = $valData;
-                    }
-                } else {
-                    $this->$instance = $value;
-                }
+        $CI=CI_Controller::get_instance();
+        if($CI != null){
+            foreach ($CI as $instance => $value) {
+                $this->$instance = $value;
             }
         }
         if(isset($this->load)){

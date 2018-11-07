@@ -10,7 +10,7 @@ defined("BASEPATH") OR exit("No direct script access allowed");
 
 class ES_Ctrl_UcTableP extends ES_UcModS_Controller
 {
-    public static $initialized;
+
     //>>>initVarsForeignTable<<<
     public $lcFkObjFieldP;
     //<<<initVarsForeignTable>>>
@@ -42,7 +42,6 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
         //>>>setObjFieldsFilterBy<<<
         $this->data['oUcObjFilterByP'] =  $this->model_lcFkTableP->setOptions($this->lcObjFilterByP);
         //<<<setObjFieldsFilterBy>>>
-        self::$initialized = true;
     }
 
     public function setUcObjTableP($oData, $oUcObjTableP = null)
