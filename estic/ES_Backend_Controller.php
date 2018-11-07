@@ -5,7 +5,9 @@
  * Date: 2/22/2018
  * Time: 12:01 AM
  */
+
 use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
+use Propel\Runtime\Exception\PropelException;
 
 class ES_Backend_Controller extends ES_Controller
 {
@@ -29,9 +31,20 @@ class ES_Backend_Controller extends ES_Controller
         // -------------------------------------------------
         $this->fromAjax = $this->input->post('fromAjax') ? true : false;
         $this->data['uri_string'] = $this->uri->uri_string();
+//        $editTagsSet = CiSettingsQuery::create()->select(['EditTag'])->find()->getData();
+//        $editTagsOpt = CiOptionsQuery::create()->select(['EditTag'])->find()->getData();
+//        $editTags = array_merge($editTagsSet,$editTagsOpt);
+//        $this->data['editTags'] = $editTags;
+        if($this->CI == null){
+            $this->onInit();
+        }
+    }
+
+    public function onInit(){
 
         $this->load->helper('form');
         $this->load->library('form_validation');
+        $this->load->library('upload');
 //        $this->load->library('request');
         $this->load->library('encryption');
 //        $this->form_validation->set_error_delimiters('<p class="error">', '</p>');
@@ -76,25 +89,17 @@ class ES_Backend_Controller extends ES_Controller
 
                 if (is_object($sessUserData)) {
                     if($sessUserData->id_role == 1){
-                        $this->data['oSysTables'] = CiTablesQuery::create()->find();
-                        $this->data['oSysModules'] = CiModulesQuery::create()->find();
+                        $this->data['oSysTables'] = Model_Tables::create()->find();
+                        $this->data['oSysModules'] = Model_Modules::create()->find();
                     } else if($this->uri->segments(1) == 'admin'){
-                        $this->data['oSysModules'] = CiModulesQuery::create()->find();
-                        $this->data['oSysTables'] = CiTablesQuery::create()->
-                        filterByIdRoles($sessUserData->id_role)->
-                        find();
+                        $this->data['oSysModules'] = Model_Modules::create()->find();
+                        $this->data['oSysTables'] = Model_Tables::create()->filterByIdNivelRole($sessUserData->id_role);
                     } else if($this->uri->segments(1) == 'base'){
-                        $this->data['oSysModules'] = CiModulesQuery::create()->find();
-                        $this->data['oSysTables'] = CiTablesQuery::create()->
-                        filterByIdRoles($sessUserData->id_role)->
-                        find();
+                        $this->data['oSysModules'] = Model_Modules::create()->find();
+                        $this->data['oSysTables'] = Model_Tables::create()->filterByIdNivelRole($sessUserData->id_role);
                     }
                 }
             }
         }
-//        $editTagsSet = CiSettingsQuery::create()->select(['EditTag'])->find()->getData();
-//        $editTagsOpt = CiOptionsQuery::create()->select(['EditTag'])->find()->getData();
-//        $editTags = array_merge($editTagsSet,$editTagsOpt);
-//        $this->data['editTags'] = $editTags;
     }
 }
