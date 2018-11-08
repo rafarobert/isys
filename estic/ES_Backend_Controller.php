@@ -78,15 +78,10 @@ class ES_Backend_Controller extends ES_Controller
                     if($sessUserData->id_role == 1){
                         $this->data['oSysTables'] = CiTablesQuery::create()->find();
                         $this->data['oSysModules'] = CiModulesQuery::create()->find();
-                    } else if($this->uri->segments(1) == 'admin'){
+                    } else {
                         $this->data['oSysModules'] = CiModulesQuery::create()->find();
                         $this->data['oSysTables'] = CiTablesQuery::create()->
-                        filterByIdRoles($sessUserData->id_role)->
-                        find();
-                    } else if($this->uri->segments(1) == 'base'){
-                        $this->data['oSysModules'] = CiModulesQuery::create()->find();
-                        $this->data['oSysTables'] = CiTablesQuery::create()->
-                        filterByIdRoles($sessUserData->id_role)->
+                        filterByIdNivelRole($sessUserData->id_role)->
                         find();
                     }
                 }

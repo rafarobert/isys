@@ -1004,10 +1004,11 @@ class CI_Session {
         $this->CI->load->model('base/model_roles');
         $dashboard = "admin/dashboard";
         $this->isLoguedin() == FALSE || redirect($dashboard);
-        $roles = std2array($this->CI->model_roles->get_by('id_role'));
+        $roles = $this->CI->model_roles->find();
         // Set form
         $rules = $this->MI->rules_register;
         $this->CI->form_validation->set_rules($rules);
+
 
         if(validateVar($roles,'array')){
             // Process form
@@ -1015,15 +1016,15 @@ class CI_Session {
                 // We can login and redirect
                 if($this->_unique_email()){
                     $data = $this->CI->input->post();
-                    $data["password"] = $this->CI->input->post("password");
-                    if(count($roles) == 1){
-                        $data["id_role"] = $roles[0]['id_role'];
-                    } else {
-                        foreach ($roles as $role){
-                            $data["id_role"] = $role->id_role;
-                        }
-                    }
-
+                    /**
+                     * @var Model_Roles $role
+                     */
+//                    foreach ($roles as $role) {
+//                        if ($data['id_role'] == $role->getIdRole()){
+//                            $data["id_role"] = $role->getIdRole();
+//                        }
+//                    }
+//
                     $this->MI->save($data);
                     $this->login();
                     redirect($dashboard);
