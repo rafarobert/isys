@@ -51,6 +51,7 @@ class ES_Controller extends ES_Ctrl_Vars
                 $this->$name = new $name();
             }
         }
+        return $CI;
     }
 
     public function loadView($path, $error = ''){

@@ -203,51 +203,55 @@ class Ctrl_Ajax extends ES_Base_Controller
         $class = isString($class) ? $class : $this->router->class;
         $mod = isString($mod) ? $mod : $this->router->module;
         $pk = isString($pk) || isNumeric($pk) ? $pk : '';
-        $acr = $sys[$mod];
 
-        $this->{"init".ucfirst($class)}(true);
-        if($response = $this->{"model_$class"}->{$method}($pk)){
-            if(inArray('tableRef',$post) && inArray('idTableRef',$post) && inArray('fieldTableRef',$post)){
-                $tableRef = $post['tableRef'];
-                $pkTableRef = ucfirst($post['pkTableRef']);
-                $idTableRef = ucfirst($post['idTableRef']);
-                $fieldTableRef = $post['fieldTableRef'];
-                list($classRefMod,$classRefName) = getModSubMod($tableRef);
-                $this->{"init".ucfirst($classRefName)}(true);
-                $objRef = $this->{"model_$classRefName"}->{"findOneBy$pkTableRef"}($idTableRef);
-                $aIdsFiles = std2array($objRef->{"get$fieldTableRef"}());
-                if(in_array($pk,$aIdsFiles)){
-                    $key = array_search($pk,$aIdsFiles);
-                    unset($aIdsFiles[$key]);
-                    $objRef->{"set$fieldTableRef"}($aIdsFiles);
-                    $data = $objRef->save();
+        $response = array();
+        if(class_exists("init".ucfirst($class))){
+            $acr = $sys[$mod];
+
+            $this->{"init".ucfirst($class)}(true);
+            if($response = $this->{"model_$class"}->{$method}($pk)){
+                if(inArray('tableRef',$post) && inArray('idTableRef',$post) && inArray('fieldTableRef',$post)){
+                    $tableRef = $post['tableRef'];
+                    $pkTableRef = ucfirst($post['pkTableRef']);
+                    $idTableRef = ucfirst($post['idTableRef']);
+                    $fieldTableRef = $post['fieldTableRef'];
+                    list($classRefMod,$classRefName) = getModSubMod($tableRef);
+                    $this->{"init".ucfirst($classRefName)}(true);
+                    $objRef = $this->{"model_$classRefName"}->{"findOneBy$pkTableRef"}($idTableRef);
+                    $aIdsFiles = std2array($objRef->{"get$fieldTableRef"}());
+                    if(in_array($pk,$aIdsFiles)){
+                        $key = array_search($pk,$aIdsFiles);
+                        unset($aIdsFiles[$key]);
+                        $objRef->{"set$fieldTableRef"}($aIdsFiles);
+                        $data = $objRef->save();
+                    }
                 }
             }
-        }
-        if(validateArray($response,'message') && validateArray($response,'code')){
-            preg_match_all("/`(.*?)`/",$response['message'],$aMessage);
-            if(validateArray($aMessage,1)){
-                $response['constraints'] = $aMessage[1];
-                if(compareArrayNum($response,'code',1451)){
-                    list($foreignMod, $foreignTable) = getModSubMod($aMessage[1][1]);
-                    list($localMod, $localTable) = getModSubMod($aMessage[1][4]);
-                    list($foreignTableS, $foreignP) = setSingularPlural($foreignTable);
-                    list($localTableS, $localTableP) = setSingularPlural($localTable);
-                    $response['SQL'] = $response['message'];
-                    $response['message'] = "No se puede eliminar el registro debido a que existe un $foreignTableS que hace referencia a esta $localTableS";
+            if(validateArray($response,'message') && validateArray($response,'code')){
+                preg_match_all("/`(.*?)`/",$response['message'],$aMessage);
+                if(validateArray($aMessage,1)){
+                    $response['constraints'] = $aMessage[1];
+                    if(compareArrayNum($response,'code',1451)){
+                        list($foreignMod, $foreignTable) = getModSubMod($aMessage[1][1]);
+                        list($localMod, $localTable) = getModSubMod($aMessage[1][4]);
+                        list($foreignTableS, $foreignP) = setSingularPlural($foreignTable);
+                        list($localTableS, $localTableP) = setSingularPlural($localTable);
+                        $response['SQL'] = $response['message'];
+                        $response['message'] = "No se puede eliminar el registro debido a que existe un $foreignTableS que hace referencia a esta $localTableS";
+                    }
                 }
-            }
-            $response['error'] = 'Hubo un error al eliminar el registro';
-        } else {
-            $response = array();
-            $view = $this->{"ctrl_$class"}->index();
-            if(validateVar($view,'array')){
-                list($response['view'], $response['error']) = $view;
+                $response['error'] = 'Hubo un error al eliminar el registro';
             } else {
-                $response['error'] = 'ok';
-                $response['view'] = $view;
+                $response = array();
+                $view = $this->{"ctrl_$class"}->index();
+                if(validateVar($view,'array')){
+                    list($response['view'], $response['error']) = $view;
+                } else {
+                    $response['error'] = 'ok';
+                    $response['view'] = $view;
+                }
+                $response['message'] = 'El registro fue eliminado de forma exitosa';
             }
-            $response['message'] = 'El registro fue eliminado de forma exitosa';
         }
         echo json_encode($response);
         exit;

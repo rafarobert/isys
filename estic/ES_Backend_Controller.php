@@ -11,8 +11,9 @@ class ES_Backend_Controller extends ES_Controller
 {
     function __construct()
     {
-        $this->initLoaded();
+        $CI = $this->initLoaded();
         parent::__construct();
+        $this->data['subLayout'] = 'backend/_subLayout';
 
         $this->data['siteTitle'] = config_item('site_title');
         $this->data['metaTitle'] = config_item('meta_title');
@@ -24,12 +25,24 @@ class ES_Backend_Controller extends ES_Controller
         // ------------- img configurations ----------------
         $this->data['imgMaxHeight'] = config_item('img_max_height');
         $this->data['imgMaxWidth'] = config_item('img_max_width');
-        $this->data['imgMaxSize'] = config_item('img_max_size');
+        $this->data['fileMaxSize'] = config_item('file_max_size');
         $this->data['fileTypes'] = config_item('file_types');
+        $this->data['fileTypesJs'] = config_item('file_types_js');
         // -------------------------------------------------
         $this->fromAjax = $this->input->post('fromAjax') ? true : false;
         $this->data['uri_string'] = $this->uri->uri_string();
 
+        if(!$CI || strstr($this->uri->uri_string(), 'sys/migrate')){
+            $this->onLoad();
+        }
+
+//        $editTagsSet = CiSettingsQuery::create()->select(['EditTag'])->find()->getData();
+//        $editTagsOpt = CiOptionsQuery::create()->select(['EditTag'])->find()->getData();
+//        $editTags = array_merge($editTagsSet,$editTagsOpt);
+//        $this->data['editTags'] = $editTags;
+    }
+
+    public function onLoad() {
         $this->load->helper('form');
         $this->load->library('form_validation');
 //        $this->load->library('request');
@@ -47,7 +60,6 @@ class ES_Backend_Controller extends ES_Controller
             $sessUserData = null;
 
             if ($this->session->isLoguedin()) {
-                $this->data['subLayout'] = $this->uri->segment(1) == 'base' ? 'backend/base/_subLayout' : 'backend/admin/_subLayout';
                 $this->CI->data['subview'] = 'admin/dashboard/index';
                 $sessUserData = (object)$this->session->get_userdata()[config_item('sess_key_admin')];
                 $this->data['oUser'] = $sessUserData;
@@ -87,9 +99,5 @@ class ES_Backend_Controller extends ES_Controller
                 }
             }
         }
-//        $editTagsSet = CiSettingsQuery::create()->select(['EditTag'])->find()->getData();
-//        $editTagsOpt = CiOptionsQuery::create()->select(['EditTag'])->find()->getData();
-//        $editTags = array_merge($editTagsSet,$editTagsOpt);
-//        $this->data['editTags'] = $editTags;
     }
 }

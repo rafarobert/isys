@@ -283,6 +283,7 @@ CREATE TABLE `ci_users`
     `cellphone_number_1` VARCHAR(20),
     `cellphone_number_2` VARCHAR(20),
     `picture` int(11) unsigned,
+    `id_provincia` int(10) unsigned,
     `id_role` int(10) unsigned,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `signin_method` VARCHAR(100),
@@ -292,9 +293,13 @@ CREATE TABLE `ci_users`
     PRIMARY KEY (`id_user`),
     UNIQUE INDEX `ci_users_id_user_uindex` (`id_user`),
     INDEX `ci_users_ibfk_1` (`id_role`),
+    INDEX `ci_users_ibfk_2` (`id_provincia`),
     CONSTRAINT `ci_users_ibfk_1`
         FOREIGN KEY (`id_role`)
-        REFERENCES `ci_roles` (`id_role`)
+        REFERENCES `ci_roles` (`id_role`),
+    CONSTRAINT `ci_users_ibfk_2`
+        FOREIGN KEY (`id_provincia`)
+        REFERENCES `ci_provincias` (`id_provincia`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -380,6 +385,7 @@ CREATE TABLE `dfa_conceptos`
     `id_user_created` int(11) unsigned NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
+    `id_archivo` int(10) unsigned,
     PRIMARY KEY (`id_concepto`),
     INDEX `dfa_conceptos_ibfk_2` (`id_user_created`),
     INDEX `dfa_conceptos_ibfk_3` (`id_user_modified`),

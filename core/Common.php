@@ -1427,6 +1427,21 @@ if (!function_exists('rrmdir')) {
     }
 }
 
+if (!function_exists('array2str')) {
+
+    function array2str($array)
+    {
+        if(is_array($array)){
+            $str = '|';
+            foreach ($array as $item){
+                $str .= $item.'|';
+            }
+            return $str;
+        } else {
+            return $array;
+        }
+    }
+}
 if (!function_exists('array2std')) {
 
     function array2std($array) {

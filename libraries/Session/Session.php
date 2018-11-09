@@ -1000,74 +1000,97 @@ class CI_Session {
     }
 
     public function signUp($mod = 'users'){
-        // Redirect a user if he's already logged in
-        $this->CI->load->model('base/model_roles');
-        $dashboard = "admin/dashboard";
-        $this->isLoguedin() == FALSE || redirect($dashboard);
-        $roles = $this->CI->model_roles->find();
-        // Set form
-        $rules = $this->MI->rules_register;
-        $this->CI->form_validation->set_rules($rules);
+        if (is_object($oUser = $this->getUserLoggued())){
+            $uri = $this->CI->input->post('uri_string') ? $this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? $this->CI->uri->uri_string() :
+                ($oUser->id_role == 1 ? 'base/dashboard' : 'admin/dashboard'));
+            if($uri == 'base/sessions/signup'){
+                $uri = WEBSERVER.($oUser->id_role == 1 ? 'base/dashboard' : 'admin/dashboard');
+            } else {
+                $uri = WEBSERVER.$uri;
+            }
+            redirect($uri);
+        } else {
+            // Redirect a user if he's already logged in
+            $this->CI->load->model('base/model_roles');
+            $dashboard = "admin/dashboard";
+            $this->isLoguedin() == FALSE || redirect($dashboard);
+            $roles = $this->CI->model_roles->find();
+            // Set form
+            $rules = $this->MI->rules_register;
+            $this->CI->form_validation->set_rules($rules);
 
-
-        if(validateVar($roles,'array')){
-            // Process form
-            if($this->CI->form_validation->run() == true){
-                // We can login and redirect
-                if($this->_unique_email()){
-                    $data = $this->CI->input->post();
-                    /**
-                     * @var Model_Roles $role
-                     */
+            if(validateVar($roles,'array')){
+                // Process form
+                if($this->CI->form_validation->run() == true){
+                    // We can login and redirect
+                    if($this->_unique_email()){
+                        $data = $this->CI->input->post();
+                        /**
+                         * @var Model_Roles $role
+                         */
 //                    foreach ($roles as $role) {
 //                        if ($data['id_role'] == $role->getIdRole()){
 //                            $data["id_role"] = $role->getIdRole();
 //                        }
 //                    }
 //
-                    $this->MI->save($data);
-                    $this->login();
-                    redirect($dashboard);
-                } else {
-                    $this->set_flashdata('error', 'El email introducido ya existe');
+                        $this->MI->save($data);
+                        $this->login();
+                        redirect($dashboard);
+                    } else {
+                        $this->set_flashdata('error', 'El email introducido ya existe');
+                    }
                 }
             }
+            // Load view
+            $oUser = new stdClass();
+            $oUser->name = $this->CI->input->post('name');
+            $oUser->email = $this->CI->input->post('email');
+            $oUser->password = $this->CI->input->post('password');
+            $this->CI->data['subLayout'] = "register";
+            $this->CI->data['oUser'] = $oUser;
         }
-        // Load view
-        $oUser = new stdClass();
-        $oUser->name = $this->CI->input->post('name');
-        $oUser->email = $this->CI->input->post('email');
-        $oUser->password = $this->CI->input->post('password');
-        $this->CI->data['subLayout'] = "register";
-        $this->CI->data['oUser'] = $oUser;
     }
 
     public function login(){
-	    $emailPost = $this->CI->input->post('email');
-	    $ngEmailPost = $this->CI->input->post('ngemail');
-	    $passwordPost = $this->hash($this->CI->input->post('password'));
-	    $ngPasswordPost = $this->hash($this->CI->input->post('ngpassword'));
 
-        $oUser = $this->MI->get_by(array(
-            'email' => $emailPost ? $emailPost : ($ngEmailPost ? $ngEmailPost : ''),
-            'password' => $passwordPost ? $passwordPost : ($ngPasswordPost ? $ngPasswordPost : ''),
-            0 => 'id_role',
-            1 => 'name',
-            2 => 'lastname',
-            3 => 'id_user',
-            4 => 'email'
-
-        ), true, true);
-
-        if(is_object($oUser)){
-            // log in user
-            $data = std2array($oUser);
-            $data['loggedin'] = TRUE;
-            $this->set_userdata($this->sessKey,$data);
-            $uri = $this->CI->input->post('uri_string') ? WEBSERVER.$this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? WEBSERVER.$this->CI->uri->uri_string() : WEBSERVER.'admin/dashboard');
+        if (is_object($oUser = $this->getUserLoggued())){
+            $uri = $this->CI->input->post('uri_string') ? $this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? $this->CI->uri->uri_string() :
+                ($oUser->id_role == 1 ? 'base/dashboard' : 'admin/dashboard'));
+            if($uri == 'base/sessions/login'){
+                $uri = WEBSERVER.($oUser->id_role == 1 ? 'base/dashboard' : 'admin/dashboard');
+            } else {
+                $uri = WEBSERVER.$uri;
+            }
             redirect($uri);
         } else {
-            return false;
+
+            $emailPost = $this->CI->input->post('email');
+            $ngEmailPost = $this->CI->input->post('ngemail');
+            $passwordPost = $this->hash($this->CI->input->post('password'));
+            $ngPasswordPost = $this->hash($this->CI->input->post('ngpassword'));
+
+            $oUser = $this->MI->get_by(array(
+                'email' => $emailPost ? $emailPost : ($ngEmailPost ? $ngEmailPost : ''),
+                'password' => $passwordPost ? $passwordPost : ($ngPasswordPost ? $ngPasswordPost : ''),
+                0 => 'id_role',
+                1 => 'name',
+                2 => 'lastname',
+                3 => 'id_user',
+                4 => 'email'
+            ), true, true);
+
+            if(is_object($oUser)){
+                // log in user
+                $data = std2array($oUser);
+                $data['loggedin'] = TRUE;
+                $this->set_userdata($this->sessKey,$data);
+                $uri = $this->CI->input->post('uri_string') ? WEBSERVER.$this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? WEBSERVER.$this->CI->uri->uri_string() :
+                    ($oUser->id_role == 1 ? WEBSERVER.'base/dashboard' : WEBSERVER.'admin/dashboard'));
+                redirect($uri);
+            } else {
+                return false;
+            }
         }
     }
 

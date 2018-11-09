@@ -324,7 +324,7 @@ Class ES_Model extends ES_Model_Vars {
                     $vals = std2array($vals);
                 }
                 if(is_array($vals)){
-                    $str = json_encode($vals);
+                    $str = array2str($vals);
                     return $str;
                 }
                 return $vals;
@@ -472,57 +472,62 @@ Class ES_Model extends ES_Model_Vars {
         $this->load->library('upload', $config);
         $this->load->library('image_lib');
 
-        foreach ($_FILES as $fName => $fSettings){
-            $dirPictures .= "$fName/";
-            createFolder($dirPictures);
-            $dirPicturesThumb = $dirPictures."thumbs";
-            createFolder($dirPicturesThumb);
-            $this->upload->upload_path = $dirPictures;
-            $config['new_image'] = $dirPicturesThumb;
-            $files = $_FILES;
-            $aThumbs = array();
-            $aFiles = ['.docx','xlsx','pdf'];
-            $aThumbs = [];
-            if (isArray($files[$fName])) {
-                if (!$this->upload->do_upload($fName) && $id == null) {
-                    return false;
-                } else {
-                    $this->upload->bFileUploaded = true;
-                    $this->upload->num_thumbs = $config['num_thumbs'];
-                    $this->upload->file_url = WEBASSETS."$submod/$fName/".$this->upload->orig_name;
-                    $file = $this->upload->data();
-                    $config['source_image'] = $file['full_path'];
-                    for ($i = 0; $i < $config['num_thumbs']; $i++) {
-                        if($this->image_lib->initialize($config)){
-                            if(in_array($this->image_lib->dest_ext,$aFiles)){
-                                $this->upload->num_thumbs = 0;
-                            } else {
-                                $aThumbs['thumb_'.$config['width']] = $file;
-                                unset($aThumbs['thumb_'.$config['width']]['nro_thumbs']);
-                                $this->image_lib->resize();
-                                $aThumbs['thumb_'.$config['width']]['width'] = $this->image_lib->width;
-                                $aThumbs['thumb_'.$config['width']]['height'] = $this->image_lib->height;
-                                $aThumbs['thumb_'.$config['width']]['name'] = $this->image_lib->dest_name;
-                                $aThumbs['thumb_'.$config['width']]['library'] = $this->image_lib->image_library;
-                                $aThumbs['thumb_'.$config['width']]['thumb_marker'] = $this->image_lib->thumb_marker;
-                                $aThumbs['thumb_'.$config['width']]['url'] = WEBASSETS."$submod/$fName/thumbs/".$this->image_lib->dest_name;
-                                $aThumbs['thumb_'.$config['width']]['raw_name'] = $this->image_lib->dest_name;
-                                $aThumbs['thumb_'.$config['width']]['ext'] = $this->image_lib->dest_ext;
-                                $aThumbs['thumb_'.$config['width']]['path'] = $this->image_lib->dest_folder;
-                                $aThumbs['thumb_'.$config['width']]['full_path'] = $this->image_lib->full_dst_path;
-                                $config['width'] = $config['width'] + 150;
-                                $config['height'] = $config['height'] + 150;
-                                $config['thumb_marker'] = '-thumb_' . $config['width'];
+        if(isArray($_FILES)){
+            foreach ($_FILES as $fName => $fSettings){
+                $dirPictures .= "$fName/";
+                createFolder($dirPictures);
+                $dirPicturesThumb = $dirPictures."thumbs";
+                createFolder($dirPicturesThumb);
+                $this->upload->upload_path = $dirPictures;
+                $config['new_image'] = $dirPicturesThumb;
+                $files = $_FILES;
+                $aThumbs = array();
+                $aFiles = explode('|',config_item('file_without_tumbs'));
+                $aThumbs = [];
+                if (isArray($files[$fName])) {
+                    if (!$this->upload->do_upload($fName) && $id == null) {
+                        return false;
+                    } else {
+                        $this->upload->bFileUploaded = true;
+                        $this->upload->num_thumbs = $config['num_thumbs'];
+                        $this->upload->file_url = WEBASSETS."$submod/$fName/".$this->upload->orig_name;
+                        $file = $this->upload->data();
+                        $config['source_image'] = $file['full_path'];
+                        for ($i = 0; $i < $config['num_thumbs']; $i++) {
+                            if($this->image_lib->initialize($config)){
+                                if(in_array($this->image_lib->dest_ext,$aFiles)){
+                                    $this->upload->num_thumbs = 0;
+                                } else {
+                                    $aThumbs['thumb_'.$config['width']] = $file;
+                                    unset($aThumbs['thumb_'.$config['width']]['nro_thumbs']);
+                                    $this->image_lib->resize();
+                                    $aThumbs['thumb_'.$config['width']]['width'] = $this->image_lib->width;
+                                    $aThumbs['thumb_'.$config['width']]['height'] = $this->image_lib->height;
+                                    $aThumbs['thumb_'.$config['width']]['name'] = $this->image_lib->dest_name;
+                                    $aThumbs['thumb_'.$config['width']]['library'] = $this->image_lib->image_library;
+                                    $aThumbs['thumb_'.$config['width']]['thumb_marker'] = $this->image_lib->thumb_marker;
+                                    $aThumbs['thumb_'.$config['width']]['url'] = WEBASSETS."$submod/$fName/thumbs/".$this->image_lib->dest_name;
+                                    $aThumbs['thumb_'.$config['width']]['raw_name'] = $this->image_lib->dest_name;
+                                    $aThumbs['thumb_'.$config['width']]['ext'] = $this->image_lib->dest_ext;
+                                    $aThumbs['thumb_'.$config['width']]['path'] = $this->image_lib->dest_folder;
+                                    $aThumbs['thumb_'.$config['width']]['full_path'] = $this->image_lib->full_dst_path;
+                                    $config['width'] = $config['width'] + 150;
+                                    $config['height'] = $config['height'] + 150;
+                                    $config['thumb_marker'] = '-thumb_' . $config['width'];
+                                }
                             }
                         }
+                        $this->upload->data_thumbs = $aThumbs;
                     }
-                    $this->upload->data_thumbs = $aThumbs;
+                    $this->upload->file_name = $files[$fName]['name'];
+                    $this->upload->file_type = $files[$fName]['type'];
                 }
-                $this->upload->file_name = $files[$fName]['name'];
-                $this->upload->file_type = $files[$fName]['type'];
             }
+            return true;
+        } else {
+            $this->upload->error_msg[] = 'Algo salio mal, no se pudo subir el archivo';
+            return false;
         }
-        return true;
     }
 
     public function setForeignValues($t1Contents, $t1FieldRef, $t2Contents, $t2FieldRef, $bWithAllFields = false){
@@ -616,8 +621,10 @@ Class ES_Model extends ES_Model_Vars {
 
     public function getArrayDataWithThumbs($model){
         $aData = $model->getArrayData();
-        if(isArray($model->thumbs)){
-            $aData['thumbs'] = $model->thumbs;
+        if(isset($model->thumbs)){
+            if(isArray($model->thumbs)){
+                $aData['thumbs'] = $model->thumbs;
+            }
         }
         return $aData;
     }
