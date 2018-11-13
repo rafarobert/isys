@@ -450,8 +450,31 @@ Class ES_Model extends ES_Model_Vars {
         }
         return $objs;
     }
+    public function initLoaded(){
+        $CI=CI_Controller::get_instance();
+        if($CI != null){
+            foreach ($CI as $instance => $value) {
+                if($instance == 'data'){
+                    foreach ($CI->$instance as $dataKey => $dataVal){
+                        $this->$instance[$dataKey] = $dataVal;
+                    }
+                } else {
+                    $this->$instance = $value;
+                }
+            }
+        }
+        if(isset($this->load)){
+            $models = $this->load->_ci_models;
+            foreach ($models as $alias => $name) {
+                $this->$name = new $name();
+            }
+        }
+        return $CI;
+    }
 
     public function do_upload($field, $id){
+
+        //$this->initLoaded();
         list($mod,$submod) = getModSubMod($this->_table_name);
         $dirPictures = ROOTPATH."assets/$submod/";
         createFolder($dirPictures);

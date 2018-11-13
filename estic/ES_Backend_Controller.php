@@ -93,10 +93,15 @@ class ES_Backend_Controller extends ES_Controller
                         $this->data['oSysModules'] = CiModulesQuery::create()->find();
                     } else {
                         $this->data['oSysModules'] = CiModulesQuery::create()->find();
-                        $this->data['oSysTables'] = CiTablesQuery::create()->
-                        filterByIdNivelRole($sessUserData->id_role)->
-                        find();
+                        $this->data['oSysTables'] = CiTablesQuery::create()->filterByIdNivelRole($sessUserData->id_role)->find();
                     }
+//                    if($sessUserData->id_role == 1){
+//                        $this->data['oSysTables'] = Model_Tables::create()->find();
+//                        $this->data['oSysModules'] = Model_Modules::create()->find();
+//                    } else {
+//                        $this->data['oSysModules'] = Model_Modules::create()->find();
+//                        $this->data['oSysTables'] = Model_Tables::create()->filterByIdNivelRole($sessUserData->id_role);
+//                    }
                 }
             }
         }
