@@ -174,7 +174,7 @@ else if ($hostName == "test.$proyName.com")
 // ------------------ Configuraciones para produccion --------------------------
 else if ($hostName == "desarrollo.defensoria.gob.bo" || $hostName == '192.168.2.21')
 {
-    define('ENVIRONMENT', 'production');
+    define('ENVIRONMENT', 'development');
     define('LOCALFOLDER', '');
     $rootPath = DOCUMENTROOT;
     $webServer = "$protocol://$hostName/";
@@ -229,18 +229,18 @@ switch (ENVIRONMENT)
         break;
 
     case 'production':
-        error_reporting(-1);
-        ini_set('display_errors', 1);
-        break;
-//        if (version_compare(PHP_VERSION, '5.3', '>='))
-//        {
-//            error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
-//        }
-//        else
-//        {
-//            error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_USER_NOTICE);
-//        }
+//        error_reporting(-1);
+//        ini_set('display_errors', 1);
 //        break;
+        if (version_compare(PHP_VERSION, '5.3', '>='))
+        {
+            error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
+        }
+        else
+        {
+            error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_USER_NOTICE);
+        }
+        break;
 
     default:
         header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
