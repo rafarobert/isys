@@ -5,7 +5,7 @@
  * Date: 2/22/2018
  * Time: 12:01 AM
  */
-use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
+
 
 class ES_Backend_Controller extends ES_Controller
 {
