@@ -42,7 +42,13 @@ class ES_Controller extends ES_Ctrl_Vars
         $CI=CI_Controller::get_instance();
         if($CI != null){
             foreach ($CI as $instance => $value) {
-                $this->$instance = $value;
+                if($instance == 'data'){
+                    foreach ($CI->$instance as $dataKey => $dataVal){
+                        $this->$instance[$dataKey] = $dataVal;
+                    }
+                } else {
+                    $this->$instance = $value;
+                }
             }
         }
         if(isset($this->load)){

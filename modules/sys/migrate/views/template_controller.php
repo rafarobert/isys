@@ -36,6 +36,8 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
         }
         if($bWithInit){
             self::$instance->init();
+        } else if(!self::$initialized){
+            self::$instance->init();
         }
         return self::$instance;
     }
