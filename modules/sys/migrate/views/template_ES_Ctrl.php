@@ -43,6 +43,7 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
         $this->data['oUcObjFilterByP'] =  $this->model_lcFkTableP->setOptions($this->lcObjFilterByP);
         //<<<setObjFieldsFilterBy>>>
         self::$initialized = true;
+        return $this->getInstance();
     }
 
     public function setUcObjTableP($oData, $oUcObjTableP = null)

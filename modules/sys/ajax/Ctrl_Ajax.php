@@ -205,9 +205,8 @@ class Ctrl_Ajax extends ES_Base_Controller
         $pk = isString($pk) || isNumeric($pk) ? $pk : '';
 
         $response = array();
-        if(class_exists("init".ucfirst($class))){
+        if($this->{"init".ucfirst($class)}()){
             $acr = $sys[$mod];
-
             $this->{"init".ucfirst($class)}(true);
             if($response = $this->{"model_$class"}->{$method}($pk)){
                 if(inArray('tableRef',$post) && inArray('idTableRef',$post) && inArray('fieldTableRef',$post)){
@@ -252,6 +251,9 @@ class Ctrl_Ajax extends ES_Base_Controller
                 }
                 $response['message'] = 'El registro fue eliminado de forma exitosa';
             }
+        } else {
+            $response['error'] = "error";
+            $response['message'] = "Algo salio mal, Tu archivo no pudo ser eliminado";
         }
         echo json_encode($response);
         exit;

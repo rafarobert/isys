@@ -70,13 +70,16 @@ class ES_Controller extends ES_Ctrl_Vars
         $method = isString($method) ? $method : $this->router->method;
         $class = isString($class) ? $class : $this->router->class;
         $mod = isString($mod) ? $mod : $this->router->module;
-        if (($this->input->post('fromAjax') || compareStrStr($this->router->class,'ajax'))) {
+        if ($this->input->post('fromAjax') || compareStrStr($this->router->class,'ajax')) {
             if (validateVar($error)){
                 return ['view' => $this->load->view("$mod/$class/$method", $this->data, true), 'error' => $error];
             } else {
                 return $this->load->view("$mod/$class/$method", $this->data, true);
             }
             $this->data["subview"] = "$mod/$class/$method";
+        } else if(isset($this->printView) && $this->printView) {
+            unset($this->printView);
+            return $this->load->view("$mod/$class/$method", $this->data, true);
         } else {
             $this->data["subview"] = "$mod/$class/$method";
         }

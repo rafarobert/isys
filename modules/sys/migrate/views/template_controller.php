@@ -20,6 +20,15 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
         parent::__construct();
     }
 
+    public function getInstance(){
+        return self::$instance;
+    }
+
+    public function toBePrinted(){
+        $this->printView = true;
+        return self::$instance;
+    }
+
     public static function create($bWithInit = false)
     {
         if (!self::$instance) {
