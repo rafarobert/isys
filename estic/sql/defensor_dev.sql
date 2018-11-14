@@ -209,7 +209,6 @@ CREATE TABLE `ci_sessions`
     `data` BLOB NOT NULL,
     `last_activity` DATETIME NOT NULL,
     `id_user` int(11) unsigned,
-    `id_role` int(11) unsigned,
     PRIMARY KEY (`id`),
     INDEX `ci_sessions_ibfk_1` (`id_user`),
     CONSTRAINT `ci_sessions_ibfk_1`
@@ -284,7 +283,6 @@ CREATE TABLE `ci_users`
     `cellphone_number_1` VARCHAR(20),
     `cellphone_number_2` VARCHAR(20),
     `picture` int(11) unsigned,
-    `id_provincia` int(10) unsigned,
     `id_role` int(10) unsigned,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `signin_method` VARCHAR(100),
@@ -294,13 +292,9 @@ CREATE TABLE `ci_users`
     PRIMARY KEY (`id_user`),
     UNIQUE INDEX `ci_users_id_user_uindex` (`id_user`),
     INDEX `ci_users_ibfk_1` (`id_role`),
-    INDEX `ci_users_ibfk_2` (`id_provincia`),
     CONSTRAINT `ci_users_ibfk_1`
         FOREIGN KEY (`id_role`)
-        REFERENCES `ci_roles` (`id_role`),
-    CONSTRAINT `ci_users_ibfk_2`
-        FOREIGN KEY (`id_provincia`)
-        REFERENCES `ci_provincias` (`id_provincia`)
+        REFERENCES `ci_roles` (`id_role`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -320,8 +314,8 @@ CREATE TABLE `dfa_archivos`
     `id_publicacion` int(10) unsigned,
     `detalle` VARCHAR(300),
     `descripcion` VARCHAR(300),
-    `change_count` INTEGER DEFAULT 0 NOT NULL,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
     `id_user_created` int(11) unsigned NOT NULL,
     `date_modified` DATETIME NOT NULL,
@@ -516,6 +510,7 @@ DROP TABLE IF EXISTS `dfa_denuncias`;
 CREATE TABLE `dfa_denuncias`
 (
     `id_denuncia` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `id_denunciado` int(10) unsigned,
     `id_victima` int(10) unsigned,
     `descripcion` TEXT,
     `lugar_riesgo` VARCHAR(500),
@@ -523,18 +518,18 @@ CREATE TABLE `dfa_denuncias`
     `desc_lugar` TEXT,
     `desc_denunciado` TEXT,
     `desc_mal_servicio` TEXT,
-    `id_delegacion` int(10) unsigned,
-    `id_rango_edad` int(10) unsigned,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
     `id_user_created` int(11) unsigned NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
+    `id_delegacion` int(10) unsigned,
     PRIMARY KEY (`id_denuncia`),
     UNIQUE INDEX `dfa_denuncias_id_denuncia_uindex` (`id_denuncia`),
     INDEX `dfa_denuncias_ibfk_1` (`id_user_created`),
     INDEX `dfa_denuncias_ibfk_2` (`id_user_modified`),
+    INDEX `dfa_denuncias_ibfk_3` (`id_denunciado`),
     INDEX `dfa_denuncias_ibfk_4` (`id_victima`),
     INDEX `dfa_denuncias_ibfk_5` (`id_relacion`),
     CONSTRAINT `dfa_denuncias_ibfk_1`
@@ -543,6 +538,9 @@ CREATE TABLE `dfa_denuncias`
     CONSTRAINT `dfa_denuncias_ibfk_2`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_denuncias_ibfk_3`
+        FOREIGN KEY (`id_denunciado`)
+        REFERENCES `dfa_personas` (`id_persona`),
     CONSTRAINT `dfa_denuncias_ibfk_4`
         FOREIGN KEY (`id_victima`)
         REFERENCES `dfa_personas` (`id_persona`),
@@ -838,19 +836,19 @@ CREATE TABLE `dfa_publicaciones`
 (
     `id_publicacion` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `titulo` VARCHAR(200),
-    `titular` VARCHAR(500),
     `descripcion` VARCHAR(500),
     `fecha_publicacion` DATETIME,
     `id_delegacion` int(10) unsigned,
     `id_unidad` int(10) unsigned,
     `id_categoria_publicacion` int(10) unsigned,
-    `etiquetas` VARCHAR(250),
+    `tipo` VARCHAR(250),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
     `id_user_created` int(11) unsigned NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
+    `column_14` INTEGER,
     PRIMARY KEY (`id_publicacion`),
     UNIQUE INDEX `dfa_publicaciones_id_publicacion_uindex` (`id_publicacion`),
     INDEX `dfa_publicaciones_ibfk_1` (`id_user_created`),
