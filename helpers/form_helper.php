@@ -678,14 +678,16 @@ if ( ! function_exists('set_options'))
 	function set_options($data, $options, $checked = FALSE, $extra = '')
 	{
         list($options, $aImgs, $aData) = distribute_options($data, $options);
-        $iCheckOpen = validateArray($data,'i-checks') ? "<div class='i-checks'>" : "";
-        $iCheckClose = validateArray($data,'i-checks') ? "</div>" : "";
+        $iCheckOpen = validateArray($data,'i-checks') || (validateArray($data,'class') && strstr($data['class'],'i-check')) ? "<div class='i-checks'>" : "";
+        $iCheckClose = validateArray($data,'i-checks') || (validateArray($data,'class') && strstr($data['class'],'i-check')) ? "</div>" : "";
+        $labelOpen = '<label>';
+        $labelClose = '</label>';
         if(validateArray($data,'options')){
             $options = $data['options'];
             unset($data['options']);
         }
         if(validateVar($options,'array')){
-            $htmlOptions = "<label>";
+            $htmlOptions = '';
             foreach ($options as $key => $option){
 
                 // ****************** incluye data *******************
@@ -707,35 +709,36 @@ if ( ! function_exists('set_options'))
                     $checkeds = $checked;
                 }
                 unset($data['option']);
+                if(strstr($data['name'],'[]')){
+                    $dataName = str_replace('[]','',$data['name']);
+                    $data['id'] = 'input'.ucfirst($dataName).ucfirst(cleanWhiteSpaces($option));
+                } else {
+                    $data['id'] = 'input'.ucfirst($data['name']).ucfirst(cleanWhiteSpaces($option));
+                }
                 if(validateVar($checkeds,'array')){
-                    foreach ($checkeds as $k => $check){
-                        $data['id'] = 'input'.ucfirst($data['name']).ucfirst(cleanWhiteSpaces($option));
-                        if($option == $check){
-                            $htmlOptions .= form_checkbox($data, $k, true, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
-                        } else {
-                            $htmlOptions .= form_checkbox($data, $k, false, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
-                        }
+                    if(in_array($option,$checkeds)){
+                        $htmlOptions .= $iCheckOpen.$labelOpen.form_checkbox($data, $key, true, $extra).'<span>'.ucfirst($option)."</span>$labelClose.$iCheckClose";
+                    } else {
+                        $htmlOptions .= $iCheckOpen.$labelOpen.form_checkbox($data, $key, false, $extra).'<span>'.ucfirst($option)."</span>$labelClose.$iCheckClose";
                     }
                 } else {
                     if(is_object($checked)){
                         foreach ($checked as $chk){
-                            $data['id'] = 'input'.ucfirst($data['name']).ucfirst(cleanWhiteSpaces($option));
                             if($chk == $key){
-                                $htmlOptions .= form_checkbox($data, $key, true, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
+                                $htmlOptions .= $iCheckOpen.$labelOpen.form_checkbox($data, $key, true, $extra).'<span>'.ucfirst($option)."</span>$labelClose.$iCheckClose";
                             } else {
-                                $htmlOptions .= form_checkbox($data, $key, false, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
+                                $htmlOptions .= $iCheckOpen.$labelOpen.form_checkbox($data, $key, false, $extra).'<span>'.ucfirst($option)."</span>$labelClose.$iCheckClose";
                             }
                         }
                     } else {
                         $data['id'] = 'input'.ucfirst($data['name']).ucfirst(cleanWhiteSpaces($option));
                         if($checked == $key){
-                            $htmlOptions .= form_checkbox($data, strval($key), true, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
+                            $htmlOptions .= $iCheckOpen.$labelOpen.form_checkbox($data, strval($key), true, $extra).'<span>'.ucfirst($option)."</span>$labelClose.$iCheckClose";
                         } else {
-                            $htmlOptions .= form_checkbox($data, strval($key), false, $extra).'<span>'.ucfirst($option)."</span></label>$iCheckClose";
+                            $htmlOptions .= $iCheckOpen.$labelOpen.form_checkbox($data, strval($key), false, $extra).'<span>'.ucfirst($option)."</span>$labelClose.$iCheckClose";
                         }
                     }
                 }
-                $htmlOptions .= "$iCheckOpen<label>";
             }
             return $htmlOptions;
         } else {
