@@ -1649,7 +1649,7 @@ if (!function_exists('str2array')) {
             $aIds = array();
             $aParts = explode('|',$str);
            foreach ($aParts as $part){
-               if(isNumeric($part)){
+               if($part != ""){
                    $aIds[] = $part;
                }
            }

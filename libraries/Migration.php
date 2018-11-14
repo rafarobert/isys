@@ -1733,6 +1733,7 @@ class CI_Migration
             $formType = 'radio';
         }else if ($this->inputCheckboxes($settings)) {
             $inputData['name'] = $inputData['name'] . '[]';
+            $inputData['class'] .= ' i-checks';
             $formType = 'checkboxes';
             $data['lcErrorForField'] .= '[]';
         } else if ($this->inputCheckbox($settings)) {

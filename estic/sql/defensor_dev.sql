@@ -78,6 +78,7 @@ CREATE TABLE `ci_files`
     `id_user_created` int(11) unsigned NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
+    `id_city` int(10) unsigned,
     PRIMARY KEY (`id_file`),
     UNIQUE INDEX `ci_files_id_file_uindex` (`id_file`),
     INDEX `ci_files_ibfk_1` (`id_user_created`),
@@ -209,7 +210,6 @@ CREATE TABLE `ci_sessions`
     `data` BLOB NOT NULL,
     `last_activity` DATETIME NOT NULL,
     `id_user` int(11) unsigned,
-    `id_role` int(11) unsigned,
     PRIMARY KEY (`id`),
     INDEX `ci_sessions_ibfk_1` (`id_user`),
     CONSTRAINT `ci_sessions_ibfk_1`
@@ -845,6 +845,7 @@ CREATE TABLE `dfa_publicaciones`
     `id_unidad` int(10) unsigned,
     `id_categoria_publicacion` int(10) unsigned,
     `etiquetas` VARCHAR(250),
+    `ids_archivos` VARCHAR(1000),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
