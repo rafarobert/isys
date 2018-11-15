@@ -18,10 +18,10 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
     public function __construct()
     {
         parent::__construct();
+        $this->load->model("lcModS/model_lcTableP");
     }
 
     public function init(){
-        $this->load->model("lcModS/model_lcTableP");
         //>>>loadModelsForeignTable<<<
         $this->load->model("lcFkModS/model_lcFkTableP");
         //<<<loadModelsForeignTable>>>

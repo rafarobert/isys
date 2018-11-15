@@ -1329,17 +1329,25 @@ if (!function_exists('setObject')) {
 
     function setObject($nameWithDashes, $blcFirst = true, $bReturnUcNames = true)
     {
-        $aNames = explode('_',$nameWithDashes);
+        if(strstr($nameWithDashes,'_')){
+            $aNames = explode('_',$nameWithDashes);
+        } else if(strstr($nameWithDashes, ' ')){
+            $aNames = explode(' ',$nameWithDashes);
+        } else {
+            $aNames[] = $nameWithDashes;
+        }
         if($bReturnUcNames){
             $callback = function($name){
                 return ucfirst($name);
             };
             $aNames = array_map($callback,$aNames);
         }
+        $strImploded = implode('',$aNames);
+        $strImploded = str_replace(' ', '', $strImploded);
         if($blcFirst){
-            return lcfirst(implode('',$aNames));
+            return lcfirst($strImploded);
         } else {
-            return implode('',$aNames);
+            return $strImploded;
         }
     }
 }

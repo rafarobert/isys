@@ -1064,7 +1064,7 @@ class CI_Migration
         $data["UcIdObjTable"] = ucfirst(setObject($pkTable));
         $data["UcIdObjTableS"] = ucfirst(setObject($pkTableS));
         $data["lcIdObjTable"] = lcfirst(setObject($pkTable));
-        $data["pkTable"] = $pkTable;
+        $data["pkTableVar"] = $pkTable;
         $data["lcTableP"] = lcfirst($subModP);
         $data['$lcTableS'] = '$' . lcfirst($subModS);
         $data['lcTableS'] = lcfirst($subModS);
@@ -1175,7 +1175,7 @@ class CI_Migration
                             $data['tableTitle'] = $tableTitle;
                             // ********************* Para el Model ***************************
                             $data['rulesNameEditView'] = '$rules_' . str_replace('-', '_', $vNameView);
-                            $data = $this->getPhpFieldsRules($vFieldsView, $data['pkTable'], $data);
+                            $data = $this->getPhpFieldsRules($vFieldsView, $data['pkTableVar'], $data);
                             $data["validatedModelFieldsEditView"] .= $this->load->view(["template_ES_Model" => "validatedModelFieldsEditView"], $data, true, true, true);
 
                             list($vFieldsIniChecked, $fieldIniImg, $fieldIniPass, $data) = $this->checkInputFields($vFieldsView, $data);
@@ -1633,7 +1633,7 @@ class CI_Migration
                     }
                     if (validateArray($settings, 'options')) {
                         $inputData['options'] = $settings['options'];
-                        $inputData['class'] = inArray($typeForm,array_flip($aRdsChks),false) ? 'form-control' : 'chosen-select';
+                        $inputData['class'] .= inArray($typeForm,array_flip($aRdsChks),false) ? 'form-control ' : 'chosen-select ';
                     }
                 }
             } else if (compareArrayStr($settings, 'type', 'int') || compareArrayStr($settings, 'type', 'decimal')) {
@@ -1642,13 +1642,13 @@ class CI_Migration
                     $inputData['data-width'] = !validateArray($settings, 'data') ? "70" : (validateArray($settings['data'], 'width') ? $settings['data']['width'] : "70");
                     $inputData['data-height'] = !validateArray($settings, 'data') ? "70" : (validateArray($settings['data'], 'height') ? $settings['data']['height'] : "70");
                     $inputData['data-step'] = !validateArray($settings, 'data') ? "10" : (validateArray($settings['data'], 'step') ? $settings['data']['step'] : "10");
-                    $inputData['class'] .= 'dial m-r-sm';
+                    $inputData['class'] .= 'dial m-r-sm ';
                 }
                 if ($this->bInputHasOptions($settings)) {
                     list($typeForm, $inputData, $data) = $this->getInputType($settings, $inputData, $data);
                     if (validateArray($settings, 'options')) {
                         $inputData['options'] = $settings['options'];
-                        $inputData['class'] = !inArray($typeForm,array_flip($aRdsChks),false) ? 'form-control' : 'chosen-select';
+                        $inputData['class'] = !inArray($typeForm,array_flip($aRdsChks),false) ? 'form-control ' : 'chosen-select ';
                     }
                 } else {
                     $typeForm = 'number';
@@ -1680,7 +1680,7 @@ class CI_Migration
 
             $data['inputData'] = var_export($inputData, true);
             if (validateArray($settings, 'password') || compareArrayStr($settings, 'input', 'password')) {
-                $data['lcTableId'] = $data['pkTable'];
+                $data['lcTableId'] = $data['pkTableVar'];
                 $data['lcInputPassConfId'] = "fieldConfirm" . ucfirst($name);
                 $data['UcInputPassConfLabel'] = "Confirmar " . ucfirst($name);
                 $data['UcInputPassConfPlaceholder'] = "Confirmar contraseña";
@@ -1728,30 +1728,33 @@ class CI_Migration
 
         $formType = 'default';
         if ($this->inputRadios($settings)) {
+            $inputData['class'] .= 'i-checks ';
             $formType = 'radios';
         } else if ($this->inputRadio($settings)) {
+            $inputData['class'] .= 'i-checks ';
             $formType = 'radio';
         }else if ($this->inputCheckboxes($settings)) {
             $inputData['name'] = $inputData['name'] . '[]';
-            $inputData['class'] .= ' i-checks';
+            $inputData['class'] .= 'i-checks ';
             $formType = 'checkboxes';
             $data['lcErrorForField'] .= '[]';
         } else if ($this->inputCheckbox($settings)) {
             $formType = 'checkbox';
+            $inputData['class'] .= 'i-checks ';
             $inputData['name'] .= '[]';
             $data['lcErrorForField'] .= '[]';
         } else if ($this->inputMultiselect($settings)) {
             $inputData['name'] .= '[]';
             $inputData['multiple'] = '';
-            $inputData['class'] = 'chosen-select';
+            $inputData['class'] = 'chosen-select ';
             $formType = 'multiselect';
             $data['lcErrorForField'] .= '[]';
         } else if ($this->inputSelect($settings)) {
-            $inputData['class'] = 'chosen-select';
+            $inputData['class'] = 'chosen-select ';
             $formType = 'select';
         } else if ($this->inputDropdown($settings)) {
             $formType = 'dropdown';
-            $inputData['class'] = 'chosen-select';
+            $inputData['class'] = 'chosen-select ';
         } else if ($this->inputStatic($settings)) {
             $formType = 'static';
         } else {
@@ -2086,9 +2089,28 @@ class CI_Migration
         $data["packGettersFunctions"] = '';
         $data["packSettersFunctions"] = '';
         $data["globalLocalFieldsVars"]  = '';
+        $data["globalStaticFieldName"]  = '';
+        $data["globalStaticLocalVars"]  = '';
         $data["globalLocalWithForeignFieldsVars"] = '';
         $data["packLocalForeignGettersFunctions"] = '';
+
+        $aStaticVars = [];
         foreach ($fields as $name => $settings) {
+            if(arrayHas($settings,'options')) {
+                if(isArray($settings['options'])){
+                    foreach ($settings['options'] as $option){
+                        if(!in_array($option,$aStaticVars)){
+                            $data['lcVarStaticOption'] = $option;
+                            $data['lcObjStaticOption'] = ucfirst(setObject('$'.$option,false));
+                            $data["globalStaticLocalVars"] .= $this->load->view(["template_ES_Model" => "globalStaticLocalVars"], $data, true, true, true);
+                            $aStaticVars[] = $option;
+                        }
+                    }
+                }
+            }
+            $data['lcVarStaticFieldName'] = $settings['field'];
+            $data['lcObjStaticFieldName'] = '$field'.ucfirst(setObject($settings['field'], false));
+            $data["globalStaticFieldName"] .= $this->load->view(["template_ES_Model" => "globalStaticFieldName"], $data, true, true, true);
 
             // ========================================= inicio - getPhpFieldsProperties ======================================
             if(compareStrStr($settings['type'], 'datetime') ||

@@ -18,6 +18,22 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     public $_es_class = "ES_Model_UcTableP";
     public $lcTableS;
 
+    //>>>globalStaticLocalVars<<<
+    /**
+     * Value for lcVarStaticOption static option.
+     *
+     * @var        dataType
+     */
+    public static $lcObjStaticOption = 'lcVarStaticOption';
+    //<<<globalStaticLocalVars>>>
+    ////>>>globalStaticFieldName<<<
+    /**
+     * Value for lcVarStaticFieldName static option.
+     *
+     * @var        dataType
+     */
+    public static $lcObjStaticFieldName = 'lcVarStaticFieldName';
+    //<<<globalStaticFieldName>>>
     //>>>globalLocalFieldsVars<<<
     /**
      * Value for lcLocalField field.

@@ -148,6 +148,13 @@ Class ES_Model extends ES_Model_Vars {
         }
         $bSelectAdded = false;
         foreach ($where as $k => $wh){
+            if(isString($wh)){
+                if(strstr($wh,'|')){
+                    $wh = trim($wh,'|');
+                    $aWheres[$k] = explode('|',$wh);
+                    $wh = null;
+                }
+            }
             if(isNumeric($k,false)){
                 if($i == 0 && isString($wh)){
                     $aWheres = !isNumeric($k, false) ? [$k => $wh] : [];
@@ -176,9 +183,11 @@ Class ES_Model extends ES_Model_Vars {
                 }
             } else if(isString($k)){
                 if(isArray($wh)){
+                    // Esta parte funciona como valor booleano para determinar si se agrega al select o no
                     if (inArray(1,$wh, false)){
                         $select .= isBoolean($wh[1]) && $wh[1] && !strhas($select,$k) ? ", $k" : "";
                     }
+                    // ------------------------------------------------------------------------------
                     $aWheres[$k] = $wh[0];
                 } else if(isString($wh)){
                     $aWheres[$k] = $wh;
@@ -199,7 +208,11 @@ Class ES_Model extends ES_Model_Vars {
 
         $this->db->select($select);
         foreach($aWheres as $k => $where){
-            $this->db->where($k,$where);
+            if(isArray($where)){
+                $this->db->where_in($k,$where);
+            } else {
+                $this->db->where($k,$where);
+            }
         }
         return $this->get(null, $single);
     }
@@ -642,7 +655,10 @@ Class ES_Model extends ES_Model_Vars {
         return $oModel;
     }
 
-    public function getArrayDataWithThumbs($model){
+    public function getArrayDataWithThumbs($model = null){
+        if(!is_object($model)){
+            $model = $this;
+        }
         $aData = $model->getArrayData();
         if(isset($model->thumbs)){
             if(isArray($model->thumbs)){
