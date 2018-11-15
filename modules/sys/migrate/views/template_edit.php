@@ -82,7 +82,8 @@
                                     "name" => "save",
                                     "value" => "Guardar",
                                     "id" => "btnSave",
-                                    "class" => "btn btn-primary"
+                                    "class" => "btn btn-primary",
+                                    "onclick" => "oPageBack.onSubmit()"
                                 );
                                 echo form_submit($data) ?>
                             </div>

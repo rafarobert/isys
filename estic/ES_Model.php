@@ -688,6 +688,19 @@ Class ES_Model extends ES_Model_Vars {
         return $aData;
     }
 
+    public function findByIdsFiles($aIds){
+        if(isString($aIds) && strstr($aIds,'|')){
+            $aIds = explode('|',trim($aIds,'|'));
+        }
+        $aFiles = array();
+        if(isArray($aIds)){
+            foreach ($aIds as $id){
+                $aFiles[] = $this->findOneByIdFile($id)->getArrayDataWithThumbs();
+            }
+        }
+        return $aFiles;
+    }
+
     public function delete($id){
         $filter = $this->_primary_filter;
         $id = $filter($id);

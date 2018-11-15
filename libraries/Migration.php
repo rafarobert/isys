@@ -1042,7 +1042,7 @@ class CI_Migration
         list($modS, $modP) = setSingularPlural($sys[$mod]['name']);
         $data = array();
 
-        list($vFieldsChecked, $fieldImg, $fieldPass, $data) = $this->checkInputFields($vFields, $data);
+        list($vFieldsChecked, $fieldImg, $fieldPass, $fieldHidden, $data) = $this->checkInputFields($vFields, $data);
         $aFieldsNames = array_keys($vFieldsChecked);
         list($pkTableS,$pkTableP) = setSingularPlural($pkTable);
         $data["validatedFieldsNames"] = var_export($aFieldsNames, true);
@@ -1076,13 +1076,14 @@ class CI_Migration
 
         list($data, $aEditViewsPhpContent) = $this->loadEditViews($fields, $vFieldsViews, $data, $tableName);
 
-        return [$mod, $submod, $subModS, $subModP, $data, $vFields, $aEditViewsPhpContent, $fieldImg, $fieldPass];
+        return [$mod, $submod, $subModS, $subModP, $data, $vFields, $aEditViewsPhpContent, $fieldImg, $fieldPass, $fieldHidden];
     }
 
     public function checkInputFields($vFields, $data)
     {
         $vFieldsBackup = $vFields;
         $fieldPass = '';
+        $fieldHidden = '';
         $fieldImg = false;
         $data['setADBTablesRefFields'] = '';
         $bDBTable = false;
@@ -1114,7 +1115,7 @@ class CI_Migration
             }
         }
 
-        return [$vFieldsBackup, $fieldImg, $fieldPass, $data];
+        return [$vFieldsBackup, $fieldImg, $fieldPass, $fieldHidden, $data];
     }
 
     public function getFieldNameEditView($fields, $idSettings, $editView, $tableName = '')
@@ -1178,7 +1179,7 @@ class CI_Migration
                             $data = $this->getPhpFieldsRules($vFieldsView, $data['pkTableVar'], $data);
                             $data["validatedModelFieldsEditView"] .= $this->load->view(["template_ES_Model" => "validatedModelFieldsEditView"], $data, true, true, true);
 
-                            list($vFieldsIniChecked, $fieldIniImg, $fieldIniPass, $data) = $this->checkInputFields($vFieldsView, $data);
+                            list($vFieldsIniChecked, $fieldIniImg, $fieldIniPass, $fieldHidden, $data) = $this->checkInputFields($vFieldsView, $data);
                             if (strhas($vNameView, 'ini')) {
                                 $data['editView'] = $vNameView;
                                 $data["validatedFieldsEditIni"] = var_export(array_keys($vFieldsIniChecked), true);
@@ -1212,7 +1213,7 @@ class CI_Migration
         $aMixDbPkFk = array_merge($aDBTablesPks,$aDBTablesFks);
         $sys = config_item('sys');
         $excepts = array_merge(config_item('controlFields'), [$pkTable]);
-        list($mod, $submod, $subModS, $subModP, $data, $vFields, $aEditViewsPhpContent, $fieldImg, $fieldPass) = $default;
+        list($mod, $submod, $subModS, $subModP, $data, $vFields, $aEditViewsPhpContent, $fieldImg, $fieldPass, $fieldHidden) = $default;
 
         $data['initVarsForeignTable'] = '';
         $data['loadModelsForeignTable'] = '';
@@ -1604,7 +1605,7 @@ class CI_Migration
                 $inputData['disabled'] = '';
             }
             if (compareArrayStr($settings, 'input', 'hidden')) {
-                $inputData['class'] .= 'display-none ';
+                $inputData['class'] = 'display-none';
             }
             // ********************************************************************************************
             if (compareArrayStr($settings, 'type', 'text')) {
@@ -1623,6 +1624,7 @@ class CI_Migration
                     }
                 } else if (compareArrayStr($settings, 'input', 'hidden')) {
                     $typeForm = 'hidden';
+                    $inputData["class"] = 'display-none';
                 } else if (compareArrayStr($settings,'input','image') || compareArrayStr($settings,'input','file')){
                     $typeForm = 'hidden';
                 }
@@ -1664,6 +1666,7 @@ class CI_Migration
             list($data, $typeForm, $bIsForeing) = $this->validateFkTable($data, $fields, $settings, $sys, $typeForm,$tableName);
             $data['lcInputFormType'] = $typeForm;
             if (compareArrayStr($settings, 'input', 'hidden')) {
+                $inputData['class'] = 'display-none';
                 $data['UcInputLabel'] = '';
             } else {
                 $data['UcInputLabel'] = validateArray($settings, 'label') ? $settings['label'] : setLabel($name,true);

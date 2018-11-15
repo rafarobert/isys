@@ -372,7 +372,7 @@ CREATE TABLE `dfa_conceptos`
     `id_concepto` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(300),
     `titulo` VARCHAR(300),
-    `titular` VARCHAR(500),
+    `titular` VARCHAR(1000),
     `descripcion` TEXT,
     `id_historia` int(10) unsigned,
     `ids_archivos` VARCHAR(400),
@@ -837,16 +837,17 @@ CREATE TABLE `dfa_publicaciones`
 (
     `id_publicacion` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `titulo` VARCHAR(200),
-    `titular` VARCHAR(500),
-    `descripcion` VARCHAR(500),
+    `titular` VARCHAR(1000),
+    `descripcion` TEXT,
     `fecha_publicacion` DATETIME,
     `id_delegacion` int(10) unsigned,
     `id_unidad` int(10) unsigned,
     `id_categoria_publicacion` int(10) unsigned,
     `etiquetas` VARCHAR(250),
-    `secciones_pagina` VARCHAR(1000),
+    `secciones` VARCHAR(1000),
     `publicado` VARCHAR(250),
     `ids_archivos` VARCHAR(1000),
+    `id_foto_principal` int(10) unsigned,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -860,6 +861,10 @@ CREATE TABLE `dfa_publicaciones`
     INDEX `dfa_publicaciones_ibfk_3` (`id_delegacion`),
     INDEX `dfa_publicaciones_ibfk_4` (`id_unidad`),
     INDEX `dfa_publicaciones_ibfk_5` (`id_categoria_publicacion`),
+    INDEX `dfa_publicaciones_ibfk` (`id_foto_principal`),
+    CONSTRAINT `dfa_publicaciones_ibfk`
+        FOREIGN KEY (`id_foto_principal`)
+        REFERENCES `ci_files` (`id_file`),
     CONSTRAINT `dfa_publicaciones_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
