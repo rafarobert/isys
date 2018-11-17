@@ -48,7 +48,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class CI_Session_database_driver extends CI_Session_driver implements SessionHandlerInterface {
 
-	/**
+    /**
+     * @var ES_Controller $CI
+     */
+    protected $CI;
+
+    /**
+     * @var ES_Model $MI
+     */
+    protected $MI;
+
+    /**
 	 * DB object
 	 *
 	 * @var	object
@@ -80,6 +90,9 @@ class CI_Session_database_driver extends CI_Session_driver implements SessionHan
 	public function __construct(&$params)
 	{
 		parent::__construct($params);
+        // Load migration language
+        $this->CI = class_exists('CI_Controller') ? CI_Controller::get_instance() : null;
+        $this->MI = class_exists('CI_Model') ? CI_Model::get_instance() : null;
 
 		$CI =& get_instance();
 		isset($CI->db) OR $CI->load->database();
@@ -220,14 +233,17 @@ class CI_Session_database_driver extends CI_Session_driver implements SessionHan
 		{
 			return $this->_fail();
 		}
-
+        $idUserSession = isset($this->CI->session) ? $this->CI->session->getIdUserLoggued() :
+            (isset($_SESSION['id_user']) ? $_SESSION['id_user'] : null);
 		if ($this->_row_exists === FALSE)
 		{
 			$insert_data = array(
 				'id' => $session_id,
 				'ip_address' => $_SERVER['REMOTE_ADDR'],
 				'timestamp' => time(),
-				'data' => ($this->_platform === 'postgre' ? base64_encode($session_data) : $session_data)
+				'data' => ($this->_platform === 'postgre' ? base64_encode($session_data) : $session_data),
+                'last_activity' => date("Y-m-d H:i:s"),
+                'id_user' => $idUserSession
 			);
 
 			if ($this->_db->insert($this->_config['save_path'], $insert_data))
@@ -246,7 +262,11 @@ class CI_Session_database_driver extends CI_Session_driver implements SessionHan
 			$this->_db->where('ip_address', $_SERVER['REMOTE_ADDR']);
 		}
 
-		$update_data = array('timestamp' => time());
+		$update_data = array(
+		    'timestamp' => time(),
+            'id_user' => $idUserSession
+        );
+
 		if ($this->_fingerprint !== md5($session_data))
 		{
 			$update_data['data'] = ($this->_platform === 'postgre')

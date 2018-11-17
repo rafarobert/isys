@@ -947,11 +947,11 @@ class CI_Session {
         } else if(inArray($this->sessKey, $this->userdata)){
             return $this->userdata[$this->sessKey]['id_user'];
         } else {
-            return '';
+            return null;
         }
     }
 
-    public function getUserLoggued(){
+    public function getDataUserLoggued(){
         $this->sessKey = config_item('sess_key_admin');
         if($this->CI->initUsers(true)){
             if($this->has_userdata($this->sessKey)) {
@@ -965,6 +965,17 @@ class CI_Session {
         } else {
             return '';
         }
+    }
+
+    public function getObjectUserLoggued(){
+	    $this->CI->load->model('base/model_users');
+	    $data = $this->getDataUserLoggued();
+	    if($data){
+            return $this->CI->model_users->setFromData($data);
+        } else {
+	        return null;
+        }
+
     }
 
     public function isLoguedin(){
@@ -1000,7 +1011,7 @@ class CI_Session {
     }
 
     public function signUp($mod = 'users'){
-        if (is_object($oUser = $this->getUserLoggued())){
+        if (is_object($oUser = $this->getDataUserLoggued())){
             $uri = $this->CI->input->post('uri_string') ? $this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? $this->CI->uri->uri_string() :
                 ($oUser->id_role == 1 ? 'base/dashboard' : 'admin/dashboard'));
             if($uri == 'base/sessions/signup'){
@@ -1012,6 +1023,8 @@ class CI_Session {
         } else {
             // Redirect a user if he's already logged in
             $this->CI->load->model('base/model_roles');
+            $this->CI->load->model('admin/model_users_roles');
+            $this->CI->load->model('admin/model_personas');
             $dashboard = "admin/dashboard";
             $this->isLoguedin() == FALSE || redirect($dashboard);
             $roles = $this->CI->model_roles->find();
@@ -1025,6 +1038,7 @@ class CI_Session {
                     // We can login and redirect
                     if($this->_unique_email()){
                         $data = $this->CI->input->post();
+                        $data['from_session'] = true;
                         /**
                          * @var Model_Roles $role
                          */
@@ -1034,11 +1048,15 @@ class CI_Session {
 //                        }
 //                    }
 //
-                        $this->MI->save($data);
+                        $this->CI->model_users->save($data);
+                        $this->CI->model_users_roles->save($data);
+                        $this->CI->model_personas->save($data);
+
                         $this->login();
                         redirect($dashboard);
                     } else {
                         $this->set_flashdata('error', 'El email introducido ya existe');
+//                        echo '<script>estic.warning("El email introducido ya existe")</script>';
                     }
                 }
             }
@@ -1054,7 +1072,7 @@ class CI_Session {
 
     public function login(){
 
-        if (is_object($oUser = $this->getUserLoggued())){
+        if (is_object($oUser = $this->getDataUserLoggued())){
             $uri = $this->CI->input->post('uri_string') ? $this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? $this->CI->uri->uri_string() :
                 ($oUser->id_role == 1 ? 'base/dashboard' : 'admin/dashboard'));
             if($uri == 'base/sessions/login'){

@@ -16,7 +16,6 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     public $_primary_key = "idTable";
     public $_table_name = "lcmodType_lcTableP";
     public $_es_class = "ES_Model_UcTableP";
-    public $lcTableS;
 
     //>>>globalStaticLocalVars<<<
     /**

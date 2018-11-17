@@ -451,6 +451,45 @@ if ( ! function_exists('show_error'))
 	}
 }
 
+if ( ! function_exists('show_error_handled'))
+{
+	/**
+	 * Error Handler
+	 *
+	 * This function lets us invoke the exception class and
+	 * display errors using the standard error template located
+	 * in application/views/errors/error_general.php
+	 * This function will send the error page directly to the
+	 * browser and exit.
+	 *
+	 * @param	string
+	 * @param	int
+	 * @param	string
+	 * @return	void
+	 */
+    function show_error_handled($message, $status_code = 500, $heading = 'An Error Was Encountered')
+    {
+        $status_code = abs($status_code);
+        if ($status_code < 100)
+        {
+            $exit_status = $status_code + 9; // 9 is EXIT__AUTO_MIN
+            if ($exit_status > 125) // 125 is EXIT__AUTO_MAX
+            {
+                $exit_status = 1; // EXIT_ERROR
+            }
+
+            $status_code = 500;
+        }
+        else
+        {
+            $exit_status = 1; // EXIT_ERROR
+        }
+
+        $_error =& load_class('Exceptions', 'core');
+        echo $_error->show_error($heading, $message, 'error_general', $status_code);
+    }
+}
+
 // ------------------------------------------------------------------------
 
 if ( ! function_exists('show_404'))
@@ -1629,12 +1668,14 @@ if (!function_exists('str2array')) {
                 foreach ($str as $key => $subValue){
                     if(isArray($subValue)){
                         foreach ($subValue as $key2 => $subValue2){
-                            if(strpos($subValue2,'[') > -1 && strpos($subValue2,']') > -1){
-                                $subValue2 = str_replace('"','',$subValue2);
-                                $subValue2 = str_replace('[','',$subValue2);
-                                $subValue2 = str_replace(']','',$subValue2);
-                                $subValue2 = explode(',',$subValue2);
-                                $str[$key][$key2] = array_combine($subValue2,$subValue2);
+                            if(isString($subValue2)){
+                                if(strpos($subValue2,'[') > -1 && strpos($subValue2,']') > -1){
+                                    $subValue2 = str_replace('"','',$subValue2);
+                                    $subValue2 = str_replace('[','',$subValue2);
+                                    $subValue2 = str_replace(']','',$subValue2);
+                                    $subValue2 = explode(',',$subValue2);
+                                    $str[$key][$key2] = array_combine($subValue2,$subValue2);
+                                }
                             }
                         }
                     } else {

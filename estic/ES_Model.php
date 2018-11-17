@@ -263,6 +263,7 @@ Class ES_Model extends ES_Model_Vars {
 //    }
 
     public function save($data = null, $id = null, $with_id = true){
+        $this->CI = CI_Controller::get_instance();
         if($data == null){
             $data = $this->getArrayData();
             $pk = ucfirst(setObject($this->getPrimaryKey()));
@@ -306,12 +307,19 @@ Class ES_Model extends ES_Model_Vars {
 
         if($this->db->field_exists('id_user_modified', $this->_table_name)){
             if($this->db->table_exists('ci_users') && $this->db->field_exists('id_user','ci_users')){
-                $oUserLoggued = $this->session->getUserLoggued();
+                $oUserLoggued = $this->session->getObjectUserLoggued();
                 if (is_object($oUserLoggued) && $id == null){
                     $data['id_user_created'] = $oUserLoggued->id_user;
                     $data['id_user_modified'] = $oUserLoggued->id_user;
                 } else if(is_object($oUserLoggued) && $id != null){
                     $data['id_user_modified'] = $oUserLoggued->id_user;
+                } else if(validateArray($data,'from_session')){
+                    $oUserSaved = $this->CI->model_users->findOneByEmail($data['email']);
+                    $data['id_user_modified'] = $oUserSaved->getIdUser();
+                    $data['id_user_created'] = $oUserSaved->getIdUser();
+                } else {
+                    show_error('Se intenta agregar o modificar un registro en la base de datos, en la tabla: '.$this->_table_name.', para ello es necesario haber iniciado sesion, para registrar al usuario que realiza cambios, Por favor inicia sesion y vuelve a intentarlo');
+                    exit();
                 }
             }
         }

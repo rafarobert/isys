@@ -113,6 +113,15 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                 //<<<validateFieldPassword>>>
                 if ($error == 'ok') {
                     $data = $this->model_lcTableP->save($oUcObjTableS->getArrayData(), $id);
+                    //>>>validateFieldImgUpload3<<<
+                    $this->model_archivos->save($data);
+                    //<<<validateFieldImgUpload3>>>
+                    //>>>validateUserSavedForRolling1<<<
+                    $this->model_users_roles->save($data);
+                    //<<<validateUserSavedForRolling1>>>
+                    //>>>validateUsersSavedForPersonTable1<<<
+                    $this->model_personas->save($data);
+                    //<<<validateUsersSavedForPersonTable1>>>
                     //>>>validateFieldImgUpload2<<<
                     if(isset($this->upload->data_thumbs)){
                         foreach ($this->upload->data_thumbs as $index => $thumb){

@@ -237,6 +237,16 @@ class Ctrl_Migrate extends ES_Controller
 
     public function fromdatabase()
     {
+        $this->load->library('session');
+        $sessUser = $this->session->getObjectUserLoggued();
+        if(!isObject($sessUser)){
+            show_error('Debes iniciar sesion para realizar esta accion');
+            exit();
+        }
+        if($sessUser->getIdRole() != 1){
+            show_error('No tiene permisos para realizar esta accion, por favor contactese con los administradores del sistema');
+            exit();
+        }
         $tables = $this->dbforge->getArrayFieldsFromTable();
         $migIndex = 1;
         $modInit = '';

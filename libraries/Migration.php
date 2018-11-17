@@ -913,18 +913,26 @@ class CI_Migration
             }
             $idMigTable = valNumeric($modModId . $id_migration);
 
-            if (validate_modulo($modModName, $modSubmod)) {
-                $this->CI->initTables(true);
-//                $oTables = $this->CI->model_tables->find(true);
+            $this->load->library('session');
+            $sessUser = $this->session->getDataUserLoggued();
+            if(isObject($sessUser)) {
+                if($sessUser->id_role != 1){
+                    show_error('El cambio que se desea realizar, requiere permisos del administrador, porfavor contactate con sistemas para continuar');
+                    exit();
+                }
+            } else {
+                show_error('Para realizar esta accion debes iniciar sesion.');
+                exit();
+            }
 
-                $modelTables = "model_$modSubmod";
-//                foreach ($oTables as $table) {
-//                    if ($table->$modIdTable == $idMigTable) {
-//                        $exists = true;
-//                        break;
-//                    }
-//                    $exists = false;
-//                }
+            if(!validate_modulo('base','users')){
+                show_error_handled("El modulo users no se encuentraba creado, por que no se pudo registrar al modulo: $modModName/$modSubmod, al momento de la migracion: $idMigTable, verifica que el modulo base/usere se encuentra creado para evitar este error");
+                return $idMigTable;
+            }
+
+            if (validate_modulo($modModName, $modSubmod)) {
+                $sessUser = $this->session->getObjectUserLoggued();
+                $this->CI->initTables(true);
 
                 $oTable = $this->CI->model_tables->findOneByIdTable($idMigTable);
 
@@ -943,6 +951,7 @@ class CI_Migration
                 } else {
                     $this->CI->model_tables->save($data, null, $idMigTable);
                 }
+
             } else if ($tableName != $modTable) {
                 redirect("sys/migrate/ci/$modMigIndex");
             }
@@ -1338,6 +1347,14 @@ class CI_Migration
         if($tableName == 'ci_files'){
             $data["validateFieldImgUpload1"] = $this->load->view(["template_controller" => "validateFieldImgUpload1"], $data, true, true);
             $data["validateFieldImgUpload2"] = $this->load->view(["template_controller" => "validateFieldImgUpload2"], $data, true, true);
+            $data["validateFieldImgUpload3"] = $this->load->view(["template_controller" => "validateFieldImgUpload3"], $data, true, true);
+            $data["validateFieldImgUpload4"] = $this->load->view(["template_ES_Ctrl" => "validateFieldImgUpload4"], $data, true, true);
+        }
+        if($tableName == 'ci_users'){
+            $data["validateUserSavedForRolling1"] = $this->load->view(["template_controller" => "validateUserSavedForRolling1"], $data, true, true);
+            $data["validateUserSavedForRolling2"] = $this->load->view(["template_ES_Ctrl" => "validateUserSavedForRolling2"], $data, true, true);
+            $data["validateUsersSavedForPersonTable1"] = $this->load->view(["template_controller" => "validateUsersSavedForPersonTable1"], $data, true, true);
+            $data["validateUsersSavedForPersonTable2"] = $this->load->view(["template_ES_Ctrl" => "validateUsersSavedForPersonTable2"], $data, true, true);
         }
 
         if ($fieldImg != '') {

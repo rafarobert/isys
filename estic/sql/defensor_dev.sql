@@ -207,8 +207,10 @@ CREATE TABLE `ci_sessions`
     `ip_address` VARCHAR(45) NOT NULL,
     `timestamp` int(10) unsigned DEFAULT 0 NOT NULL,
     `data` BLOB NOT NULL,
-    `last_activity` DATETIME NOT NULL,
+    `last_activity` DATETIME DEFAULT '0000-00-00 00:00:00',
     `id_user` int(11) unsigned,
+    `lng` INTEGER,
+    `lat` INTEGER,
     PRIMARY KEY (`id`),
     INDEX `ci_sessions_ibfk_1` (`id_user`),
     CONSTRAINT `ci_sessions_ibfk_1`
@@ -647,6 +649,35 @@ CREATE TABLE `dfa_estadisticas`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- dfa_etiquetas
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `dfa_etiquetas`;
+
+CREATE TABLE `dfa_etiquetas`
+(
+    `id_etiqueta` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(250),
+    `descripcion` VARCHAR(500),
+    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `id_user_modified` int(11) unsigned NOT NULL,
+    `id_user_created` int(11) unsigned NOT NULL,
+    `date_modified` DATETIME NOT NULL,
+    `date_created` DATETIME NOT NULL,
+    PRIMARY KEY (`id_etiqueta`),
+    UNIQUE INDEX `dfa_etiquetas_id_etiqueta_uindex` (`id_etiqueta`),
+    INDEX `dfa_etiquetas_ibfk_1` (`id_user_created`),
+    INDEX `dfa_etiquetas_ibfk_2` (`id_user_modified`),
+    CONSTRAINT `dfa_etiquetas_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_etiquetas_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- dfa_oficinas
 -- ---------------------------------------------------------------------
 
@@ -721,7 +752,7 @@ DROP TABLE IF EXISTS `dfa_personas`;
 CREATE TABLE `dfa_personas`
 (
     `id_persona` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `id_usuario` int(10) unsigned,
+    `id_user` int(10) unsigned,
     `id_residencia` int(10) unsigned,
     `id_rango_edad` int(10) unsigned,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
@@ -734,7 +765,7 @@ CREATE TABLE `dfa_personas`
     UNIQUE INDEX `dfa_personas_id_persona_uindex` (`id_persona`),
     INDEX `dfa_personas_ibfk_1` (`id_user_created`),
     INDEX `dfa_personas_ibfk_2` (`id_user_modified`),
-    INDEX `dfa_personas_ibfk_3` (`id_usuario`),
+    INDEX `dfa_personas_ibfk_3` (`id_user`),
     INDEX `dfa_personas_ibfk_4` (`id_residencia`),
     INDEX `dfa_personas_ibfk_5` (`id_rango_edad`),
     CONSTRAINT `dfa_personas_ibfk_1`
@@ -744,7 +775,7 @@ CREATE TABLE `dfa_personas`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `dfa_personas_ibfk_3`
-        FOREIGN KEY (`id_usuario`)
+        FOREIGN KEY (`id_user`)
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `dfa_personas_ibfk_4`
         FOREIGN KEY (`id_residencia`)
@@ -845,9 +876,11 @@ CREATE TABLE `dfa_publicaciones`
     `id_categoria_publicacion` int(10) unsigned,
     `etiquetas` VARCHAR(250),
     `secciones` VARCHAR(1000),
-    `publicado` VARCHAR(250),
+    `estado_publicacion` VARCHAR(250),
     `ids_archivos` VARCHAR(1000),
     `id_foto_principal` int(10) unsigned,
+    `revisado` VARCHAR(250),
+    `comentarios` TEXT,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -1153,6 +1186,43 @@ CREATE TABLE `dfa_unidades`
     CONSTRAINT `dfa_unidades_ibfk_4`
         FOREIGN KEY (`id_direccion`)
         REFERENCES `dfa_unidades` (`id_unidad`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- dfa_users_roles
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `dfa_users_roles`;
+
+CREATE TABLE `dfa_users_roles`
+(
+    `id_user_role` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_user` int(10) unsigned,
+    `id_role` int(10) unsigned,
+    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `id_user_modified` int(11) unsigned NOT NULL,
+    `id_user_created` int(11) unsigned NOT NULL,
+    `date_modified` DATETIME NOT NULL,
+    `date_created` DATETIME NOT NULL,
+    PRIMARY KEY (`id_user_role`),
+    UNIQUE INDEX `dfa_usuarios_roles_id_usuario_role_uindex` (`id_user_role`),
+    INDEX `dfa_usuarios_roles_ibfk_1` (`id_user_created`),
+    INDEX `dfa_usuarios_roles_ibfk_2` (`id_user_modified`),
+    INDEX `dfa_usuarios_roles_ibfk_3` (`id_user`),
+    INDEX `dfa_usuarios_roles_ibfk_4` (`id_role`),
+    CONSTRAINT `dfa_users_roles_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_users_roles_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_users_roles_ibfk_3`
+        FOREIGN KEY (`id_user`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_users_roles_ibfk_4`
+        FOREIGN KEY (`id_role`)
+        REFERENCES `ci_roles` (`id_role`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
