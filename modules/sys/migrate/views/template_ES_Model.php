@@ -62,7 +62,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         parent::__construct();
     }
 
-    public function get_new()
+    public function getNew()
     {
         $this->lcTableS = new Model_UcTableP();
         return $this->lcTableS;

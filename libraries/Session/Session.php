@@ -1038,7 +1038,6 @@ class CI_Session {
                     // We can login and redirect
                     if($this->_unique_email()){
                         $data = $this->CI->input->post();
-                        $data['from_session'] = true;
                         /**
                          * @var Model_Roles $role
                          */
@@ -1047,8 +1046,8 @@ class CI_Session {
 //                            $data["id_role"] = $role->getIdRole();
 //                        }
 //                    }
-//
-                        $this->CI->model_users->save($data);
+                        $data = $this->CI->model_users->save($data);
+                        $data['from_session'] = true;
                         $this->CI->model_users_roles->save($data);
                         $this->CI->model_personas->save($data);
 

@@ -19,18 +19,21 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
     {
         parent::__construct();
         $this->load->model("lcModS/model_lcTableP");
+        if(isset($this->model_lcTableP)){
+            $this->model_initialized = $this->model_lcTableP;
+        }
         //>>>validateFieldImgUpload4<<<
-        if(validate_modulo('admin','model_archivos')) {
+        if(validate_modulo('admin','archivos')) {
             $this->load->model('admin/model_archivos');
         }
         //<<<validateFieldImgUpload4>>>
         //>>>validateUserSavedForRolling2<<<
-        if(validate_modulo('admin','model_users_roles')){
+        if(validate_modulo('admin','users_roles')){
             $this->load->model('admin/model_users_roles');
         }
         //<<<validateUserSavedForRolling2>>>
         //>>>validateUsersSavedForPersonTable2<<<
-        if(validate_modulo('admin','model_personas')) {
+        if(validate_modulo('admin','personas')) {
             $this->load->model('admin/model_personas');
         }
         //<<<validateUsersSavedForPersonTable2>>>

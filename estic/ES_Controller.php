@@ -8,6 +8,8 @@ class ES_Controller extends ES_Ctrl_Vars
     const ARRAYS = 'array';
     const NUMERIC = 'numeric';
     public $fromAjax = false;
+    public $error = 'ok';
+    public $model_initialized;
 
     public $request;
     public $response;
@@ -104,5 +106,66 @@ class ES_Controller extends ES_Ctrl_Vars
             }
         }
         return [$id,$view];
+    }
+
+    public function doUpload($oFile){
+        $id = $oFile->getIdFile();
+        if (!$this->model_files->do_upload("file", $id) && $id == null) {
+            $this->data['errors'] = $this->error = array('error' => $this->upload->display_errors());
+            $this->fromAjax = true;
+        } else {
+            $this->data["file"] = $this->upload->data();
+            $oFile = $this->model_files->setFromData($this->upload->data(),$oFile);
+            $this->fromAjax = true;
+        }
+        return $oFile;
+    }
+
+    public function doUploadThumbs($oFile){
+        if(isset($oFile->aData)){
+            $this->data['aData'] = $oFile->aData;
+        }
+        $id = $oFile->getIdFile();
+        if(isset($this->upload->data_thumbs)){
+            foreach ($this->upload->data_thumbs as $index => $thumb){
+                $thumb['id_parent'] = $id;
+                $this->data['aData'][$index] = $this->model_files->save($thumb);
+            }
+            $oFile->setThumbs();
+            $thumb1 = $oFile->getThumb1();
+            $oArchivo = $this->model_archivos->getNew();
+            $oArchivo->setIdFile($oFile->getIdFile());
+            $oArchivo->setIdPreview($thumb1->getIdFile());
+            $oArchivo->saveOrUpdate();
+        }
+        return $oFile;
+    }
+
+    public function returnResponse($oObject, $responseView = '', $responseRedirect = '')
+    {
+        if($this->fromAjax){
+            $responseView = !isString($responseView) ? $this->uri->uri_string() : $responseView;
+            $responseRedirect = !isString($responseRedirect) ? $this->uri->segment(1).'/'.$this->uri->segment(2) : $responseRedirect;
+            if ($this->error == 'ok') {
+                $data = $this->data['aData'];
+                $aReturn['message'] = setMessage($data, 'File agregado exitosamente');
+                $aReturn['error'] = $this->error;
+                $this->data['oFile'] = $oObject = $this->model_initialized->setFromData($data, $oObject);
+                $aReturn['primary'] = $primary = $this->model_initialized->getPrimaryKey();
+                $aReturn['pk'] = $oObject->$primary;
+                $aReturn['view'] = $this->load->view($responseView, $this->data, true);
+                $aReturn['redirect'] = $responseRedirect;
+                $aReturn['data'] = $data;
+                echo json_encode($aReturn);
+                exit;
+            } else {
+                $aReturn['error'] = $error = "File con datos incompletos, porfavor revisa los datos";;
+                $aReturn['view'] = $this->load->view($responseView, $this->data, true);
+                echo json_encode($aReturn);
+                exit;
+            }
+        } else {
+            redirect($responseRedirect);
+        }
     }
 }

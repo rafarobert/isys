@@ -314,7 +314,7 @@ CREATE TABLE `dfa_archivos`
 (
     `id_archivo` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `id_file` int(10) unsigned,
-    `id_portada` int(10) unsigned,
+    `id_preview` int(10) unsigned,
     `id_concepto` int(10) unsigned,
     `id_historia` int(10) unsigned,
     `id_delegacion` int(10) unsigned,
@@ -332,7 +332,7 @@ CREATE TABLE `dfa_archivos`
     INDEX `dfa_archivos_ibfk_1` (`id_user_created`),
     INDEX `dfa_archivos_ibfk_2` (`id_user_modified`),
     INDEX `dfa_archivos_ibfk_3` (`id_file`),
-    INDEX `dfa_archivos_ibfk_4` (`id_portada`),
+    INDEX `dfa_archivos_ibfk_4` (`id_preview`),
     INDEX `dfa_archivos_ibfk_5` (`id_concepto`),
     INDEX `dfa_archivos_ibfk_6` (`id_historia`),
     INDEX `dfa_archivos_ibfk_7` (`id_delegacion`),
@@ -347,7 +347,7 @@ CREATE TABLE `dfa_archivos`
         FOREIGN KEY (`id_file`)
         REFERENCES `ci_files` (`id_file`),
     CONSTRAINT `dfa_archivos_ibfk_4`
-        FOREIGN KEY (`id_portada`)
+        FOREIGN KEY (`id_preview`)
         REFERENCES `ci_files` (`id_file`),
     CONSTRAINT `dfa_archivos_ibfk_5`
         FOREIGN KEY (`id_concepto`)

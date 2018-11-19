@@ -1248,7 +1248,14 @@ if (!function_exists('objectHas')) {
     function objectHas($object, $index, $bEmpty = true)
     {
         if(isObject($object,$bEmpty) && (isString($index,$bEmpty) || isNumeric($index,$bEmpty))){
-            if(isset($object->$index)){
+            $isset = false;
+            foreach ($object as $key => $val){
+                if($key == $index){
+                    $isset = true;
+                    break;
+                }
+            }
+            if($isset){
                 if($bEmpty){
                     if($object->$index != "" && $object->$index != [] && $object->$index != null){
                         return true;

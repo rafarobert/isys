@@ -1347,7 +1347,7 @@ class CI_Migration
         if($tableName == 'ci_files'){
             $data["validateFieldImgUpload1"] = $this->load->view(["template_controller" => "validateFieldImgUpload1"], $data, true, true);
             $data["validateFieldImgUpload2"] = $this->load->view(["template_controller" => "validateFieldImgUpload2"], $data, true, true);
-            $data["validateFieldImgUpload3"] = $this->load->view(["template_controller" => "validateFieldImgUpload3"], $data, true, true);
+//            $data["validateFieldImgUpload3"] = $this->load->view(["template_controller" => "validateFieldImgUpload3"], $data, true, true);
             $data["validateFieldImgUpload4"] = $this->load->view(["template_ES_Ctrl" => "validateFieldImgUpload4"], $data, true, true);
         }
         if($tableName == 'ci_users'){
@@ -1507,9 +1507,9 @@ class CI_Migration
                             if (validateVar($aTagsEditView, 'array')) {
                                 foreach ($aTagsEditView as $tagEditView => $phpContentEditView) {
                                     $fileEditViewPath = $frameAppPath . "$submod/views/$tagEditView" . $this->_ext_php;
-                                    if (!file_exists($fileEditViewPath)) {
+//                                    if (!file_exists($fileEditViewPath)) {
                                         write_file($fileEditViewPath, $phpContentEditView);
-                                    }
+//                                    }
                                 }
                             }
                         }

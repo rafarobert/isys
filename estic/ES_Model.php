@@ -636,25 +636,46 @@ Class ES_Model extends ES_Model_Vars {
         return $this->setFromData($oField);
     }
 
-    public function setFiles($oModel,$aIdsFiles){
+    public function setThumbs($oModel = null, $idsFiles = null)
+    {
+        $this->CI = CI_Controller::get_instance();
+        $aIdsFiles = array();
+        if($oModel == null){
+            if($this->_table_name == 'ci_files'){
+                $oModel = $this;
+            }
+        }
+        if($idsFiles == null) {
+            if($this->_table_name == 'ci_files'){
+                /**
+                 * @var Model_Files $oModel
+                 */
+                $aIdsFiles[] = $oModel->getIdFile();
+            }
+        }
         $this->load->model("base/model_files");
-        if(isArray($aIdsFiles) || isObject($aIdsFiles)){
-            foreach ($aIdsFiles as $key => $idFile){
-                if(isNumeric($idFile) || isString($idFile)){
-                    $oFile = $this->model_files->findOneByIdFile($idFile);
-                    $oModel->files[$key] = $oFile;
-                    if(isObject($oFile)){
-                        $oThumbFiles = $this->model_files->filterByIdParent($oFile->getIdFile());
-                        if (isObject($oThumbFiles) || isArray($oThumbFiles)){
-                            /**
-                             * @var ES_Model_Files $thumb
-                             */
-                            $oModel->files[$key]->{'thumbs'} = array();
-                            foreach ($oThumbFiles as $thumb){
-                                $mark = strReplace(['-','_','thumb'],'',$thumb->getThumbMarker());
-                                $oModel->thumbFiles[$mark] = $thumb->getArrayData();
-                                $oModel->files[$key]->{'thumbs'}[$mark] = $thumb->getArrayData();
-                            }
+        if (!isArray($idsFiles) || !isObject($idsFiles)) {
+            if (isNumeric($idsFiles)) {
+                $aIdsFiles[] = $idsFiles;
+            }
+        } else {
+            $aIdsFiles = $idsFiles;
+        }
+        foreach ($aIdsFiles as $key => $idFile) {
+            if (isNumeric($idFile) || isString($idFile)) {
+                $oFile = $this->model_files->findOneByIdFile($idFile);
+                $oModel->files[$key] = $oFile;
+                if (isObject($oFile)) {
+                    $oThumbFiles = $this->model_files->filterByIdParent($oFile->getIdFile());
+                    if (isObject($oThumbFiles) || isArray($oThumbFiles)) {
+                        /**
+                         * @var ES_Model_Files $thumb
+                         */
+                        $oModel->files[$key]->{'thumbs'} = array();
+                        foreach ($oThumbFiles as $thumb) {
+                            $mark = strReplace(['-', '_', 'thumb'], '', $thumb->getThumbMarker());
+                            $oModel->thumbFiles[$mark] = $thumb->getArrayData();
+                            $oModel->files[$key]->{'thumbs'}[$mark] = $thumb->getArrayData();
                         }
                     }
                 }
@@ -663,7 +684,74 @@ Class ES_Model extends ES_Model_Vars {
         return $oModel;
     }
 
+    public function getThumb1($model = null)
+    {
+        $this->load->library('upload');
+        $nroThumb = 1;
+        $indexThumb = 1;
+        if(!is_object($model)){
+            $model = $this;
+        }
+        if(isset($model->thumbFiles)){
+            if(isArray($model->thumbFiles)){
+                foreach ($model->thumbFiles as $key => $thumbData){
+                    if($indexThumb == $nroThumb){
+                        return $this->setFromData($thumbData);
+                    }
+                    $indexThumb++;
+                }
+                $aData['thumbs'] = $model->thumbs;
+            }
+        }
+        return $aData;
+    }
+
+    public function getThumb2($model = null)
+    {
+        $this->load->library('upload');
+        $nroThumb = 2;
+        $indexThumb = 1;
+        if(!is_object($model)){
+            $model = $this;
+        }
+        if(isset($model->thumbFiles)){
+            if(isArray($model->thumbFiles)){
+                foreach ($model->thumbFiles as $key => $thumbData){
+                    if($indexThumb == $nroThumb){
+                        return $this->setFromData($thumbData);
+                    }
+                    $indexThumb++;
+                }
+                $aData['thumbs'] = $model->thumbs;
+            }
+        }
+        return $aData;
+    }
+
+    public function getThumb3($model = null)
+    {
+        $this->load->library('upload');
+        $nroThumb = 3;
+        $indexThumb = 1;
+        if(!is_object($model)){
+            $model = $this;
+        }
+        if(isset($model->thumbFiles)){
+            if(isArray($model->thumbFiles)){
+                foreach ($model->thumbFiles as $key => $thumbData){
+                    if($indexThumb == $nroThumb){
+                        return $this->setFromData($thumbData);
+                    }
+                    $indexThumb++;
+                }
+                $aData['thumbs'] = $model->thumbs;
+            }
+        }
+        return $aData;
+    }
+
     public function getArrayDataWithThumbs($model = null){
+
         if(!is_object($model)){
             $model = $this;
         }
@@ -736,8 +824,10 @@ Class ES_Model extends ES_Model_Vars {
     /**
      * @var ES_Model $object
      */
-    public function saveOrUpdate($object, $id = null){
-        $data = $object->getData();
-        $object->save($data,$id);
+    public function saveOrUpdate($id = null){
+        $data = $this->getArrayData();
+        $data = $this->save($data,$id);
+        $this->setFromData($data,$this);
+        $this->aData = $data;
     }
 }
