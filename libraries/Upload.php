@@ -180,6 +180,13 @@ class CI_Upload {
 	public $upload_path = '';
 
 	/**
+	 * Upload path
+	 *
+	 * @var	string
+	 */
+	public $upload_path_db = '';
+
+	/**
 	 * Overwrite flag
 	 *
 	 * @var	bool
@@ -632,8 +639,8 @@ class CI_Upload {
 	{
 		$data = array(
 				'name'		=> $this->orig_name,
-				'path'		=> $this->upload_path,
-				'full_path'		=> $this->upload_path.$this->file_name,
+				'path'		=> $this->upload_path_db,
+				'full_path'		=> $this->upload_path_db.$this->file_name,
 				'raw_name'		=> str_replace($this->file_ext, '', $this->file_name),
 //				'orig_name'		=> $this->orig_name,
 				'id_user_created'		=> $this->MI->session->getIdUserLoggued(),

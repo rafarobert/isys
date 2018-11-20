@@ -313,7 +313,7 @@ Class ES_Model extends ES_Model_Vars {
                     $data['id_user_modified'] = $oUserLoggued->id_user;
                 } else if(is_object($oUserLoggued) && $id != null){
                     $data['id_user_modified'] = $oUserLoggued->id_user;
-                } else if(validateArray($data,'from_session')){
+                } else if(validateArray($data,'from_session') || $this->input->post('fromSession')){
                     $oUserSaved = $this->CI->model_users->findOneByEmail($data['email']);
                     $data['id_user_modified'] = $oUserSaved->getIdUser();
                     $data['id_user_created'] = $oUserSaved->getIdUser();
@@ -498,13 +498,14 @@ Class ES_Model extends ES_Model_Vars {
         //$this->initLoaded();
         list($mod,$submod) = getModSubMod($this->_table_name);
         $dirPictures = ROOTPATH."assets/$submod/";
+        $dirPicturesDB = "assets/$submod/";
         createFolder($dirPictures);
         // Settings for images
         $config = array(
             'allowed_types'     => config_item('file_types'),
             'max_size'          => config_item('img_max_size'),
             'max_width'         => config_item('img_max_width'),
-            'max_height'        => config_item('img_max_heigth'),
+            'max_height'        => config_item('img_max_height'),
             'maintain_ratio'    => true,
             'image_library'     => 'gd2',
             'create_thumb'      => TRUE,
@@ -519,11 +520,15 @@ Class ES_Model extends ES_Model_Vars {
         if(isArray($_FILES)){
             foreach ($_FILES as $fName => $fSettings){
                 $dirPictures .= "$fName/";
+                $dirPicturesDB .= "$fName/";
                 createFolder($dirPictures);
                 $dirPicturesThumb = $dirPictures."thumbs";
+                $dirPicturesThumbDB = $dirPicturesDB."thumbs";
                 createFolder($dirPicturesThumb);
                 $this->upload->upload_path = $dirPictures;
+                $this->upload->upload_path_db = $dirPicturesDB;
                 $config['new_image'] = $dirPicturesThumb;
+                $config['new_image_db'] = $dirPicturesThumbDB;
                 $files = $_FILES;
                 $aThumbs = array();
                 $aFiles = explode('|',config_item('file_without_tumbs'));
@@ -534,9 +539,9 @@ Class ES_Model extends ES_Model_Vars {
                     } else {
                         $this->upload->bFileUploaded = true;
                         $this->upload->num_thumbs = $config['num_thumbs'];
-                        $this->upload->file_url = WEBASSETS."$submod/$fName/".$this->upload->orig_name;
+                        $this->upload->file_url = "/assets/$submod/$fName/".$this->upload->orig_name;
                         $file = $this->upload->data();
-                        $config['source_image'] = $file['full_path'];
+                        $config['source_image'] = ROOTPATH.$file['full_path'];
                         for ($i = 0; $i < $config['num_thumbs']; $i++) {
                             if($this->image_lib->initialize($config)){
                                 if(in_array($this->image_lib->dest_ext,$aFiles)){
@@ -550,11 +555,11 @@ Class ES_Model extends ES_Model_Vars {
                                     $aThumbs['thumb_'.$config['width']]['name'] = $this->image_lib->dest_name;
                                     $aThumbs['thumb_'.$config['width']]['library'] = $this->image_lib->image_library;
                                     $aThumbs['thumb_'.$config['width']]['thumb_marker'] = $this->image_lib->thumb_marker;
-                                    $aThumbs['thumb_'.$config['width']]['url'] = WEBASSETS."$submod/$fName/thumbs/".$this->image_lib->dest_name;
+                                    $aThumbs['thumb_'.$config['width']]['url'] = "/assets/$submod/$fName/thumbs/".$this->image_lib->dest_name;
                                     $aThumbs['thumb_'.$config['width']]['raw_name'] = $this->image_lib->dest_name;
                                     $aThumbs['thumb_'.$config['width']]['ext'] = $this->image_lib->dest_ext;
-                                    $aThumbs['thumb_'.$config['width']]['path'] = $this->image_lib->dest_folder;
-                                    $aThumbs['thumb_'.$config['width']]['full_path'] = $this->image_lib->full_dst_path;
+                                    $aThumbs['thumb_'.$config['width']]['path'] = $this->image_lib->dest_folder_db;
+                                    $aThumbs['thumb_'.$config['width']]['full_path'] = $this->image_lib->full_dst_path_db;
                                     $config['width'] = $config['width'] + 150;
                                     $config['height'] = $config['height'] + 150;
                                     $config['thumb_marker'] = '-thumb_' . $config['width'];
@@ -829,5 +834,6 @@ Class ES_Model extends ES_Model_Vars {
         $data = $this->save($data,$id);
         $this->setFromData($data,$this);
         $this->aData = $data;
+        return $data;
     }
 }

@@ -104,7 +104,7 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                 }
                 //<<<validateFieldPassword>>>
                 if ($error == 'ok') {
-                    $oUcObjTableS->saveOrUpdate($id);
+                    $data = $oUcObjTableS->saveOrUpdate($id);
                     //>>>validateUserSavedForRolling1<<<
                     $this->model_users_roles->save($data);
                     //<<<validateUserSavedForRolling1>>>
@@ -114,6 +114,7 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                     //>>>validateFieldImgUpload2<<<
                     $oUcObjTableS = $this->doUploadThumbs($oUcObjTableS);
                     //<<<validateFieldImgUpload2>>>
+                    $this->data['oUcObjTableS'] = $oUcObjTableS;
                     $this->returnResponse($oUcObjTableS);
                 } else {
                     $this->returnResponse($oUcObjTableS);

@@ -1083,8 +1083,9 @@ class CI_Session {
         } else {
 
             $emailPost = $this->CI->input->post('email');
-            $ngEmailPost = $this->CI->input->post('ngemail');
             $passwordPost = $this->hash($this->CI->input->post('password'));
+
+            $ngEmailPost = $this->CI->input->post('ngemail');
             $ngPasswordPost = $this->hash($this->CI->input->post('ngpassword'));
 
             $oUser = $this->MI->get_by(array(

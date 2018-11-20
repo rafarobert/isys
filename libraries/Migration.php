@@ -926,7 +926,7 @@ class CI_Migration
             }
 
             if(!validate_modulo('base','users')){
-                show_error_handled("El modulo users no se encuentraba creado, por que no se pudo registrar al modulo: $modModName/$modSubmod, al momento de la migracion: $idMigTable, verifica que el modulo base/usere se encuentra creado para evitar este error");
+                show_error_handled("El modulo users no se encuentraba creado, debido a ello no se pudo registrar la tabla $tableName, al momento de la migracion: $idMigTable, verifica que el modulo base/usere se encuentra creado para evitar este error");
                 return $idMigTable;
             }
 

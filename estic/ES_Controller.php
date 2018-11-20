@@ -143,11 +143,11 @@ class ES_Controller extends ES_Ctrl_Vars
 
     public function returnResponse($oObject, $responseView = '', $responseRedirect = '')
     {
+        $responseView = !isString($responseView) ? $this->uri->uri_string() : $responseView;
+        $responseRedirect = !isString($responseRedirect) ? $this->uri->segment(1).'/'.$this->uri->segment(2) : $responseRedirect;
         if($this->fromAjax){
-            $responseView = !isString($responseView) ? $this->uri->uri_string() : $responseView;
-            $responseRedirect = !isString($responseRedirect) ? $this->uri->segment(1).'/'.$this->uri->segment(2) : $responseRedirect;
             if ($this->error == 'ok') {
-                $data = $this->data['aData'];
+                $data = isset($this->data['aData']) ? $this->data['aData'] : (isset($oObject->aData) ? $oObject->aData : []);
                 $aReturn['message'] = setMessage($data, 'File agregado exitosamente');
                 $aReturn['error'] = $this->error;
                 $this->data['oFile'] = $oObject = $this->model_initialized->setFromData($data, $oObject);

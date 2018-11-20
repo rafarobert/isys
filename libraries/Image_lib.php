@@ -85,6 +85,13 @@ class CI_Image_lib {
 	public $new_image		= '';
 
 	/**
+	 * Path to the modified image
+	 *
+	 * @var string
+	 */
+	public $new_image_db		= '';
+
+	/**
 	 * Image width
 	 *
 	 * @var int
@@ -289,6 +296,13 @@ class CI_Image_lib {
 	public $dest_folder		= '';
 
 	/**
+	 * Destination image folder
+	 *
+	 * @var string
+	 */
+	public $dest_folder_db		= '';
+
+	/**
 	 * Image mime-type
 	 *
 	 * @var string
@@ -336,6 +350,13 @@ class CI_Image_lib {
 	 * @var string
 	 */
 	public $full_dst_path		= '';
+
+	/**
+	 * Full path to destination image
+	 *
+	 * @var string
+	 */
+	public $full_dst_path_db		= '';
 
 	/**
 	 * File permissions
@@ -577,12 +598,14 @@ class CI_Image_lib {
 			else
 			{
 				$full_dest_path = $this->new_image;
+				$full_dest_path_db = $this->new_image_db;
 			}
 
 			// Is there a file name?
 			if ( ! preg_match('#\.(jpg|jpeg|gif|png)$#i', $full_dest_path))
 			{
 				$this->dest_folder = $full_dest_path.'/';
+				$this->dest_folder_db = $full_dest_path_db.'/';
 				$this->dest_image = $this->source_image;
 			}
 			else
@@ -613,6 +636,7 @@ class CI_Image_lib {
 
 		$this->full_src_path = $this->source_folder.$this->source_image;
 		$this->full_dst_path = $this->dest_folder.$filename.$this->thumb_marker.$file_ext;
+		$this->full_dst_path_db = $this->dest_folder_db.$filename.$this->thumb_marker.$file_ext;
 		$this->dest_name = $filename.$this->thumb_marker.$file_ext;
 		$this->dest_raw_name = $filename.$this->thumb_marker;
 		$this->dest_ext = $file_ext;
