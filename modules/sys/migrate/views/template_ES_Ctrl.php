@@ -37,6 +37,8 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
             $this->load->model('admin/model_personas');
         }
         //<<<validateUsersSavedForPersonTable2>>>
+        $this->subjectP = 'lcTableP';
+        $this->subjectS = 'lcTableS';
     }
 
     public function init(){

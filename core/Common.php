@@ -1550,6 +1550,7 @@ if (!function_exists('setMessage')) {
 
     function setMessage($aData, $added, $aSearched = [])
     {
+        $aExcepts = ['password','status','estado'];
         $message = '';
         foreach ($aData as $key => $data){
             if(isArray($aSearched)){
@@ -1559,7 +1560,7 @@ if (!function_exists('setMessage')) {
                     }
                 }
             } else {
-                if(validateVar($data) && !strstr($data,'/')){
+                if(validateVar($data) && !strstr($data,'/') && !in_array($key,$aExcepts)){
                     $message .= "$key: $data, ";
                 }
             }

@@ -1507,9 +1507,9 @@ class CI_Migration
                             if (validateVar($aTagsEditView, 'array')) {
                                 foreach ($aTagsEditView as $tagEditView => $phpContentEditView) {
                                     $fileEditViewPath = $frameAppPath . "$submod/views/$tagEditView" . $this->_ext_php;
-//                                    if (!file_exists($fileEditViewPath)) {
+                                    if (!file_exists($fileEditViewPath)) {
                                         write_file($fileEditViewPath, $phpContentEditView);
-//                                    }
+                                    }
                                 }
                             }
                         }

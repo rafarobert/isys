@@ -15,6 +15,8 @@ class ES_Controller extends ES_Ctrl_Vars
     public $response;
     public $restful;
     public $oauth;
+    public $subjectP;
+    public $subjectS;
 
     public $data = array();
 
@@ -145,10 +147,11 @@ class ES_Controller extends ES_Ctrl_Vars
     {
         $responseView = !isString($responseView) ? $this->uri->uri_string() : $responseView;
         $responseRedirect = !isString($responseRedirect) ? $this->uri->segment(1).'/'.$this->uri->segment(2) : $responseRedirect;
+
         if($this->fromAjax){
             if ($this->error == 'ok') {
                 $data = isset($this->data['aData']) ? $this->data['aData'] : (isset($oObject->aData) ? $oObject->aData : []);
-                $aReturn['message'] = setMessage($data, 'File agregado exitosamente');
+                $aReturn['message'] = setMessage($data, ucfirst($this->subjectS).' agregado exitosamente');
                 $aReturn['error'] = $this->error;
                 $this->data['oFile'] = $oObject = $this->model_initialized->setFromData($data, $oObject);
                 $aReturn['primary'] = $primary = $this->model_initialized->getPrimaryKey();
@@ -159,7 +162,8 @@ class ES_Controller extends ES_Ctrl_Vars
                 echo json_encode($aReturn);
                 exit;
             } else {
-                $aReturn['error'] = $error = "File con datos incompletos, porfavor revisa los datos";;
+                $aReturn['error'] = $error = ucfirst($this->subjectS)." con datos incompletos, porfavor revisa los datos";
+                $aReturn['required'] = validation_errors();
                 $aReturn['view'] = $this->load->view($responseView, $this->data, true);
                 echo json_encode($aReturn);
                 exit;
