@@ -933,8 +933,13 @@ class CI_Migration
             if (validate_modulo($modModName, $modSubmod)) {
                 $sessUser = $this->session->getObjectUserLoggued();
                 $this->CI->initTables(true);
-
+                $this->CI->initModulesTables(true);
+                $idModuleTable = intval($idMigTable.'0');
                 $oTable = $this->CI->model_tables->findOneByIdTable($idMigTable);
+                $oModuleTable = $this->CI->model_modules_tables->findOneByIdModuleTable($idModuleTable);
+                if (!is_object($oModuleTable )){
+                    $oModuleTable = $this->CI->model_modules_tables->getNew();
+                }
 
                 $data = array(
                     'title' => validateArray($tableSettings, 'title') ? $tableSettings['title'] : setLabel($submod,true),
@@ -946,11 +951,21 @@ class CI_Migration
                     'listed' => validateArray($tableSettings, 'bIsListed') ? $tableSettings['bIsListed'] : 'enabled',
                     'change_count' => isObject($oTable) ? $oTable->getChangeCount() : 0
                 );
-                if (isObject($oTable)) {
-                    $this->CI->model_tables->save($data, $idMigTable);
-                } else {
-                    $this->CI->model_tables->save($data, null, $idMigTable);
-                }
+                $oTable->setFromData($data);
+                $oTable->saveOrUpdate($idMigTable);
+                $oModuleTable->setIdTable($oTable->getIdTable());
+                $oModuleTable->setIdModule($modModId);
+                $oModuleTable->saveOrUpdate(intval($idMigTable.'0'));
+
+//                if (isObject($oTable)) {
+//                    $data = $this->CI->model_tables->save($data, $idMigTable);
+//                    $data['id_module'] = $modModId;
+//                    $this->CI->model_modules_tables->save($data,$idMigTable);
+//                } else {
+//                    $this->CI->model_tables->save($data, null, $idMigTable);
+//                    $data['id_module'] = $modModId;
+//                    $this->CI->model_modules_tables->save($data,null,$idMigTable);
+//                }
 
             } else if ($tableName != $modTable) {
                 redirect("sys/migrate/ci/$modMigIndex");
@@ -1030,12 +1045,14 @@ class CI_Migration
         $excepts = array_merge(config_item('controlFields'), [$pkTable]);
         $allFields = array_keys($fields);
         $aFieldsColumnsKey = $this->dbforge->getArrayColumnsKey($tableName);
-        foreach ($aFieldsColumnsKey as $keyNum => $fieldFkName) {
-            if (compareStrStr($fieldFkName, 'id_user_modified')) {
-                unset($aFieldsColumnsKey[$keyNum]);
-            }
-            if (compareStrStr($fieldFkName, 'id_user_created')) {
-                unset($aFieldsColumnsKey[$keyNum]);
+        if($aFieldsColumnsKey != null){
+            foreach ($aFieldsColumnsKey as $keyNum => $fieldFkName) {
+                if (compareStrStr($fieldFkName, 'id_user_modified')) {
+                    unset($aFieldsColumnsKey[$keyNum]);
+                }
+                if (compareStrStr($fieldFkName, 'id_user_created')) {
+                    unset($aFieldsColumnsKey[$keyNum]);
+                }
             }
         }
 

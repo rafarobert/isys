@@ -264,6 +264,7 @@ Class ES_Model extends ES_Model_Vars {
 
     public function save($data = null, $id = null, $with_id = true){
         $this->CI = CI_Controller::get_instance();
+        $idToInsert = null;
         if($data == null){
             $data = $this->getArrayData();
             $pk = ucfirst(setObject($this->getPrimaryKey()));
@@ -365,13 +366,27 @@ Class ES_Model extends ES_Model_Vars {
         $vals = array_map($funct_v, array_keys($data), array_values($data));
         $data = array_combine($keys,$vals);
         unset($data[null]);
-        if(inArray($this->_primary_key,$data) ){
-            unset($data[$this->_primary_key]);
-        }
+//        if(inArray($this->_primary_key,$data) ){
+//            $idToInsert = $data[$this->_primary_key];
+//            unset($data[$this->_primary_key]);
+//        }
 
         // insert
-        if (($id == null || $id == 0) && !isset($data[$this->_primary_key])) {
-            $data[$this->_primary_key] = null;
+//        if (($id == null || $id == 0) && !isset($data[$this->_primary_key])) {
+//        $id = isset($data[$this->_primary_key]) ? $data[$this->_primary_key] : null;
+        if(isset($data[$this->_primary_key])){
+            if($data[$this->_primary_key] == 0){
+                if($id){
+                    $data['id_user_created'] = is_object($oUserLoggued) ? $oUserLoggued->getIdUser() : 1;
+                    $data[$this->_primary_key] = $id;
+                    $id = null;
+                } else {
+                    unset($data[$this->_primary_key]);
+                }
+            }
+        }
+        if (($id == null || $id == 0)) {
+//            $data[$this->_primary_key] = null;
             if (is_numeric($with_id) || is_string($with_id)) {
                 $id = $with_id;
                 $data[$this->_primary_key] = $with_id;
@@ -659,13 +674,12 @@ Class ES_Model extends ES_Model_Vars {
             }
         }
         $this->load->model("base/model_files");
-        if (!isArray($idsFiles) || !isObject($idsFiles)) {
-            if (isNumeric($idsFiles)) {
-                $aIdsFiles[] = $idsFiles;
-            }
-        } else {
+        if(isArray($idsFiles) || isObject($idsFiles)){
             $aIdsFiles = $idsFiles;
+        } else if(isNumeric($idsFiles)){
+            $aIdsFiles[] = $idsFiles;
         }
+
         foreach ($aIdsFiles as $key => $idFile) {
             if (isNumeric($idFile) || isString($idFile)) {
                 $oFile = $this->model_files->findOneByIdFile($idFile);
@@ -831,7 +845,7 @@ Class ES_Model extends ES_Model_Vars {
      */
     public function saveOrUpdate($id = null){
         $data = $this->getArrayData();
-        $data = $this->save($data,$id);
+        $data = $this->save($data,$id,true);
         $this->setFromData($data,$this);
         $this->aData = $data;
         return $data;

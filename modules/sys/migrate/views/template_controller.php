@@ -92,8 +92,6 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
 
             if ($this->form_validation->run() == true) {
 
-                $error = 'ok';
-
                 $oUcObjTableS = $this->model_lcTableP->getDataFromPost($oUcObjTableS);
                 //>>>validateFieldImgUpload1<<<
                 $oUcObjTableS = $this->doUpload($oUcObjTableS);
@@ -103,7 +101,7 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                     $data["lcField"] = $this->input->post('lcField');
                 }
                 //<<<validateFieldPassword>>>
-                if ($error == 'ok') {
+                if ($this->error == 'ok') {
                     $data = $oUcObjTableS->saveOrUpdate($id);
                     //>>>validateUserSavedForRolling1<<<
                     $this->model_users_roles->save($data);
@@ -120,10 +118,10 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                     $this->returnResponse($oUcObjTableS);
                 }
             } else {
-                $this->data['error'] = $error = "tableTitle con datos incompletos, porfavor revisa los datos";;
+                $this->data['error'] = $this->error = "tableTitle con datos incompletos, porfavor revisa los datos";;
             }
             // Se carga la vista
-            return $this->loadView('lcModS/lcTableP/edit', $error);
+            return $this->loadView('lcModS/lcTableP/edit', $this->error);
         } else {
             redirect('lcModS/lcTableP/index');
         }

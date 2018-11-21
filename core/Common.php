@@ -1826,7 +1826,7 @@ if (!function_exists('setSingularPlural')) {
         // ********** si la tercera letra es un de estas se resta la primera letra del final osea la 's', ejemplo: detalles ***************
         $aConsonantesEspeciales = ['l','n'];
         $englishWords = config_item('english_words');
-        foreach ($names as $name) {
+        foreach ($names as $i => $name) {
             $pos1 = strlen($name) - 5;
             $pos2 = strlen($name) - 4;
             $pos3 = strlen($name) - 3;
@@ -1843,11 +1843,13 @@ if (!function_exists('setSingularPlural')) {
             // ******************************* words excepted in english ******************************
             foreach ($englishWords as $word){
                 if(strpos($name,$word) > -1){
-                    $namesPlural[] = $name;
-                    $namesSingular[] = substr($name, 0, strlen($name) - 1);
+                    $namesPlural[$i] = $name;
+                    $namesSingular[$i] = substr($name, 0, strlen($name) - 1);
                     $_sub_mod_s = count($namesSingular) > 1 ? implode('_', $namesSingular) : $namesSingular[0];
                     $_sub_mod_p = count($namesPlural) > 1 ? implode('_', $namesPlural) : $namesPlural[0];
-                    return [$_sub_mod_s, $_sub_mod_p];
+                    if(count($names) == 1){
+                        return [$_sub_mod_s, $_sub_mod_p];
+                    }
                 }
             }
             // ******************************************************************************************
@@ -1856,30 +1858,30 @@ if (!function_exists('setSingularPlural')) {
                 if (in_array($secondLetter,$aVocales)) {
                     if(in_array($thirdLetter,$aConsonantes)){
                         if(in_array($fifthLetter.$fourthLetter,$aDiptongos)){
-                            $namesSingular[] = substr($name, 0, strlen($name) - 2);
+                            $namesSingular[$i] = substr($name, 0, strlen($name) - 2);
                         } else {
                             if (in_array($secondLetter, $aVocalesdebiles)){
-                                $namesSingular[] = substr($name, 0, strlen($name) - 2);
+                                $namesSingular[$i] = substr($name, 0, strlen($name) - 2);
                             } else if(in_array($secondLetter, $aVocalesfuertes)){
-                                $namesSingular[] = substr($name, 0, strlen($name) - 1);
+                                $namesSingular[$i] = substr($name, 0, strlen($name) - 1);
                             }
                         }
                     } else if(in_array($thirdLetter,$aVocales)){
                         if(in_array($secondLetter,$aVocalesfuertes)){
-                            $namesSingular[] = substr($name, 0, strlen($name) - 1);
+                            $namesSingular[$i] = substr($name, 0, strlen($name) - 1);
                         } elseif (in_array($secondLetter,$aVocalesdebiles)){
-                            $namesSingular[] = substr($name, 0, strlen($name) - 2);
+                            $namesSingular[$i] = substr($name, 0, strlen($name) - 2);
                         }
                     }
                 } else if(in_array($secondLetter,$aConsonantes)){
-                    $namesSingular[] = substr($name, 0, strlen($name) - 1);
+                    $namesSingular[$i] = substr($name, 0, strlen($name) - 1);
                 } else {
-                    $namesSingular[] = substr($name, 0, strlen($name) - 1);
+                    $namesSingular[$i] = substr($name, 0, strlen($name) - 1);
                 }
-                $namesPlural[] = $name;
+                $namesPlural[$i] = $name;
             } else {
-                $namesSingular[] = $name;
-                $namesPlural[] = $name . 's';
+                $namesSingular[$i] = $name;
+                $namesPlural[$i] = $name . 's';
             }
         }
         $_sub_mod_s = count($namesSingular) > 1 ? implode('_', $namesSingular) : $namesSingular[0];

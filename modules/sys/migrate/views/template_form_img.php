@@ -9,6 +9,7 @@
     <script>
         oDropZone.inputName = 'lcObjField';
         oDropZone.inputId = 'inputUcObjField';
+        oDropZone.idFotoPrincipal = '<?=$file->getIdFile()?>';
     </script>
         <?php if(isArray($files)){ ?>
     <script>
@@ -22,7 +23,6 @@
         oDropZone.uploads['<?=$ind?>'].tableRef= '<?=$oUcObjTableS->getTableName()?>';
         oDropZone.uploads['<?=$ind?>'].pkTableRef= '<?=setObject($oUcObjTableS->getPrimaryKey())?>';
         oDropZone.uploads['<?=$ind?>'].idObjTableRef= '<?=$oUcObjTableS->getUcIdObjTable()?>';
-        oDropZone.uploads['<?=$ind?>'].idFotoPrincipal= '<?=$file->getIdFile()?>';
         oDropZone.uploads['<?=$ind?>'].fieldTableRef= 'UcObjField';
         <?php } ?>
     </script>

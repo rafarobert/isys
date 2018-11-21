@@ -124,6 +124,43 @@ CREATE TABLE `ci_modules`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- ci_modules_tables
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ci_modules_tables`;
+
+CREATE TABLE `ci_modules_tables`
+(
+    `id_module_table` INTEGER NOT NULL,
+    `id_module` int(10) unsigned,
+    `id_table` int(10) unsigned,
+    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `id_user_modified` int(11) unsigned NOT NULL,
+    `id_user_created` int(11) unsigned NOT NULL,
+    `date_modified` DATETIME NOT NULL,
+    `date_created` DATETIME NOT NULL,
+    PRIMARY KEY (`id_module_table`),
+    UNIQUE INDEX `ci_modules_tables_id_module_table_uindex` (`id_module_table`),
+    INDEX `ci_modules_tables_ibfk_1` (`id_user_created`),
+    INDEX `ci_modules_tables_ibfk_2` (`id_user_modified`),
+    INDEX `ci_modules_tables_ibfk_3` (`id_table`),
+    INDEX `ci_modules_tables_ibfk_4` (`id_module`),
+    CONSTRAINT `ci_modules_tables_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `ci_modules_tables_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `ci_modules_tables_ibfk_3`
+        FOREIGN KEY (`id_table`)
+        REFERENCES `ci_tables` (`id_table`),
+    CONSTRAINT `ci_modules_tables_ibfk_4`
+        FOREIGN KEY (`id_module`)
+        REFERENCES `ci_modules` (`id_module`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- ci_provincias
 -- ---------------------------------------------------------------------
 

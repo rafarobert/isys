@@ -74,7 +74,7 @@ define('LANGUAGE', 'spanish');
  *  Set time limit for migrating tables from database with migrate class
  * ------------------------------------------------------
  */
-set_time_limit(300);
+set_time_limit(900);
 /*
  * ------------------------------------------------------
  *  Set zlib.output_compression On  ¡Precaucion, mejor dejarlo en off!

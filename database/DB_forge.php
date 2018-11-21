@@ -1198,7 +1198,7 @@ abstract class CI_DB_forge
         if ($database == '') {
             $database = $CI->db->database;
         }
-        $sql = "SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA LIKE '$database'";
+        $sql = "SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA LIKE '$database' ORDER BY CREATE_TIME ASC";
 
         $result = $CI->db->query($sql)->result();
         return array_column(json_decode(json_encode($result), true), "TABLE_NAME");
