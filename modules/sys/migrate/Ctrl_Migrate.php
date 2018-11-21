@@ -272,9 +272,9 @@ class Ctrl_Migrate extends ES_Controller
             rrmdir($framePath."tables/");
             createFolder($framePath."tables/");
         }
-        $ciMigIndex = 0;
+
         foreach ($modules as $modName => $tables){
-            $migIndex = 1;
+            $migIndex = 900;
             foreach ($tables as $name => $fields){
                 $oTableFromCiTables = $this->model_tables->findOneByTableName($name);
                 if(isObject($oTableFromCiTables)){

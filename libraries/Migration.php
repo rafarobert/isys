@@ -911,13 +911,8 @@ class CI_Migration
                 $oMigrations = $this->db->get('migrations')->result();
                 $id_migration = $oMigrations[0]->version + 1;
             }
-            $oTablesFromCiTables = $this->model_tables->findOneByIdTable($id_migration);
-            if(is_object($oTablesFromCiTables)){
-                $idMigTable = $id_migration;
-            } else {
-                $idMigTable = valNumeric($modModId . $id_migration);
-            }
-            $idModuleTable = intval($idMigTable.'0');
+
+//            $idModuleTable = intval($idMigTable.'0');
             $this->load->library('session');
             $sessUser = $this->session->getDataUserLoggued();
             if(isObject($sessUser)) {
@@ -932,15 +927,15 @@ class CI_Migration
 
             if(!validate_modulo('base','users')){
                 show_error_handled("El modulo users no se encuentraba creado, debido a ello no se pudo registrar la tabla $tableName, al momento de la migracion: $idMigTable, verifica que el modulo base/usere se encuentra creado para evitar este error");
-                return $idMigTable;
+                return $id_migration;
             }
 
             if (validate_modulo($modModName, $modSubmod)) {
                 $sessUser = $this->session->getObjectUserLoggued();
 
                 $this->CI->initModulesTables(true);
-                $oModuleTable = $this->CI->model_modules_tables->findOneByIdModuleTable($idModuleTable);
-                $oTable = $this->CI->model_tables->findOneByIdTable($idMigTable);
+                $oModuleTable = $this->CI->model_modules_tables->findOneByIdModuleTable($id_migration);
+                $oTable = $this->CI->model_tables->findOneByIdTable($id_migration);
 
                 $data = array(
                     'title' => validateArray($tableSettings, 'title') ? $tableSettings['title'] : setLabel($submod,true),
@@ -956,22 +951,22 @@ class CI_Migration
 
                 );
                 if (isObject($oTable)) {
-                    $data = $this->CI->model_tables->save($data, $idMigTable);
+                    $data = $this->CI->model_tables->save($data, $id_migration);
                 } else {
-                    $data = $this->CI->model_tables->save($data, null, $idMigTable);
+                    $data = $this->CI->model_tables->save($data, null, $id_migration);
                 }
                 if(isObject($oModuleTable)){
                     $data['id_module'] = $modModId;
-                    $this->CI->model_modules_tables->save($data,$idModuleTable);
+                    $this->CI->model_modules_tables->save($data,$id_migration);
                 } else {
                     $data['id_module'] = $modModId;
-                    $this->CI->model_modules_tables->save($data,null,$idModuleTable);
+                    $this->CI->model_modules_tables->save($data,null,$id_migration);
                 }
 
             } else if ($tableName != $modTable) {
                 redirect("sys/migrate/ci/$modMigIndex");
             }
-            return $idMigTable;
+            return $id_migration;
         }
     }
 

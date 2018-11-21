@@ -50,6 +50,38 @@ CREATE TABLE `ci_cities`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- ci_domains
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ci_domains`;
+
+CREATE TABLE `ci_domains`
+(
+    `id_domain` INTEGER NOT NULL AUTO_INCREMENT,
+    `host` VARCHAR(450),
+    `hostname` VARCHAR(450),
+    `protocol` VARCHAR(10),
+    `port` INTEGER,
+    `origin` VARCHAR(450),
+    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `id_user_modified` int(11) unsigned NOT NULL,
+    `id_user_created` int(11) unsigned NOT NULL,
+    `date_modified` DATETIME NOT NULL,
+    `date_created` DATETIME NOT NULL,
+    PRIMARY KEY (`id_domain`),
+    UNIQUE INDEX `ci_domains_id_domain_uindex` (`id_domain`),
+    INDEX `ci_domains_ibfk_1` (`id_user_created`),
+    INDEX `ci_domains_ibfk_2` (`id_user_modified`),
+    CONSTRAINT `ci_domains_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `ci_domains_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- ci_files
 -- ---------------------------------------------------------------------
 
