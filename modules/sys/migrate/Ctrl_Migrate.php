@@ -248,8 +248,10 @@ class Ctrl_Migrate extends ES_Controller
             show_error('No tiene permisos para realizar esta accion, por favor contactese con los administradores del sistema');
             exit();
         }
+        $this->initTables(true);
         $dbTables = $this->dbforge->getArrayFieldsFromTable();
         unset($dbTables['migrations']);
+
         $modules = [];
         foreach ($dbTables as $tabName => $tabFields){
             foreach ($mainModules as $main){
@@ -270,9 +272,17 @@ class Ctrl_Migrate extends ES_Controller
             rrmdir($framePath."tables/");
             createFolder($framePath."tables/");
         }
+        $ciMigIndex = 0;
         foreach ($modules as $modName => $tables){
             $migIndex = 1;
             foreach ($tables as $name => $fields){
+                $oTableFromCiTables = $this->model_tables->findOneByTableName($name);
+                if(isObject($oTableFromCiTables)){
+                    $ciMigIndex = $oTableFromCiTables->getIdTable();
+                } else {
+                    $migIndex++;
+                    $ciMigIndex = 0;
+                }
                 foreach ($fields as $fieldName => $fieldValues){
                     $aJsonFields = $this->dbforge->getFieldCommentsFromDB($fieldName,$name);
                     if(validateVar($aJsonFields, 'array')){
@@ -294,8 +304,11 @@ class Ctrl_Migrate extends ES_Controller
                 $tableName = $name;
                 $tableFields = $fields;
                 list($mod,$submod) = getModSubMod($tableName);
-
-                $strMigIndex = str_pad("$migIndex", 3, "0", STR_PAD_LEFT);
+                if($ciMigIndex == 0){
+                    $strMigIndex = str_pad("$migIndex", 3, "0", STR_PAD_LEFT);
+                } else {
+                    $strMigIndex = str_pad("$ciMigIndex", 3, "0", STR_PAD_LEFT);
+                }
                 $fileName = $strMigIndex."_create_$tableName.php";
                 $tableRelations = $this->dbforge->getTableRelations($name);
                 $tableSettings['ctrl'] = isset($tableSettings['ctrl']) ? $tableSettings['ctrl'] : TRUE;
@@ -317,7 +330,6 @@ class Ctrl_Migrate extends ES_Controller
                         }
                     }
                 }
-                $migIndex++;
             }
         }
         $this->setTableVars();

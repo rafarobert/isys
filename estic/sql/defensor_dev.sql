@@ -131,7 +131,7 @@ DROP TABLE IF EXISTS `ci_modules_tables`;
 
 CREATE TABLE `ci_modules_tables`
 (
-    `id_module_table` INTEGER NOT NULL,
+    `id_module_table` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `id_module` int(10) unsigned,
     `id_table` int(10) unsigned,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
@@ -144,20 +144,12 @@ CREATE TABLE `ci_modules_tables`
     UNIQUE INDEX `ci_modules_tables_id_module_table_uindex` (`id_module_table`),
     INDEX `ci_modules_tables_ibfk_1` (`id_user_created`),
     INDEX `ci_modules_tables_ibfk_2` (`id_user_modified`),
-    INDEX `ci_modules_tables_ibfk_3` (`id_table`),
-    INDEX `ci_modules_tables_ibfk_4` (`id_module`),
     CONSTRAINT `ci_modules_tables_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `ci_modules_tables_ibfk_2`
         FOREIGN KEY (`id_user_modified`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `ci_modules_tables_ibfk_3`
-        FOREIGN KEY (`id_table`)
-        REFERENCES `ci_tables` (`id_table`),
-    CONSTRAINT `ci_modules_tables_ibfk_4`
-        FOREIGN KEY (`id_module`)
-        REFERENCES `ci_modules` (`id_module`)
+        REFERENCES `ci_users` (`id_user`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -679,7 +671,7 @@ CREATE TABLE `dfa_estadisticas`
         REFERENCES `ci_provincias` (`id_provincia`),
     CONSTRAINT `dfa_estadisticas_ibfk_5`
         FOREIGN KEY (`id_procedimiento`)
-        REFERENCES `dfa_procedimientos` (`id_procedimiento`),
+        REFERENCES `dfa_tipos_procedimientos` (`id_tipo_procedimiento`),
     CONSTRAINT `dfa_estadisticas_ibfk_6`
         FOREIGN KEY (`id_residencia`)
         REFERENCES `dfa_tipos_residencias` (`id_residencia`)
@@ -752,14 +744,14 @@ CREATE TABLE `dfa_oficinas`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- dfa_organismos
+-- dfa_organismos_financiadores
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `dfa_organismos`;
+DROP TABLE IF EXISTS `dfa_organismos_financiadores`;
 
-CREATE TABLE `dfa_organismos`
+CREATE TABLE `dfa_organismos_financiadores`
 (
-    `id_organismo` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `id_organismo_financiador` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(200),
     `descripcion` VARCHAR(500),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
@@ -768,14 +760,14 @@ CREATE TABLE `dfa_organismos`
     `id_user_created` int(11) unsigned NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
-    PRIMARY KEY (`id_organismo`),
-    UNIQUE INDEX `dfa_organismos_id_organismo_uindex` (`id_organismo`),
+    PRIMARY KEY (`id_organismo_financiador`),
+    UNIQUE INDEX `dfa_organismos_id_organismo_uindex` (`id_organismo_financiador`),
     INDEX `dfa_organismos_ibfk_1` (`id_user_created`),
     INDEX `dfa_organismos_ibfk_2` (`id_user_modified`),
-    CONSTRAINT `dfa_organismos_ibfk_1`
+    CONSTRAINT `dfa_organismos_financiadores_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_organismos_ibfk_2`
+    CONSTRAINT `dfa_organismos_financiadores_ibfk_2`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`)
 ) ENGINE=InnoDB;
@@ -820,35 +812,6 @@ CREATE TABLE `dfa_personas`
     CONSTRAINT `dfa_personas_ibfk_5`
         FOREIGN KEY (`id_rango_edad`)
         REFERENCES `dfa_rangos_edades` (`id_rango_edad`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- dfa_procedimientos
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `dfa_procedimientos`;
-
-CREATE TABLE `dfa_procedimientos`
-(
-    `id_procedimiento` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `nombre` VARCHAR(200),
-    `descripcion` VARCHAR(500),
-    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
-    `change_count` INTEGER DEFAULT 0 NOT NULL,
-    `id_user_modified` int(11) unsigned NOT NULL,
-    `id_user_created` int(11) unsigned NOT NULL,
-    `date_modified` DATETIME NOT NULL,
-    `date_created` DATETIME NOT NULL,
-    PRIMARY KEY (`id_procedimiento`),
-    UNIQUE INDEX `dfa_procedimientos_id_procedimiento_uindex` (`id_procedimiento`),
-    INDEX `dfa_procedimientos_ibfk_1` (`id_user_created`),
-    INDEX `dfa_procedimientos_ibfk_2` (`id_user_modified`),
-    CONSTRAINT `dfa_procedimientos_ibfk_1`
-        FOREIGN KEY (`id_user_created`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_procedimientos_ibfk_2`
-        FOREIGN KEY (`id_user_modified`)
-        REFERENCES `ci_users` (`id_user`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -908,6 +871,7 @@ CREATE TABLE `dfa_publicaciones`
     `titular` VARCHAR(1000),
     `descripcion` TEXT,
     `fecha_publicacion` DATETIME,
+    `id_adjuntoria` int(10) unsigned,
     `id_delegacion` int(10) unsigned,
     `id_unidad` int(10) unsigned,
     `id_categoria_publicacion` int(10) unsigned,
@@ -932,9 +896,7 @@ CREATE TABLE `dfa_publicaciones`
     INDEX `dfa_publicaciones_ibfk_4` (`id_unidad`),
     INDEX `dfa_publicaciones_ibfk_5` (`id_categoria_publicacion`),
     INDEX `dfa_publicaciones_ibfk` (`id_foto_principal`),
-    CONSTRAINT `dfa_publicaciones_ibfk`
-        FOREIGN KEY (`id_foto_principal`)
-        REFERENCES `ci_files` (`id_file`),
+    INDEX `dfa_publicaciones_ibfk_7` (`id_adjuntoria`),
     CONSTRAINT `dfa_publicaciones_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -949,7 +911,13 @@ CREATE TABLE `dfa_publicaciones`
         REFERENCES `dfa_unidades` (`id_unidad`),
     CONSTRAINT `dfa_publicaciones_ibfk_5`
         FOREIGN KEY (`id_categoria_publicacion`)
-        REFERENCES `dfa_tipos_publicaciones` (`id_tipos_publicacion`)
+        REFERENCES `dfa_tipos_publicaciones` (`id_tipos_publicacion`),
+    CONSTRAINT `dfa_publicaciones_ibfk_6`
+        FOREIGN KEY (`id_foto_principal`)
+        REFERENCES `ci_files` (`id_file`),
+    CONSTRAINT `dfa_publicaciones_ibfk_7`
+        FOREIGN KEY (`id_adjuntoria`)
+        REFERENCES `ci_modules` (`id_module`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1036,6 +1004,35 @@ CREATE TABLE `dfa_tipos_contratos`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `dfa_tipos_contratos_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- dfa_tipos_procedimientos
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `dfa_tipos_procedimientos`;
+
+CREATE TABLE `dfa_tipos_procedimientos`
+(
+    `id_tipo_procedimiento` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(200),
+    `descripcion` VARCHAR(500),
+    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `id_user_modified` int(11) unsigned NOT NULL,
+    `id_user_created` int(11) unsigned NOT NULL,
+    `date_modified` DATETIME NOT NULL,
+    `date_created` DATETIME NOT NULL,
+    PRIMARY KEY (`id_tipo_procedimiento`),
+    UNIQUE INDEX `dfa_procedimientos_id_procedimiento_uindex` (`id_tipo_procedimiento`),
+    INDEX `dfa_procedimientos_ibfk_1` (`id_user_created`),
+    INDEX `dfa_procedimientos_ibfk_2` (`id_user_modified`),
+    CONSTRAINT `dfa_tipos_procedimientos_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_tipos_procedimientos_ibfk_2`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`)
 ) ENGINE=InnoDB;

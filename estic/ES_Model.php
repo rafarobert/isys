@@ -366,27 +366,13 @@ Class ES_Model extends ES_Model_Vars {
         $vals = array_map($funct_v, array_keys($data), array_values($data));
         $data = array_combine($keys,$vals);
         unset($data[null]);
-//        if(inArray($this->_primary_key,$data) ){
-//            $idToInsert = $data[$this->_primary_key];
-//            unset($data[$this->_primary_key]);
-//        }
+        if(inArray($this->_primary_key,$data) ){
+            unset($data[$this->_primary_key]);
+        }
 
         // insert
-//        if (($id == null || $id == 0) && !isset($data[$this->_primary_key])) {
-//        $id = isset($data[$this->_primary_key]) ? $data[$this->_primary_key] : null;
-        if(isset($data[$this->_primary_key])){
-            if($data[$this->_primary_key] == 0){
-                if($id){
-                    $data['id_user_created'] = is_object($oUserLoggued) ? $oUserLoggued->getIdUser() : 1;
-                    $data[$this->_primary_key] = $id;
-                    $id = null;
-                } else {
-                    unset($data[$this->_primary_key]);
-                }
-            }
-        }
-        if (($id == null || $id == 0)) {
-//            $data[$this->_primary_key] = null;
+        if (($id == null || $id == 0) && !isset($data[$this->_primary_key])) {
+            $data[$this->_primary_key] = null;
             if (is_numeric($with_id) || is_string($with_id)) {
                 $id = $with_id;
                 $data[$this->_primary_key] = $with_id;
@@ -843,9 +829,9 @@ Class ES_Model extends ES_Model_Vars {
     /**
      * @var ES_Model $object
      */
-    public function saveOrUpdate($id = null){
+    public function saveOrUpdate($id = null, $withId = false){
         $data = $this->getArrayData();
-        $data = $this->save($data,$id,true);
+        $data = $this->save($data,$id,$withId);
         $this->setFromData($data,$this);
         $this->aData = $data;
         return $data;

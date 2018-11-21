@@ -639,7 +639,7 @@ CREATE TABLE `dfa_estadisticas`
         REFERENCES `ci_provincias` (`id_provincia`),
     CONSTRAINT `dfa_estadisticas_ibfk_5`
         FOREIGN KEY (`id_procedimiento`)
-        REFERENCES `dfa_procedimientos` (`id_procedimiento`),
+        REFERENCES dfa_tipos_procedimientos (id_tipo_procedimiento),
     CONSTRAINT `dfa_estadisticas_ibfk_6`
         FOREIGN KEY (`id_residencia`)
         REFERENCES `dfa_tipos_residencias` (`id_residencia`)
