@@ -366,6 +366,43 @@ CREATE TABLE `ci_users`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- ci_users_roles
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ci_users_roles`;
+
+CREATE TABLE `ci_users_roles`
+(
+    `id_user_role` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_user` int(10) unsigned,
+    `id_role` int(10) unsigned,
+    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `id_user_modified` int(11) unsigned NOT NULL,
+    `id_user_created` int(11) unsigned NOT NULL,
+    `date_modified` DATETIME NOT NULL,
+    `date_created` DATETIME NOT NULL,
+    PRIMARY KEY (`id_user_role`),
+    UNIQUE INDEX `dfa_usuarios_roles_id_usuario_role_uindex` (`id_user_role`),
+    INDEX `dfa_usuarios_roles_ibfk_1` (`id_user_created`),
+    INDEX `dfa_usuarios_roles_ibfk_2` (`id_user_modified`),
+    INDEX `dfa_usuarios_roles_ibfk_3` (`id_user`),
+    INDEX `dfa_usuarios_roles_ibfk_4` (`id_role`),
+    CONSTRAINT `ci_users_roles_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `ci_users_roles_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `ci_users_roles_ibfk_3`
+        FOREIGN KEY (`id_user`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `ci_users_roles_ibfk_4`
+        FOREIGN KEY (`id_role`)
+        REFERENCES `ci_roles` (`id_role`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- dfa_archivos
 -- ---------------------------------------------------------------------
 
@@ -622,7 +659,8 @@ DROP TABLE IF EXISTS `dfa_empleados`;
 CREATE TABLE `dfa_empleados`
 (
     `id_empleado` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `id_usuario` int(10) unsigned,
+    `id_user` int(10) unsigned,
+    `id_role` int(10) unsigned,
     `id_oficina` int(10) unsigned,
     `id_puesto` int(10) unsigned,
     `id_unidad` int(10) unsigned,
@@ -636,10 +674,11 @@ CREATE TABLE `dfa_empleados`
     UNIQUE INDEX `dfa_empleados_id_empleado_uindex` (`id_empleado`),
     INDEX `dfa_empleados_ibfk_1` (`id_user_created`),
     INDEX `dfa_empleados_ibfk_2` (`id_user_modified`),
-    INDEX `dfa_empleados_ibfk_3` (`id_usuario`),
+    INDEX `dfa_empleados_ibfk_3` (`id_user`),
     INDEX `dfa_empleados_ibfk_4` (`id_puesto`),
     INDEX `dfa_empleados_ibfk_5` (`id_unidad`),
     INDEX `dfa_empleados_ibfk_6` (`id_oficina`),
+    INDEX `dfa_empleados_ibfk_7` (`id_role`),
     CONSTRAINT `dfa_empleados_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -647,7 +686,7 @@ CREATE TABLE `dfa_empleados`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `dfa_empleados_ibfk_3`
-        FOREIGN KEY (`id_usuario`)
+        FOREIGN KEY (`id_user`)
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `dfa_empleados_ibfk_4`
         FOREIGN KEY (`id_puesto`)
@@ -657,7 +696,10 @@ CREATE TABLE `dfa_empleados`
         REFERENCES `dfa_unidades` (`id_unidad`),
     CONSTRAINT `dfa_empleados_ibfk_6`
         FOREIGN KEY (`id_oficina`)
-        REFERENCES `dfa_oficinas` (`id_oficina`)
+        REFERENCES `dfa_oficinas` (`id_oficina`),
+    CONSTRAINT `dfa_empleados_ibfk_7`
+        FOREIGN KEY (`id_role`)
+        REFERENCES `ci_roles` (`id_role`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1252,43 +1294,6 @@ CREATE TABLE `dfa_unidades`
     CONSTRAINT `dfa_unidades_ibfk_4`
         FOREIGN KEY (`id_direccion`)
         REFERENCES `dfa_unidades` (`id_unidad`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- dfa_users_roles
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `dfa_users_roles`;
-
-CREATE TABLE `dfa_users_roles`
-(
-    `id_user_role` INTEGER NOT NULL AUTO_INCREMENT,
-    `id_user` int(10) unsigned,
-    `id_role` int(10) unsigned,
-    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
-    `change_count` INTEGER DEFAULT 0 NOT NULL,
-    `id_user_modified` int(11) unsigned NOT NULL,
-    `id_user_created` int(11) unsigned NOT NULL,
-    `date_modified` DATETIME NOT NULL,
-    `date_created` DATETIME NOT NULL,
-    PRIMARY KEY (`id_user_role`),
-    UNIQUE INDEX `dfa_usuarios_roles_id_usuario_role_uindex` (`id_user_role`),
-    INDEX `dfa_usuarios_roles_ibfk_1` (`id_user_created`),
-    INDEX `dfa_usuarios_roles_ibfk_2` (`id_user_modified`),
-    INDEX `dfa_usuarios_roles_ibfk_3` (`id_user`),
-    INDEX `dfa_usuarios_roles_ibfk_4` (`id_role`),
-    CONSTRAINT `dfa_users_roles_ibfk_1`
-        FOREIGN KEY (`id_user_created`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_users_roles_ibfk_2`
-        FOREIGN KEY (`id_user_modified`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_users_roles_ibfk_3`
-        FOREIGN KEY (`id_user`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_users_roles_ibfk_4`
-        FOREIGN KEY (`id_role`)
-        REFERENCES `ci_roles` (`id_role`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

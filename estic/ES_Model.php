@@ -561,8 +561,8 @@ Class ES_Model extends ES_Model_Vars {
                                     $aThumbs['thumb_'.$config['width']]['ext'] = $this->image_lib->dest_ext;
                                     $aThumbs['thumb_'.$config['width']]['path'] = $this->image_lib->dest_folder_db;
                                     $aThumbs['thumb_'.$config['width']]['full_path'] = $this->image_lib->full_dst_path_db;
-                                    $config['width'] = $config['width'] + 150;
-                                    $config['height'] = $config['height'] + 150;
+                                    $config['width'] = $config['width'] + 400;
+                                    $config['height'] = $config['height'] + 400;
                                     $config['thumb_marker'] = '-thumb_' . $config['width'];
                                 }
                             }

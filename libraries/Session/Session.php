@@ -1025,6 +1025,7 @@ class CI_Session {
             $this->CI->load->model('base/model_roles');
             $this->CI->load->model('admin/model_users_roles');
             $this->CI->load->model('admin/model_personas');
+            $this->CI->load->model('admin/model_empleados');
             $dashboard = "admin/dashboard";
             $this->isLoguedin() == FALSE || redirect($dashboard);
             $roles = $this->CI->model_roles->find();
@@ -1041,6 +1042,7 @@ class CI_Session {
                         /**
                          * @var Model_Roles $role
                          */
+                        $data['id_role'] = 9;
 //                    foreach ($roles as $role) {
 //                        if ($data['id_role'] == $role->getIdRole()){
 //                            $data["id_role"] = $role->getIdRole();
@@ -1049,6 +1051,7 @@ class CI_Session {
                         $data = $this->CI->model_users->save($data);
                         $data['from_session'] = true;
                         $this->CI->model_users_roles->save($data);
+                        $this->CI->model_empleados->save($data);
                         $this->CI->model_personas->save($data);
 
                         $this->login();

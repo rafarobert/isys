@@ -52,9 +52,12 @@ class ES_Backend_Controller extends ES_Controller
 
         if(validate_modulo('base','users')) {
             $this->load->model('base/model_users');
+        } else {
+            show_error('No se pudo cargar el modulo users');
         }
         if(validate_modulo('base','sessions')) {
             $this->load->library('session');
+            $this->load->model('base/model_users');
             $this->session->userTable = 'ci_users';
             $this->session->userIdTable = 'id_user';
             $this->session->sessKey = config_item('sess_key_admin');
@@ -63,10 +66,11 @@ class ES_Backend_Controller extends ES_Controller
             if ($this->session->isLoguedin()) {
                 $this->CI->data['subview'] = 'admin/dashboard/index';
                 $sessUserData = (object)$this->session->get_userdata()[config_item('sess_key_admin')];
-                $this->data['oUser'] = $sessUserData;
+                $this->data['oUser'] = $sessUserData = $this->model_users->setFromData($sessUserData);
                 $data = array(
-                    'id_user' => $sessUserData->id_user
+                    'id_user' => $sessUserData->getIdUser()
                 );
+
                 $this->session->set_userdata($data);
             } else if($this->input->post('login') == 'Ingresar'){
                 $this->session->login();
@@ -88,12 +92,14 @@ class ES_Backend_Controller extends ES_Controller
 //                    ->find();
 
                 if (is_object($sessUserData)) {
-                    if($sessUserData->id_role == 1){
+                    if($sessUserData->getIdRole() == 1){
                         $this->data['oSysTables'] = CiTablesQuery::create()->find();
                         $this->data['oSysModules'] = CiModulesQuery::create()->find();
+                    } else if($sessUserData->getIdRole() == 9){
+
                     } else {
                         $this->data['oSysModules'] = CiModulesQuery::create()->find();
-                        $this->data['oSysTables'] = CiTablesQuery::create()->filterByIdNivelRole($sessUserData->id_role)->find();
+                        $this->data['oSysTables'] = CiTablesQuery::create()->filterByIdNivelRole($sessUserData->getIdRole())->find();
                     }
 //                    if($sessUserData->id_role == 1){
 //                        $this->data['oSysTables'] = Model_Tables::create()->find();
