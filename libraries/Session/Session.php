@@ -1110,6 +1110,8 @@ class CI_Session {
                     ($oUser->id_role == 1 ? WEBSERVER.'base/dashboard' : WEBSERVER.'admin/dashboard'));
                 redirect($uri);
             } else {
+                $this->CI->data['errors']['login'] = 'El usuario no ';
+                $this->CI->data['subLayout'] = 'login';
                 return false;
             }
         }

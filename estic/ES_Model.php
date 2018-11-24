@@ -802,6 +802,19 @@ Class ES_Model extends ES_Model_Vars {
         return $aFiles;
     }
 
+    public function findByIdsEtiquetas($aIds){
+        if(isString($aIds) && strstr($aIds,'|')){
+            $aIds = explode('|',trim($aIds,'|'));
+        }
+        $aEtiquetas = array();
+        if(isArray($aIds)){
+            foreach ($aIds as $id){
+                $aEtiquetas[] = $this->findOneByIdEtiqueta($id)->getArrayData();
+            }
+        }
+        return $aEtiquetas;
+    }
+
     public function delete($id){
         $filter = $this->_primary_filter;
         $id = $filter($id);

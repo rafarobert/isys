@@ -872,7 +872,7 @@ CREATE TABLE `dfa_publicaciones`
         REFERENCES `dfa_unidades` (`id_unidad`),
     CONSTRAINT `dfa_publicaciones_ibfk_5`
         FOREIGN KEY (`id_categoria_publicacion`)
-        REFERENCES `dfa_tipos_publicaciones` (`id_tipos_publicacion`)
+        REFERENCES dfa_categorias_publicaciones (`id_tipos_publicacion`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

@@ -759,7 +759,7 @@ DROP TABLE IF EXISTS `dfa_etiquetas`;
 
 CREATE TABLE `dfa_etiquetas`
 (
-    `id_etiqueta` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_etiqueta` int(11) unsigned NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(250),
     `descripcion` VARCHAR(500),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
@@ -949,7 +949,7 @@ CREATE TABLE `dfa_publicaciones`
     `id_delegacion` int(10) unsigned,
     `id_unidad` int(10) unsigned,
     `id_categoria_publicacion` int(10) unsigned,
-    `etiquetas` VARCHAR(250),
+    `id_etiquetas` VARCHAR(450),
     `secciones` VARCHAR(1000),
     `estado_publicacion` VARCHAR(250),
     `ids_archivos` VARCHAR(1000),
@@ -971,6 +971,7 @@ CREATE TABLE `dfa_publicaciones`
     INDEX `dfa_publicaciones_ibfk_5` (`id_categoria_publicacion`),
     INDEX `dfa_publicaciones_ibfk` (`id_foto_principal`),
     INDEX `dfa_publicaciones_ibfk_7` (`id_adjuntoria`),
+    INDEX `dfa_publicaciones_ibfk_8` (`id_etiquetas`),
     CONSTRAINT `dfa_publicaciones_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -985,7 +986,7 @@ CREATE TABLE `dfa_publicaciones`
         REFERENCES `dfa_unidades` (`id_unidad`),
     CONSTRAINT `dfa_publicaciones_ibfk_5`
         FOREIGN KEY (`id_categoria_publicacion`)
-        REFERENCES `dfa_tipos_publicaciones` (`id_tipos_publicacion`),
+        REFERENCES dfa_categorias_publicaciones (`id_tipos_publicacion`),
     CONSTRAINT `dfa_publicaciones_ibfk_6`
         FOREIGN KEY (`id_foto_principal`)
         REFERENCES `ci_files` (`id_file`),

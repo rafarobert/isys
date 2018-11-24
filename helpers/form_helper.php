@@ -716,7 +716,7 @@ if ( ! function_exists('set_options'))
                     $data['id'] = 'input'.ucfirst($data['name']).ucfirst(cleanWhiteSpaces($option));
                 }
                 if(validateVar($checkeds,'array')){
-                    if(in_array($option,$checkeds)){
+                    if(in_array($option,$checkeds) || in_array($key,$checkeds)){
                         $htmlOptions .= $iCheckOpen.$labelOpen.form_checkbox($data, $key, true, $extra).'<span>'.ucfirst($option)."</span>$labelClose.$iCheckClose";
                     } else {
                         $htmlOptions .= $iCheckOpen.$labelOpen.form_checkbox($data, $key, false, $extra).'<span>'.ucfirst($option)."</span>$labelClose.$iCheckClose";
