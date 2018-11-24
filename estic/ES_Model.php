@@ -741,6 +741,7 @@ Class ES_Model extends ES_Model_Vars {
         if(!is_object($model)){
             $model = $this;
         }
+        $aData = array();
         if(isset($model->thumbFiles)){
             if(isArray($model->thumbFiles)){
                 foreach ($model->thumbFiles as $key => $thumbData){
@@ -789,9 +790,13 @@ Class ES_Model extends ES_Model_Vars {
         return $aData;
     }
 
-    public function findByIdsFiles($aIds){
-        if(isString($aIds) && strstr($aIds,'|')){
-            $aIds = explode('|',trim($aIds,'|'));
+    public function findByIdsFiles($ids){
+        $aIds = array();
+        if(isString($ids) && strstr($ids,'|')){
+            $aIds = explode('|',trim($ids,'|'));
+        }
+        if(isNumeric($ids)){
+            $aIds[] = $ids;
         }
         $aFiles = array();
         if(isArray($aIds)){

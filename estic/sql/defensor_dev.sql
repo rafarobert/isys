@@ -462,6 +462,35 @@ CREATE TABLE `dfa_archivos`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- dfa_categorias_publicaciones
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `dfa_categorias_publicaciones`;
+
+CREATE TABLE `dfa_categorias_publicaciones`
+(
+    `id_tipos_publicacion` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(200),
+    `descripcion` VARCHAR(500),
+    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `id_user_modified` int(11) unsigned NOT NULL,
+    `id_user_created` int(11) unsigned NOT NULL,
+    `date_modified` DATETIME NOT NULL,
+    `date_created` DATETIME NOT NULL,
+    PRIMARY KEY (`id_tipos_publicacion`),
+    UNIQUE INDEX `dfa_categorias_publicaciones_id_categoria_publicacion_uindex` (`id_tipos_publicacion`),
+    INDEX `dfa_categorias_publicaciones_ibfk_1` (`id_user_created`),
+    INDEX `dfa_categorias_publicaciones_ibfk_2` (`id_user_modified`),
+    CONSTRAINT `dfa_categorias_publicaciones_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_categorias_publicaciones_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- dfa_conceptos
 -- ---------------------------------------------------------------------
 
@@ -986,7 +1015,7 @@ CREATE TABLE `dfa_publicaciones`
         REFERENCES `dfa_unidades` (`id_unidad`),
     CONSTRAINT `dfa_publicaciones_ibfk_5`
         FOREIGN KEY (`id_categoria_publicacion`)
-        REFERENCES dfa_categorias_publicaciones (`id_tipos_publicacion`),
+        REFERENCES `dfa_categorias_publicaciones` (`id_tipos_publicacion`),
     CONSTRAINT `dfa_publicaciones_ibfk_6`
         FOREIGN KEY (`id_foto_principal`)
         REFERENCES `ci_files` (`id_file`),
@@ -1108,35 +1137,6 @@ CREATE TABLE `dfa_tipos_procedimientos`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `dfa_tipos_procedimientos_ibfk_2`
-        FOREIGN KEY (`id_user_modified`)
-        REFERENCES `ci_users` (`id_user`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- dfa_tipos_publicaciones
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `dfa_tipos_publicaciones`;
-
-CREATE TABLE `dfa_tipos_publicaciones`
-(
-    `id_tipos_publicacion` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `nombre` VARCHAR(200),
-    `descripcion` VARCHAR(500),
-    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
-    `change_count` INTEGER DEFAULT 0 NOT NULL,
-    `id_user_modified` int(11) unsigned NOT NULL,
-    `id_user_created` int(11) unsigned NOT NULL,
-    `date_modified` DATETIME NOT NULL,
-    `date_created` DATETIME NOT NULL,
-    PRIMARY KEY (`id_tipos_publicacion`),
-    UNIQUE INDEX `dfa_categorias_publicaciones_id_categoria_publicacion_uindex` (`id_tipos_publicacion`),
-    INDEX `dfa_categorias_publicaciones_ibfk_1` (`id_user_created`),
-    INDEX `dfa_categorias_publicaciones_ibfk_2` (`id_user_modified`),
-    CONSTRAINT `dfa_tipos_publicaciones_ibfk_1`
-        FOREIGN KEY (`id_user_created`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_tipos_publicaciones_ibfk_2`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`)
 ) ENGINE=InnoDB;
