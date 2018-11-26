@@ -163,7 +163,7 @@ else if ($hostName == '192.168.1.10' || $hostName == '192.168.2.103' )
 }
 // ------------------------------------------------------------------------------------
 // ------------------------ Configuraciones para Testing ------------------------------
-else if ($hostName == "test.$proyName.com")
+else if ($hostName == "test.$proyName.com" || $hostName == '192.168.1.11')
 {
     define('ENVIRONMENT', 'testing');
     define('LOCALFOLDER', '');

@@ -1023,7 +1023,7 @@ class CI_Session {
         } else {
             // Redirect a user if he's already logged in
             $this->CI->load->model('base/model_roles');
-            $this->CI->load->model('admin/model_users_roles');
+            $this->CI->load->model('base/model_users_roles');
             $this->CI->load->model('admin/model_personas');
             $this->CI->load->model('admin/model_empleados');
             $dashboard = "admin/dashboard";
@@ -1084,6 +1084,7 @@ class CI_Session {
             }
             redirect($uri);
         } else {
+            $this->CI->load->model('base/model_users_roles');
 
             $emailPost = $this->CI->input->post('email');
             $passwordPost = $this->hash($this->CI->input->post('password'));
@@ -1104,11 +1105,27 @@ class CI_Session {
             if(is_object($oUser)){
                 // log in user
                 $data = std2array($oUser);
+                $oUser = $this->CI->model_users->setFromData($data);
+                $oUsersRoles = $this->CI->model_users_roles->filterByIdUser($oUser->getIdUser());
+                /**
+                 * @var Model_Users_roles $oUserRole
+                 */
+                $data['ids_roles'] = array();
+                foreach ($oUsersRoles as $oUserRole){
+                    $data['ids_roles'][] = $oUserRole->getIdRole();
+                }
+                if(!in_array($oUser->getIdRole(), $data['ids_roles'])){
+                    $data['ids_roles'][] = $oUser->getIdRole();
+                }
                 $data['loggedin'] = TRUE;
                 $this->set_userdata($this->sessKey,$data);
                 $uri = $this->CI->input->post('uri_string') ? WEBSERVER.$this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? WEBSERVER.$this->CI->uri->uri_string() :
                     ($oUser->id_role == 1 ? WEBSERVER.'base/dashboard' : WEBSERVER.'admin/dashboard'));
-                redirect($uri);
+                if($this->CI->input->post('login') == 'Desbloquear'){
+                    redirect('admin/dashboard');
+                } else {
+                    redirect($uri);
+                }
             } else {
                 $this->CI->data['errors']['login'] = 'El usuario no ';
                 $this->CI->data['subLayout'] = 'login';
@@ -1126,6 +1143,11 @@ class CI_Session {
         $this->CI->data['subLayout'] = '';
         $this->CI->data['subview'] = 'admin/start';
         redirect(WEBSERVER.'admin');
+    }
+
+    public function locked(){
+        $this->sess_destroy();
+        $this->CI->data['subLayout'] = 'lockscreen';
     }
 
     public function hash($string){

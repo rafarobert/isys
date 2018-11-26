@@ -289,13 +289,15 @@ CREATE TABLE `ci_tables`
 (
     `id_table` int(11) unsigned NOT NULL,
     `id_module` int(10) unsigned,
-    `id_nivel_role` int(10) unsigned,
+    `id_role` int(10) unsigned,
     `title` VARCHAR(100) NOT NULL,
     `table_name` VARCHAR(255),
     `listed` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `description` TEXT,
     `icon` VARCHAR(200) NOT NULL,
     `url` VARCHAR(400) NOT NULL,
+    `url_edit` VARCHAR(450),
+    `url_index` VARCHAR(450),
     `status` VARCHAR(255) DEFAULT 'ENABLED',
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -307,7 +309,7 @@ CREATE TABLE `ci_tables`
     INDEX `ci_tables_ibfk_4` (`id_module`),
     INDEX `id_user_created` (`id_user_created`),
     INDEX `id_user_modified` (`id_user_modified`),
-    INDEX `ci_tables_ibfk_3` (`id_nivel_role`),
+    INDEX `ci_tables_ibfk_3` (`id_role`),
     CONSTRAINT `ci_tables_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -315,11 +317,48 @@ CREATE TABLE `ci_tables`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `ci_tables_ibfk_3`
-        FOREIGN KEY (`id_nivel_role`)
+        FOREIGN KEY (`id_role`)
         REFERENCES `ci_roles` (`id_role`),
     CONSTRAINT `ci_tables_ibfk_4`
         FOREIGN KEY (`id_module`)
         REFERENCES `ci_modules` (`id_module`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- ci_tables_roles
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ci_tables_roles`;
+
+CREATE TABLE `ci_tables_roles`
+(
+    `id_table_role` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_table` int(10) unsigned,
+    `id_role` int(10) unsigned,
+    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `id_user_modified` int(11) unsigned NOT NULL,
+    `id_user_created` int(11) unsigned NOT NULL,
+    `date_modified` DATETIME NOT NULL,
+    `date_created` DATETIME NOT NULL,
+    PRIMARY KEY (`id_table_role`),
+    UNIQUE INDEX `ci_tables_roles_id_table_role_uindex` (`id_table_role`),
+    INDEX `ci_tables_roles_ibfk_1` (`id_user_created`),
+    INDEX `ci_tables_roles_ibfk_2` (`id_user_modified`),
+    INDEX `ci_tables_roles_ibfk_3` (`id_table`),
+    INDEX `ci_tables_roles_ibfk_4` (`id_role`),
+    CONSTRAINT `ci_tables_roles_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `ci_tables_roles_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `ci_tables_roles_ibfk_3`
+        FOREIGN KEY (`id_table`)
+        REFERENCES `ci_tables` (`id_table`),
+    CONSTRAINT `ci_tables_roles_ibfk_4`
+        FOREIGN KEY (`id_role`)
+        REFERENCES `ci_roles` (`id_role`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -345,7 +384,7 @@ CREATE TABLE `ci_users`
     `phone_number_2` VARCHAR(20),
     `cellphone_number_1` VARCHAR(20),
     `cellphone_number_2` VARCHAR(20),
-    `picture` int(11) unsigned,
+    `id_foto_perfil` int(11) unsigned,
     `id_provincia` int(10) unsigned,
     `id_role` int(10) unsigned,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
@@ -357,12 +396,16 @@ CREATE TABLE `ci_users`
     UNIQUE INDEX `ci_users_id_user_uindex` (`id_user`),
     INDEX `ci_users_ibfk_1` (`id_role`),
     INDEX `ci_users_ibfk_2` (`id_provincia`),
+    INDEX `ci_users_ibfk_3` (`id_foto_perfil`),
     CONSTRAINT `ci_users_ibfk_1`
         FOREIGN KEY (`id_role`)
         REFERENCES `ci_roles` (`id_role`),
     CONSTRAINT `ci_users_ibfk_2`
         FOREIGN KEY (`id_provincia`)
-        REFERENCES `ci_provincias` (`id_provincia`)
+        REFERENCES `ci_provincias` (`id_provincia`),
+    CONSTRAINT `ci_users_ibfk_3`
+        FOREIGN KEY (`id_foto_perfil`)
+        REFERENCES `ci_files` (`id_file`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -471,6 +514,7 @@ CREATE TABLE `dfa_categorias_publicaciones`
 (
     `id_tipos_publicacion` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(200),
+    `icons` VARCHAR(450),
     `descripcion` VARCHAR(500),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
@@ -499,7 +543,6 @@ DROP TABLE IF EXISTS `dfa_conceptos`;
 CREATE TABLE `dfa_conceptos`
 (
     `id_concepto` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `nombre` VARCHAR(300),
     `titulo` VARCHAR(300),
     `titular` VARCHAR(1000),
     `descripcion` TEXT,
@@ -508,6 +551,10 @@ CREATE TABLE `dfa_conceptos`
     `id_tipo_concepto` int(10) unsigned,
     `id_unidad` int(10) unsigned,
     `tipo` VARCHAR(300),
+    `estado_concepto` VARCHAR(250),
+    `revisado` VARCHAR(250),
+    `comentarios` TEXT,
+    `id_foto_principal` int(10) unsigned,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -520,6 +567,7 @@ CREATE TABLE `dfa_conceptos`
     INDEX `dfa_conceptos_ibfk_4` (`id_tipo_concepto`),
     INDEX `dfa_conceptos_ibfk_5` (`id_unidad`),
     INDEX `dfa_conceptos_ibfk_1` (`id_historia`),
+    INDEX `dfa_conceptos_ibfk_6` (`id_foto_principal`),
     CONSTRAINT `dfa_conceptos_ibfk_1`
         FOREIGN KEY (`id_historia`)
         REFERENCES `dfa_conceptos` (`id_concepto`),
@@ -534,7 +582,10 @@ CREATE TABLE `dfa_conceptos`
         REFERENCES `dfa_tipos_conceptos` (`id_tipo_concepto`),
     CONSTRAINT `dfa_conceptos_ibfk_5`
         FOREIGN KEY (`id_unidad`)
-        REFERENCES `dfa_unidades` (`id_unidad`)
+        REFERENCES `dfa_unidades` (`id_unidad`),
+    CONSTRAINT `dfa_conceptos_ibfk_6`
+        FOREIGN KEY (`id_foto_principal`)
+        REFERENCES `ci_files` (`id_file`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -791,6 +842,7 @@ CREATE TABLE `dfa_etiquetas`
     `id_etiqueta` int(11) unsigned NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(250),
     `descripcion` VARCHAR(500),
+    `icons` VARCHAR(450),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,

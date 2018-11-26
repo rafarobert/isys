@@ -926,7 +926,7 @@ class CI_Migration
             }
 
             if(!validate_modulo('base','users')){
-                show_error_handled("El modulo users no se encuentraba creado, debido a ello no se pudo registrar la tabla $tableName, al momento de la migracion: $idMigTable, verifica que el modulo base/usere se encuentra creado para evitar este error");
+                show_error_handled("El modulo users no se encuentraba creado, debido a ello no se pudo registrar la tabla $tableName, al momento de la migracion: $id_migration, verifica que el modulo base/usere se encuentra creado para evitar este error");
                 return $id_migration;
             }
 
@@ -934,33 +934,45 @@ class CI_Migration
                 $sessUser = $this->session->getObjectUserLoggued();
 
                 $this->CI->initModulesTables(true);
+                $this->CI->initTablesRoles(true);
                 $oModuleTable = $this->CI->model_modules_tables->findOneByIdModuleTable($id_migration);
                 $oTable = $this->CI->model_tables->findOneByIdTable($id_migration);
+                $oTableRoles = $this->CI->model_tables_roles->findOneByIdTable($id_migration);
 
                 $data = array(
                     'title' => validateArray($tableSettings, 'title') ? $tableSettings['title'] : setLabel($submod,true),
                     'table_name' => $tableName,
                     'icon' => validateArray($tableSettings, 'icon') ? $tableSettings['icon'] : '',
+                    'url_edit' => validateArray($tableSettings, 'url') ? $tableSettings['url'].'/edit' : config_item('sys')[$mod]['dir'] . "$submod/edit",
+                    'url_index' => validateArray($tableSettings, 'url') ? $tableSettings['url'].'/index' : config_item('sys')[$mod]['dir'] . "$submod/index",
                     'url' => validateArray($tableSettings, 'url') ? $tableSettings['url'] : config_item('sys')[$mod]['dir'] . "$submod",
                     'description' => validateArray($tableSettings, 'descripcion') ? $tableSettings['descripcion'] : '',
                     'status' => validateArray($tableSettings, 'estado') ? $tableSettings['estado'] : 'enabled',
                     'listed' => validateArray($tableSettings, 'bIsListed') ? $tableSettings['bIsListed'] : 'enabled',
                     'change_count' => isObject($oTable) ? $oTable->getChangeCount() : 0,
                     'id_module' => $modModId,
-                    'id_nivel_role' => 1
+                    'id_role' => 1
 
                 );
+
                 if (isObject($oTable)) {
                     $data = $this->CI->model_tables->save($data, $id_migration);
                 } else {
                     $data = $this->CI->model_tables->save($data, null, $id_migration);
                 }
+
+                $data['id_module'] = $modModId;
                 if(isObject($oModuleTable)){
-                    $data['id_module'] = $modModId;
-                    $this->CI->model_modules_tables->save($data,$id_migration);
+                    $data = $this->CI->model_modules_tables->save($data,$id_migration);
                 } else {
-                    $data['id_module'] = $modModId;
-                    $this->CI->model_modules_tables->save($data,null,$id_migration);
+                    $data = $this->CI->model_modules_tables->save($data,null,$id_migration);
+                }
+
+                $data['id_role'] = 1;
+                if(isObject($oTableRoles)){
+                    $data = $this->CI->model_tables_roles->save($data,$id_migration);
+                } else {
+                    $data = $this->CI->model_tables_roles->save($data,null,$id_migration);
                 }
 
             } else if ($tableName != $modTable) {
@@ -1637,6 +1649,10 @@ class CI_Migration
             if (compareArrayStr($settings, 'input', 'hidden')) {
                 $inputData['class'] = 'display-none';
             }
+            if (compareArrayStr($settings, 'input', 'button')) {
+                $inputData['content'] = $name;
+                $inputData['class'] .= "btn btn-primary btn-rounded btn-block ";
+            }
             // ********************************************************************************************
             if (compareArrayStr($settings, 'type', 'text')) {
                 $typeForm = 'textarea';
@@ -1720,6 +1736,8 @@ class CI_Migration
                 $htmlFormContent .= $this->load->view("template_form_password", $data, true, true);
             } else if (compareArrayStr($settings, 'input', 'image') || compareArrayStr($settings, 'input', 'file')) {
                 $htmlFormContent .= $this->load->view("template_form_img", $data, true, true);
+            } else if (compareArrayStr($settings, 'input', 'button')) {
+                $htmlFormContent .= $this->load->view("template_form_button", $data, true, true);
             } else if (validateArray($settings, 'options') || $bIsForeing) {
                 $htmlFormContent .= $this->load->view("template_form_with_options", $data, true, true, true);
             } else if($bIsTextArea){

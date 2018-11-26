@@ -17,6 +17,12 @@ class ES_Controller extends ES_Ctrl_Vars
     public $oauth;
     public $subjectP;
     public $subjectS;
+    /**
+     * @var Model_Users $oUserLogguedIn
+     */
+    public $oUserLogguedIn;
+    public $aSessData;
+    public $aRolesFromSess;
 
     public $data = array();
 

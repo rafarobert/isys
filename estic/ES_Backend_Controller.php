@@ -34,7 +34,9 @@ class ES_Backend_Controller extends ES_Controller
         $this->data['uri_string'] = $this->uri->uri_string();
 
         if(!$CI || strstr($this->uri->uri_string(), 'sys/migrate')){
-            $this->onLoad();
+            if(validate_modulo('base','users')) {
+                $this->onLoad();
+            }
         }
 
 //        $editTagsSet = CiSettingsQuery::create()->select(['EditTag'])->find()->getData();
@@ -61,18 +63,19 @@ class ES_Backend_Controller extends ES_Controller
             $this->session->userTable = 'ci_users';
             $this->session->userIdTable = 'id_user';
             $this->session->sessKey = config_item('sess_key_admin');
-            $sessUserData = null;
 
             if ($this->session->isLoguedin()) {
                 $this->CI->data['subview'] = 'admin/dashboard/index';
-                $sessUserData = (object)$this->session->get_userdata()[config_item('sess_key_admin')];
-                $this->data['oUser'] = $sessUserData = $this->model_users->setFromData($sessUserData);
+                $this->aSessData = (object)$this->session->get_userdata()[config_item('sess_key_admin')];
+                $this->data['aSessData'] = std2array($this->aSessData);
+                $this->data['oUserLogguedIn'] = $this->oUserLogguedIn = $this->model_users->setFromData($this->aSessData);
+                $this->data['aUserLogguedIn'] = $this->oUserLogguedIn->getArrayData();
                 $data = array(
-                    'id_user' => $sessUserData->getIdUser()
+                    'id_user' => $this->oUserLogguedIn->getIdUser()
                 );
 
                 $this->session->set_userdata($data);
-            } else if($this->input->post('login') == 'Ingresar'){
+            } else if($this->input->post('login') == 'Ingresar' || $this->input->post('login') == 'Desbloquear'){
                 $this->session->login();
             } else {
                 $this->data['subLayout'] = 'login';
@@ -91,23 +94,58 @@ class ES_Backend_Controller extends ES_Controller
 //                    ->filterByIdSetting(1)
 //                    ->find();
 
-                if (is_object($sessUserData)) {
-                    if($sessUserData->getIdRole() == 1){
-                        $this->data['oSysTables'] = CiTablesQuery::create()->find();
-                        $this->data['oSysModules'] = CiModulesQuery::create()->find();
-                    } else if($sessUserData->getIdRole() == 9){
-
-                    } else {
-                        $this->data['oSysModules'] = CiModulesQuery::create()->find();
-                        $this->data['oSysTables'] = CiTablesQuery::create()->filterByIdNivelRole($sessUserData->getIdRole())->find();
+                if (is_object($this->oUserLogguedIn)) {
+                    $this->aRolesFromSess[] = $this->oUserLogguedIn->getIdRole();
+                    $tablesEnabled = array();
+                    if(isset($this->aSessData->ids_roles)){
+                        foreach ($this->aSessData->ids_roles as $sessRole){
+                            if(!in_array($sessRole, $this->aRolesFromSess)){
+                                $this->aRolesFromSess[] = $sessRole;
+                            }
+                            $tablesEnabled[] = CiTablesRolesQuery::create()
+                                ->select(['id_table'])
+                                ->filterByIdRole($sessRole)
+                                ->find()
+                                ->toArray();
+                        }
                     }
-//                    if($sessUserData->id_role == 1){
+                    $this->data['aRolesFromSess'] = $this->aRolesFromSess;
+                    $aTablesIds = array();
+                    $aTablesUrls = array();
+                    foreach ($tablesEnabled as $tables){
+                        foreach ($tables as $idTable){
+                            if(!in_array($idTable,$aTablesUrls)){
+                                $aTablesIds[] = $idTable;
+                                $aTablesUrls[] = CiTablesQuery::create()
+                                    ->select(['url'])
+                                    ->findOneByIdTable($idTable);
+                            }
+                        }
+                    }
+
+                    $aExcepts = ['admin/','base/','base/sessions','admin/dashboard','base/dashboard','sys/migrate'];
+                    $aTablesUrls = array_merge($aTablesUrls,$aExcepts);
+                    $uri = $this->uri->segment(1).'/'.$this->uri->segment(2);
+                    if(in_array($uri,$aTablesUrls)){
+                        if($this->oUserLogguedIn->getIdRole() == 1){
+                            $this->data['oSysTables'] = CiTablesQuery::create()->find();
+                            $this->data['oSysModules'] = CiModulesQuery::create()->find();
+                        } else {
+                            $this->data['oSysModules'] = CiModulesQuery::create()->find();
+                            $this->data['oSysTables'] = CiTablesQuery::create()->filterByIdTable($aTablesIds,Criteria::IN)->find();
+                        }
+//                    if($this->aSessData->id_role == 1){
 //                        $this->data['oSysTables'] = Model_Tables::create()->find();
 //                        $this->data['oSysModules'] = Model_Modules::create()->find();
 //                    } else {
 //                        $this->data['oSysModules'] = Model_Modules::create()->find();
-//                        $this->data['oSysTables'] = Model_Tables::create()->filterByIdNivelRole($sessUserData->id_role);
+//                        $this->data['oSysTables'] = Model_Tables::create()->filterByIdNivelRole($this->oUserLogguedIn->id_role);
 //                    }
+                    } else {
+                        $this->data['oSysTables'] = array();
+                        $this->data['oSysModules'] = array();
+                        $this->session->locked();
+                    }
                 }
             }
         }

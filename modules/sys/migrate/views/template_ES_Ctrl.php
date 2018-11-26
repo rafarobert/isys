@@ -28,8 +28,8 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
         }
         //<<<validateFieldImgUpload4>>>
         //>>>validateUserSavedForRolling2<<<
-        if(validate_modulo('admin','users_roles')){
-            $this->load->model('admin/model_users_roles');
+        if(validate_modulo('base','users_roles')){
+            $this->load->model('base/model_users_roles');
         }
         //<<<validateUserSavedForRolling2>>>
         //>>>validateUsersSavedForPersonTable2<<<

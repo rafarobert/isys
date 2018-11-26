@@ -677,10 +677,10 @@ Class ES_Model extends ES_Model_Vars {
                          * @var ES_Model_Files $thumb
                          */
                         $oModel->files[$key]->{'thumbs'} = array();
-                        foreach ($oThumbFiles as $thumb) {
+                        foreach ($oThumbFiles as $keyThumb => $thumb) {
                             $mark = strReplace(['-', '_', 'thumb'], '', $thumb->getThumbMarker());
-                            $oModel->thumbFiles[$mark] = $thumb->getArrayData();
-                            $oModel->files[$key]->{'thumbs'}[$mark] = $thumb->getArrayData();
+                            $oModel->thumbFiles[$keyThumb] = $thumb->getArrayData();
+                            $oModel->files[$key]->{'thumbs'}[$keyThumb] = $thumb->getArrayData();
                         }
                     }
                 }
@@ -761,10 +761,15 @@ Class ES_Model extends ES_Model_Vars {
         if(!is_object($model)){
             $model = $this;
         }
+        $model->setThumbs();
         $aData = $model->getArrayData();
         if(isset($model->thumbs)){
             if(isArray($model->thumbs)){
                 $aData['thumbs'] = $model->thumbs;
+            }
+        } else if(isset($model->thumbFiles)){
+            if(isArray($model->thumbFiles)){
+                $aData['thumbs'] = $model->thumbFiles;
             }
         }
         return $aData;
@@ -798,10 +803,13 @@ Class ES_Model extends ES_Model_Vars {
         if(isNumeric($ids)){
             $aIds[] = $ids;
         }
+        if(isArray($ids)){
+            $aIds = $ids;
+        }
         $aFiles = array();
         if(isArray($aIds)){
-            foreach ($aIds as $id){
-                $aFiles[] = $this->findOneByIdFile($id)->getArrayDataWithThumbs();
+            foreach ($aIds as $k => $id){
+                $aFiles[$k] = $this->findOneByIdFile($id)->getArrayDataWithThumbs();
             }
         }
         return $aFiles;
