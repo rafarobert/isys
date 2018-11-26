@@ -205,9 +205,9 @@ class Ctrl_Ajax extends ES_Base_Controller
         $pk = isString($pk) || isNumeric($pk) ? $pk : '';
 
         $response = array();
-        if($this->{"init".ucfirst($class)}()){
+        if($this->{"init".ucfirst(setObject($class))}(true)){
             $acr = $sys[$mod];
-            $this->{"init".ucfirst($class)}(true);
+//            $this->{"init".ucfirst(setObject($class))}(true);
             if($response = $this->{"model_$class"}->{$method}($pk)){
                 if(inArray('tableRef',$post) && inArray('idTableRef',$post) && inArray('fieldTableRef',$post)){
                     $tableRef = $post['tableRef'];
