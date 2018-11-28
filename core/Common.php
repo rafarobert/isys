@@ -446,6 +446,22 @@ if ( ! function_exists('show_error'))
 		}
 
 		$_error =& load_class('Exceptions', 'core');
+
+        /**
+         * @var Model_Logs $CI
+         */
+        if(!strstr($message,'base/logs')){
+            if(validate_modulo('base','logs')){
+                $CI = Ctrl_Logs::create()->init();
+                $data['heading'] = $heading;
+                $data['message'] = $message;
+                $data['exit_status'] = $exit_status;
+                $data['code'] = $status_code;
+                $data['post'] = $CI->input->post();$data['level'] = $_error->ob_level;
+                $CI->model_logs->save($data);
+            }
+        }
+
 		echo $_error->show_error($heading, $message, 'error_general', $status_code);
 		exit($exit_status);
 	}
@@ -692,6 +708,21 @@ if ( ! function_exists('_error_handler'))
 		// If the error is fatal, the execution of the script should be stopped because
 		// errors can't be recovered from. Halting the script conforms with PHP's
 		// default error handling. See http://www.php.net/manual/en/errorfunc.constants.php
+
+        /**
+         * @var Model_Logs $CI
+         */
+        if(validate_modulo('base','logs')){
+            $CI = Ctrl_Logs::create()->init();
+            $data['severity'] = $severity;
+            $data['message'] = $message;
+            $data['file'] = $filepath;
+            $data['line'] = $line;
+            $data['post'] = $CI->input->post();
+            $data['level'] = $_error->ob_level;
+            $CI->model_logs->save($data);
+        }
+
 		if ($is_error)
 		{
 			exit(1); // EXIT_ERROR
@@ -713,6 +744,7 @@ if ( ! function_exists('_exception_handler'))
 	 * @param	Exception	$exception
 	 * @return	void
 	 */
+
 	function _exception_handler($exception)
 	{
 		$_error =& load_class('Exceptions', 'core');
@@ -724,6 +756,24 @@ if ( ! function_exists('_exception_handler'))
 			$_error->show_exception($exception);
 		}
 
+		/**
+         * @var Model_Logs $CI
+         */
+		if(validate_modulo('base','logs')){
+            $CI = Ctrl_Logs::create()->init();
+            $data['message'] = $exception->getMessage();
+            $data['code'] = $exception->getCode();
+            $data['file'] = $exception->getFile();
+            $data['line'] = $exception->getLine();
+            $data['previous'] = $exception->getPrevious();
+            $data['trace'] = $exception->getTraceAsString();
+            $data['level'] = $_error->ob_level;
+            $data['post'] = $CI->input->post();
+            $data['id_user_modified'] = $CI->session->getIdUserLoggued() == null ? 1 : $CI->session->getIdUserLoggued();
+            $data['id_user_created'] = $CI->session->getIdUserLoggued() == null ? 1 : $CI->session->getIdUserLoggued();
+
+            $CI->model_logs->save($data);
+        }
 		exit(1); // EXIT_ERROR
 	}
 }

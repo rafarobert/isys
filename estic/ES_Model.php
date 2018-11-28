@@ -318,6 +318,9 @@ Class ES_Model extends ES_Model_Vars {
                     $oUserSaved = $this->CI->model_users->findOneByEmail($data['email']);
                     $data['id_user_modified'] = $oUserSaved->getIdUser();
                     $data['id_user_created'] = $oUserSaved->getIdUser();
+                } else if($this->_table_name == 'ci_logs') {
+                    $data['id_user_modified'] = 1;
+                    $data['id_user_created'] = 1;
                 } else {
                     show_error('Se intenta agregar o modificar un registro en la base de datos, en la tabla: '.$this->_table_name.', para ello es necesario haber iniciado sesion, para registrar al usuario que realiza cambios, Por favor inicia sesion y vuelve a intentarlo');
                     exit();

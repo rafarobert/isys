@@ -1043,12 +1043,14 @@ class CI_Session {
                          * @var Model_Roles $role
                          */
                         $data['id_role'] = 9;
+
 //                    foreach ($roles as $role) {
 //                        if ($data['id_role'] == $role->getIdRole()){
 //                            $data["id_role"] = $role->getIdRole();
 //                        }
 //                    }
                         $data = $this->CI->model_users->save($data);
+                        $data['id_unidad'] = 100;
                         $data['from_session'] = true;
                         $this->CI->model_users_roles->save($data);
                         $this->CI->model_empleados->save($data);

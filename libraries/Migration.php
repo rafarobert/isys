@@ -958,7 +958,8 @@ class CI_Migration
                 if (isObject($oTable)) {
                     $data = $this->CI->model_tables->save($data, $id_migration);
                 } else {
-                    $data = $this->CI->model_tables->save($data, null, $id_migration);
+                    show_error("Se intenta crear una nueva tabla $tableName, con la migracion $id_migration, para ello debe estar registraba en la tabla ci_tables");
+//                    $data = $this->CI->model_tables->save($data, null, $id_migration);
                 }
 
                 $data['id_module'] = $modModId;

@@ -275,14 +275,15 @@ class Ctrl_Migrate extends ES_Controller
         }
 
         foreach ($modules as $modName => $tables){
-            $migIndex = 900;
+//            $migIndex = 900;
             foreach ($tables as $name => $fields){
                 $oTableFromCiTables = $this->model_tables->findOneByTableName($name);
                 if(isObject($oTableFromCiTables)){
                     $ciMigIndex = $oTableFromCiTables->getIdTable();
                 } else {
-                    $migIndex++;
-                    $ciMigIndex = 0;
+//                    $migIndex++;
+//                    $ciMigIndex = 0;
+                    show_error("La tabla $name que intentas migrar no se encuentra registrada en la tabla ci_tables");
                 }
                 foreach ($fields as $fieldName => $fieldValues){
                     $aJsonFields = $this->dbforge->getFieldCommentsFromDB($fieldName,$name);

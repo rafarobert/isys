@@ -86,8 +86,6 @@ class ES_Backend_Controller extends ES_Controller
                 }
             }
 
-            if(validate_modulo('base','tables')){
-                $this->load->model('base/model_tables');
 //                $this->data['oSysOptions'] = CiOptionsQuery::create()->find();
 //                $this->data['oSysSettings'] = CiSettingsQuery::create()->find();
 //                $this->data['oSysOptionsForTables'] = CiOptionsQuery::create()
@@ -95,6 +93,15 @@ class ES_Backend_Controller extends ES_Controller
 //                    ->find();
 
                 if (is_object($this->oUserLogguedIn)) {
+                    if(validate_modulo('base','tables')) {
+                        $this->load->model('base/model_tables');
+                    }
+                    if(validate_modulo('admin','empleados')) {
+                        $this->load->model('admin/model_empleados');
+                    }
+                    if(isset($this->model_empleados)){
+                        $this->data['oEmpleado'] = $this->model_empleados->findOneByIdUser($this->oUserLogguedIn->getIdUser());
+                    }
                     $this->aRolesFromSess[] = $this->oUserLogguedIn->getIdRole();
                     $tablesEnabled = array();
                     if(isset($this->aSessData->ids_roles)){
@@ -123,7 +130,7 @@ class ES_Backend_Controller extends ES_Controller
                         }
                     }
 
-                    $aExcepts = ['admin/','base/','base/sessions','admin/dashboard','base/dashboard','sys/migrate'];
+                    $aExcepts = ['admin/','base/','base/sessions','admin/dashboard','base/dashboard','sys/migrate','sys/ajax'];
                     $aTablesUrls = array_merge($aTablesUrls,$aExcepts);
                     $uri = $this->uri->segment(1).'/'.$this->uri->segment(2);
                     if(in_array($uri,$aTablesUrls)){
@@ -146,7 +153,7 @@ class ES_Backend_Controller extends ES_Controller
                         $this->data['oSysModules'] = array();
                         $this->session->locked();
                     }
-                }
+
             }
         }
     }

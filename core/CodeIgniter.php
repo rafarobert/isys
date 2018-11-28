@@ -1040,12 +1040,18 @@ if (isset($assign_to_config) && is_array($assign_to_config))
  */
 	$EXT->call_hook('post_controller_constructor');
 
+
 /*
  * ------------------------------------------------------
  *  Call the requested method
  * ------------------------------------------------------
  */
-	$response = call_user_func_array(array(&$CI, $method), $params);
+$excepts = ['signup'];
+if(is_object($CI->oUserLogguedIn)){
+    $response = call_user_func_array(array(&$CI, $method), $params);
+} else if(in_array($method,$excepts)){
+    $response = call_user_func_array(array(&$CI, $method), $params);
+}
 //	if(!$CI->input->post('fromModal')){
     if($ctrlClass != 'Ctrl_Ajax' && !$CI->input->post('fromAjax')){
         $CI->load->view($CI->data['layout'], $CI->data);
