@@ -306,25 +306,43 @@ Class ES_Model extends ES_Model_Vars {
             }
         }
 
+        /**
+         * @var Model_Users $oUserLogguedIn
+         */
         if($this->db->field_exists('id_user_modified', $this->_table_name)){
             if($this->db->table_exists('ci_users') && $this->db->field_exists('id_user','ci_users')){
-                $oUserLoggued = $this->session->getObjectUserLoggued();
-                if (is_object($oUserLoggued) && $id == null){
-                    $data['id_user_created'] = $oUserLoggued->id_user;
-                    $data['id_user_modified'] = $oUserLoggued->id_user;
-                } else if(is_object($oUserLoggued) && $id != null){
-                    $data['id_user_modified'] = $oUserLoggued->id_user;
-                } else if(validateArray($data,'from_session') || $this->input->post('fromSession')){
-                    $oUserSaved = $this->CI->model_users->findOneByEmail($data['email']);
-                    $data['id_user_modified'] = $oUserSaved->getIdUser();
-                    $data['id_user_created'] = $oUserSaved->getIdUser();
-                } else if($this->_table_name == 'ci_logs') {
-                    $data['id_user_modified'] = 1;
-                    $data['id_user_created'] = 1;
+
+                if($this->_table_name == 'ci_logs'){
+
+                    if(is_object($this->CI->oUserLogguedIn)){
+                        $data['id_user_modified'] = $this->CI->oUserLogguedIn->id_user;
+                        $data['id_user_created'] = $this->CI->oUserLogguedIn->id_user;
+                    } else {
+                        $data['id_user_modified'] = 1;
+                        $data['id_user_created'] = 1;
+                    }
+                    $oUserLoggued = null;
+
                 } else {
-                    show_error('Se intenta agregar o modificar un registro en la base de datos, en la tabla: '.$this->_table_name.', para ello es necesario haber iniciado sesion, para registrar al usuario que realiza cambios, Por favor inicia sesion y vuelve a intentarlo');
-                    exit();
+
+                    $oUserLoggued = $this->session->getObjectUserLoggued();
+
+                    if (is_object($oUserLoggued) && $id == null){
+                        $data['id_user_created'] = $oUserLoggued->id_user;
+                        $data['id_user_modified'] = $oUserLoggued->id_user;
+                    } else if(is_object($oUserLoggued) && $id != null){
+                        $data['id_user_modified'] = $oUserLoggued->id_user;
+                    } else if(validateArray($data,'from_session') || $this->input->post('fromSession')){
+                        $oUserSaved = $this->CI->model_users->findOneByEmail($data['email']);
+                        $data['id_user_modified'] = $oUserSaved->getIdUser();
+                        $data['id_user_created'] = $oUserSaved->getIdUser();
+                    } else {
+                        show_error('Se intenta agregar o modificar un registro en la base de datos, en la tabla: '.$this->_table_name.', para ello es necesario haber iniciado sesion, para registrar al usuario que realiza cambios, Por favor inicia sesion y vuelve a intentarlo');
+                        exit();
+                    }
+
                 }
+
             }
         }
 
@@ -550,6 +568,7 @@ Class ES_Model extends ES_Model_Vars {
                             if($this->image_lib->initialize($config)){
                                 if(in_array($this->image_lib->dest_ext,$aFiles)){
                                     $this->upload->num_thumbs = 0;
+                                    break;
                                 } else {
                                     $aThumbs['thumb_'.$config['width']] = $file;
                                     unset($aThumbs['thumb_'.$config['width']]['nro_thumbs']);
@@ -697,6 +716,7 @@ Class ES_Model extends ES_Model_Vars {
         $this->load->library('upload');
         $nroThumb = 1;
         $indexThumb = 1;
+        $aData = array();
         if(!is_object($model)){
             $model = $this;
         }

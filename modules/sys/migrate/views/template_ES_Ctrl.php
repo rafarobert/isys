@@ -19,8 +19,14 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
     {
         parent::__construct();
         $this->load->model("lcModS/model_lcTableP");
+
         if(isset($this->model_lcTableP)){
+
             $this->model_initialized = $this->model_lcTableP;
+
+        } else if(isset($this->CI_global->model_lcTableP)){
+
+            $this->model_initialized = $this->CI_global->model_lcTableP;
         }
         //>>>validateFieldImgUpload4<<<
         if(validate_modulo('admin','archivos')) {
@@ -43,6 +49,9 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
 
     public function init(){
         //>>>loadModelsForeignTable<<<
+        if(!validate_modulo('lcFkModS','lcFkTableP')){
+            return $this->getInstance();
+        }
         $this->load->model("lcFkModS/model_lcFkTableP");
         //<<<loadModelsForeignTable>>>
         $this->initLoaded();

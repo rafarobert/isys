@@ -968,10 +968,14 @@ class CI_Session {
     }
 
     public function getObjectUserLoggued(){
-	    $this->CI->load->model('base/model_users');
-	    $data = $this->getDataUserLoggued();
-	    if($data){
-            return $this->CI->model_users->setFromData($data);
+	    if(validate_modulo('base','users')){
+            $this->CI->load->model('base/model_users');
+            $data = $this->getDataUserLoggued();
+            if($data){
+                return $this->CI->model_users->setFromData($data);
+            } else {
+                return null;
+            }
         } else {
 	        return null;
         }
@@ -1002,7 +1006,7 @@ class CI_Session {
 
         !$id || $this->CI->db->where("$this->userIdTable !=", $id);
 
-        $user = $this->MI->get();
+        $user = $this->CI->model_users->get();
         if(count($user)){
             $this->CI->form_validation->set_message('_unique_email', 'Ya existe ese %s registrado');
             return false;
@@ -1030,7 +1034,7 @@ class CI_Session {
             $this->isLoguedin() == FALSE || redirect($dashboard);
             $roles = $this->CI->model_roles->find();
             // Set form
-            $rules = $this->MI->rules_register;
+            $rules = $this->CI->model_users->rules_register;
             $this->CI->form_validation->set_rules($rules);
 
             if(validateVar($roles,'array')){
@@ -1094,7 +1098,7 @@ class CI_Session {
             $ngEmailPost = $this->CI->input->post('ngemail');
             $ngPasswordPost = $this->hash($this->CI->input->post('ngpassword'));
 
-            $oUser = $this->MI->get_by(array(
+            $oUser = $this->CI->model_users->get_by(array(
                 'email' => $emailPost ? $emailPost : ($ngEmailPost ? $ngEmailPost : ''),
                 'password' => $passwordPost ? $passwordPost : ($ngPasswordPost ? $ngPasswordPost : ''),
                 0 => 'id_role',

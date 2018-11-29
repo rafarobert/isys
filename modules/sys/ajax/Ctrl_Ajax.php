@@ -35,43 +35,27 @@ class Ctrl_Ajax extends ES_Base_Controller
 
         exit();
     }
+    public function index(){
+        echo 'hello, from ajax';
+    }
 
     public function save_user(){
 
     }
 
-    public function export($table = '', $funct = 'edit', $subview = ''){
+    public function export($module = '', $class = '', $method = '', $id= ''){
         $SYS = config_item('sys');
-        $data = $this->input->post('data');
-        list($mod, $submod) = getModSubMod($table);
-        if($tableRelated = $this->input->get('verifyFields')){
-            list($modP, $submodP) = getModSubMod($tableRelated);
-            $modP = $SYS[$modP]['name'];
-            $this->{"init_$submodP"}(true);
-            $ctrl_submod = "ctrl_".$submodP;
-            $model_submod = "model_".$submodP;
-            $fieldsP = $this->$model_submod->get_new();
-            $fieldsP = std2array($fieldsP);
-        };
-//        $mod = $SYS[$mod]['name'];
-        // ************** inicia el submodulo ************
-        $this->{"init_$submod"}(true);
-        // **********************
-        $ctrl_submod = "ctrl_".$submod;
-        $model_submod = "model_".$submod;
-        $result = $this->$ctrl_submod->$funct($subview);
-        $fields = $this->$model_submod->get_new();
-        $fields = std2array($fields);
 
-        if(isset($fieldsP)){
-            $fields_diff = array_diff_assoc($fieldsP,$fields);
-            $fields_intersect = array_intersect_assoc($fields,$fieldsP);
-            $result['diff'] = $fields_diff;
-            $result['intersect'] = $fields_intersect;
+        $methodExcepts = ['index'];
+
+        if(!in_array($method, $methodExcepts)){
+
+            // ************** inicia el submodulo ************
+            if($this->{"init".ucfirst($class)}(true)){
+
+                return $this->{"ctrl_$class"}->$method();
+            }
         }
-        echo json_encode($result);
-
-        exit();
     }
 
     public function exportFields($table = ''){

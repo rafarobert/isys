@@ -454,6 +454,7 @@ if ( ! function_exists('show_error'))
             if(validate_modulo('base','logs')){
                 $CI = Ctrl_Logs::create()->init();
                 $data['heading'] = $heading;
+                $data['action'] = $CI->uri->uri_string;
                 $data['message'] = $message;
                 $data['exit_status'] = $exit_status;
                 $data['code'] = $status_code;
@@ -463,7 +464,7 @@ if ( ! function_exists('show_error'))
         }
 
 		echo $_error->show_error($heading, $message, 'error_general', $status_code);
-		exit($exit_status);
+//		exit($exit_status);
 	}
 }
 
@@ -769,11 +770,10 @@ if ( ! function_exists('_exception_handler'))
             $data['trace'] = $exception->getTraceAsString();
             $data['level'] = $_error->ob_level;
             $data['post'] = $CI->input->post();
-            $data['id_user_modified'] = $CI->session->getIdUserLoggued() == null ? 1 : $CI->session->getIdUserLoggued();
-            $data['id_user_created'] = $CI->session->getIdUserLoggued() == null ? 1 : $CI->session->getIdUserLoggued();
 
             $CI->model_logs->save($data);
         }
+        echo $exception->getMessage();
 		exit(1); // EXIT_ERROR
 	}
 }
@@ -1266,7 +1266,13 @@ if (!function_exists('validateArray')) {
 if (!function_exists('strReplace')) {
     function strReplace($searchs,$replace,$str){
         $strReplaced = $str;
-        foreach ($searchs as $char){
+        $aSearchs = array();
+        if(!isArray($searchs)){
+            $aSearchs[] = $searchs;
+        } else {
+            $aSearchs = $searchs;
+        }
+        foreach ($aSearchs as $char){
             $strReplaced = str_replace($char,$replace,$strReplaced);
         }
         return $strReplaced;

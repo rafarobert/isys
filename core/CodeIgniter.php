@@ -931,7 +931,7 @@ if (isset($assign_to_config) && is_array($assign_to_config))
 
 
     $RTR->framePath =  $framePath;
-    $file = "$framePath"."$directory/$class/$ctrlClass.php";
+    $file = "$framePath".$directory."$class/$ctrlClass.php";
 
 	if (empty($class) OR ! file_exists($file))
 	{
@@ -939,7 +939,7 @@ if (isset($assign_to_config) && is_array($assign_to_config))
 	}
 	else
 	{
-		require_once($framePath.$RTR->directory.'/'.$class.'/'.$ctrlClass.'.php');
+		require_once($framePath.$RTR->directory.$class.'/'.$ctrlClass.'.php');
 
 		if ( ! class_exists($ctrlClass, FALSE) OR $method[0] === '_' OR method_exists('CI_Controller', $method))
 		{
@@ -1046,17 +1046,46 @@ if (isset($assign_to_config) && is_array($assign_to_config))
  *  Call the requested method
  * ------------------------------------------------------
  */
-$excepts = ['signup'];
+$methodsExcepts = ['signup','login'];
+
+$classExcepts = ['ajax','migrate'];
+
+// if User logu¿gued in continue
 if(is_object($CI->oUserLogguedIn)){
+
     $response = call_user_func_array(array(&$CI, $method), $params);
-} else if(in_array($method,$excepts)){
+
+    // or if the url is in an except path
+} else if(in_array($method ,$methodsExcepts) || in_array($class,$classExcepts)){
+
     $response = call_user_func_array(array(&$CI, $method), $params);
+
+} else {
+
+    $response = [];
 }
-//	if(!$CI->input->post('fromModal')){
-    if($ctrlClass != 'Ctrl_Ajax' && !$CI->input->post('fromAjax')){
-        $CI->load->view($CI->data['layout'], $CI->data);
+
+$CI->data['response'] = $response;
+
+// If the url comes from ajax show as json
+
+    if($ctrlClass == 'Ctrl_Ajax' || $CI->input->post('fromAjax') || $class == 'ajax'){
+
+        if($response){
+
+            echo safe_json_encode($response);
+
+        } else {
+
+            $CI->data['subLayout'] = 'lockscreen';
+            $CI->load->view($CI->data['layout'], $CI->data);
+        }
+
     } else {
-        echo json_encode($response);
+
+        // if not it displays the content
+        $CI->data['subview'] = isset($CI->data['subview']) ? $CI->data['subview'] : 'ajax';
+        $CI->load->view($CI->data['layout'], $CI->data);
     }
 
 	// Mark a benchmark end point

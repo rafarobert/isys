@@ -903,7 +903,7 @@ class CI_Migration
             $modIdTable = $this->dbforge->getPrimaryKeyFromTable($modTable);
             $modModName = $sys[$modMod]['name'];
             $modModId = $sys[$mod]['id'];
-            $this->CI->initTables(true);
+
 
             if ($this->input->validate('id_migration')) {
                 $id_migration = $this->input->get('id_migration');
@@ -914,7 +914,9 @@ class CI_Migration
 
 //            $idModuleTable = intval($idMigTable.'0');
             $this->load->library('session');
+
             $sessUser = $this->session->getDataUserLoggued();
+
             if(isObject($sessUser)) {
                 if($sessUser->id_role != 1){
                     show_error('El cambio que se desea realizar, requiere permisos del administrador, porfavor contactate con sistemas para continuar');
@@ -933,11 +935,8 @@ class CI_Migration
             if (validate_modulo($modModName, $modSubmod)) {
                 $sessUser = $this->session->getObjectUserLoggued();
 
-                $this->CI->initModulesTables(true);
-                $this->CI->initTablesRoles(true);
-                $oModuleTable = $this->CI->model_modules_tables->findOneByIdModuleTable($id_migration);
-                $oTable = $this->CI->model_tables->findOneByIdTable($id_migration);
-                $oTableRoles = $this->CI->model_tables_roles->findOneByIdTable($id_migration);
+//                $this->CI->initModulesTables(true);
+//                $oModuleTable = $this->CI->model_modules_tables->findOneByIdModuleTable($id_migration);
 
                 $data = array(
                     'title' => validateArray($tableSettings, 'title') ? $tableSettings['title'] : setLabel($submod,true),
@@ -949,32 +948,38 @@ class CI_Migration
                     'description' => validateArray($tableSettings, 'descripcion') ? $tableSettings['descripcion'] : '',
                     'status' => validateArray($tableSettings, 'estado') ? $tableSettings['estado'] : 'enabled',
                     'listed' => validateArray($tableSettings, 'bIsListed') ? $tableSettings['bIsListed'] : 'enabled',
-                    'change_count' => isObject($oTable) ? $oTable->getChangeCount() : 0,
                     'id_module' => $modModId,
                     'id_role' => 1
 
                 );
-
-                if (isObject($oTable)) {
-                    $data = $this->CI->model_tables->save($data, $id_migration);
-                } else {
-                    show_error("Se intenta crear una nueva tabla $tableName, con la migracion $id_migration, para ello debe estar registraba en la tabla ci_tables");
+                if($this->CI->initTables(true)){
+                    $oTable = $this->CI->model_tables->findOneByIdTable($id_migration);
+                    $data['change_count'] = isObject($oTable) ? $oTable->getChangeCount() : 0;
+                    if (isObject($oTable)) {
+                        $data = $this->CI->model_tables->save($data, $id_migration);
+                    } else {
+                        show_error("Se intenta crear una nueva tabla $tableName, con la migracion $id_migration, para ello debe estar registraba en la tabla ci_tables");
 //                    $data = $this->CI->model_tables->save($data, null, $id_migration);
-                }
+                    }
+                };
 
-                $data['id_module'] = $modModId;
-                if(isObject($oModuleTable)){
-                    $data = $this->CI->model_modules_tables->save($data,$id_migration);
-                } else {
-                    $data = $this->CI->model_modules_tables->save($data,null,$id_migration);
-                }
 
-                $data['id_role'] = 1;
-                if(isObject($oTableRoles)){
-                    $data = $this->CI->model_tables_roles->save($data,$id_migration);
-                } else {
-                    $data = $this->CI->model_tables_roles->save($data,null,$id_migration);
-                }
+                if($this->CI->initTablesRoles(true)){
+                    $oTableRoles = $this->CI->model_tables_roles->findOneByIdTable($id_migration);
+                    $data['id_role'] = 1;
+                    if(isObject($oTableRoles)){
+                        $data = $this->CI->model_tables_roles->save($data,$id_migration);
+                    } else {
+                        $data = $this->CI->model_tables_roles->save($data,null,$id_migration);
+                    }
+                };
+
+//                $data['id_module'] = $modModId;
+//                if(isObject($oModuleTable)){
+//                    $data = $this->CI->model_modules_tables->save($data,$id_migration);
+//                } else {
+//                    $data = $this->CI->model_modules_tables->save($data,null,$id_migration);
+//                }
 
             } else if ($tableName != $modTable) {
                 redirect("sys/migrate/ci/$modMigIndex");
@@ -2153,7 +2158,7 @@ class CI_Migration
                     foreach ($settings['options'] as $option){
                         if(!in_array($option,$aStaticVars)){
                             $data['lcVarStaticOption'] = $option;
-                            $data['lcObjStaticOption'] = ucfirst(setObject('$'.$option,false));
+                            $data['lcObjStaticOption'] = ucfirst(setObject('$opt'.ucfirst($option),false));
                             $data["globalStaticLocalVars"] .= $this->load->view(["template_ES_Model" => "globalStaticLocalVars"], $data, true, true, true);
                             $aStaticVars[] = $option;
                         }

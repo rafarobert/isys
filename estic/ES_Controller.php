@@ -17,6 +17,7 @@ class ES_Controller extends ES_Ctrl_Vars
     public $oauth;
     public $subjectP;
     public $subjectS;
+    public $CI_global;
     /**
      * @var Model_Users $oUserLogguedIn
      */
@@ -140,10 +141,14 @@ class ES_Controller extends ES_Ctrl_Vars
                 $this->data['aData'][$index] = $this->model_files->save($thumb);
             }
             $oFile->setThumbs();
-            $thumb1 = $oFile->getThumb1();
             $oArchivo = $this->model_archivos->getNew();
             $oArchivo->setIdFile($oFile->getIdFile());
-            $oArchivo->setIdPreview($thumb1->getIdFile());
+
+            $thumb1 = $oFile->getThumb1();
+            if(is_object($thumb1)){
+                $oArchivo->setIdPreview($thumb1->getIdFile());
+            }
+
             $oArchivo->saveOrUpdate();
         }
         return $oFile;
@@ -153,7 +158,9 @@ class ES_Controller extends ES_Ctrl_Vars
     {
         $responseView = !isString($responseView) ? $this->uri->uri_string() : $responseView;
         $responseRedirect = !isString($responseRedirect) ? $this->uri->segment(1).'/'.$this->uri->segment(2) : $responseRedirect;
-
+        if(strstr($responseView, 'sys/ajax/')){
+            $responseView = str_replace('sys/ajax/','', $responseView);
+        }
         if($this->fromAjax){
             if ($this->error == 'ok') {
                 $data = isset($this->data['aData']) ? $this->data['aData'] : (isset($oObject->aData) ? $oObject->aData : []);

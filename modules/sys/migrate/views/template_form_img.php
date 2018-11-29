@@ -15,7 +15,7 @@
     <script>
         <?php foreach ($files as $ind => $file){ ?>
         oDropZone.uploads['<?=$ind?>'] = {};
-        oDropZone.uploads['<?=$ind?>'].data = JSON.parse(`<?=json_encode($file->getArrayDataWithThumbs($file))?>`);
+        oDropZone.uploads['<?=$ind?>'].data = JSON.parse(`<?=json_encode($file->getArrayDataWithThumbs())?>`);
         oDropZone.uploads['<?=$ind?>'].dir = '<?=$file->getUrl()?>';
         oDropZone.uploads['<?=$ind?>'].error = 'ok';
         oDropZone.uploads['<?=$ind?>'].fromAjax = true;

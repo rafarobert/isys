@@ -135,7 +135,9 @@ DROP TABLE IF EXISTS `ci_logs`;
 CREATE TABLE `ci_logs`
 (
     `id_log` INTEGER NOT NULL AUTO_INCREMENT,
-    `messsage` TEXT,
+    `heading` VARCHAR(499),
+    `message` TEXT,
+    `action` VARCHAR(499),
     `code` VARCHAR(200),
     `level` INTEGER,
     `file` VARCHAR(1000),
@@ -182,35 +184,6 @@ CREATE TABLE `ci_modules`
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `ci_modules_ibfk_2`
         FOREIGN KEY (`id_user_created`)
-        REFERENCES `ci_users` (`id_user`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- ci_modules_tables
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `ci_modules_tables`;
-
-CREATE TABLE `ci_modules_tables`
-(
-    `id_module_table` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `id_module` int(10) unsigned,
-    `id_table` int(10) unsigned,
-    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
-    `change_count` INTEGER DEFAULT 0 NOT NULL,
-    `id_user_modified` int(11) unsigned NOT NULL,
-    `id_user_created` int(11) unsigned NOT NULL,
-    `date_modified` DATETIME NOT NULL,
-    `date_created` DATETIME NOT NULL,
-    PRIMARY KEY (`id_module_table`),
-    UNIQUE INDEX `ci_modules_tables_id_module_table_uindex` (`id_module_table`),
-    INDEX `ci_modules_tables_ibfk_1` (`id_user_created`),
-    INDEX `ci_modules_tables_ibfk_2` (`id_user_modified`),
-    CONSTRAINT `ci_modules_tables_ibfk_1`
-        FOREIGN KEY (`id_user_created`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `ci_modules_tables_ibfk_2`
-        FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`)
 ) ENGINE=InnoDB;
 
@@ -414,14 +387,15 @@ CREATE TABLE `ci_users`
     `phone_number_2` VARCHAR(20),
     `cellphone_number_1` VARCHAR(20),
     `cellphone_number_2` VARCHAR(20),
-    `id_foto_perfil` int(11) unsigned,
+    `ids_foto_perfil` VARCHAR(450),
     `id_provincia` int(10) unsigned,
     `id_role` int(10) unsigned,
-    `change_count` INTEGER DEFAULT 0 NOT NULL,
     `signin_method` VARCHAR(100),
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
     `status` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
+    `id_foto_perfil` int(10) unsigned,
     PRIMARY KEY (`id_user`),
     UNIQUE INDEX `ci_users_id_user_uindex` (`id_user`),
     INDEX `ci_users_ibfk_1` (`id_role`),
@@ -488,7 +462,7 @@ CREATE TABLE `dfa_archivos`
     `id_preview` int(10) unsigned,
     `id_concepto` int(10) unsigned,
     `id_historia` int(10) unsigned,
-    `id_delegacion` int(10) unsigned,
+    `id_entidad` int(10) unsigned,
     `id_publicacion` int(10) unsigned,
     `detalle` VARCHAR(300),
     `descripcion` VARCHAR(300),
@@ -506,7 +480,7 @@ CREATE TABLE `dfa_archivos`
     INDEX `dfa_archivos_ibfk_4` (`id_preview`),
     INDEX `dfa_archivos_ibfk_5` (`id_concepto`),
     INDEX `dfa_archivos_ibfk_6` (`id_historia`),
-    INDEX `dfa_archivos_ibfk_7` (`id_delegacion`),
+    INDEX `dfa_archivos_ibfk_7` (`id_entidad`),
     INDEX `dfa_archivos_ibfk_8` (`id_publicacion`),
     CONSTRAINT `dfa_archivos_ibfk_1`
         FOREIGN KEY (`id_user_created`)
@@ -527,8 +501,8 @@ CREATE TABLE `dfa_archivos`
         FOREIGN KEY (`id_historia`)
         REFERENCES `dfa_conceptos` (`id_concepto`),
     CONSTRAINT `dfa_archivos_ibfk_7`
-        FOREIGN KEY (`id_delegacion`)
-        REFERENCES `dfa_delegaciones` (`id_delegacion`),
+        FOREIGN KEY (`id_entidad`)
+        REFERENCES `dfa_etiquetas` (`id_etiqueta`),
     CONSTRAINT `dfa_archivos_ibfk_8`
         FOREIGN KEY (`id_publicacion`)
         REFERENCES `dfa_publicaciones` (`id_publicacion`)
@@ -612,7 +586,7 @@ CREATE TABLE `dfa_conceptos`
         REFERENCES `dfa_tipos_conceptos` (`id_tipo_concepto`),
     CONSTRAINT `dfa_conceptos_ibfk_5`
         FOREIGN KEY (`id_unidad`)
-        REFERENCES `dfa_unidades` (`id_unidad`),
+        REFERENCES `dfa_entidades` (`id_entidad`),
     CONSTRAINT `dfa_conceptos_ibfk_6`
         FOREIGN KEY (`id_foto_principal`)
         REFERENCES `ci_files` (`id_file`)
@@ -663,62 +637,7 @@ CREATE TABLE `dfa_convocatorias`
         REFERENCES `dfa_tipos_contratos` (`id_tipo_contrato`),
     CONSTRAINT `dfa_convocatorias_ibfk_5`
         FOREIGN KEY (`id_unidad`)
-        REFERENCES `dfa_unidades` (`id_unidad`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- dfa_delegaciones
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `dfa_delegaciones`;
-
-CREATE TABLE `dfa_delegaciones`
-(
-    `id_delegacion` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `nombre` VARCHAR(200),
-    `descripcion` VARCHAR(500),
-    `direccion` VARCHAR(200),
-    `id_contacto` int(10) unsigned,
-    `telefono` VARCHAR(20),
-    `id_ciudad` int(10) unsigned,
-    `id_provincia` int(10) unsigned,
-    `id_coordinacion` int(10) unsigned,
-    `lat` DECIMAL,
-    `lng` DECIMAL,
-    `tipo` VARCHAR(100),
-    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
-    `change_count` INTEGER DEFAULT 0 NOT NULL,
-    `id_user_modified` int(11) unsigned NOT NULL,
-    `id_user_created` int(11) unsigned NOT NULL,
-    `date_modified` DATETIME NOT NULL,
-    `date_created` DATETIME NOT NULL,
-    `id_convocatoria` int(10) unsigned,
-    PRIMARY KEY (`id_delegacion`),
-    UNIQUE INDEX `dfa_delegaciones_id_delegacion_uindex` (`id_delegacion`),
-    INDEX `dfa_delegaciones_ibfk_1` (`id_user_created`),
-    INDEX `dfa_delegaciones_ibfk_2` (`id_user_modified`),
-    INDEX `dfa_delegaciones_ibfk_3` (`id_contacto`),
-    INDEX `dfa_delegaciones_ibfk_4` (`id_ciudad`),
-    INDEX `dfa_delegaciones_ibfk_5` (`id_provincia`),
-    INDEX `dfa_delegaciones_ibfk_6` (`id_coordinacion`),
-    CONSTRAINT `dfa_delegaciones_ibfk_1`
-        FOREIGN KEY (`id_user_created`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_delegaciones_ibfk_2`
-        FOREIGN KEY (`id_user_modified`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_delegaciones_ibfk_3`
-        FOREIGN KEY (`id_contacto`)
-        REFERENCES `dfa_empleados` (`id_empleado`),
-    CONSTRAINT `dfa_delegaciones_ibfk_4`
-        FOREIGN KEY (`id_ciudad`)
-        REFERENCES `ci_cities` (`id_city`),
-    CONSTRAINT `dfa_delegaciones_ibfk_5`
-        FOREIGN KEY (`id_provincia`)
-        REFERENCES `ci_provincias` (`id_provincia`),
-    CONSTRAINT `dfa_delegaciones_ibfk_6`
-        FOREIGN KEY (`id_coordinacion`)
-        REFERENCES `dfa_delegaciones` (`id_delegacion`)
+        REFERENCES `dfa_entidades` (`id_entidad`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -808,13 +727,96 @@ CREATE TABLE `dfa_empleados`
         REFERENCES `dfa_tipos_puestos` (`id_puesto`),
     CONSTRAINT `dfa_empleados_ibfk_5`
         FOREIGN KEY (`id_unidad`)
-        REFERENCES `dfa_unidades` (`id_unidad`),
+        REFERENCES `dfa_entidades` (`id_entidad`),
     CONSTRAINT `dfa_empleados_ibfk_6`
         FOREIGN KEY (`id_oficina`)
         REFERENCES `dfa_oficinas` (`id_oficina`),
     CONSTRAINT `dfa_empleados_ibfk_7`
         FOREIGN KEY (`id_role`)
         REFERENCES `ci_roles` (`id_role`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- dfa_entidades
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `dfa_entidades`;
+
+CREATE TABLE `dfa_entidades`
+(
+    `id_entidad` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(200),
+    `descripcion` VARCHAR(500),
+    `id_parent` int(10) unsigned,
+    `mapa` VARCHAR(900),
+    `tipo` VARCHAR(200),
+    `lng` DECIMAL(10,6),
+    `lat` DECIMAL(10,6),
+    `id_provincia` int(10) unsigned,
+    `id_ciudad` int(10) unsigned,
+    `telefono` VARCHAR(50),
+    `id_delegado` int(10) unsigned,
+    `direccion` VARCHAR(450),
+    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `id_user_modified` int(11) unsigned NOT NULL,
+    `id_user_created` int(11) unsigned NOT NULL,
+    `date_modified` DATETIME NOT NULL,
+    `date_created` DATETIME NOT NULL,
+    PRIMARY KEY (`id_entidad`),
+    INDEX `dfa_unidades_ibfk_1` (`id_user_created`),
+    INDEX `dfa_unidades_ibfk_2` (`id_user_modified`),
+    INDEX `dfa_unidades_ibfk_3` (`id_parent`),
+    INDEX `dfa_entidades_ibfk_4` (`id_delegado`),
+    INDEX `dfa_entidades_ibfk_5` (`id_ciudad`),
+    INDEX `dfa_entidades_ibfk_6` (`id_provincia`),
+    CONSTRAINT `dfa_entidades_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_entidades_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_entidades_ibfk_3`
+        FOREIGN KEY (`id_parent`)
+        REFERENCES `dfa_entidades` (`id_entidad`),
+    CONSTRAINT `dfa_entidades_ibfk_4`
+        FOREIGN KEY (`id_delegado`)
+        REFERENCES `dfa_empleados` (`id_empleado`),
+    CONSTRAINT `dfa_entidades_ibfk_5`
+        FOREIGN KEY (`id_ciudad`)
+        REFERENCES `ci_cities` (`id_city`),
+    CONSTRAINT `dfa_entidades_ibfk_6`
+        FOREIGN KEY (`id_provincia`)
+        REFERENCES `ci_provincias` (`id_provincia`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- dfa_entidades_tables
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `dfa_entidades_tables`;
+
+CREATE TABLE `dfa_entidades_tables`
+(
+    `id_unidad_table` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_unidad` int(10) unsigned,
+    `id_table` int(10) unsigned,
+    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `id_user_modified` int(11) unsigned NOT NULL,
+    `id_user_created` int(11) unsigned NOT NULL,
+    `date_modified` DATETIME NOT NULL,
+    `date_created` DATETIME NOT NULL,
+    PRIMARY KEY (`id_unidad_table`),
+    UNIQUE INDEX `dfa_unidades_tables_id_unidad_table_uindex` (`id_unidad_table`),
+    INDEX `dfa_unidades_tables_ibfk_1` (`id_user_created`),
+    INDEX `dfa_unidades_tables_ibfk_2` (`id_user_modified`),
+    CONSTRAINT `dfa_entidades_tables_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_entidades_tables_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -907,6 +909,10 @@ CREATE TABLE `dfa_oficinas`
     `id_oficina` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `id_provincia` int(10) unsigned,
     `id_ciudad` int(10) unsigned,
+    `id_contacto` int(10) unsigned,
+    `telefono` VARCHAR(30),
+    `lat` DECIMAL(10,6),
+    `lng` DECIMAL(10,6),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -919,6 +925,7 @@ CREATE TABLE `dfa_oficinas`
     INDEX `dfa_oficinas_ibfk_2` (`id_user_modified`),
     INDEX `dfa_oficinas_ibfk_3` (`id_provincia`),
     INDEX `dfa_oficinas_ibfk_4` (`id_ciudad`),
+    INDEX `dfa_oficinas_ibfk_5` (`id_contacto`),
     CONSTRAINT `dfa_oficinas_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -930,7 +937,10 @@ CREATE TABLE `dfa_oficinas`
         REFERENCES `ci_provincias` (`id_provincia`),
     CONSTRAINT `dfa_oficinas_ibfk_4`
         FOREIGN KEY (`id_ciudad`)
-        REFERENCES `ci_cities` (`id_city`)
+        REFERENCES `ci_cities` (`id_city`),
+    CONSTRAINT `dfa_oficinas_ibfk_5`
+        FOREIGN KEY (`id_contacto`)
+        REFERENCES `dfa_empleados` (`id_empleado`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1061,9 +1071,7 @@ CREATE TABLE `dfa_publicaciones`
     `titular` VARCHAR(1000),
     `descripcion` TEXT,
     `fecha_publicacion` DATETIME,
-    `id_adjuntoria` int(10) unsigned,
-    `id_delegacion` int(10) unsigned,
-    `id_unidad` int(10) unsigned,
+    `id_entidad` int(10) unsigned,
     `id_categoria_publicacion` int(10) unsigned,
     `id_etiquetas` VARCHAR(450),
     `secciones` VARCHAR(1000),
@@ -1082,11 +1090,9 @@ CREATE TABLE `dfa_publicaciones`
     UNIQUE INDEX `dfa_publicaciones_id_publicacion_uindex` (`id_publicacion`),
     INDEX `dfa_publicaciones_ibfk_1` (`id_user_created`),
     INDEX `dfa_publicaciones_ibfk_2` (`id_user_modified`),
-    INDEX `dfa_publicaciones_ibfk_3` (`id_delegacion`),
-    INDEX `dfa_publicaciones_ibfk_4` (`id_unidad`),
     INDEX `dfa_publicaciones_ibfk_5` (`id_categoria_publicacion`),
     INDEX `dfa_publicaciones_ibfk` (`id_foto_principal`),
-    INDEX `dfa_publicaciones_ibfk_7` (`id_adjuntoria`),
+    INDEX `dfa_publicaciones_ibfk_7` (`id_entidad`),
     INDEX `dfa_publicaciones_ibfk_8` (`id_etiquetas`),
     CONSTRAINT `dfa_publicaciones_ibfk_1`
         FOREIGN KEY (`id_user_created`)
@@ -1095,20 +1101,14 @@ CREATE TABLE `dfa_publicaciones`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `dfa_publicaciones_ibfk_3`
-        FOREIGN KEY (`id_delegacion`)
-        REFERENCES `dfa_delegaciones` (`id_delegacion`),
-    CONSTRAINT `dfa_publicaciones_ibfk_4`
-        FOREIGN KEY (`id_unidad`)
-        REFERENCES `dfa_unidades` (`id_unidad`),
+        FOREIGN KEY (`id_entidad`)
+        REFERENCES `dfa_entidades` (`id_entidad`),
     CONSTRAINT `dfa_publicaciones_ibfk_5`
         FOREIGN KEY (`id_categoria_publicacion`)
         REFERENCES `dfa_categorias_publicaciones` (`id_categoria_publicacion`),
     CONSTRAINT `dfa_publicaciones_ibfk_6`
         FOREIGN KEY (`id_foto_principal`)
-        REFERENCES `ci_files` (`id_file`),
-    CONSTRAINT `dfa_publicaciones_ibfk_7`
-        FOREIGN KEY (`id_adjuntoria`)
-        REFERENCES `ci_modules` (`id_module`)
+        REFERENCES `ci_files` (`id_file`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1370,41 +1370,6 @@ CREATE TABLE `dfa_tipos_servicios`
     CONSTRAINT `dfa_tipos_servicios_ibfk_2`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- dfa_unidades
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `dfa_unidades`;
-
-CREATE TABLE `dfa_unidades`
-(
-    `id_unidad` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `nombre` VARCHAR(200),
-    `descripcion` VARCHAR(500),
-    `id_parent` int(10) unsigned,
-    `mapa` VARCHAR(900),
-    `tipo` VARCHAR(200),
-    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
-    `change_count` INTEGER DEFAULT 0 NOT NULL,
-    `id_user_modified` int(11) unsigned NOT NULL,
-    `id_user_created` int(11) unsigned NOT NULL,
-    `date_modified` DATETIME NOT NULL,
-    `date_created` DATETIME NOT NULL,
-    PRIMARY KEY (`id_unidad`),
-    INDEX `dfa_unidades_ibfk_1` (`id_user_created`),
-    INDEX `dfa_unidades_ibfk_2` (`id_user_modified`),
-    INDEX `dfa_unidades_ibfk_3` (`id_parent`),
-    CONSTRAINT `dfa_unidades_ibfk_1`
-        FOREIGN KEY (`id_user_created`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_unidades_ibfk_2`
-        FOREIGN KEY (`id_user_modified`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_unidades_ibfk_3`
-        FOREIGN KEY (`id_parent`)
-        REFERENCES `dfa_unidades` (`id_unidad`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
