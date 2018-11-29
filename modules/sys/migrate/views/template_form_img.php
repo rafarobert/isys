@@ -9,7 +9,9 @@
     <script>
         oDropZone.inputName = 'lcObjField';
         oDropZone.inputId = 'inputUcObjField';
-        oDropZone.idFotoPrincipal = '<?=$file->getIdFile()?>';
+        oDropZone.inputIdMainFile = '<<<completar>>>';
+        oDropZone.inputNameMainFile = '<<<completar>>>';
+        oDropZone.idFotoPrincipal = '<<<completar>>>';
     </script>
         <?php if(isArray($files)){ ?>
     <script>
