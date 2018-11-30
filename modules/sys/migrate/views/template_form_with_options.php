@@ -5,7 +5,7 @@
         <?php
         $data = '$inputData';
         //>>>relatetionsOption<<<
-        $data['related'] = $oRelatedField;
+        $data['related'] = $oRelatedFieldP;
         //<<<relatetionsOption>>>
         echo form_lcInputFormType($data, $objOptions, $oUcObjTableS->getUcObjField());
         //>>>printSecondItem<<<

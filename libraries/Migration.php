@@ -1739,7 +1739,8 @@ class CI_Migration
                     foreach ($settings['selectBy'] as $select){
                         if(strstr($select,'id_')){
                             $related = ucfirst(str_replace('id_','',$settings['idForeign']));
-                            $data['oRelatedField'] = "\$o".$related;
+                            list($relatedS,$relatedP) = setSingularPlural($related);
+                            $data['oRelatedFieldP'] = "\$o".$relatedP;
                             $data['relatetionsOption'] = $this->load->view(["template_form_with_options" => "relatetionsOption"], $data, true, true);
                         }
                     }
