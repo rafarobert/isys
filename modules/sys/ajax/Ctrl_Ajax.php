@@ -51,7 +51,7 @@ class Ctrl_Ajax extends ES_Base_Controller
         if(!in_array($method, $methodExcepts)){
 
             // ************** inicia el submodulo ************
-            if($this->{"init".ucfirst($class)}(true)){
+            if($this->{"init".ucfirst(setObject($class))}(true)){
 
                 return $this->{"ctrl_$class"}->$method();
             }

@@ -4,6 +4,9 @@
     <div class="col-sm-10">
         <?php
         $data = '$inputData';
+        //>>>relatetionsOption<<<
+        $data['related'] = $oRelatedField;
+        //<<<relatetionsOption>>>
         echo form_lcInputFormType($data, $objOptions, $oUcObjTableS->getUcObjField());
         //>>>printSecondItem<<<
         echo form_lcSecondInputFormType($data['lcSecondInputFormType']);

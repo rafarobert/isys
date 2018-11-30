@@ -387,7 +387,9 @@ CREATE TABLE `ci_users`
     `phone_number_2` VARCHAR(20),
     `cellphone_number_1` VARCHAR(20),
     `cellphone_number_2` VARCHAR(20),
-    `ids_foto_perfil` VARCHAR(450),
+    `ids_fotos_perfil` VARCHAR(450),
+    `id_foto_perfil` int(10) unsigned,
+    `id_city` int(10) unsigned,
     `id_provincia` int(10) unsigned,
     `id_role` int(10) unsigned,
     `signin_method` VARCHAR(100),
@@ -395,12 +397,12 @@ CREATE TABLE `ci_users`
     `status` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
-    `id_foto_perfil` int(10) unsigned,
     PRIMARY KEY (`id_user`),
     UNIQUE INDEX `ci_users_id_user_uindex` (`id_user`),
     INDEX `ci_users_ibfk_1` (`id_role`),
     INDEX `ci_users_ibfk_2` (`id_provincia`),
     INDEX `ci_users_ibfk_3` (`id_foto_perfil`),
+    INDEX `ci_users_ibfk_4` (`id_city`),
     CONSTRAINT `ci_users_ibfk_1`
         FOREIGN KEY (`id_role`)
         REFERENCES `ci_roles` (`id_role`),
@@ -409,7 +411,10 @@ CREATE TABLE `ci_users`
         REFERENCES `ci_provincias` (`id_provincia`),
     CONSTRAINT `ci_users_ibfk_3`
         FOREIGN KEY (`id_foto_perfil`)
-        REFERENCES `ci_files` (`id_file`)
+        REFERENCES `ci_files` (`id_file`),
+    CONSTRAINT `ci_users_ibfk_4`
+        FOREIGN KEY (`id_city`)
+        REFERENCES `ci_cities` (`id_city`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -641,6 +646,85 @@ CREATE TABLE `dfa_convocatorias`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- dfa_cursos
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `dfa_cursos`;
+
+CREATE TABLE `dfa_cursos`
+(
+    `id_curso` int(11) unsigned NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(400),
+    `descripcion` VARCHAR(1000),
+    `num_modulos` INTEGER,
+    `fecha_inicio` DATETIME,
+    `fecha_final` DATETIME,
+    `id_foto_portada` int(10) unsigned,
+    `ids_files` VARCHAR(450),
+    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `id_user_modified` int(11) unsigned NOT NULL,
+    `id_user_created` int(11) unsigned NOT NULL,
+    `date_modified` DATETIME NOT NULL,
+    `date_created` DATETIME NOT NULL,
+    PRIMARY KEY (`id_curso`),
+    UNIQUE INDEX `dfa_cursos_id_curso_uindex` (`id_curso`),
+    INDEX `dfa_cursos_ibfk_1` (`id_user_created`),
+    INDEX `dfa_cursos_ibfk_2` (`id_user_modified`),
+    INDEX `dfa_cursos_ibfk_3` (`id_foto_portada`),
+    CONSTRAINT `dfa_cursos_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_cursos_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_cursos_ibfk_3`
+        FOREIGN KEY (`id_foto_portada`)
+        REFERENCES `ci_files` (`id_file`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- dfa_cursos_modulos
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `dfa_cursos_modulos`;
+
+CREATE TABLE `dfa_cursos_modulos`
+(
+    `id_curso_modulo` int(11) unsigned NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(400),
+    `id_curso` int(10) unsigned,
+    `id_foto_portada` int(10) unsigned,
+    `ids_files` INTEGER,
+    `fecha_inicio` DATETIME,
+    `fecha_final` DATETIME,
+    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `id_user_modified` int(11) unsigned NOT NULL,
+    `id_user_created` int(11) unsigned NOT NULL,
+    `date_modified` DATETIME NOT NULL,
+    `date_created` DATETIME NOT NULL,
+    PRIMARY KEY (`id_curso_modulo`),
+    UNIQUE INDEX `dfa_cursos_modulos_id_curso_modulo_uindex` (`id_curso_modulo`),
+    INDEX `dfa_cursos_modulos_ibfk_1` (`id_user_created`),
+    INDEX `dfa_cursos_modulos_ibfk_2` (`id_user_modified`),
+    INDEX `dfa_cursos_modulos_ibfk_4` (`id_foto_portada`),
+    INDEX `dfa_cursos_modulos_ibfk_3` (`id_curso`),
+    CONSTRAINT `dfa_cursos_modulos_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_cursos_modulos_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_cursos_modulos_ibfk_3`
+        FOREIGN KEY (`id_curso`)
+        REFERENCES `dfa_cursos` (`id_curso`),
+    CONSTRAINT `dfa_cursos_modulos_ibfk_4`
+        FOREIGN KEY (`id_foto_portada`)
+        REFERENCES `ci_files` (`id_file`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- dfa_denuncias
 -- ---------------------------------------------------------------------
 
@@ -652,12 +736,14 @@ CREATE TABLE `dfa_denuncias`
     `id_victima` int(10) unsigned,
     `descripcion` TEXT,
     `lugar_riesgo` VARCHAR(500),
-    `id_relacion` int(10) unsigned,
+    `id_tipo_relacion` int(10) unsigned,
     `desc_lugar` TEXT,
     `desc_denunciado` TEXT,
     `desc_mal_servicio` TEXT,
-    `id_delegacion` int(10) unsigned,
+    `id_oficina` int(10) unsigned,
     `id_rango_edad` int(10) unsigned,
+    `ids_files` VARCHAR(490),
+    `id_foto_portada` int(10) unsigned,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -669,19 +755,27 @@ CREATE TABLE `dfa_denuncias`
     INDEX `dfa_denuncias_ibfk_1` (`id_user_created`),
     INDEX `dfa_denuncias_ibfk_2` (`id_user_modified`),
     INDEX `dfa_denuncias_ibfk_4` (`id_victima`),
-    INDEX `dfa_denuncias_ibfk_5` (`id_relacion`),
+    INDEX `dfa_denuncias_ibfk_5` (`id_tipo_relacion`),
+    INDEX `dfa_denuncias_ibfk_3` (`id_oficina`),
+    INDEX `dfa_denuncias_ibfk_6` (`id_rango_edad`),
     CONSTRAINT `dfa_denuncias_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `dfa_denuncias_ibfk_2`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_denuncias_ibfk_3`
+        FOREIGN KEY (`id_oficina`)
+        REFERENCES `dfa_oficinas` (`id_oficina`),
     CONSTRAINT `dfa_denuncias_ibfk_4`
         FOREIGN KEY (`id_victima`)
         REFERENCES `dfa_personas` (`id_persona`),
     CONSTRAINT `dfa_denuncias_ibfk_5`
-        FOREIGN KEY (`id_relacion`)
-        REFERENCES `dfa_tipos_relaciones` (`id_tipo_relacion`)
+        FOREIGN KEY (`id_tipo_relacion`)
+        REFERENCES `dfa_tipos_relaciones` (`id_tipo_relacion`),
+    CONSTRAINT `dfa_denuncias_ibfk_6`
+        FOREIGN KEY (`id_rango_edad`)
+        REFERENCES `dfa_rangos_edades` (`id_rango_edad`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -869,6 +963,48 @@ CREATE TABLE `dfa_estadisticas`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- dfa_estudiantes
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `dfa_estudiantes`;
+
+CREATE TABLE `dfa_estudiantes`
+(
+    `id_estudiante` int(11) unsigned NOT NULL AUTO_INCREMENT,
+    `id_user` int(10) unsigned,
+    `id_modulo` int(10) unsigned,
+    `id_curso` int(10) unsigned,
+    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `id_user_modified` int(11) unsigned NOT NULL,
+    `id_user_created` int(11) unsigned NOT NULL,
+    `date_modified` DATETIME NOT NULL,
+    `date_created` DATETIME NOT NULL,
+    PRIMARY KEY (`id_estudiante`),
+    UNIQUE INDEX `dfa_estudiantes_id_estudiante_uindex` (`id_estudiante`),
+    INDEX `dfa_estudiantes_ibfk_1` (`id_user_created`),
+    INDEX `dfa_estudiantes_ibfk_2` (`id_user_modified`),
+    INDEX `dfa_estudiantes_ibfk_3` (`id_curso`),
+    INDEX `dfa_estudiantes_ibfk_4` (`id_modulo`),
+    INDEX `dfa_estudiantes_ibfk_5` (`id_user`),
+    CONSTRAINT `dfa_estudiantes_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_estudiantes_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_estudiantes_ibfk_3`
+        FOREIGN KEY (`id_curso`)
+        REFERENCES `dfa_cursos` (`id_curso`),
+    CONSTRAINT `dfa_estudiantes_ibfk_4`
+        FOREIGN KEY (`id_modulo`)
+        REFERENCES `dfa_cursos_modulos` (`id_curso_modulo`),
+    CONSTRAINT `dfa_estudiantes_ibfk_5`
+        FOREIGN KEY (`id_user`)
+        REFERENCES `ci_users` (`id_user`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- dfa_etiquetas
 -- ---------------------------------------------------------------------
 
@@ -907,10 +1043,16 @@ DROP TABLE IF EXISTS `dfa_oficinas`;
 CREATE TABLE `dfa_oficinas`
 (
     `id_oficina` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `direccion` VARCHAR(800),
+    `id_contacto` int(10) unsigned,
+    `telefono_1` VARCHAR(30),
+    `telefono_2` VARCHAR(30),
+    `celular_1` VARCHAR(30),
+    `celular_2` VARCHAR(30),
     `id_provincia` int(10) unsigned,
     `id_ciudad` int(10) unsigned,
-    `id_contacto` int(10) unsigned,
-    `telefono` VARCHAR(30),
+    `id_foto_portada` int(10) unsigned,
+    `ids_files` VARCHAR(490),
     `lat` DECIMAL(10,6),
     `lng` DECIMAL(10,6),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
@@ -984,6 +1126,7 @@ CREATE TABLE `dfa_personas`
     `id_user` int(10) unsigned,
     `id_residencia` int(10) unsigned,
     `id_rango_edad` int(10) unsigned,
+    `direccion` VARCHAR(490),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,

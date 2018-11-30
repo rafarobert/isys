@@ -384,6 +384,13 @@ if ( ! function_exists('form_dropdown'))
 	    if(is_object($selected)){
             $selected = std2array($selected);
         }
+        if(validateArray($data, 'relations')){
+            $aRelated = array();
+            foreach ($data['relations'] as $idWanted => $idRelated){
+                $aRelated[$idWanted] = $options[$idRelated];
+            }
+            $options = $aRelated;
+        }
         if(!validateVar($options, 'array', false) &&
             validateVar($options, 'string', false) &&
             $extra = ''){

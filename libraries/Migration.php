@@ -1246,6 +1246,19 @@ class CI_Migration
         return [$data, $aPhpContentEditViews];
     }
 
+    public function verifyRelatedTables($relations){
+        $vRelatedWithOutExcepts = $relations;
+        foreach ($vRelatedWithOutExcepts as $fkName => $settings) {
+            $idForeign = $settings['idForeign'];
+            foreach ($vRelatedWithOutExcepts as $fkName2 => $settings2){
+                if($settings2['pk'] == $idForeign){
+
+                    unset($relations[$fkName2]);
+                }
+            }
+        }
+        return $relations;
+    }
     public function createCtrl2($tableName, $pkTable, $fields, $default = [])
     {
         $aDBTablesPks = $this->dbforge->getPrimaryKeysOfTables(true);
@@ -1267,6 +1280,9 @@ class CI_Migration
         $relationsUnique = $this->getTableRelations($fields, true);
         $relationsWithOutExcepts = $this->getTableRelations($fields, false, true, true);
 
+        $relationsUnique = $this->verifyRelatedTables($relationsUnique);
+        $relationsWithOutExcepts = $this->verifyRelatedTables($relationsWithOutExcepts);
+
         foreach ((array)$relationsUnique as $fkName => $settings) {
             list($fMod, $fSubmod) = getModSubMod($settings['table']);
             list($fSubModS, $fSubModP) = setSingularPlural($fSubmod);
@@ -1278,6 +1294,7 @@ class CI_Migration
             $data['lcFkModS'] = lcfirst($fModS);
             $data['lcFkModP'] = lcfirst($fModP);
             $data['initVarsForeignTable'] .= $this->load->view(["template_ES_Ctrl" => "initVarsForeignTable"], $data, true, true, true);
+
             $data['loadModelsForeignTable'] .= $this->load->view(["template_ES_Ctrl" => "loadModelsForeignTable"], $data, true, true, true);
         }
         for ($ind = 0; $ind < 3; $ind++) {
@@ -1717,6 +1734,17 @@ class CI_Migration
 
             list($data, $typeForm, $bIsForeing) = $this->validateFkTable($data, $fields, $settings, $sys, $typeForm,$tableName);
             $data['lcInputFormType'] = $typeForm;
+            if(inArray('selectBy',$settings)){
+                if(is_array($settings['selectBy'])){
+                    foreach ($settings['selectBy'] as $select){
+                        if(strstr($select,'id_')){
+                            $related = ucfirst(str_replace('id_','',$settings['idForeign']));
+                            $data['oRelatedField'] = "\$o".$related;
+                            $data['relatetionsOption'] = $this->load->view(["template_form_with_options" => "relatetionsOption"], $data, true, true);
+                        }
+                    }
+                }
+            }
             if (compareArrayStr($settings, 'input', 'hidden')) {
                 $inputData['class'] = 'display-none';
                 $data['UcInputLabel'] = '';
@@ -1878,18 +1906,22 @@ class CI_Migration
 //                if(in_array($vFkTableFieldRef,$aMixDbPkFk)){
 //                    list($fkTableName,$fkTableFields,$vFkTableFieldRef,$vFkTableFieldRefArray) = $this->getSelectByFieldsFromFkField($fkTableFields,$vFkTableFieldRef);
 //                }
-                    $originFkTableFieldRef = $fields[$idLocal]['selectBy'];
-                    list($data, $typeForm, $bIsForeing, $fkTableFieldRefSettings) = $this->FK_set_DataForSelectingFields($fkTableName, $fkTableFields, $vFkTableFieldRef, $originFkTableFieldRef, $vFkTableFieldRefArray, $settings, $tableName, $idLocal, $data, $sys);
+                    if(!isset($fields[$idLocal]['selectBy'])){
+                        show_error("El Campo $idLocal de la table $tableName hace refencia a una tabla foranea , se debe establecer mediante los parametros json a que campo hara referencia en la otra table que no sea el id de la misma");
+                    } else {
+                        $originFkTableFieldRef = $fields[$idLocal]['selectBy'];
+                        list($data, $typeForm, $bIsForeing, $fkTableFieldRefSettings) = $this->FK_set_DataForSelectingFields($fkTableName, $fkTableFields, $vFkTableFieldRef, $originFkTableFieldRef, $vFkTableFieldRefArray, $settings, $tableName, $idLocal, $data, $sys);
 
-                    if (!validateArray($fields[$idLocal], 'selectBy')) {
-                        $data[]['selectBy'] = compareArrayStr($fkTableFieldRefSettings,'selectBy','nombre') ? $fkTableFieldRefSettings['selectBy'] : '';
+                        if (!validateArray($fields[$idLocal], 'selectBy')) {
+                            $data[]['selectBy'] = compareArrayStr($fkTableFieldRefSettings,'selectBy','nombre') ? $fkTableFieldRefSettings['selectBy'] : '';
 //                    if (validateArray($fkTableFields, $vFkTableFieldRef)) {
 //                        $fkTableFieldRefSettings = $fkTableFields[$vFkTableFieldRef];
 //                    } else {
 //                        show_error("El parametro $vFkTableFieldRef no existe en la tabla $fkTableName, revisa los parametros json de la tabla: " . $data["tableName"] . '.');
 //                    }
-                        $data['objOptions'] = '$data["options"]';
-                        $bIsForeing = false;
+                            $data['objOptions'] = '$data["options"]';
+                            $bIsForeing = false;
+                        }
                     }
                 } else if(validateArray($fields[$idLocal], 'options')){
                     $data['objOptions'] = '$data["options"]';
@@ -2558,6 +2590,7 @@ class CI_Migration
         $fkTableIdName = '';
         $fkTableFields = array();
         $vFkTableFieldRef = '';
+        $fkTableFieldRef = '';
         if (validateArray($fields[$idLocal],'idForeign')) {
 
             if (validateArray($fields[$idLocal], 'table')) {
@@ -2584,6 +2617,8 @@ class CI_Migration
                 }
                 if(validateArray($fkTableFields[$fkTableIdName],'selectBy')){
                     $fkTableFieldRef = $fkTableFields[$fkTableIdName]['selectBy'];
+                } else {
+                    $fkTableFieldRef = '';
                 }
             }
 
