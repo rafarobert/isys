@@ -269,6 +269,8 @@ Class ES_Model extends ES_Model_Vars {
             $data = $this->getArrayData();
             $pk = ucfirst(setObject($this->getPrimaryKey()));
             $id = $this->{"get$pk"}();
+        } else if(isString($data)){
+            return $data;
         }
         $this->load->library('session');
         // set timesatamps
@@ -281,12 +283,12 @@ Class ES_Model extends ES_Model_Vars {
         }
 
         if($this->db->field_exists('password', $this->_table_name) && $id == null){
-            $data['password'] = $this->session->hash($data['password']);
+            $data['password'] = validateVar($data['password']) ? $this->session->hash($data['password']) : $data['password'];
         }
         if($this->db->field_exists('email', $this->_table_name) && $this->_table_name == 'ci_users'){
             if(!$this->session->_unique_email()){
-                echo 'El email ya se encuentra registrado';
-                exit();
+                return $this->CI->model_users->findOneByEmail($this->CI->input->post('email'))->getArrayData();
+//                exit();
             };
         }
 
@@ -336,6 +338,9 @@ Class ES_Model extends ES_Model_Vars {
                         $oUserSaved = $this->CI->model_users->findOneByEmail($data['email']);
                         $data['id_user_modified'] = $oUserSaved->getIdUser();
                         $data['id_user_created'] = $oUserSaved->getIdUser();
+                    } else if($this->CI->input->post('fromAjax')){
+                        $data['id_user_modified'] = isset($data['id_user']) ? $data['id_user'] : 1;
+                        $data['id_user_created'] = isset($data['id_user']) ? $data['id_user'] : 1;
                     } else {
                         show_error('Se intenta agregar o modificar un registro en la base de datos, en la tabla: '.$this->_table_name.', para ello es necesario haber iniciado sesion, para registrar al usuario que realiza cambios, Por favor inicia sesion y vuelve a intentarlo');
                         exit();

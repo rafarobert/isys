@@ -993,7 +993,7 @@ class CI_Session {
         // Do NOT validate if email already exists
         // Unless it's the email for the current user
 
-        if($id == ''){
+        if($id == '' && $this->CI->router->class != 'ajax'){
             $id = $this->CI->uri->segment(4);
         }
         $this->CI->db->where('email', $this->CI->input->post('email'));

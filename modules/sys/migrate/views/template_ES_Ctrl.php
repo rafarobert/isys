@@ -30,17 +30,17 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
         }
         //>>>validateFieldImgUpload4<<<
         if(validate_modulo('admin','archivos')) {
-            $this->load->model('admin/model_archivos');
+            $this->initArchivos();
         }
         //<<<validateFieldImgUpload4>>>
         //>>>validateUserSavedForRolling2<<<
         if(validate_modulo('base','users_roles')){
-            $this->load->model('base/model_users_roles');
+            $this->initUsersRoles();
         }
         //<<<validateUserSavedForRolling2>>>
         //>>>validateUsersSavedForPersonTable2<<<
         if(validate_modulo('admin','personas')) {
-            $this->load->model('admin/model_personas');
+            $this->initPersonas();
         }
         //<<<validateUsersSavedForPersonTable2>>>
         $this->subjectP = 'lcTableP';

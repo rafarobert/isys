@@ -1607,24 +1607,28 @@ if (!function_exists('setMessage')) {
     function setMessage($aData, $added, $aSearched = [])
     {
         $aExcepts = ['password','status','estado'];
-        $message = '';
-        foreach ($aData as $key => $data){
-            if(isArray($aSearched)){
-                foreach ($aSearched as $search){
-                    if($key == $search && validateVar($data) && !strstr($data,'/')){
-                        $message .= "$key: $data | ";
+        $message = $added.': ';
+        if(isArray($aData)){
+            foreach ($aData as $key => $data){
+                if(isArray($aSearched)){
+                    foreach ($aSearched as $search){
+                        if($key == $search && validateVar($data) && !strstr($data,'/')){
+                            $message .= "$key: $data | ";
+                        }
+                    }
+                } else {
+                    if(validateVar($data) && !strstr($data,'/') && !in_array($key,$aExcepts)){
+                        $message .= "$key: $data, ";
                     }
                 }
-            } else {
-                if(validateVar($data) && !strstr($data,'/') && !in_array($key,$aExcepts)){
-                    $message .= "$key: $data, ";
-                }
             }
+        } else if(isString($aData)){
+            return $aData;
         }
         if($message == ""){
             return ucfirst("$added.");
         } else {
-            return ucfirst("$message, $added.");
+            return ucfirst("$message.");
         }
     }
 }

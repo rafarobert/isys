@@ -75,7 +75,10 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
 
             $oUcObjTableS = $this->model_lcTableP->getNewUcObjTableS();
         }
-
+        //>>>validateFieldImgUpload3<<<
+        // revisa esta seccion despues de cada migracion
+        $oUcObjTableS = $this->model_lcTableP->setThumbs($oUcObjTableS,$oUcObjTableS->getIdsArchivos());
+        //<<<validateFieldImgUpload3>>>
         if(is_object($oUcObjTableS)){
 
             $this->form_validation->set_rules($rules);
@@ -104,21 +107,31 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                 if ($this->error == 'ok') {
                     $data = $oUcObjTableS->saveOrUpdate($id);
                     //>>>validateUserSavedForRolling1<<<
-                    $this->model_users_roles->save($data);
+                    $oUserRole = $this->model_users_roles->findOneByIdUser($oUcObjTableS->getIdUser());
+                    if(isObject($oUserRole)){
+                        $oUserRole->saveOrUpdate($data);
+                    } else {
+                        $this->model_users_roles->save($data);
+                    }
                     //<<<validateUserSavedForRolling1>>>
                     //>>>validateUsersSavedForPersonTable1<<<
-                    $this->model_personas->save($data);
+                    $oPersona = $this->model_personas->findOneByIdUser($oUcObjTableS->getIdUser());
+                    if(isObject($oPersona)){
+                        $oPersona->saveOrUpdate($data);
+                    } else {
+                        $this->model_personas->save($data);
+                    }
                     //<<<validateUsersSavedForPersonTable1>>>
                     //>>>validateFieldImgUpload2<<<
                     $oUcObjTableS = $this->doUploadThumbs($oUcObjTableS);
                     //<<<validateFieldImgUpload2>>>
                     $this->data['oUcObjTableS'] = $oUcObjTableS;
-                    $this->returnResponse($oUcObjTableS);
+                    return $this->returnResponse($oUcObjTableS);
                 } else {
-                    $this->returnResponse($oUcObjTableS);
+                    return $this->returnResponse($oUcObjTableS);
                 }
             } else {
-                $this->data['error'] = $this->error = "tableTitle con datos incompletos, porfavor revisa los datos";;
+                $this->data['error'][] = $this->error = $this->errors[] = "tableTitle con datos incompletos, porfavor revisa los datos";;
             }
             // Se carga la vista
             return $this->loadView('lcModS/lcTableP/edit', $this->error);

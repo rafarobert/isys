@@ -9,6 +9,7 @@ class ES_Controller extends ES_Ctrl_Vars
     const NUMERIC = 'numeric';
     public $fromAjax = false;
     public $error = 'ok';
+    public $errors = [];
     public $model_initialized;
 
     public $request;
@@ -31,6 +32,7 @@ class ES_Controller extends ES_Ctrl_Vars
         parent::__construct();
         $this->load->helper('security');
         $this->img_path = realpath(ROOTPATH.'assets/img/');
+        $this->fromAjax = $this->input->post('fromAjax');
         $this->data['errors'] = array();
         $this->data['siteTitle'] = config_item('site_title');;
         $this->data['siteName'] = config_item('site_name');
@@ -89,7 +91,11 @@ class ES_Controller extends ES_Ctrl_Vars
         $mod = isString($mod) ? $mod : $this->router->module;
         if ($this->input->post('fromAjax') || compareStrStr($this->router->class,'ajax') || isArray($_FILES)) {
             if (validateVar($error)){
-                return ['view' => $this->load->view("$mod/$class/$method", $this->data, true), 'error' => $error];
+                return [
+                    'view' => $this->load->view("$mod/$class/$method", $this->data, true),
+                    'required' => validation_errors(),
+                    'error' => $error
+                ];
             } else {
                 return $this->load->view("$mod/$class/$method", $this->data, true);
             }
@@ -166,20 +172,24 @@ class ES_Controller extends ES_Ctrl_Vars
                 $data = isset($this->data['aData']) ? $this->data['aData'] : (isset($oObject->aData) ? $oObject->aData : []);
                 $aReturn['message'] = setMessage($data, ucfirst($this->subjectS).' agregado exitosamente');
                 $aReturn['error'] = $this->error;
+                $aReturn['errors'] = $this->errors;
                 $this->data['oFile'] = $oObject = $this->model_initialized->setFromData($data, $oObject);
                 $aReturn['primary'] = $primary = $this->model_initialized->getPrimaryKey();
                 $aReturn['pk'] = $oObject->$primary;
                 $aReturn['view'] = $this->load->view($responseView, $this->data, true);
                 $aReturn['redirect'] = $responseRedirect;
                 $aReturn['data'] = $data;
-                echo json_encode($aReturn);
-                exit;
+                return $aReturn;
+//                echo json_encode($aReturn);
+//                exit;
             } else {
                 $aReturn['error'] = $error = ucfirst($this->subjectS)." con datos incompletos, porfavor revisa los datos";
+                $aReturn['errors'] = $this->errors;
                 $aReturn['required'] = validation_errors();
                 $aReturn['view'] = $this->load->view($responseView, $this->data, true);
-                echo json_encode($aReturn);
-                exit;
+                return $aReturn;
+//                echo json_encode($aReturn);
+//                exit;
             }
         } else {
             redirect($responseRedirect);
