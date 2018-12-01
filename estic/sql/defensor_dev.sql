@@ -523,6 +523,7 @@ CREATE TABLE `dfa_categorias_publicaciones`
 (
     `id_categoria_publicacion` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(200),
+    `id_seccion_publicacion` int(10) unsigned,
     `icons` VARCHAR(450),
     `descripcion` VARCHAR(500),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
@@ -535,12 +536,16 @@ CREATE TABLE `dfa_categorias_publicaciones`
     UNIQUE INDEX `dfa_categorias_publicaciones_id_categoria_publicacion_uindex` (`id_categoria_publicacion`),
     INDEX `dfa_categorias_publicaciones_ibfk_1` (`id_user_created`),
     INDEX `dfa_categorias_publicaciones_ibfk_2` (`id_user_modified`),
+    INDEX `dfa_categorias_publicaciones_ibfk_3` (`id_seccion_publicacion`),
     CONSTRAINT `dfa_categorias_publicaciones_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `dfa_categorias_publicaciones_ibfk_2`
         FOREIGN KEY (`id_user_modified`)
-        REFERENCES `ci_users` (`id_user`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_categorias_publicaciones_ibfk_3`
+        FOREIGN KEY (`id_seccion_publicacion`)
+        REFERENCES `dfa_secciones_publicaciones` (`id_seccion_publicacion`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1217,7 +1222,7 @@ CREATE TABLE `dfa_publicaciones`
     `id_entidad` int(10) unsigned,
     `id_categoria_publicacion` int(10) unsigned,
     `id_etiquetas` VARCHAR(450),
-    `secciones` VARCHAR(1000),
+    `id_seccion_publicacion` int(10) unsigned,
     `estado_publicacion` VARCHAR(250),
     `ids_archivos` VARCHAR(1000),
     `id_foto_principal` int(10) unsigned,
@@ -1237,6 +1242,7 @@ CREATE TABLE `dfa_publicaciones`
     INDEX `dfa_publicaciones_ibfk` (`id_foto_principal`),
     INDEX `dfa_publicaciones_ibfk_7` (`id_entidad`),
     INDEX `dfa_publicaciones_ibfk_8` (`id_etiquetas`),
+    INDEX `dfa_publicaciones_ibfk_4` (`id_seccion_publicacion`),
     CONSTRAINT `dfa_publicaciones_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -1246,6 +1252,9 @@ CREATE TABLE `dfa_publicaciones`
     CONSTRAINT `dfa_publicaciones_ibfk_3`
         FOREIGN KEY (`id_entidad`)
         REFERENCES `dfa_entidades` (`id_entidad`),
+    CONSTRAINT `dfa_publicaciones_ibfk_4`
+        FOREIGN KEY (`id_seccion_publicacion`)
+        REFERENCES `dfa_secciones_publicaciones` (`id_seccion_publicacion`),
     CONSTRAINT `dfa_publicaciones_ibfk_5`
         FOREIGN KEY (`id_categoria_publicacion`)
         REFERENCES `dfa_categorias_publicaciones` (`id_categoria_publicacion`),
@@ -1284,14 +1293,14 @@ CREATE TABLE `dfa_rangos_edades`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- dfa_secciones_paginas
+-- dfa_secciones_publicaciones
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `dfa_secciones_paginas`;
+DROP TABLE IF EXISTS `dfa_secciones_publicaciones`;
 
-CREATE TABLE `dfa_secciones_paginas`
+CREATE TABLE `dfa_secciones_publicaciones`
 (
-    `id_seccion_pagina` INTEGER NOT NULL,
+    `id_seccion_publicacion` int(11) unsigned NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(450),
     `descripcion` VARCHAR(500),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
@@ -1300,13 +1309,14 @@ CREATE TABLE `dfa_secciones_paginas`
     `id_user_created` int(11) unsigned NOT NULL,
     `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
-    PRIMARY KEY (`id_seccion_pagina`),
-    INDEX `dfa_secciones_paginas_ibfk_1` (`id_user_created`),
-    INDEX `dfa_secciones_paginas_ibfk_2` (`id_user_modified`),
-    CONSTRAINT `dfa_secciones_paginas_ibfk_1`
+    PRIMARY KEY (`id_seccion_publicacion`),
+    UNIQUE INDEX `dfa_secciones_publicaciones_id_seccion_publicacion_uindex` (`id_seccion_publicacion`),
+    INDEX `dfa_secciones_publicaciones_ibfk_1` (`id_user_created`),
+    INDEX `dfa_secciones_publicaciones_ibfk_2` (`id_user_modified`),
+    CONSTRAINT `dfa_secciones_publicaciones_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_secciones_paginas_ibfk_2`
+    CONSTRAINT `dfa_secciones_publicaciones_ibfk_2`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`)
 ) ENGINE=InnoDB;

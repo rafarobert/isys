@@ -1544,7 +1544,9 @@ if (!function_exists('array2str')) {
         if(is_array($array)){
             $str = '|';
             foreach ($array as $item){
-                $str .= $item.'|';
+                if(isString($item)){
+                    $str .= $item.'|';
+                }
             }
             return $str;
         } else {
