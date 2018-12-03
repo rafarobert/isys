@@ -472,19 +472,41 @@ CREATE TABLE `dfa_archivos`
     `titulo` VARCHAR(400),
     `ids_files` VARCHAR(490),
     `id_cover_picture` int(10) unsigned,
-    `descripcion` VARCHAR(300),
+    `descripcion` TEXT,
+    `estado_publicacion` VARCHAR(300),
+    `id_etiquetas` VARCHAR(490),
+    `id_entidad` int(10) unsigned,
+    `id_categoria_publicacion` int(10) unsigned,
+    `revisado` VARCHAR(300),
+    `comentarios` TEXT,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
     `id_user_created` int(11) unsigned NOT NULL,
-    `date_modified` DATETIME NOT NULL,
     `date_created` DATETIME NOT NULL,
+    `date_modified` DATETIME NOT NULL,
     PRIMARY KEY (`id_archivo`),
     UNIQUE INDEX `dfa_archivos_id_archivo_uindex` (`id_archivo`),
     INDEX `dfa_archivos_ibfk_3` (`id_cover_picture`),
+    INDEX `dfa_archivos_ibfk_1` (`id_user_created`),
+    INDEX `dfa_archivos_ibfk_2` (`id_user_modified`),
+    INDEX `dfa_archivos_ibfk_4` (`id_entidad`),
+    INDEX `dfa_archivos_ibfk_5` (`id_categoria_publicacion`),
+    CONSTRAINT `dfa_archivos_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_archivos_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `dfa_archivos_ibfk_3`
         FOREIGN KEY (`id_cover_picture`)
-        REFERENCES `ci_files` (`id_file`)
+        REFERENCES `ci_files` (`id_file`),
+    CONSTRAINT `dfa_archivos_ibfk_4`
+        FOREIGN KEY (`id_entidad`)
+        REFERENCES `dfa_entidades` (`id_entidad`),
+    CONSTRAINT `dfa_archivos_ibfk_5`
+        FOREIGN KEY (`id_categoria_publicacion`)
+        REFERENCES `dfa_categorias_publicaciones` (`id_categoria_publicacion`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -497,6 +519,7 @@ CREATE TABLE `dfa_categorias_publicaciones`
 (
     `id_categoria_publicacion` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(200),
+    `titulo` VARCHAR(490),
     `id_seccion_publicacion` int(10) unsigned,
     `icons` VARCHAR(450),
     `descripcion` VARCHAR(500),
@@ -593,7 +616,7 @@ CREATE TABLE `dfa_convocatorias`
     `precio_referencial` DECIMAL,
     `fecha_publicacion` DATE,
     `id_concepto` int(10) unsigned,
-    `id_unidad` int(10) unsigned,
+    `id_entidad` int(10) unsigned,
     `ids_files` VARCHAR(490),
     `id_cover_picture` int(10) unsigned,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
@@ -608,8 +631,9 @@ CREATE TABLE `dfa_convocatorias`
     INDEX `dfa_convocatorias_ibfk_2` (`id_user_modified`),
     INDEX `dfa_convocatorias_ibfk_3` (`id_tipo_contrato`),
     INDEX `dfa_convocatorias_ibfk_4` (`id_forma_contrato`),
-    INDEX `dfa_convocatorias_ibfk_5` (`id_unidad`),
+    INDEX `dfa_convocatorias_ibfk_5` (`id_entidad`),
     INDEX `dfa_convocatorias_ibfk_6` (`id_cover_picture`),
+    INDEX `dfa_convocatorias_ibfk_7` (`id_concepto`),
     CONSTRAINT `dfa_convocatorias_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -623,11 +647,14 @@ CREATE TABLE `dfa_convocatorias`
         FOREIGN KEY (`id_forma_contrato`)
         REFERENCES `dfa_tipos_contratos` (`id_tipo_contrato`),
     CONSTRAINT `dfa_convocatorias_ibfk_5`
-        FOREIGN KEY (`id_unidad`)
+        FOREIGN KEY (`id_entidad`)
         REFERENCES `dfa_entidades` (`id_entidad`),
     CONSTRAINT `dfa_convocatorias_ibfk_6`
         FOREIGN KEY (`id_cover_picture`)
-        REFERENCES `ci_files` (`id_file`)
+        REFERENCES `ci_files` (`id_file`),
+    CONSTRAINT `dfa_convocatorias_ibfk_7`
+        FOREIGN KEY (`id_concepto`)
+        REFERENCES `dfa_conceptos` (`id_concepto`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -646,6 +673,10 @@ CREATE TABLE `dfa_cursos`
     `fecha_final` DATETIME,
     `ids_files` VARCHAR(490),
     `id_cover_picture` int(10) unsigned,
+    `estado_curso` VARCHAR(300),
+    `id_entidad` int(10) unsigned,
+    `revisado` VARCHAR(300),
+    `comentarios` TEXT,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -657,6 +688,7 @@ CREATE TABLE `dfa_cursos`
     INDEX `dfa_cursos_ibfk_1` (`id_user_created`),
     INDEX `dfa_cursos_ibfk_2` (`id_user_modified`),
     INDEX `dfa_cursos_ibfk_3` (`id_cover_picture`),
+    INDEX `dfa_cursos_ibfk_4` (`id_entidad`),
     CONSTRAINT `dfa_cursos_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -665,7 +697,10 @@ CREATE TABLE `dfa_cursos`
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `dfa_cursos_ibfk_3`
         FOREIGN KEY (`id_cover_picture`)
-        REFERENCES `ci_files` (`id_file`)
+        REFERENCES `ci_files` (`id_file`),
+    CONSTRAINT `dfa_cursos_ibfk_4`
+        FOREIGN KEY (`id_entidad`)
+        REFERENCES `dfa_entidades` (`id_entidad`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -678,11 +713,15 @@ CREATE TABLE `dfa_cursos_modulos`
 (
     `id_curso_modulo` int(11) unsigned NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(400),
+    `descripcion` TEXT,
     `id_curso` int(10) unsigned,
     `id_cover_picture` int(10) unsigned,
     `ids_files` INTEGER,
     `fecha_inicio` DATETIME,
     `fecha_final` DATETIME,
+    `estado_modulo` VARCHAR(300),
+    `revisado` VARCHAR(300),
+    `comentarios` TEXT,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -965,8 +1004,11 @@ CREATE TABLE `dfa_estudiantes`
 (
     `id_estudiante` int(11) unsigned NOT NULL AUTO_INCREMENT,
     `id_user` int(10) unsigned,
-    `id_modulo` int(10) unsigned,
     `id_curso` int(10) unsigned,
+    `id_modulo` int(10) unsigned,
+    `nota` INTEGER,
+    `ids_files` VARCHAR(490),
+    `id_cover_picture` int(10) unsigned,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
