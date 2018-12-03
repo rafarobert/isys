@@ -147,15 +147,6 @@ class ES_Controller extends ES_Ctrl_Vars
                 $this->data['aData'][$index] = $this->model_files->save($thumb);
             }
             $oFile->setThumbs();
-            $oArchivo = $this->model_archivos->getNew();
-            $oArchivo->setIdFile($oFile->getIdFile());
-
-            $thumb1 = $oFile->getThumb1();
-            if(is_object($thumb1)){
-                $oArchivo->setIdPreview($thumb1->getIdFile());
-            }
-
-            $oArchivo->saveOrUpdate();
         }
         return $oFile;
     }

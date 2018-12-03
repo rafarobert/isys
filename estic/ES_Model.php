@@ -375,6 +375,24 @@ Class ES_Model extends ES_Model_Vars {
                     $str = array2str($vals);
                     return $str;
                 }
+                if(isString($vals)){
+                    $isDate = false;
+                    $nums = explode('/',$vals);
+                    if(count($nums) == 3){
+                        foreach ($nums as $num){
+                            if(!isNumeric($num)){
+                                $isDate = false;
+                            }
+                            else {
+                                $isDate = true;
+                            }
+                        }
+                        if($isDate){
+                            $date = new DateTime(implode('-',$nums));
+                            $vals = $date->format('Y-m-d H:i:s');
+                        }
+                    }
+                }
                 return $vals;
             } return null;
 
@@ -785,7 +803,9 @@ Class ES_Model extends ES_Model_Vars {
     }
 
     public function getArrayDataWithThumbs($model = null){
-
+        if($this == null){
+            return;
+        }
         if(!is_object($model)){
             $model = $this;
         }

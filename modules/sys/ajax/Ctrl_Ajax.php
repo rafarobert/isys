@@ -151,48 +151,15 @@ class Ctrl_Ajax extends ES_Base_Controller
         echo json_encode($response);
     }
 
-    public function remove(){
+    public function remove($modulo,$class,$method,$pk){
         $this->load->library('migration');
-//        if(function_exists('initStaticTableVars')){
-//            initStaticTableVars($this);
-//        }
         $post = $this->input->post();
-        $dir = '';
-        $tableRef = '';
-        $classRefMod = '';
-        $classRefName = '';
-        $idTableRef = '';
-        if(inArray('dir',$post)){
-            $dir = $post['dir'];
-        }
-
-        $dir = str_replace(WEBSERVER,'',$dir);
-        $path = preg_replace(['/^\//','/\/$/'],'',$dir);
         $sys = config_item('sys');
-        $mod = null;
-        $class = null;
-        $method = null;
-        $pk = null;
-
-        if(substr_count($path,'/') == 3 ){
-            list($mod, $class, $method, $pk) = explode('/',$path);
-        } else if(substr_count($path,'/') == 2 ){
-            list($mod, $class, $method) = explode('/',$path);
-        } else if(substr_count($path,'/') == 1 ){
-            list($class, $method) = explode('/',$path);
-        } else if(substr_count($path,'/') == 0){
-            list($method) = explode('/',$path);
-        }
-        $method = isString($method) ? $method : $this->router->method;
-        $class = isString($class) ? $class : $this->router->class;
-        $mod = isString($mod) ? $mod : $this->router->module;
-        $pk = isString($pk) || isNumeric($pk) ? $pk : '';
 
         $response = array();
-        if($this->{"init".ucfirst(setObject($class))}(true)){
-            $acr = $sys[$mod];
-//            $this->{"init".ucfirst(setObject($class))}(true);
-            if($response = $this->{"model_$class"}->{$method}($pk)){
+        if($this->{"init".ucfirst(setObject($class))}(true)) {
+            $acr = $sys[$modulo];
+            if($response = $this->{"model_$class"}->{$method}($pk)) {
                 if(inArray('tableRef',$post) && inArray('idTableRef',$post) && inArray('fieldTableRef',$post)){
                     $tableRef = $post['tableRef'];
                     $pkTableRef = ucfirst($post['pkTableRef']);
@@ -210,7 +177,7 @@ class Ctrl_Ajax extends ES_Base_Controller
                     }
                 }
             }
-            if(validateArray($response,'message') && validateArray($response,'code')){
+            if(validateArray($response,'message') && validateArray($response,'code')) {
                 preg_match_all("/`(.*?)`/",$response['message'],$aMessage);
                 if(validateArray($aMessage,1)){
                     $response['constraints'] = $aMessage[1];

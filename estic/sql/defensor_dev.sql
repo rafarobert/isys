@@ -22,6 +22,8 @@ CREATE TABLE `ci_cities`
     `area` INTEGER,
     `nro_municipios` INTEGER,
     `surface` DECIMAL,
+    `id_cover_picture` int(10) unsigned,
+    `ids_files` VARCHAR(490),
     `height` DECIMAL,
     `status` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
@@ -35,6 +37,7 @@ CREATE TABLE `ci_cities`
     INDEX `ci_cities_ibfk_2` (`id_user_modified`),
     INDEX `ci_cities_ibfk_3` (`id_capital`),
     INDEX `ci_cities_ibfk_4` (`id_region`),
+    INDEX `ci_cities_ibfk_5` (`id_cover_picture`),
     CONSTRAINT `ci_cities_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -46,7 +49,10 @@ CREATE TABLE `ci_cities`
         REFERENCES `ci_cities` (`id_city`),
     CONSTRAINT `ci_cities_ibfk_4`
         FOREIGN KEY (`id_region`)
-        REFERENCES `ci_cities` (`id_city`)
+        REFERENCES `ci_cities` (`id_city`),
+    CONSTRAINT `ci_cities_ibfk_5`
+        FOREIGN KEY (`id_cover_picture`)
+        REFERENCES `ci_files` (`id_file`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -387,8 +393,8 @@ CREATE TABLE `ci_users`
     `phone_number_2` VARCHAR(20),
     `cellphone_number_1` VARCHAR(20),
     `cellphone_number_2` VARCHAR(20),
-    `ids_fotos_perfil` VARCHAR(450),
-    `id_foto_perfil` int(10) unsigned,
+    `ids_files` VARCHAR(450),
+    `id_cover_picture` int(10) unsigned,
     `id_city` int(10) unsigned,
     `id_provincia` int(10) unsigned,
     `id_role` int(10) unsigned,
@@ -401,7 +407,7 @@ CREATE TABLE `ci_users`
     UNIQUE INDEX `ci_users_id_user_uindex` (`id_user`),
     INDEX `ci_users_ibfk_1` (`id_role`),
     INDEX `ci_users_ibfk_2` (`id_provincia`),
-    INDEX `ci_users_ibfk_3` (`id_foto_perfil`),
+    INDEX `ci_users_ibfk_3` (`id_cover_picture`),
     INDEX `ci_users_ibfk_4` (`id_city`),
     CONSTRAINT `ci_users_ibfk_1`
         FOREIGN KEY (`id_role`)
@@ -410,7 +416,7 @@ CREATE TABLE `ci_users`
         FOREIGN KEY (`id_provincia`)
         REFERENCES `ci_provincias` (`id_provincia`),
     CONSTRAINT `ci_users_ibfk_3`
-        FOREIGN KEY (`id_foto_perfil`)
+        FOREIGN KEY (`id_cover_picture`)
         REFERENCES `ci_files` (`id_file`),
     CONSTRAINT `ci_users_ibfk_4`
         FOREIGN KEY (`id_city`)
@@ -463,13 +469,9 @@ DROP TABLE IF EXISTS `dfa_archivos`;
 CREATE TABLE `dfa_archivos`
 (
     `id_archivo` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `id_file` int(10) unsigned,
-    `id_preview` int(10) unsigned,
-    `id_concepto` int(10) unsigned,
-    `id_historia` int(10) unsigned,
-    `id_entidad` int(10) unsigned,
-    `id_publicacion` int(10) unsigned,
-    `detalle` VARCHAR(300),
+    `titulo` VARCHAR(400),
+    `ids_files` VARCHAR(490),
+    `id_cover_picture` int(10) unsigned,
     `descripcion` VARCHAR(300),
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
@@ -479,38 +481,10 @@ CREATE TABLE `dfa_archivos`
     `date_created` DATETIME NOT NULL,
     PRIMARY KEY (`id_archivo`),
     UNIQUE INDEX `dfa_archivos_id_archivo_uindex` (`id_archivo`),
-    INDEX `dfa_archivos_ibfk_1` (`id_user_created`),
-    INDEX `dfa_archivos_ibfk_2` (`id_user_modified`),
-    INDEX `dfa_archivos_ibfk_3` (`id_file`),
-    INDEX `dfa_archivos_ibfk_4` (`id_preview`),
-    INDEX `dfa_archivos_ibfk_5` (`id_concepto`),
-    INDEX `dfa_archivos_ibfk_6` (`id_historia`),
-    INDEX `dfa_archivos_ibfk_7` (`id_entidad`),
-    INDEX `dfa_archivos_ibfk_8` (`id_publicacion`),
-    CONSTRAINT `dfa_archivos_ibfk_1`
-        FOREIGN KEY (`id_user_created`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_archivos_ibfk_2`
-        FOREIGN KEY (`id_user_modified`)
-        REFERENCES `ci_users` (`id_user`),
+    INDEX `dfa_archivos_ibfk_3` (`id_cover_picture`),
     CONSTRAINT `dfa_archivos_ibfk_3`
-        FOREIGN KEY (`id_file`)
-        REFERENCES `ci_files` (`id_file`),
-    CONSTRAINT `dfa_archivos_ibfk_4`
-        FOREIGN KEY (`id_preview`)
-        REFERENCES `ci_files` (`id_file`),
-    CONSTRAINT `dfa_archivos_ibfk_5`
-        FOREIGN KEY (`id_concepto`)
-        REFERENCES `dfa_conceptos` (`id_concepto`),
-    CONSTRAINT `dfa_archivos_ibfk_6`
-        FOREIGN KEY (`id_historia`)
-        REFERENCES `dfa_conceptos` (`id_concepto`),
-    CONSTRAINT `dfa_archivos_ibfk_7`
-        FOREIGN KEY (`id_entidad`)
-        REFERENCES `dfa_etiquetas` (`id_etiqueta`),
-    CONSTRAINT `dfa_archivos_ibfk_8`
-        FOREIGN KEY (`id_publicacion`)
-        REFERENCES `dfa_publicaciones` (`id_publicacion`)
+        FOREIGN KEY (`id_cover_picture`)
+        REFERENCES `ci_files` (`id_file`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -561,14 +535,14 @@ CREATE TABLE `dfa_conceptos`
     `titular` VARCHAR(1000),
     `descripcion` TEXT,
     `id_historia` int(10) unsigned,
-    `ids_archivos` VARCHAR(400),
     `id_tipo_concepto` int(10) unsigned,
     `id_unidad` int(10) unsigned,
     `tipo` VARCHAR(300),
     `estado_concepto` VARCHAR(250),
     `revisado` VARCHAR(250),
     `comentarios` TEXT,
-    `id_foto_principal` int(10) unsigned,
+    `ids_files` VARCHAR(400),
+    `id_cover_picture` int(10) unsigned,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -581,7 +555,7 @@ CREATE TABLE `dfa_conceptos`
     INDEX `dfa_conceptos_ibfk_4` (`id_tipo_concepto`),
     INDEX `dfa_conceptos_ibfk_5` (`id_unidad`),
     INDEX `dfa_conceptos_ibfk_1` (`id_historia`),
-    INDEX `dfa_conceptos_ibfk_6` (`id_foto_principal`),
+    INDEX `dfa_conceptos_ibfk_6` (`id_cover_picture`),
     CONSTRAINT `dfa_conceptos_ibfk_1`
         FOREIGN KEY (`id_historia`)
         REFERENCES `dfa_conceptos` (`id_concepto`),
@@ -598,7 +572,7 @@ CREATE TABLE `dfa_conceptos`
         FOREIGN KEY (`id_unidad`)
         REFERENCES `dfa_entidades` (`id_entidad`),
     CONSTRAINT `dfa_conceptos_ibfk_6`
-        FOREIGN KEY (`id_foto_principal`)
+        FOREIGN KEY (`id_cover_picture`)
         REFERENCES `ci_files` (`id_file`)
 ) ENGINE=InnoDB;
 
@@ -620,6 +594,8 @@ CREATE TABLE `dfa_convocatorias`
     `fecha_publicacion` DATE,
     `id_concepto` int(10) unsigned,
     `id_unidad` int(10) unsigned,
+    `ids_files` VARCHAR(490),
+    `id_cover_picture` int(10) unsigned,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -633,6 +609,7 @@ CREATE TABLE `dfa_convocatorias`
     INDEX `dfa_convocatorias_ibfk_3` (`id_tipo_contrato`),
     INDEX `dfa_convocatorias_ibfk_4` (`id_forma_contrato`),
     INDEX `dfa_convocatorias_ibfk_5` (`id_unidad`),
+    INDEX `dfa_convocatorias_ibfk_6` (`id_cover_picture`),
     CONSTRAINT `dfa_convocatorias_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -647,7 +624,10 @@ CREATE TABLE `dfa_convocatorias`
         REFERENCES `dfa_tipos_contratos` (`id_tipo_contrato`),
     CONSTRAINT `dfa_convocatorias_ibfk_5`
         FOREIGN KEY (`id_unidad`)
-        REFERENCES `dfa_entidades` (`id_entidad`)
+        REFERENCES `dfa_entidades` (`id_entidad`),
+    CONSTRAINT `dfa_convocatorias_ibfk_6`
+        FOREIGN KEY (`id_cover_picture`)
+        REFERENCES `ci_files` (`id_file`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -664,8 +644,8 @@ CREATE TABLE `dfa_cursos`
     `num_modulos` INTEGER,
     `fecha_inicio` DATETIME,
     `fecha_final` DATETIME,
-    `id_foto_portada` int(10) unsigned,
-    `ids_files` VARCHAR(450),
+    `ids_files` VARCHAR(490),
+    `id_cover_picture` int(10) unsigned,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -676,7 +656,7 @@ CREATE TABLE `dfa_cursos`
     UNIQUE INDEX `dfa_cursos_id_curso_uindex` (`id_curso`),
     INDEX `dfa_cursos_ibfk_1` (`id_user_created`),
     INDEX `dfa_cursos_ibfk_2` (`id_user_modified`),
-    INDEX `dfa_cursos_ibfk_3` (`id_foto_portada`),
+    INDEX `dfa_cursos_ibfk_3` (`id_cover_picture`),
     CONSTRAINT `dfa_cursos_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -684,7 +664,7 @@ CREATE TABLE `dfa_cursos`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`),
     CONSTRAINT `dfa_cursos_ibfk_3`
-        FOREIGN KEY (`id_foto_portada`)
+        FOREIGN KEY (`id_cover_picture`)
         REFERENCES `ci_files` (`id_file`)
 ) ENGINE=InnoDB;
 
@@ -699,7 +679,7 @@ CREATE TABLE `dfa_cursos_modulos`
     `id_curso_modulo` int(11) unsigned NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(400),
     `id_curso` int(10) unsigned,
-    `id_foto_portada` int(10) unsigned,
+    `id_cover_picture` int(10) unsigned,
     `ids_files` INTEGER,
     `fecha_inicio` DATETIME,
     `fecha_final` DATETIME,
@@ -713,7 +693,7 @@ CREATE TABLE `dfa_cursos_modulos`
     UNIQUE INDEX `dfa_cursos_modulos_id_curso_modulo_uindex` (`id_curso_modulo`),
     INDEX `dfa_cursos_modulos_ibfk_1` (`id_user_created`),
     INDEX `dfa_cursos_modulos_ibfk_2` (`id_user_modified`),
-    INDEX `dfa_cursos_modulos_ibfk_4` (`id_foto_portada`),
+    INDEX `dfa_cursos_modulos_ibfk_4` (`id_cover_picture`),
     INDEX `dfa_cursos_modulos_ibfk_3` (`id_curso`),
     CONSTRAINT `dfa_cursos_modulos_ibfk_1`
         FOREIGN KEY (`id_user_created`)
@@ -725,7 +705,7 @@ CREATE TABLE `dfa_cursos_modulos`
         FOREIGN KEY (`id_curso`)
         REFERENCES `dfa_cursos` (`id_curso`),
     CONSTRAINT `dfa_cursos_modulos_ibfk_4`
-        FOREIGN KEY (`id_foto_portada`)
+        FOREIGN KEY (`id_cover_picture`)
         REFERENCES `ci_files` (`id_file`)
 ) ENGINE=InnoDB;
 
@@ -748,7 +728,7 @@ CREATE TABLE `dfa_denuncias`
     `id_oficina` int(10) unsigned,
     `id_rango_edad` int(10) unsigned,
     `ids_files` VARCHAR(490),
-    `id_foto_portada` int(10) unsigned,
+    `id_cover_picture` int(10) unsigned,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -856,6 +836,8 @@ CREATE TABLE `dfa_entidades`
     `telefono` VARCHAR(50),
     `id_delegado` int(10) unsigned,
     `direccion` VARCHAR(450),
+    `ids_files` VARCHAR(490),
+    `id_cover_picture` int(10) unsigned,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -869,6 +851,7 @@ CREATE TABLE `dfa_entidades`
     INDEX `dfa_entidades_ibfk_4` (`id_delegado`),
     INDEX `dfa_entidades_ibfk_5` (`id_ciudad`),
     INDEX `dfa_entidades_ibfk_6` (`id_provincia`),
+    INDEX `dfa_entidades_ibfk_7` (`id_cover_picture`),
     CONSTRAINT `dfa_entidades_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -886,7 +869,10 @@ CREATE TABLE `dfa_entidades`
         REFERENCES `ci_cities` (`id_city`),
     CONSTRAINT `dfa_entidades_ibfk_6`
         FOREIGN KEY (`id_provincia`)
-        REFERENCES `ci_provincias` (`id_provincia`)
+        REFERENCES `ci_provincias` (`id_provincia`),
+    CONSTRAINT `dfa_entidades_ibfk_7`
+        FOREIGN KEY (`id_cover_picture`)
+        REFERENCES `ci_files` (`id_file`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -933,6 +919,8 @@ CREATE TABLE `dfa_estadisticas`
     `porcentaje` VARCHAR(100),
     `id_procedimiento` int(10) unsigned,
     `id_residencia` int(10) unsigned,
+    `ids_files` VARCHAR(490),
+    `id_cover_picture` int(10) unsigned,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -1056,8 +1044,8 @@ CREATE TABLE `dfa_oficinas`
     `celular_2` VARCHAR(30),
     `id_provincia` int(10) unsigned,
     `id_ciudad` int(10) unsigned,
-    `id_foto_portada` int(10) unsigned,
     `ids_files` VARCHAR(490),
+    `id_cover_picture` int(10) unsigned,
     `lat` DECIMAL(10,6),
     `lng` DECIMAL(10,6),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
@@ -1224,8 +1212,8 @@ CREATE TABLE `dfa_publicaciones`
     `id_etiquetas` VARCHAR(450),
     `id_seccion_publicacion` int(10) unsigned,
     `estado_publicacion` VARCHAR(250),
-    `ids_archivos` VARCHAR(1000),
-    `id_foto_principal` int(10) unsigned,
+    `ids_files` VARCHAR(1000),
+    `id_cover_picture` int(10) unsigned,
     `revisado` VARCHAR(250),
     `comentarios` TEXT,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
@@ -1239,7 +1227,7 @@ CREATE TABLE `dfa_publicaciones`
     INDEX `dfa_publicaciones_ibfk_1` (`id_user_created`),
     INDEX `dfa_publicaciones_ibfk_2` (`id_user_modified`),
     INDEX `dfa_publicaciones_ibfk_5` (`id_categoria_publicacion`),
-    INDEX `dfa_publicaciones_ibfk` (`id_foto_principal`),
+    INDEX `dfa_publicaciones_ibfk` (`id_cover_picture`),
     INDEX `dfa_publicaciones_ibfk_7` (`id_entidad`),
     INDEX `dfa_publicaciones_ibfk_8` (`id_etiquetas`),
     INDEX `dfa_publicaciones_ibfk_4` (`id_seccion_publicacion`),
@@ -1259,7 +1247,7 @@ CREATE TABLE `dfa_publicaciones`
         FOREIGN KEY (`id_categoria_publicacion`)
         REFERENCES `dfa_categorias_publicaciones` (`id_categoria_publicacion`),
     CONSTRAINT `dfa_publicaciones_ibfk_6`
-        FOREIGN KEY (`id_foto_principal`)
+        FOREIGN KEY (`id_cover_picture`)
         REFERENCES `ci_files` (`id_file`)
 ) ENGINE=InnoDB;
 

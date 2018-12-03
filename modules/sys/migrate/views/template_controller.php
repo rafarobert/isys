@@ -77,7 +77,7 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
         }
         //>>>validateFieldImgUpload3<<<
         // revisa esta seccion despues de cada migracion
-        $oUcObjTableS = $this->model_lcTableP->setThumbs($oUcObjTableS,$oUcObjTableS->getIdsArchivos());
+        $oUcObjTableS = $this->model_lcTableP->setThumbs($oUcObjTableS,$oUcObjTableS->getIdsfiles());
         //<<<validateFieldImgUpload3>>>
         if(is_object($oUcObjTableS)){
 

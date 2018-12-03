@@ -9,9 +9,9 @@
     <script>
         oDropZone.inputName = 'lcObjField';
         oDropZone.inputId = 'inputUcObjField';
-        oDropZone.inputIdMainFile = '<<<completar>>>';
-        oDropZone.inputNameMainFile = '<<<completar>>>';
-        oDropZone.idFotoPrincipal = '<<<completar>>>';
+        oDropZone.inputIdMainFile = 'inputIdCoverPicture';
+        oDropZone.inputNameMainFile = 'idCoverPicture';
+        oDropZone.idFotoPrincipal = '<?=$oUcObjTableS->getIdCoverPicture()?>';
     </script>
         <?php if(isArray($files)){ ?>
     <script>

@@ -1555,9 +1555,9 @@ class CI_Migration
                             if (validateVar($aTagsEditView, 'array')) {
                                 foreach ($aTagsEditView as $tagEditView => $phpContentEditView) {
                                     $fileEditViewPath = $frameAppPath . "$submod/views/$tagEditView" . $this->_ext_php;
-                                    if (!file_exists($fileEditViewPath)) {
+//                                    if (!file_exists($fileEditViewPath)) {
                                         write_file($fileEditViewPath, $phpContentEditView);
-                                    }
+//                                    }
                                 }
                             }
                         }
@@ -1726,10 +1726,10 @@ class CI_Migration
                 }
             } else if (compareArrayStr($settings, 'type', 'date')) {
                 $typeForm = 'input';
-                $inputData["class"] .= "datepicker ";
+//                $inputData["class"] .= "datepicker ";
             } else if (compareArrayStr($settings, 'type', 'datetime')) {
                 $typeForm = 'input';
-                $inputData["class"] .= "datepicker ";
+//                $inputData["class"] .= "datepicker ";
             }
 
             list($data, $typeForm, $bIsForeing) = $this->validateFkTable($data, $fields, $settings, $sys, $typeForm,$tableName);
