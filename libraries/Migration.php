@@ -105,6 +105,7 @@ class CI_Migration
     protected $MI;
 
     public $settings;
+    public $fields;
     public $_ext_php = '.php';
     public $_ext_txt = '.txt';
     public $_ext_js = '.js';
@@ -867,7 +868,7 @@ class CI_Migration
     public function set_settings($tableSettings, $tableName)
     {
         if (count($tableSettings)) {
-            $fields = $this->dbforge->fields != [] ? $this->dbforge->fields : ($this->_fields == [] ? header("Refresh:0") : $this->_fields);
+            $this->fields = $fields = $this->dbforge->fields != [] ? $this->dbforge->fields : ($this->_fields == [] ? header("Refresh:0") : $this->_fields);
 
             $pkTable = $this->dbforge->getPrimaryKeyFromTable($tableName);
             // ******************************************************************************************
@@ -1251,8 +1252,19 @@ class CI_Migration
         foreach ($vRelatedWithOutExcepts as $fkName => $settings) {
             $idForeign = $settings['idForeign'];
             foreach ($vRelatedWithOutExcepts as $fkName2 => $settings2){
+                $break = false;
+                if(inArray('filterBy',$settings)){
+                    $aFiltersBy = $settings2['filterBy'];
+                    foreach ($aFiltersBy as $keyFilter => $valFilter) {
+                        if(inArray($keyFilter,$this->fields)){
+                            $break = true;
+                        }
+                    }
+                }
+                if($break){
+                    break;
+                }
                 if($settings2['pk'] == $idForeign){
-
                     unset($relations[$fkName2]);
                 }
             }
