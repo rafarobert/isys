@@ -5,6 +5,7 @@
  * Date: #dateCreated
  * Time: #timeCreated
  */
+use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
 defined("BASEPATH") OR exit("No direct script access allowed");
 

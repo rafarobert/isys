@@ -94,7 +94,8 @@ class ES_Controller extends ES_Ctrl_Vars
                 return [
                     'view' => $this->load->view("$mod/$class/$method", $this->data, true),
                     'required' => validation_errors(),
-                    'error' => $error
+                    'error' => $error,
+                    'errors' => $this->errors
                 ];
             } else {
                 return $this->load->view("$mod/$class/$method", $this->data, true);
@@ -106,6 +107,7 @@ class ES_Controller extends ES_Ctrl_Vars
         } else {
             $this->data["subview"] = "$mod/$class/$method";
         }
+
     }
 
     public function filterIdOrView($id, $view){

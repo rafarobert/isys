@@ -22,9 +22,10 @@ CREATE TABLE `ci_cities`
     `area` INTEGER,
     `nro_municipios` INTEGER,
     `surface` DECIMAL,
-    `id_cover_picture` int(10) unsigned,
     `ids_files` VARCHAR(490),
+    `id_cover_picture` int(10) unsigned,
     `height` DECIMAL,
+    `tipo` VARCHAR(490),
     `status` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -472,14 +473,16 @@ CREATE TABLE `dfa_archivos`
     `titulo` VARCHAR(400),
     `ids_files` VARCHAR(490),
     `id_cover_picture` int(10) unsigned,
-    `descripcion` TEXT,
+    `descripcion` VARCHAR(499),
     `estado_publicacion` VARCHAR(300),
     `id_etiquetas` VARCHAR(490),
     `id_entidad` int(10) unsigned,
     `id_categoria_publicacion` int(10) unsigned,
     `revisado` VARCHAR(300),
     `comentarios` TEXT,
+    `id_seccion_publicacion` int(10) unsigned,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `tipo` VARCHAR(300),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
     `id_user_created` int(11) unsigned NOT NULL,
@@ -492,6 +495,7 @@ CREATE TABLE `dfa_archivos`
     INDEX `dfa_archivos_ibfk_2` (`id_user_modified`),
     INDEX `dfa_archivos_ibfk_4` (`id_entidad`),
     INDEX `dfa_archivos_ibfk_5` (`id_categoria_publicacion`),
+    INDEX `dfa_archivos_ibfk_6` (`id_seccion_publicacion`),
     CONSTRAINT `dfa_archivos_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -506,7 +510,10 @@ CREATE TABLE `dfa_archivos`
         REFERENCES `dfa_entidades` (`id_entidad`),
     CONSTRAINT `dfa_archivos_ibfk_5`
         FOREIGN KEY (`id_categoria_publicacion`)
-        REFERENCES `dfa_categorias_publicaciones` (`id_categoria_publicacion`)
+        REFERENCES `dfa_categorias_publicaciones` (`id_categoria_publicacion`),
+    CONSTRAINT `dfa_archivos_ibfk_6`
+        FOREIGN KEY (`id_seccion_publicacion`)
+        REFERENCES `dfa_secciones_publicaciones` (`id_seccion_publicacion`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -555,7 +562,7 @@ CREATE TABLE `dfa_conceptos`
 (
     `id_concepto` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `titulo` VARCHAR(300),
-    `titular` VARCHAR(1000),
+    `titular` TEXT,
     `descripcion` TEXT,
     `id_historia` int(10) unsigned,
     `id_tipo_concepto` int(10) unsigned,
@@ -1246,7 +1253,7 @@ CREATE TABLE `dfa_publicaciones`
 (
     `id_publicacion` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `titulo` VARCHAR(200),
-    `titular` VARCHAR(1000),
+    `titular` TEXT,
     `descripcion` TEXT,
     `fecha_publicacion` DATETIME,
     `id_entidad` int(10) unsigned,
@@ -1256,6 +1263,7 @@ CREATE TABLE `dfa_publicaciones`
     `estado_publicacion` VARCHAR(250),
     `ids_files` VARCHAR(1000),
     `id_cover_picture` int(10) unsigned,
+    `id_city` int(10) unsigned,
     `revisado` VARCHAR(250),
     `comentarios` TEXT,
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
@@ -1273,9 +1281,13 @@ CREATE TABLE `dfa_publicaciones`
     INDEX `dfa_publicaciones_ibfk_7` (`id_entidad`),
     INDEX `dfa_publicaciones_ibfk_8` (`id_etiquetas`),
     INDEX `dfa_publicaciones_ibfk_4` (`id_seccion_publicacion`),
+    INDEX `dfa_publicaciones_ibfk_11` (`id_city`),
     CONSTRAINT `dfa_publicaciones_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_publicaciones_ibfk_11`
+        FOREIGN KEY (`id_city`)
+        REFERENCES `ci_cities` (`id_city`),
     CONSTRAINT `dfa_publicaciones_ibfk_2`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`),

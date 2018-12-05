@@ -20,6 +20,9 @@ Class ES_Model extends ES_Model_Vars {
      */
     protected $MI;
 
+    public $rowPerPages = 10;
+    public $numPages = 0;
+
     /**
      * Value for virtual field files.
      *
@@ -105,7 +108,8 @@ Class ES_Model extends ES_Model_Vars {
         return $data;
     }
 
-    public function get($id = null, $single = false){
+    public function get($id = null, $single = false, $bPaginate = false){
+
         if($id != null){
             $filter = $this->_primary_filter;
             $id = $filter($id);
@@ -121,9 +125,38 @@ Class ES_Model extends ES_Model_Vars {
         } else if($this->db->field_exists('status',$this->_table_name)){
             $this->db->where_in('status', ['ENABLED','enabled']);
         }
+
+        if($bPaginate && $page = $this->input->post('page')){
+            $this->db->offset($page*$this->rowPerPages);
+            $this->db->limit($this->rowPerPages);
+        }
         $this->db->order_by($this->_order_by);
         $oResult = $this->db->get($this->_table_name)->$method();
+
+        if($bPaginate){
+            if(!$this->input->post('page')){
+                $_POST['page'] = 1;
+                if(isset($oResult)){
+                    $numPages = count($oResult) > 10 ? floatval(count($oResult)/$this->rowPerPages) : 1;
+
+                }
+            }
+        }
         return $oResult;
+    }
+
+    public function paginate(){
+
+        $oResult = $this->get();
+        if(isset($oResult)){
+            $page = $this->input->post('page');
+            $limit = 10;
+            $offset = $page*$limit;
+            $numPages = count($oResult) ? count($oResult) / $limit : 0;
+                $numResult = count($oResult);
+                $numPages = $numResult / $limit;
+        }
+
     }
 
     public function setResultsFromData($oResults){
@@ -857,7 +890,9 @@ Class ES_Model extends ES_Model_Vars {
         $aFiles = array();
         if(isArray($aIds)){
             foreach ($aIds as $k => $id){
-                $aFiles[$k] = $this->findOneByIdFile($id)->getArrayDataWithThumbs();
+                $oFile = $this->findOneByIdFile($id);
+                $oFile->setThumbs();
+                $aFiles[$k] = $oFile->getArrayDataWithThumbs();
             }
         }
         return $aFiles;

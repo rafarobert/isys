@@ -1547,9 +1547,9 @@ class CI_Migration
             if (createFolder($frameAppPath . "$submod/")) {
                 if (createFolder($frameAppPath . "$submod/views/")) {
                     $filePath = $frameAppPath . "$submod/views/edit" . $this->_ext_php;
-                    if (!file_exists($filePath)) {
+//                    if (!file_exists($filePath)) {
                         write_file($filePath, $phpContent);
-                    }
+//                    }
                     if (validateVar($aPhpContentEditViews, 'array')) {
                         foreach ($aPhpContentEditViews as $fieldLinkEditView => $aTagsEditView) {
                             if (validateVar($aTagsEditView, 'array')) {
