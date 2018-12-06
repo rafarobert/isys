@@ -606,10 +606,10 @@ Class ES_Model extends ES_Model_Vars {
                         $aFileNamePartsV[] = clean($aFileNamePart);
                     }
                     $fSettings['name'] = implode('.',$aFileNamePartsV);
+                    $_FILES[$fName]['name'] = implode('.',$aFileNamePartsV);
                 } else {
                     return false;
                 }
-                $fSettings['name'] = cleanString($fSettings['name']);
                 $dirPictures .= "$fName/";
                 $dirPicturesDB .= "$fName/";
                 createFolder($dirPictures);
