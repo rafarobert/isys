@@ -579,6 +579,7 @@ Class ES_Model extends ES_Model_Vars {
         $dirPicturesDB = "assets/$submod/";
         createFolder($dirPictures);
         // Settings for images
+        $aFileTypes = explode('|',config_item('file_types'));
         $config = array(
             'allowed_types'     => config_item('file_types'),
             'max_size'          => config_item('img_max_size'),
@@ -597,6 +598,18 @@ Class ES_Model extends ES_Model_Vars {
 
         if(isArray($_FILES)){
             foreach ($_FILES as $fName => $fSettings){
+                if(isset($fSettings['name'])){
+                    $fileName = $fSettings['name'];
+                    $aFileNameParts = explode('.',$fileName);
+                    $aFileNamePartsV = array();
+                    foreach ($aFileNameParts as $aFileNamePart) {
+                        $aFileNamePartsV[] = clean($aFileNamePart);
+                    }
+                    $fSettings['name'] = implode('.',$aFileNamePartsV);
+                } else {
+                    return false;
+                }
+                $fSettings['name'] = cleanString($fSettings['name']);
                 $dirPictures .= "$fName/";
                 $dirPicturesDB .= "$fName/";
                 createFolder($dirPictures);
@@ -858,6 +871,11 @@ Class ES_Model extends ES_Model_Vars {
 
     public function getFiles($oModel){
         if (isset($oModel->files)){
+            foreach ($oModel->files as $key => $file) {
+                if($file == null){
+                    unset($oModel->files[$key]);
+                }
+            }
             return $oModel->files;
         }
         return [];

@@ -75,6 +75,7 @@ define('LANGUAGE', 'spanish');
  * ------------------------------------------------------
  */
 set_time_limit(900);
+
 /*
  * ------------------------------------------------------
  *  Set zlib.output_compression On  ¡Precaucion, mejor dejarlo en off!

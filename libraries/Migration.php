@@ -1253,8 +1253,8 @@ class CI_Migration
             $idForeign = $settings['idForeign'];
             foreach ($vRelatedWithOutExcepts as $fkName2 => $settings2){
                 $break = false;
-                if(inArray('filterBy',$settings)){
-                    $aFiltersBy = $settings2['filterBy'];
+                if(inArray('filterBy',$settings) && is_array($settings['filterBy'])){
+                    $aFiltersBy = $settings['filterBy'];
                     foreach ($aFiltersBy as $keyFilter => $valFilter) {
                         if(inArray($keyFilter,$this->fields)){
                             $break = true;
@@ -1746,7 +1746,7 @@ class CI_Migration
 
             list($data, $typeForm, $bIsForeing) = $this->validateFkTable($data, $fields, $settings, $sys, $typeForm,$tableName);
             $data['lcInputFormType'] = $typeForm;
-            if(inArray('selectBy',$settings)){
+            if(isset($settings['selectBy']) && in_array('selectBy',$settings)){
                 if(is_array($settings['selectBy'])){
                     foreach ($settings['selectBy'] as $select){
                         if(strstr($select,'id_')){
@@ -1799,6 +1799,7 @@ class CI_Migration
             <?=modal('" . $inputData['id'] . "Modal')?>";
             }
             unset($data["printSecondItem"]);
+            unset($data['relatetionsOption']);
         }
         return [$htmlFormContent, $aEachNames, $modalsContent];
     }
