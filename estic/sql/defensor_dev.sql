@@ -680,10 +680,16 @@ CREATE TABLE `dfa_cursos`
     `fecha_final` DATETIME,
     `ids_files` VARCHAR(490),
     `id_cover_picture` int(10) unsigned,
-    `estado_publicacion` VARCHAR(300),
     `id_entidad` int(10) unsigned,
+    `modalidad` VARCHAR(300),
+    `duracion` VARCHAR(300),
+    `carga_horaria` VARCHAR(300),
+    `dedicacion_semanal` VARCHAR(300),
+    `id_parent` int(10) unsigned,
+    `estado_publicacion` VARCHAR(300),
     `revisado` VARCHAR(300),
     `comentarios` TEXT,
+    `tipo` VARCHAR(300),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -696,6 +702,7 @@ CREATE TABLE `dfa_cursos`
     INDEX `dfa_cursos_ibfk_2` (`id_user_modified`),
     INDEX `dfa_cursos_ibfk_3` (`id_cover_picture`),
     INDEX `dfa_cursos_ibfk_4` (`id_entidad`),
+    INDEX `dfa_cursos_ibfk_5` (`id_parent`),
     CONSTRAINT `dfa_cursos_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -707,52 +714,10 @@ CREATE TABLE `dfa_cursos`
         REFERENCES `ci_files` (`id_file`),
     CONSTRAINT `dfa_cursos_ibfk_4`
         FOREIGN KEY (`id_entidad`)
-        REFERENCES `dfa_entidades` (`id_entidad`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- dfa_cursos_modulos
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `dfa_cursos_modulos`;
-
-CREATE TABLE `dfa_cursos_modulos`
-(
-    `id_curso_modulo` int(11) unsigned NOT NULL AUTO_INCREMENT,
-    `nombre` VARCHAR(400),
-    `descripcion` TEXT,
-    `id_curso` int(10) unsigned,
-    `id_cover_picture` int(10) unsigned,
-    `ids_files` INTEGER,
-    `fecha_inicio` DATETIME,
-    `fecha_final` DATETIME,
-    `estado_modulo` VARCHAR(300),
-    `revisado` VARCHAR(300),
-    `comentarios` TEXT,
-    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
-    `change_count` INTEGER DEFAULT 0 NOT NULL,
-    `id_user_modified` int(11) unsigned NOT NULL,
-    `id_user_created` int(11) unsigned NOT NULL,
-    `date_modified` DATETIME NOT NULL,
-    `date_created` DATETIME NOT NULL,
-    PRIMARY KEY (`id_curso_modulo`),
-    UNIQUE INDEX `dfa_cursos_modulos_id_curso_modulo_uindex` (`id_curso_modulo`),
-    INDEX `dfa_cursos_modulos_ibfk_1` (`id_user_created`),
-    INDEX `dfa_cursos_modulos_ibfk_2` (`id_user_modified`),
-    INDEX `dfa_cursos_modulos_ibfk_4` (`id_cover_picture`),
-    INDEX `dfa_cursos_modulos_ibfk_3` (`id_curso`),
-    CONSTRAINT `dfa_cursos_modulos_ibfk_1`
-        FOREIGN KEY (`id_user_created`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_cursos_modulos_ibfk_2`
-        FOREIGN KEY (`id_user_modified`)
-        REFERENCES `ci_users` (`id_user`),
-    CONSTRAINT `dfa_cursos_modulos_ibfk_3`
-        FOREIGN KEY (`id_curso`)
-        REFERENCES `dfa_cursos` (`id_curso`),
-    CONSTRAINT `dfa_cursos_modulos_ibfk_4`
-        FOREIGN KEY (`id_cover_picture`)
-        REFERENCES `ci_files` (`id_file`)
+        REFERENCES `dfa_entidades` (`id_entidad`),
+    CONSTRAINT `dfa_cursos_ibfk_5`
+        FOREIGN KEY (`id_parent`)
+        REFERENCES `dfa_cursos` (`id_curso`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1012,7 +977,6 @@ CREATE TABLE `dfa_estudiantes`
     `id_estudiante` int(11) unsigned NOT NULL AUTO_INCREMENT,
     `id_user` int(10) unsigned,
     `id_curso` int(10) unsigned,
-    `id_modulo` int(10) unsigned,
     `nota` INTEGER,
     `ids_files` VARCHAR(490),
     `id_cover_picture` int(10) unsigned,
@@ -1027,7 +991,6 @@ CREATE TABLE `dfa_estudiantes`
     INDEX `dfa_estudiantes_ibfk_1` (`id_user_created`),
     INDEX `dfa_estudiantes_ibfk_2` (`id_user_modified`),
     INDEX `dfa_estudiantes_ibfk_3` (`id_curso`),
-    INDEX `dfa_estudiantes_ibfk_4` (`id_modulo`),
     INDEX `dfa_estudiantes_ibfk_5` (`id_user`),
     CONSTRAINT `dfa_estudiantes_ibfk_1`
         FOREIGN KEY (`id_user_created`)
@@ -1038,9 +1001,6 @@ CREATE TABLE `dfa_estudiantes`
     CONSTRAINT `dfa_estudiantes_ibfk_3`
         FOREIGN KEY (`id_curso`)
         REFERENCES `dfa_cursos` (`id_curso`),
-    CONSTRAINT `dfa_estudiantes_ibfk_4`
-        FOREIGN KEY (`id_modulo`)
-        REFERENCES `dfa_cursos_modulos` (`id_curso_modulo`),
     CONSTRAINT `dfa_estudiantes_ibfk_5`
         FOREIGN KEY (`id_user`)
         REFERENCES `ci_users` (`id_user`)
