@@ -425,6 +425,10 @@ Class ES_Model extends ES_Model_Vars {
                             $vals = $date->format('Y-m-d H:i:s');
                         }
                     }
+                    if(strstr($vals,'&lt;') ||strstr($vals,'&gt;')){
+                        $vals = str_replace('&gt;','>',$vals);
+                        $vals = str_replace('&lt;','<',$vals);
+                    }
                 }
                 return $vals;
             } return null;

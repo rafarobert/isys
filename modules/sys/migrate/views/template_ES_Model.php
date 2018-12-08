@@ -194,7 +194,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
                 } else if(objectHas($oData,setObject($key),false)){
 
-                    $oModelUcObjTableP->$key = isNumeric($oData->{setObject($key)}) ? valNumeric($oData->{setObject($key)}) : $oData->{setObject($key)};
+                    $oModelUcObjTableP->$key = isNumeric($oData->{setObject($key)}) ? valNumeric($oData->{setObject($key)}) : ($oData->{setObject($key)} == "" ? $value : $oData->{setObject($key)});
                 }
             }
             return $oModelUcObjTableP;
@@ -215,6 +215,24 @@ class ES_Model_UcTableP extends ES_UcModS_Model
             //>>>foreignPackForGetData<<<
             $data['lcLocalField_lcForeignField'] = $this->lcLocalField_lcForeignField;
             //<<<foreignPackForGetData>>>
+        }
+        $funct = function($val){
+            return isNumeric($val,false) ? valNumeric($val) : $val;
+        };
+        $data = array_map($funct,$data);
+        return $data;
+    }
+
+    public function toArray($bWithForeign = false){
+        $data = array(
+            //>>>localPackForToArray<<<
+            'UcObjField' => $this->lcField,
+            //<<<localPackForToArray>>>
+        );
+        if($bWithForeign){
+            //>>>foreignPackForToArray<<<
+            $data['UcObjLocalFieldUcObjForeignField'] = $this->lcLocalField_lcForeignField;
+            //<<<foreignPackForToArray>>>
         }
         $funct = function($val){
             return isNumeric($val,false) ? valNumeric($val) : $val;

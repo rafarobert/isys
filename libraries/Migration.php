@@ -2185,7 +2185,9 @@ class CI_Migration
 
         $phpGlobalVars = '';
         $data["localPackForGetData"] = '';
+        $data["localPackForToArray"] = '';
         $data["foreignPackForGetData"] = '';
+        $data["foreignPackForToArray"] = '';
         $data["packFindOneByFunctions"] = '';
         $data["packFilterByFunctions"] = '';
         $data["packSelectByFunctions"] = '';
@@ -2242,10 +2244,11 @@ class CI_Migration
             $data['lcObjField'] = '$'.lcfirst(setObject($name));
             $data["packGettersFunctions"] .= $this->load->view(["template_ES_Model" => "packGettersFunctions"], $data, true, true, true);
             $data["localPackForGetData"] .= $this->load->view(["template_ES_Model" => "localPackForGetData"], $data, true, true, true);
+            $data["localPackForToArray"] .= $this->load->view(["template_ES_Model" => "localPackForToArray"], $data, true, true, true);
             $data["packSettersFunctions"] .= $this->load->view(["template_ES_Model" => "packSettersFunctions"], $data, true, true, true);
             $data["packFindOneByFunctions"] .= $this->load->view(["template_ES_Model" => "packFindOneByFunctions"], $data, true, true, true);
             $data["packFilterByFunctions"] .= $this->load->view(["template_ES_Model" => "packFilterByFunctions"], $data, true, true, true);
-            $data["packSelectByFunctions"] .= $this->load->view(["template_ES_Model" => "packSelectByFunctions"], $data, true, true, true);
+//            $data["packSelectByFunctions"] .= $this->load->view(["template_ES_Model" => "packSelectByFunctions"], $data, true, true, true);
             // ----------------------------------------------------------------------
 
             // --------------------- setting Global Vars ---------------------------------------
@@ -2270,6 +2273,7 @@ class CI_Migration
                         $data['lcObjField'] = lcfirst(setObject($nameSelect));
                         $data["packLocalForeignGettersFunctions"] .= $this->load->view(["template_ES_Model" => "packLocalForeignGettersFunctions"], $data, true, true, true);
                         $data["foreignPackForGetData"] .= $this->load->view(["template_ES_Model" => "foreignPackForGetData"], $data, true, true, true);
+                        $data["foreignPackForToArray"] .= $this->load->view(["template_ES_Model" => "foreignPackForToArray"], $data, true, true, true);
                     }
                 } else if(validateVar($settings['selectBy'])){
                     $data['lcForeignField'] = lcfirst($settings['selectBy']);
@@ -2280,6 +2284,7 @@ class CI_Migration
                     $data['lcField'] = lcfirst($settings['selectBy']);
                     $data['lcObjField'] = lcfirst(setObject($settings['selectBy']));
                     $data["foreignPackForGetData"] .= $this->load->view(["template_ES_Model" => "foreignPackForGetData"], $data, true, true, true);
+                    $data["foreignPackForToArray"] .= $this->load->view(["template_ES_Model" => "foreignPackForToArray"], $data, true, true, true);
 //                    $data["packGettersFunctions"] .= $this->load->view(["template_ES_Model" => "packGettersFunctions"], $data, true, true, true);
                 }
             } else {

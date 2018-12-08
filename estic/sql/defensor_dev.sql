@@ -675,6 +675,7 @@ CREATE TABLE `dfa_cursos`
     `id_curso` int(11) unsigned NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(400),
     `descripcion` VARCHAR(1000),
+    `resumen` VARCHAR(500),
     `num_modulos` INTEGER,
     `fecha_inicio` DATETIME,
     `fecha_final` DATETIME,
@@ -686,10 +687,11 @@ CREATE TABLE `dfa_cursos`
     `carga_horaria` VARCHAR(300),
     `dedicacion_semanal` VARCHAR(300),
     `id_parent` int(10) unsigned,
+    `tipo` VARCHAR(300),
+    `id_city` int(10) unsigned,
     `estado_publicacion` VARCHAR(300),
     `revisado` VARCHAR(300),
     `comentarios` TEXT,
-    `tipo` VARCHAR(300),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
     `id_user_modified` int(11) unsigned NOT NULL,
@@ -703,6 +705,7 @@ CREATE TABLE `dfa_cursos`
     INDEX `dfa_cursos_ibfk_3` (`id_cover_picture`),
     INDEX `dfa_cursos_ibfk_4` (`id_entidad`),
     INDEX `dfa_cursos_ibfk_5` (`id_parent`),
+    INDEX `dfa_cursos_ibfk_6` (`id_city`),
     CONSTRAINT `dfa_cursos_ibfk_1`
         FOREIGN KEY (`id_user_created`)
         REFERENCES `ci_users` (`id_user`),
@@ -717,7 +720,10 @@ CREATE TABLE `dfa_cursos`
         REFERENCES `dfa_entidades` (`id_entidad`),
     CONSTRAINT `dfa_cursos_ibfk_5`
         FOREIGN KEY (`id_parent`)
-        REFERENCES `dfa_cursos` (`id_curso`)
+        REFERENCES `dfa_cursos` (`id_curso`),
+    CONSTRAINT `dfa_cursos_ibfk_6`
+        FOREIGN KEY (`id_city`)
+        REFERENCES `ci_cities` (`id_city`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1034,6 +1040,39 @@ CREATE TABLE `dfa_etiquetas`
     CONSTRAINT `dfa_etiquetas_ibfk_2`
         FOREIGN KEY (`id_user_modified`)
         REFERENCES `ci_users` (`id_user`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- dfa_layouts
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `dfa_layouts`;
+
+CREATE TABLE `dfa_layouts`
+(
+    `id_layout` int(10) unsigned NOT NULL,
+    `titulo` VARCHAR(490),
+    `content` TEXT,
+    `id_entidad` int(10) unsigned,
+    `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
+    `change_count` INTEGER DEFAULT 0 NOT NULL,
+    `id_user_modified` int(11) unsigned NOT NULL,
+    `id_user_created` int(11) unsigned NOT NULL,
+    `date_modified` DATETIME NOT NULL,
+    `date_created` DATETIME NOT NULL,
+    PRIMARY KEY (`id_layout`),
+    INDEX `dfa_layouts_ibfk_1` (`id_user_created`),
+    INDEX `dfa_layouts_ibfk_2` (`id_user_modified`),
+    INDEX `dfa_layouts_ibfk_3` (`id_entidad`),
+    CONSTRAINT `dfa_layouts_ibfk_1`
+        FOREIGN KEY (`id_user_created`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_layouts_ibfk_2`
+        FOREIGN KEY (`id_user_modified`)
+        REFERENCES `ci_users` (`id_user`),
+    CONSTRAINT `dfa_layouts_ibfk_3`
+        FOREIGN KEY (`id_entidad`)
+        REFERENCES `dfa_entidades` (`id_entidad`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
