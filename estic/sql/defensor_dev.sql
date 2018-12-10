@@ -674,7 +674,7 @@ CREATE TABLE `dfa_cursos`
 (
     `id_curso` int(11) unsigned NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(400),
-    `descripcion` VARCHAR(1000),
+    `descripcion` TEXT,
     `resumen` VARCHAR(500),
     `num_modulos` INTEGER,
     `fecha_inicio` DATETIME,
