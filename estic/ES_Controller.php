@@ -138,7 +138,7 @@ class ES_Controller extends ES_Ctrl_Vars
         return $oFile;
     }
 
-    public function doUploadThumbs($oFile){
+    public function saveThumbs($oFile){
         if(isset($oFile->aData)){
             $this->data['aData'] = $oFile->aData;
         }
@@ -146,7 +146,7 @@ class ES_Controller extends ES_Ctrl_Vars
         if(isset($this->upload->data_thumbs)){
             foreach ($this->upload->data_thumbs as $index => $thumb){
                 $thumb['id_parent'] = $id;
-                $this->data['aData'][$index] = $this->model_files->save($thumb);
+                $this->data['aData']['thumbs'][$index] = $this->model_files->save($thumb);
             }
             $oFile->setThumbs();
         }
@@ -155,6 +155,7 @@ class ES_Controller extends ES_Ctrl_Vars
 
     public function returnResponse($oObject, $responseView = '', $responseRedirect = '')
     {
+        if(isset($_FILES)){unset($_FILES);}
         $responseView = !isString($responseView) ? $this->uri->uri_string() : $responseView;
         $responseRedirect = !isString($responseRedirect) ? $this->uri->segment(1).'/'.$this->uri->segment(2) : $responseRedirect;
         if(strstr($responseView, 'sys/ajax/')){

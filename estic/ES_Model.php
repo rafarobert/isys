@@ -35,7 +35,7 @@ Class ES_Model extends ES_Model_Vars {
      *
      * @var        array
      */
-    public $thumbFiles = null;
+    public $thumbs = null;
 
     protected $_table_name = '';
     protected $_primary_key = "id";
@@ -643,19 +643,19 @@ Class ES_Model extends ES_Model_Vars {
                                     $this->upload->num_thumbs = 0;
                                     break;
                                 } else {
-                                    $aThumbs['thumb_'.$config['width']] = $file;
-                                    unset($aThumbs['thumb_'.$config['width']]['nro_thumbs']);
+                                    $aThumbs[$i] = $file;
+                                    unset($aThumbs[$i]['nro_thumbs']);
                                     $this->image_lib->resize();
-                                    $aThumbs['thumb_'.$config['width']]['width'] = $this->image_lib->width;
-                                    $aThumbs['thumb_'.$config['width']]['height'] = $this->image_lib->height;
-                                    $aThumbs['thumb_'.$config['width']]['name'] = $this->image_lib->dest_name;
-                                    $aThumbs['thumb_'.$config['width']]['library'] = $this->image_lib->image_library;
-                                    $aThumbs['thumb_'.$config['width']]['thumb_marker'] = $this->image_lib->thumb_marker;
-                                    $aThumbs['thumb_'.$config['width']]['url'] = "/assets/$submod/$fName/thumbs/".$this->image_lib->dest_name;
-                                    $aThumbs['thumb_'.$config['width']]['raw_name'] = $this->image_lib->dest_name;
-                                    $aThumbs['thumb_'.$config['width']]['ext'] = $this->image_lib->dest_ext;
-                                    $aThumbs['thumb_'.$config['width']]['path'] = $this->image_lib->dest_folder_db;
-                                    $aThumbs['thumb_'.$config['width']]['full_path'] = $this->image_lib->full_dst_path_db;
+                                    $aThumbs[$i]['width'] = $this->image_lib->width;
+                                    $aThumbs[$i]['height'] = $this->image_lib->height;
+                                    $aThumbs[$i]['name'] = $this->image_lib->dest_name;
+                                    $aThumbs[$i]['library'] = $this->image_lib->image_library;
+                                    $aThumbs[$i]['thumb_marker'] = $this->image_lib->thumb_marker;
+                                    $aThumbs[$i]['url'] = "/assets/$submod/$fName/thumbs/".$this->image_lib->dest_name;
+                                    $aThumbs[$i]['raw_name'] = $this->image_lib->dest_name;
+                                    $aThumbs[$i]['ext'] = $this->image_lib->dest_ext;
+                                    $aThumbs[$i]['path'] = $this->image_lib->dest_folder_db;
+                                    $aThumbs[$i]['full_path'] = $this->image_lib->full_dst_path_db;
                                     $config['width'] = $config['width'] + 400;
                                     $config['height'] = $config['height'] + 400;
                                     $config['thumb_marker'] = '-thumb_' . $config['width'];
@@ -774,7 +774,7 @@ Class ES_Model extends ES_Model_Vars {
                         $oModel->files[$key]->{'thumbs'} = array();
                         foreach ($oThumbFiles as $keyThumb => $thumb) {
                             $mark = strReplace(['-', '_', 'thumb'], '', $thumb->getThumbMarker());
-                            $oModel->thumbFiles[$keyThumb] = $thumb->getArrayData();
+                            $oModel->thumbs[$keyThumb] = $thumb->getArrayData();
                             $oModel->files[$key]->{'thumbs'}[$keyThumb] = $thumb->getArrayData();
                         }
                     }

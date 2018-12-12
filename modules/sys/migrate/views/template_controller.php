@@ -123,7 +123,7 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                     }
                     //<<<validateUsersSavedForPersonTable1>>>
                     //>>>validateFieldImgUpload2<<<
-                    $oUcObjTableS = $this->doUploadThumbs($oUcObjTableS);
+                    $oUcObjTableS = $this->saveThumbs($oUcObjTableS);
                     //<<<validateFieldImgUpload2>>>
                     $this->data['oUcObjTableS'] = $oUcObjTableS;
                     return $this->returnResponse($oUcObjTableS);

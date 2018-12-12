@@ -1070,7 +1070,7 @@ $CI->data['response'] = $response;
 
 // If the url comes from ajax show as json
 
-    if($ctrlClass == 'Ctrl_Ajax' || $CI->input->post('fromAjax') || $class == 'ajax'){
+    if($CI->fromAjax || $ctrlClass == 'Ctrl_Ajax' || $CI->input->post('fromAjax') || $class == 'ajax'){
 
         if($response){
 

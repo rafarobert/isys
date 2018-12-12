@@ -39,8 +39,16 @@ class Ctrl_Ajax extends ES_Base_Controller
         echo 'hello, from ajax';
     }
 
-    public function save_user(){
+    public function savetopdf(){
+        $this->load->library('api2Pdf','fd97a66b-f199-4bd9-84aa-a0332f7a26b1'); //or wherever you have stored the file
 
+        $data = json_decode(file_get_contents('php://input'), true);
+        $api_response = $this->api2pdf->headless_chrome_from_html($data["content"]);
+        $this->fromAjax = true;
+        $response = array();
+        $response['error'] = $this->error;
+        $response["data"] = $api_response->pdf;
+        return $response;
     }
 
     public function export($module = '', $class = '', $method = '', $id= ''){
@@ -209,4 +217,6 @@ class Ctrl_Ajax extends ES_Base_Controller
         echo json_encode($response);
         exit;
     }
+
+
 }
