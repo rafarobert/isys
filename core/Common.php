@@ -649,6 +649,7 @@ if ( ! function_exists('set_status_header'))
 		else
 		{
 			$server_protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+
 			header($server_protocol.' '.$code.' '.$text, TRUE, $code);
 		}
 	}

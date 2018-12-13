@@ -101,6 +101,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     //>>>packFindOneByFunctions<<<
     public function findOneByUcObjField($lcObjField){
         $aData = $this->get_by(['lcField' => $lcObjField],false,true);
+        $aData = $this->setForeigns($aData);
         if(isArray($aData)){
             return $this->setFromData($aData[0]);
         } else if(isObject($aData)){
@@ -185,7 +186,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
                 $oModelUcObjTableP = new Model_UcTableP();
             }
             $aFields = $this->getArrayData(true);
-
+            $aData = std2array($oData);
             foreach ($aFields as $key => $value){
 
                 if(objectHas($oData,$key,false)){
@@ -196,6 +197,12 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
                     $oModelUcObjTableP->$key = isNumeric($oData->{setObject($key)}) ? valNumeric($oData->{setObject($key)}) : ($oData->{setObject($key)} == "" ? $value : $oData->{setObject($key)});
                 }
+                if(isset($aData[$key])) {
+                    unset($aData[$key]);
+                }
+            }
+            foreach ($aData as $dataKey => $dataValue){
+                $oModelUcObjTableP->$dataKey = $dataValue;
             }
             return $oModelUcObjTableP;
 
@@ -238,6 +245,11 @@ class ES_Model_UcTableP extends ES_UcModS_Model
             return isNumeric($val,false) ? valNumeric($val) : $val;
         };
         $data = array_map($funct,$data);
+        if(isset($this->foreigns)){
+            foreach ($this->foreigns as $fKey => $fValue){
+                $data[$fKey] = $fValue;
+            }
+        }
         return $data;
     }
 }

@@ -34,6 +34,7 @@ class ES_Backend_Controller extends ES_Controller
         $this->fromAjax = $this->input->post('fromAjax') ? true : false;
         $this->data['uri_string'] = $this->uri->uri_string();
         $excepts = ['ajax'];
+        $this->load->library('migration');
         if (!$CI) {
             if (validate_modulo('base', 'users')) {
                 if(!in_array($this->router->class, $excepts)){

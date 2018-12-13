@@ -967,4 +967,28 @@ Class ES_Model extends ES_Model_Vars {
         $this->aData = $data;
         return $data;
     }
+
+    public function setForeigns($data){
+        $foreignKeys = $this->dbforge->getTableRelations($this->_table_name);
+        if($data != null){
+            foreach ($foreignKeys as $fKey => $ffSettings){
+                if(isset($ffSettings['table'])){
+                    list($mod,$submod) = getModSubMod($ffSettings['table']);
+                    list($submodS,$submodP) = setSingularPlural($submod);
+                    $this->{"init".ucfirst(setObject($submodP))}();
+                    $idLocal = $ffSettings['idLocal'];
+                    $idForeign = $ffSettings['idForeign'];
+                    $field = setObject(strstr($idLocal,'id_') ? str_replace('id_','',$idLocal) : $idLocal);
+                    if($data->$idLocal != null){
+                        if(is_array($data)){
+                            $data['foreigns'][$field] = $this->{'model_'.$submodP}->{'findOneBy'.setObject($submodS)}($data->$idLocal);
+                        } else if(is_object($data)){
+                            $data->{'foreigns'}[$field] = std2array($this->{'model_'.$submodP}->get_by([$idForeign => $data->$idLocal],false,true));
+                        }
+                    }
+                }
+            }
+        }
+        return $data;
+    }
 }
