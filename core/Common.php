@@ -1430,7 +1430,7 @@ if (!function_exists('probar_sesion')) {
 
 if (!function_exists('setObject')) {
 
-    function setObject($nameWithDashes, $blcFirst = true, $bReturnUcNames = true)
+    function setObject($nameWithDashes, $blcFirst = false, $bReturnUcNames = true)
     {
         if(strstr($nameWithDashes,'_')){
             $aNames = explode('_',$nameWithDashes);
@@ -2014,9 +2014,10 @@ if (!function_exists('utf8ize')) {
 
 if (!function_exists('clean')) {
     function clean($string) {
-        $string = cleanString($string);
         $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
         $string = preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
+        $string = strtolower($string);
+        $string = cleanString($string);
 
         return preg_replace('/-+/', '-', $string); // Replaces multiple hyphens with single one.
     }
