@@ -1788,6 +1788,8 @@ class CI_Migration
                 $htmlFormContent .= $this->load->view("template_form_img", $data, true, true);
             } else if (compareArrayStr($settings, 'input', 'button')) {
                 $htmlFormContent .= $this->load->view("template_form_button", $data, true, true);
+            } else if (compareArrayStr($settings, 'input', 'datetime')) {
+                $htmlFormContent .= $this->load->view("template_form_datetime", $data, true, true);
             } else if (compareArrayStr($settings, 'input', 'date')) {
                 $htmlFormContent .= $this->load->view("template_form_date", $data, true, true);
             } else if (validateArray($settings, 'options') || $bIsForeing) {

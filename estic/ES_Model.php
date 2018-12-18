@@ -367,13 +367,13 @@ Class ES_Model extends ES_Model_Vars {
                         $data['id_user_modified'] = $oUserLoggued->id_user;
                     } else if(is_object($oUserLoggued) && $id != null){
                         $data['id_user_modified'] = $oUserLoggued->id_user;
+                    } else if($this->CI->input->post('fromAjax')){
+                        $data['id_user_modified'] = isset($data['id_user']) ? $data['id_user'] : 1;
+                        $data['id_user_created'] = isset($data['id_user']) ? $data['id_user'] : 1;
                     } else if(validateArray($data,'from_session') || $this->input->post('fromSession')){
                         $oUserSaved = $this->CI->model_users->findOneByEmail($data['email']);
                         $data['id_user_modified'] = $oUserSaved->getIdUser();
                         $data['id_user_created'] = $oUserSaved->getIdUser();
-                    } else if($this->CI->input->post('fromAjax')){
-                        $data['id_user_modified'] = isset($data['id_user']) ? $data['id_user'] : 1;
-                        $data['id_user_created'] = isset($data['id_user']) ? $data['id_user'] : 1;
                     } else {
                         show_error('Se intenta agregar o modificar un registro en la base de datos, en la tabla: '.$this->_table_name.', para ello es necesario haber iniciado sesion, para registrar al usuario que realiza cambios, Por favor inicia sesion y vuelve a intentarlo');
                         exit();
@@ -900,6 +900,9 @@ Class ES_Model extends ES_Model_Vars {
 
     public function findByIdsFiles($ids){
         $aIds = array();
+        if(is_object($ids)){
+            $aIds = std2array($ids);
+        }
         if(isString($ids) && strstr($ids,'|')){
             $aIds = explode('|',trim($ids,'|'));
         }
@@ -978,40 +981,35 @@ Class ES_Model extends ES_Model_Vars {
                     $this->{"init".ucfirst(setObject($submodP))}();
                     $idLocal = $ffSettings['idLocal'];
                     $idForeign = $ffSettings['idForeign'];
-                    $field = setObject(strstr($idLocal,'id_') ? str_replace('id_','',$idLocal) : $idLocal);
-                    if(is_array($data)){
-                        if(isset($data[$idLocal]) && $data[$idLocal] != null || isset($data[setObject($idLocal)]) && $data[setObject($idLocal)] != null){
-                            if(is_array($data)){
-                                if(isset($data[setObject($idLocal)])){
-                                    $data['foreigns'][$field] = $this->{'model_'.$submodP}->{'findOneBy'.setObject($idForeign)}($data[setObject($idLocal)]);
-                                } else if(isset($data[$idLocal])){
-                                    $data['foreigns'][$field] = $this->{'model_'.$submodP}->{'findOneBy'.setObject($idForeign)}($data[$idLocal]);
-                                }
-                            } else if(is_object($data)){
-                                if(isset($data[setObject($idLocal)])){
-                                    $data->{'foreigns'}[$field] = std2array($this->{'model_'.$submodP}->get_by([$idForeign => $data->{setObject($idLocal)}],false,true));
-                                } else if(isset($data->$idLocal)){
-                                    $data->{'foreigns'}[$field] = std2array($this->{'model_'.$submodP}->get_by([$idForeign => $data->$idLocal],false,true));
-                                }
-                            }
+                    $field = ucfirst(setObject(strstr($idLocal, 'id_') ? str_replace('id_', '', $idLocal) : $idLocal));
 
-//                            if(isset()){
-//                                $data['foreigns'][$field] = $this->model_files->findByIdsFiles($this->getIdsFiles());
-//                            }
+                    if (is_array($data) && isset($data[$idLocal]) && $data[$idLocal] != null) {
 
-                        }
-                    } if(is_object($data)){
-                        if(isset($data->$idLocal) && $data->$idLocal != null || isset($data->{setObject($idLocal)}) && $data->{setObject($idLocal)} != null){
-                            if(is_array($data)){
-                                $data['foreigns'][$field] = $this->{'model_'.$submodP}->{'findOneBy'.setObject($idForeign)}($data->$idLocal);
-                            } else if(is_object($data)){
-                                $data->{'foreigns'}[$field] = std2array($this->{'model_'.$submodP}->get_by([$idForeign => $data->$idLocal],false,true));
-                            }
-                        }
+                        $data['foreigns'][$field] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->$idLocal], false, true));
+
+                    } else if (is_array($data) && isset($data[setObject($idLocal)]) && $data[setObject($idLocal)] != null) {
+
+                        $data['foreigns'][$field] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data[setObject($idLocal)]], false, true));
+
+                    } else if (is_array($data) && isset($data[ucfirst(setObject($idLocal))]) && $data[ucfirst(setObject($idLocal))] != null) {
+
+                        $data['foreigns'][$field] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data[ucfirst(setObject($idLocal))]], false, true));
+
+                    } else if (is_object($data) && isset($data->$idLocal) && $data->$idLocal != null) {
+
+                        $data->{'foreigns'}[$field] = $this->{'model_' . $submodP}->get_by([$idForeign => $data->$idLocal], false, true);
+
+                    } else if (is_object($data) && isset($data->{setObject($idLocal)}) && $data->{setObject($idLocal)} != null) {
+
+                        $data->{'foreigns'}[$field] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->{setObject($idLocal)}], false, true));
+
+                    } else if (is_object($data) && isset($data->{ucfirst(setObject($idLocal))}) && $data->{ucfirst(setObject($idLocal))} != null) {
+
+                        $data->{'foreigns'}[$field] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->{ucfirst(setObject($idLocal))}], false, true));
                     }
                 }
             }
         }
-        return $this->setFromData($data);
+        return $data != null ? $this->setFromData($data) : $data;
     }
 }

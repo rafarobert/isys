@@ -1430,7 +1430,7 @@ if (!function_exists('probar_sesion')) {
 
 if (!function_exists('setObject')) {
 
-    function setObject($nameWithDashes, $blcFirst = false, $bReturnUcNames = true)
+    function setObject($nameWithDashes, $blcFirst = true, $bReturnUcNames = true)
     {
         if(strstr($nameWithDashes,'_')){
             $aNames = explode('_',$nameWithDashes);
@@ -2078,3 +2078,30 @@ if (!function_exists('cleanString')) {
 
 
 
+if (!function_exists('validate_modulo')) {
+
+    function validate_modulo($mod,$subMod){
+
+        $CI = CI_Controller::get_instance();
+        $sys = config_item('sys');
+        $DIRS = config_item('dirs');
+        $mod_type = $sys[$mod];
+
+        if($CI->db->table_exists("$mod_type"."_$subMod")){
+            $framePath = getframePath($mod_type,$subMod);
+            if(is_dir($framePath)){
+                if(file_exists($framePath.'Ctrl_'.ucfirst($subMod).'.php') &&
+                    file_exists($framePath.'Model_'.ucfirst($subMod).'.php') &&
+                    is_dir($framePath.'views/')){
+
+                    return true;
+                }
+            }
+            show_error("El modulo $mod/$subMod no pudo ser encontrado, revisa que la direccion este bien establecida");
+        } else {
+            show_error("La tabla ".$sys[$mod].'_'.$subMod." no se encuentra en la base de datos");
+        }
+        $tableName = $sys[$mod].'_'.$subMod;
+        return false;
+    }
+}
