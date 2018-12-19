@@ -196,6 +196,10 @@ class ES_Model_UcTableP extends ES_UcModS_Model
                 } else if(objectHas($oData,setObject($key),false)){
 
                     $oModelUcObjTableP->$key = isNumeric($oData->{setObject($key)}) ? valNumeric($oData->{setObject($key)}) : ($oData->{setObject($key)} == "" ? $value : $oData->{setObject($key)});
+
+                } else if(objectHas($oData,ucfirst(setObject($key)),false)){
+
+                    $oModelUcObjTableP->$key = isNumeric($oData->{ucfirst(setObject($key))}) ? valNumeric($oData->{ucfirst(setObject($key))}) : ($oData->{ucfirst(setObject($key))} == "" ? $value : $oData->{ucfirst(setObject($key))});
                 }
                 if(isset($aData[$key])) {
                     unset($aData[$key]);

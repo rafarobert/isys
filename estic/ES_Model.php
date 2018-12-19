@@ -316,7 +316,9 @@ Class ES_Model extends ES_Model_Vars {
         }
 
         if($this->db->field_exists('password', $this->_table_name) && $id == null){
-            $data['password'] = validateVar($data['password']) ? $this->session->hash($data['password']) : $data['password'];
+            if(strlen($this->session->hash($data['password'])) != strlen($data['password'])){
+                $data['password'] = validateVar($data['password']) || validateVar($data['password'],'numeric') ? $this->session->hash($data['password']) : $data['password'];
+            }
         }
         if($this->db->field_exists('email', $this->_table_name) && $this->_table_name == 'ci_users'){
             if(!$this->session->_unique_email()){
@@ -324,7 +326,6 @@ Class ES_Model extends ES_Model_Vars {
 //                exit();
             };
         }
-
 
         if($this->_timestaps == true){
             if($id == null){
@@ -383,19 +384,6 @@ Class ES_Model extends ES_Model_Vars {
 
             }
         }
-
-//        if($this->db->field_exists('id_user_created', $this->_table_name)){
-//            if($this->db->table_exists('ci_users') && $this->db->field_exists('id_user','ci_users')){
-//                $idUserCreated = $this->session->getIdUserLoggued();
-//                $userAdmin = CiUsersQuery::create()
-//                    ->filterByIdRole(1)
-//                    ->findOneByIdUser($idUserCreated);
-//                if (isObject($userAdmin)){
-//
-//                    $data['id_user_created'] = $idUserCreated;
-//                }
-//            }
-//        }
 
         $funct_v = function ($key, $vals) {
 

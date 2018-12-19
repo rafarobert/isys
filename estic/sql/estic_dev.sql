@@ -256,7 +256,7 @@ CREATE TABLE `ci_users` (
 -- Volcado de datos para la tabla `ci_users`
 --
 
-INSERT INTO `ci_users` (`id_user`, `name`, `lastname`, `username`, `email`, `direccion`, `password`, `birthdate`, `edad`, `carnet`, `sexo`, `phone_number_1`, `phone_number_2`, `cellphone_number_1`, `cellphone_number_2`, `picture`, `id_role`, `change_count`, `estado`, `date_modified`, `date_created`) VALUES
+INSERT INTO `ci_users` (`id_user`, `name`, `lastname`, `username`, `email`, `direccion`, `password`, `birthdate`, `edad`, `carnet`, `sexo`, phone_1, phone_2, cellphone_1, cellphone_2, `picture`, `id_role`, `change_count`, `estado`, `date_modified`, `date_created`) VALUES
 (1, 'Rafael', 'Gutierrez', NULL, 'rafael@defensoria.gob.bo', NULL, '35bb6b2292c543a3bea479606e6755a9034aca3fd0a3be02180890ad5ea673a334dec82fec386880b7010ace74e4957d9bbf6e7c0e9182648896a5fd994f10a4', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 'ENABLED', '2018-08-29 09:45:30', '2018-08-29 09:45:30');
 
 -- --------------------------------------------------------
