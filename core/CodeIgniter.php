@@ -1047,7 +1047,7 @@ if (isset($assign_to_config) && is_array($assign_to_config))
  */
 $methodsExcepts = ['signup','login'];
 
-$classExcepts = ['ajax','migrate'];
+$classExcepts = ['ajax','migrate','files'];
 
 // if User logu¿gued in continue
 if(is_object($CI->oUserLogguedIn)){

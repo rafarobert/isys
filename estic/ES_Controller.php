@@ -131,6 +131,9 @@ class ES_Controller extends ES_Ctrl_Vars
         if (!$this->model_files->do_upload("file", $id) && $id == null) {
             $this->data['errors'] = $this->error = array('error' => $this->upload->display_errors());
             $this->fromAjax = true;
+        } else if($id != null){
+            $this->fromAjax = true;
+
         } else {
             $this->data["file"] = $this->upload->data();
             $oFile = $this->model_files->setFromData($this->upload->data(),$oFile);
@@ -144,10 +147,17 @@ class ES_Controller extends ES_Ctrl_Vars
             $this->data['aData'] = $oFile->aData;
         }
         $id = $oFile->getIdFile();
-        if(isset($this->upload->data_thumbs)){
+        if(validateVar($this->upload->data_thumbs,'array') || validateVar($this->upload->data_thumbs,'object')){
             foreach ($this->upload->data_thumbs as $index => $thumb){
                 $thumb['id_parent'] = $id;
                 $this->data['aData']['thumbs'][$index] = $this->model_files->save($thumb);
+            }
+            $oFile->setThumbs();
+        } else if($oFile->getIdFile() !== null && $oFile->getNroThumbs() > 0){
+            $thumbs = $this->model_files->filterByIdParent($oFile->getIdFile());
+            foreach ($thumbs as $index => $thumb){
+                $thumb = $this->model_files->setFromData($this->input->post(),$thumb);
+                $this->data['aData']['thumbs'][$index] = $thumb->saveOrUpdate($thumb->getIdFile());
             }
             $oFile->setThumbs();
         }
@@ -157,7 +167,7 @@ class ES_Controller extends ES_Ctrl_Vars
     public function returnResponse($oObject, $responseView = '', $responseRedirect = '')
     {
         if(isset($_FILES)){unset($_FILES);}
-        $responseView = !isString($responseView) ? $this->uri->uri_string() : $responseView;
+        $responseView = !isString($responseView) ? $this->uri->segment(1).'/'.$this->uri->segment(2).'/'.$this->uri->segment(3) : $responseView;
         $responseRedirect = !isString($responseRedirect) ? $this->uri->segment(1).'/'.$this->uri->segment(2) : $responseRedirect;
         if(strstr($responseView, 'sys/ajax/')){
             $responseView = str_replace('sys/ajax/','', $responseView);

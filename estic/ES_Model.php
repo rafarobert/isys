@@ -468,8 +468,12 @@ Class ES_Model extends ES_Model_Vars {
     public function getDataFromPost($object = null)
     {
         $data = $this->input->post();
-        $oModelUcObjTableS = $this->setFromData($data,$object);
-        return $oModelUcObjTableS;
+        if(validateVar($data,'array')){
+            $oModelUcObjTableS = $this->setFromData($data,$object);
+            return $oModelUcObjTableS;
+        } else {
+            return $this;
+        }
     }
 
     public function getThumbs($objs, $file = '', $field = ''){
@@ -996,6 +1000,10 @@ Class ES_Model extends ES_Model_Vars {
                         $data->{'foreigns'}[$field] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->{ucfirst(setObject($idLocal))}], false, true));
                     }
                 }
+            }
+            if(is_object($data) && isset($this->ids_files) && (validateVar($this->ids_files) || validateVar($this->ids_files, 'array') || validateVar($this->ids_files, 'object'))){
+
+                $data->{'foreigns'}['files'] = std2array($this->model_files->findByIdsFiles($this->getIdsFiles()));
             }
         }
         return $data != null ? $this->setFromData($data) : $data;

@@ -32,7 +32,7 @@ class ES_Backend_Controller extends ES_Controller
         // -------------------------------------------------
         $this->load->library('session');
         $this->fromAjax = $this->input->post('fromAjax') ? true : false;
-        $this->fromFiles = validateVar($_FILES,'array') ;
+        $this->fromFiles = isset($_FILES) && validateVar($_FILES,'array');
         $this->data['uri_string'] = $this->uri->uri_string();
         $excepts = ['ajax'];
         $this->load->library('migration');

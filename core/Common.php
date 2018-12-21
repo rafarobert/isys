@@ -1749,7 +1749,7 @@ if (!function_exists('str2array')) {
                                 }
                             }
                         }
-                    } else {
+                    } else if(isString($subValue)){
                         if(strpos($subValue,'[') > -1 && strpos($subValue,']') > -1){
                             $subValue = str_replace('"','',$subValue);
                             $subValue = str_replace('[','',$subValue);
