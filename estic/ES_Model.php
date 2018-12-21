@@ -368,7 +368,7 @@ Class ES_Model extends ES_Model_Vars {
                         $data['id_user_modified'] = $oUserLoggued->id_user;
                     } else if(is_object($oUserLoggued) && $id != null){
                         $data['id_user_modified'] = $oUserLoggued->id_user;
-                    } else if($this->CI->input->post('fromAjax')){
+                    } else if($this->CI->input->post('fromAjax') || $this->CI->fromFiles){
                         $data['id_user_modified'] = isset($data['id_user']) ? $data['id_user'] : 1;
                         $data['id_user_created'] = isset($data['id_user']) ? $data['id_user'] : 1;
                     } else if(validateArray($data,'from_session') || $this->input->post('fromSession')){

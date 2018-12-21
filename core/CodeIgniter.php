@@ -912,7 +912,6 @@ if (isset($assign_to_config) && is_array($assign_to_config))
 
 	$e404 = FALSE;
 
-
     if(isset($URI->segments[1])) {
         $framePath = getframePath();
     } else {
@@ -1057,6 +1056,10 @@ if(is_object($CI->oUserLogguedIn)){
 
     // or if the url is in an except path
 } else if(in_array($method ,$methodsExcepts) || in_array($class,$classExcepts)){
+
+    $response = call_user_func_array(array(&$CI, $method), $params);
+
+} else if($CI->fromFiles){
 
     $response = call_user_func_array(array(&$CI, $method), $params);
 

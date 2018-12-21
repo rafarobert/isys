@@ -8,6 +8,7 @@ class ES_Controller extends ES_Ctrl_Vars
     const ARRAYS = 'array';
     const NUMERIC = 'numeric';
     public $fromAjax = false;
+    public $fromFiles = false;
     public $error = 'ok';
     public $errors = [];
     public $model_initialized;
