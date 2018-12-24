@@ -980,6 +980,7 @@ Class ES_Model extends ES_Model_Vars {
     }
 
     public function setForeigns($data){
+        $this->setFromData($data,$this);
         $foreignKeys = $this->dbforge->getTableRelations($this->_table_name);
         if($data != null){
             foreach ($foreignKeys as $fKey => $ffSettings){
@@ -993,52 +994,111 @@ Class ES_Model extends ES_Model_Vars {
 
                     if (is_array($data) && isset($data[$idLocal]) && $data[$idLocal] != null) {
 
-                        $data[lcfirst($field)] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->$idLocal], false, true));
+                        $data['foreigns'][lcfirst($field)] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->$idLocal], false, true));
 
                     } else if (is_array($data) && isset($data[setObject($idLocal)]) && $data[setObject($idLocal)] != null) {
 
-                        $data[lcfirst($field)] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data[setObject($idLocal)]], false, true));
+                        $data['foreigns'][lcfirst($field)] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data[setObject($idLocal)]], false, true));
 
                     } else if (is_array($data) && isset($data[ucfirst(setObject($idLocal))]) && $data[ucfirst(setObject($idLocal))] != null) {
 
-                        $data[lcfirst($field)] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data[ucfirst(setObject($idLocal))]], false, true));
+                        $data['foreigns'][lcfirst($field)] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data[ucfirst(setObject($idLocal))]], false, true));
 
                     } else if (is_object($data) && isset($data->$idLocal) && $data->$idLocal != null) {
 
-                        $data->{lcfirst($field)} = $this->{'model_' . $submodP}->get_by([$idForeign => $data->$idLocal], false, true);
+                        $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->get_by([$idForeign => $data->$idLocal], false, true);
 
                     } else if (is_object($data) && isset($data->{setObject($idLocal)}) && $data->{setObject($idLocal)} != null) {
 
-                        $data->{lcfirst($field)} = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->{setObject($idLocal)}], false, true));
+                        $data->{'foreigns'}[lcfirst($field)] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->{setObject($idLocal)}], false, true));
 
                     } else if (is_object($data) && isset($data->{ucfirst(setObject($idLocal))}) && $data->{ucfirst(setObject($idLocal))} != null) {
 
-                        $data->{lcfirst($field)} = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->{ucfirst(setObject($idLocal))}], false, true));
+                        $data->{'foreigns'}[lcfirst($field)] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->{ucfirst(setObject($idLocal))}], false, true));
                     }
                 }
             }
 
-            $foreignsCommons = ['ids_files','id_etiquetas'];
+            $foreignsCommons = [
+                'files' => [
+                    'id_cover_picture',
+                    'ids_files',
+                ],
+                'etiquetas' => 'id_etiquetas'
+            ];
 
-            foreach ($foreignsCommons as $key => $fCommon){
-                $fCommonName = explode('_',$fCommon)[1];
-                list($fCommonS,$fCommonP) = setSingularPlural($fCommonName);
-                if(is_object($data) && isset($this->{$fCommon}) && (validateVar($this->{$fCommon}) ||
-                        validateVar($this->{$fCommon}, 'array') ||
-                        validateVar($this->{$fCommon}, 'object'))
-                ){
-                    if(!isset($this->{"model_$fCommonP"})){
-                        $this->{'init'.ucfirst(setObject($fCommonP))}();
+            foreach ($foreignsCommons as $fSubMod => $fCommon){
+
+                if(is_array($fCommon)){
+
+                    foreach ($fCommon as $fSubMod2 => $fCommon2){
+
+                        $aForeignCommonName = explode('_',$fCommon2);
+                        unset($aForeignCommonName[0]);
+                        $fCommonName = implode('_',$aForeignCommonName);
+                        list($fCommonS,$fCommonP) = setSingularPlural($fCommonName);
+
+                        if(is_object($data) && isset($this->{$fCommon2}) && (
+                                validateVar($this->{$fCommon2}) ||
+                                validateVar($this->{$fCommon2}, 'numeric') ||
+                                validateVar($this->{$fCommon2}, 'array') ||
+                                validateVar($this->{$fCommon2}, 'object'))
+                        ){
+                            if(!isset($this->{"model_$fCommonP"})){
+                                $this->{'init'.ucfirst(setObject($fSubMod))}();
+                            }
+                            if($fCommon2 == 'id_cover_picture'){
+                                $data['foreigns'][lcfirst(setObject($fCommonS))] = std2array($this->{"model_$fSubMod"}->{'findOneBy'.ucfirst(setObject('id_file'))}($this->{'get'.ucfirst(setObject($fCommon2))}())->setThumbs());
+                            } else {
+                                $data['foreigns'][$fCommonP] = std2array($this->{"model_$fSubMod"}->{'findBy'.ucfirst(setObject($fCommon2))}($this->{'get'.ucfirst(setObject($fCommon2))}()));
+                            }
+                        } else if(is_array($data) && isset($this->{$fCommon2}) && (
+                                validateVar($this->{$fCommon2}) ||
+                                validateVar($this->{$fCommon2}, 'numeric') ||
+                                validateVar($this->{$fCommon2}, 'array') ||
+                                validateVar($this->{$fCommon2}, 'object'))
+                        ) {
+                            if(!isset($this->{"model_$fSubMod"})){
+                                $this->{'init'.ucfirst(setObject($fSubMod))}();
+                            }
+                            if($fCommon2 == 'id_cover_picture'){
+                                $data['foreigns'][lcfirst(setObject($fCommonS))] = std2array($this->{"model_$fSubMod"}->{'findOneBy'.ucfirst(setObject('id_file'))}($this->{'get'.ucfirst(setObject($fCommon2))}())->setThumbs());
+                            } else {
+                                $data['foreigns'][$fCommonP] = std2array($this->{"model_$fSubMod"}->{'findBy'.ucfirst(setObject($fCommon2))}($this->{'get'.ucfirst(setObject($fCommon2))}()));
+                            }
+                        }
                     }
-                    $data->{$fCommonP} = std2array($this->{"model_$fCommonP"}->{'findBy'.ucfirst(setObject($fCommon))}($this->{'get'.ucfirst(setObject($fCommon))}()));
-                } else if(is_array($data) && isset($this->{$fCommon}) && (validateVar($this->{$fCommon}) ||
-                        validateVar($this->{$fCommon}, 'array') ||
-                        validateVar($this->{$fCommon}, 'object'))
-                ) {
-                    if(!isset($this->{"model_$fCommonP"})){
-                        $this->{'init'.ucfirst(setObject($fCommonP))}();
+                } else {
+
+                    if(is_object($data) && isset($this->{$fCommon}) && (
+                            validateVar($this->{$fCommon}) ||
+                            validateVar($this->{$fCommon}, 'numeric') ||
+                            validateVar($this->{$fCommon}, 'array') ||
+                            validateVar($this->{$fCommon}, 'object'))
+                    ){
+                        if(!isset($this->{"model_$fCommonP"})){
+                            $this->{'init'.ucfirst(setObject($fSubMod))}();
+                        }
+                        if($fCommon == 'id_cover_picture'){
+                            $data['foreigns'][lcfirst(setObject($fCommonS))] = std2array($this->{"model_$fSubMod"}->{'findOneBy'.ucfirst(setObject('id_file'))}($this->{'get'.ucfirst(setObject($fCommon))}())->setThumbs()->toArray());
+                        } else {
+                            $data['foreigns'][$fCommonP] = std2array($this->{"model_$fSubMod"}->{'findBy'.ucfirst(setObject($fCommon))}($this->{'get'.ucfirst(setObject($fCommon))}()));
+                        }
+                    } else if(is_array($data) && isset($this->{$fCommon}) && (
+                            validateVar($this->{$fCommon}) ||
+                            validateVar($this->{$fCommon}, 'numeric') ||
+                            validateVar($this->{$fCommon}, 'array') ||
+                            validateVar($this->{$fCommon}, 'object'))
+                    ) {
+                        if(!isset($this->{"model_$fSubMod"})){
+                            $this->{'init'.ucfirst(setObject($fSubMod))}();
+                        }
+                        if($fCommon == 'id_cover_picture'){
+                            $data['foreigns'][lcfirst(setObject($fCommonS))] = std2array($this->{"model_$fSubMod"}->{'findOneBy'.ucfirst(setObject('id_file'))}($this->{'get'.ucfirst(setObject($fCommon))}())->setThumbs()->toArray());
+                        } else {
+                            $data['foreigns'][$fCommonP] = std2array($this->{"model_$fSubMod"}->{'findBy'.ucfirst(setObject($fCommon))}($this->{'get'.ucfirst(setObject($fCommon))}()));
+                        }
                     }
-                    $data[$fCommonP] = std2array($this->{"model_$fCommonP"}->{'findBy'.ucfirst(setObject($fCommon))}($this->{'get'.ucfirst(setObject($fCommon))}()));
                 }
             }
         }
