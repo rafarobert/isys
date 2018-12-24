@@ -129,7 +129,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         if($bAsModel){
             $oDatas = array();
             foreach ($aData as $data){
-                $oDatas[] = $this->setFromData($data);
+                $oDatas[] = $this->setFromData($data)->toArray();
             }
             return $oDatas;
         }
@@ -201,6 +201,18 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
                     $oModelUcObjTableP->$key = isNumeric($oData->{ucfirst(setObject($key))}) ? valNumeric($oData->{ucfirst(setObject($key))}) : ($oData->{ucfirst(setObject($key))} == "" ? $value : $oData->{ucfirst(setObject($key))});
                 }
+                if(in_array($key,$this->uriStrings) && isset($oData->$key) && validateVar($oData->$key)){
+
+                    $oModelUcObjTableP->uriString = clean($oData->$key);
+
+                } else if(in_array($key,$this->uriStrings) && isset($oData->{setObject($key)}) && validateVar($oData->{setObject($key)})){
+
+                    $oModelUcObjTableP->uriString = clean($oData->{setObject($key)});
+
+                } else if(in_array($key,$this->uriStrings) && isset($oData->{ucfirst(setObject($key))}) && validateVar($oData->{ucfirst(setObject($key))})){
+
+                    $oModelUcObjTableP->uriString = clean($oData->{ucfirst(setObject($key))});
+                }
                 if(isset($aData[$key])) {
                     unset($aData[$key]);
                 }
@@ -227,6 +239,12 @@ class ES_Model_UcTableP extends ES_UcModS_Model
             $data['lcLocalField_lcForeignField'] = $this->lcLocalField_lcForeignField;
             //<<<foreignPackForGetData>>>
         }
+        if(isset($this->thumbs) && validateVar($this->thumbs, 'array')){
+            $data['thumbs'] = $this->thumbs;
+        }
+        if(isset($this->uriString) && validateVar($this->uriString)){
+            $data['uriString'] = $this->uriString;
+        }
         $funct = function($val){
             return isNumeric($val,false) ? valNumeric($val) : $val;
         };
@@ -244,6 +262,12 @@ class ES_Model_UcTableP extends ES_UcModS_Model
             //>>>foreignPackForToArray<<<
             $data['UcObjLocalFieldUcObjForeignField'] = $this->lcLocalField_lcForeignField;
             //<<<foreignPackForToArray>>>
+        }
+        if(isset($this->thumbs) && validateVar($this->thumbs, 'array')){
+            $data['thumbs'] = $this->thumbs;
+        }
+        if(isset($this->uriString) && validateVar($this->uriString)){
+            $data['uriString'] = $this->uriString;
         }
         $funct = function($val){
             return isNumeric($val,false) ? valNumeric($val) : $val;
