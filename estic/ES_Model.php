@@ -928,6 +928,22 @@ Class ES_Model extends ES_Model_Vars {
         return $aEtiquetas;
     }
 
+    public function findByIdEtiquetas($aIds){
+        if(isString($aIds) && strstr($aIds,'|')){
+            $aIds = explode('|',trim($aIds,'|'));
+        }
+        if(is_object($aIds)){
+            $aIds = std2array($aIds);
+        }
+        $aEtiquetas = array();
+        if(is_array($aIds)){
+            foreach ($aIds as $id){
+                $aEtiquetas[] = $this->findOneByIdEtiqueta($id)->getArrayData();
+            }
+        }
+        return $aEtiquetas;
+    }
+
     public function delete($id){
         $filter = $this->_primary_filter;
         $id = $filter($id);
@@ -977,33 +993,53 @@ Class ES_Model extends ES_Model_Vars {
 
                     if (is_array($data) && isset($data[$idLocal]) && $data[$idLocal] != null) {
 
-                        $data['foreigns'][$field] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->$idLocal], false, true));
+                        $data[lcfirst($field)] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->$idLocal], false, true));
 
                     } else if (is_array($data) && isset($data[setObject($idLocal)]) && $data[setObject($idLocal)] != null) {
 
-                        $data['foreigns'][$field] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data[setObject($idLocal)]], false, true));
+                        $data[lcfirst($field)] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data[setObject($idLocal)]], false, true));
 
                     } else if (is_array($data) && isset($data[ucfirst(setObject($idLocal))]) && $data[ucfirst(setObject($idLocal))] != null) {
 
-                        $data['foreigns'][$field] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data[ucfirst(setObject($idLocal))]], false, true));
+                        $data[lcfirst($field)] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data[ucfirst(setObject($idLocal))]], false, true));
 
                     } else if (is_object($data) && isset($data->$idLocal) && $data->$idLocal != null) {
 
-                        $data->{'foreigns'}[$field] = $this->{'model_' . $submodP}->get_by([$idForeign => $data->$idLocal], false, true);
+                        $data->{lcfirst($field)} = $this->{'model_' . $submodP}->get_by([$idForeign => $data->$idLocal], false, true);
 
                     } else if (is_object($data) && isset($data->{setObject($idLocal)}) && $data->{setObject($idLocal)} != null) {
 
-                        $data->{'foreigns'}[$field] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->{setObject($idLocal)}], false, true));
+                        $data->{lcfirst($field)} = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->{setObject($idLocal)}], false, true));
 
                     } else if (is_object($data) && isset($data->{ucfirst(setObject($idLocal))}) && $data->{ucfirst(setObject($idLocal))} != null) {
 
-                        $data->{'foreigns'}[$field] = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->{ucfirst(setObject($idLocal))}], false, true));
+                        $data->{lcfirst($field)} = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->{ucfirst(setObject($idLocal))}], false, true));
                     }
                 }
             }
-            if(is_object($data) && isset($this->ids_files) && (validateVar($this->ids_files) || validateVar($this->ids_files, 'array') || validateVar($this->ids_files, 'object'))){
 
-                $data->{'foreigns'}['files'] = std2array($this->model_files->findByIdsFiles($this->getIdsFiles()));
+            $foreignsCommons = ['ids_files','id_etiquetas'];
+
+            foreach ($foreignsCommons as $key => $fCommon){
+                $fCommonName = explode('_',$fCommon)[1];
+                list($fCommonS,$fCommonP) = setSingularPlural($fCommonName);
+                if(is_object($data) && isset($this->{$fCommon}) && (validateVar($this->{$fCommon}) ||
+                        validateVar($this->{$fCommon}, 'array') ||
+                        validateVar($this->{$fCommon}, 'object'))
+                ){
+                    if(!isset($this->{"model_$fCommonP"})){
+                        $this->{'init'.ucfirst(setObject($fCommonP))}();
+                    }
+                    $data->{$fCommonP} = std2array($this->{"model_$fCommonP"}->{'findBy'.ucfirst(setObject($fCommon))}($this->{'get'.ucfirst(setObject($fCommon))}()));
+                } else if(is_array($data) && isset($this->{$fCommon}) && (validateVar($this->{$fCommon}) ||
+                        validateVar($this->{$fCommon}, 'array') ||
+                        validateVar($this->{$fCommon}, 'object'))
+                ) {
+                    if(!isset($this->{"model_$fCommonP"})){
+                        $this->{'init'.ucfirst(setObject($fCommonP))}();
+                    }
+                    $data[$fCommonP] = std2array($this->{"model_$fCommonP"}->{'findBy'.ucfirst(setObject($fCommon))}($this->{'get'.ucfirst(setObject($fCommon))}()));
+                }
             }
         }
         return $data != null ? $this->setFromData($data) : $data;
