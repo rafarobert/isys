@@ -1358,10 +1358,10 @@ class CI_Migration
 
                 // ---------------------------------------- Template ES_Controller ----------------------------------------
                 if (validateArray($settings, 'filterBy') && validateArray($settings, 'idForeign')) {
-                    if ($ind != 2) {
-                        $data[$selector] .= $this->load->view(["template_ES_Ctrl" => $selector], $data, true, true, true);
-                        $aLoaded[] = $data['lcFkTableP'];
-                    }
+//                    if ($ind != 2) {
+//                        $data[$selector] .= $this->load->view(["template_ES_Ctrl" => $selector], $data, true, true, true);
+//                        $aLoaded[] = $data['lcFkTableP'];
+//                    }
                     if ($ind == 0) {
 //                        $data['fFieldsRef'] = inArray('selectBy',$settings) ? var_export($settings['selectBy'], true) : [];
                         foreach ($settings['filterBy'] as $field => $filter) {

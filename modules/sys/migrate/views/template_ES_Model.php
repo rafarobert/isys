@@ -129,7 +129,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         if($bAsModel){
             $oDatas = array();
             foreach ($aData as $data){
-                $oDatas[] = $this->setFromData($data)->toArray();
+                $oDatas[] = $this->setFromData($data);
             }
             return $oDatas;
         }
