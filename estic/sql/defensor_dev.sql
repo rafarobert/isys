@@ -692,6 +692,7 @@ CREATE TABLE `dfa_cursos`
     `carga_horaria` VARCHAR(300),
     `dedicacion_semanal` VARCHAR(300),
     `id_parent` int(10) unsigned,
+    `num_modulo` INTEGER,
     `tipo` VARCHAR(300),
     `id_city` int(10) unsigned,
     `estado_publicacion` VARCHAR(300),

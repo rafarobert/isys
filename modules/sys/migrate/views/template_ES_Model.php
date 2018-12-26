@@ -99,9 +99,9 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     //<<<packSettersFunctions>>>
 
     //>>>packFindOneByFunctions<<<
-    public function findOneByUcObjField($lcObjField){
-        $aData = $this->get_by(['lcField' => $lcObjField],false,true);
-        $aData = $this->setForeigns($aData);
+    public function findOneByUcObjField($lcObjField,$orderBy = '', $direction = 'ASC'){
+        $aData = $this->get_by(['lcField' => $lcObjField],false,true,$orderBy,$direction);
+        $aData = $this->setForeigns($aData,$orderBy,$direction);
         if(isArray($aData)){
             return $this->setFromData($aData[0]);
         } else if(isObject($aData)){
@@ -113,9 +113,10 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     //<<<packFindOneByFunctions>>>
 
     //>>>packFilterByFunctions<<<
-    public function filterByUcObjField($lcObjField, $selecting = null, $bAsModel = true){
+    public function filterByUcObjField($lcObjField, $selecting = null, $orderByOrAsModel = true, $direction = 'ASC'){
         $bSelecting = true;
         $aSetttings = array();
+        $bAsModel = true;
         if(isArray($selecting)){
             $aSetttings = $selecting;
         } else if(isString($selecting)){
@@ -124,12 +125,17 @@ class ES_Model_UcTableP extends ES_UcModS_Model
             $bSelecting = false;
         }
         $aSetttings['lcField'] = $lcObjField;
-        $aData = $this->get_by($aSetttings,$bSelecting);
 
+        if(isString($orderByOrAsModel)){
+            $orderBy = $orderByOrAsModel;
+        } else if(is_bool($orderByOrAsModel)){
+            $bAsModel = $orderByOrAsModel;
+        }
+        $aData = $this->get_by($aSetttings, $bSelecting, null, $orderByOrAsModel, $direction);
         if($bAsModel){
             $oDatas = array();
             foreach ($aData as $data){
-                $oDatas[] = $this->setFromData($data);
+                $oDatas[] = $this->setForeigns($data,$orderByOrAsModel,$direction);
             }
             return $oDatas;
         }

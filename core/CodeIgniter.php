@@ -73,7 +73,7 @@ define('LANGUAGE', 'spanish');
  *  Set time limit for migrating tables from database with migrate class
  * ------------------------------------------------------
  */
-set_time_limit(1500);
+set_time_limit(2000);
 
 /*
  * ------------------------------------------------------
