@@ -169,7 +169,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
         foreach ($oUcObjTableP as $lcTableS){
 
-            $oModelUcObjTableP[] = $this->setFromData($lcTableS);
+            $oModelUcObjTableP[] = $this->setForeigns($lcTableS);
         }
         return $oModelUcObjTableP;
     }
