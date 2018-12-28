@@ -534,6 +534,8 @@ CREATE TABLE `dfa_categorias_publicaciones`
     `titulo` VARCHAR(490),
     `id_seccion_publicacion` int(10) unsigned,
     `icons` VARCHAR(450),
+    `id_cover_picture` int(10) unsigned,
+    `ids_files` VARCHAR(490),
     `descripcion` VARCHAR(500),
     `estado` VARCHAR(15) DEFAULT 'ENABLED' NOT NULL,
     `change_count` INTEGER DEFAULT 0 NOT NULL,
