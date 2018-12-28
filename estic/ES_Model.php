@@ -306,9 +306,26 @@ Class ES_Model extends ES_Model_Vars {
 //
 //    }
 
+    public function verifyDataWithPost($data){
+
+        $posts = $this->input->post();
+
+        foreach ($posts as $keyPost => $valuePost) {
+
+            if(!inArray($keyPost,$data)){
+                $data[$keyPost] = $valuePost;
+            }
+        }
+        return $data;
+    }
+
     public function save($data = null, $id = null, $with_id = true){
+
+        $data = $this->verifyDataWithPost($data );
+
         $this->CI = CI_Controller::get_instance();
         $idToInsert = null;
+        $fromEditPerfil = false;
         if($data == null){
             $data = $this->getArrayData();
             $pk = ucfirst(setObject($this->getPrimaryKey()));
@@ -331,7 +348,10 @@ Class ES_Model extends ES_Model_Vars {
                 $data['password'] = validateVar($data['password']) || validateVar($data['password'],'numeric') ? $this->session->hash($data['password']) : $data['password'];
             }
         }
-        if($this->db->field_exists('email', $this->_table_name) && $this->_table_name == 'ci_users'){
+        if($this->input->post('fromEditPerfil')){
+            $fromEditPerfil = true;
+        }
+        if($this->db->field_exists('email', $this->_table_name) && $this->_table_name == 'ci_users' && !$fromEditPerfil){
             if(!$this->session->_unique_email()){
                 return $this->CI->model_users->findOneByEmail($this->CI->input->post('email'))->getArrayData();
 //                exit();
@@ -767,21 +787,21 @@ Class ES_Model extends ES_Model_Vars {
         foreach ($aIdsFiles as $key => $idFile) {
             if (isNumeric($idFile) || isString($idFile)) {
                 $oFile = $this->model_files->findOneByIdFile($idFile);
-                $oModel->files[$key] = $oFile;
+                $this->files[$key] = $oFile;
                 if (isObject($oFile)) {
                     $oThumbFiles = $this->model_files->filterByIdParent($oFile->getIdFile());
                     if (isObject($oThumbFiles) || isArray($oThumbFiles)) {
                         /**
                          * @var ES_Model_Files $thumb
                          */
-                        $oModel->files[$key]->{'thumbs'} = array();
+                        $this->files[$key]->{'thumbs'} = array();
                         foreach ($oThumbFiles as $keyThumb => $thumb) {
                             if(is_array($thumb)){
-                                $oModel->thumbs[$keyThumb] = $thumb;
-                                $oModel->files[$key]->{'thumbs'}[$keyThumb] = $thumb;
+                                $this->thumbs[$keyThumb] = $thumb;
+                                $this->files[$key]->{'thumbs'}[$keyThumb] = $thumb;
                             } else {
-                                $oModel->thumbs[$keyThumb] = $thumb->getArrayData();
-                                $oModel->files[$key]->{'thumbs'}[$keyThumb] = $thumb->getArrayData();
+                                $this->thumbs[$keyThumb] = $thumb->getArrayData();
+                                $this->files[$key]->{'thumbs'}[$keyThumb] = $thumb->getArrayData();
                             }
                         }
                     }
@@ -880,14 +900,14 @@ Class ES_Model extends ES_Model_Vars {
         return $aData;
     }
 
-    public function getFiles($oModel){
-        if (isset($oModel->files)){
-            foreach ($oModel->files as $key => $file) {
+    public function getFiles(){
+        if (isset($this->files)){
+            foreach ($this->files as $key => $file) {
                 if($file == null){
-                    unset($oModel->files[$key]);
+                    unset($this->files[$key]);
                 }
             }
-            return $oModel->files;
+            return $this->files;
         }
         return [];
     }

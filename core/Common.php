@@ -1302,25 +1302,49 @@ if (!function_exists('arrayHas')) {
 }
 
 if (!function_exists('objectHas')) {
-    function objectHas($object, $index, $bEmpty = true)
+    function objectHas($object, $index, $bEmpty = true, $bSetObject = false, $bUcFirst = false)
     {
+        $response = true;
         if(isObject($object,$bEmpty) && (isString($index,$bEmpty) || isNumeric($index,$bEmpty))){
             $isset = false;
             foreach ($object as $key => $val){
-                if($key == $index){
-                    $isset = true;
-                    break;
+                if($bSetObject){
+                    if($bUcFirst){
+                        if(ucfirst(setObject($key)) == $index){
+                            $isset = true;
+                            $response = $key;
+                            break;
+                        } else {
+                            $response = false;
+                        }
+                    } else {
+                        if(setObject($key) == $index){
+                            $isset = true;
+                            $response = $key;
+                            break;
+                        } else {
+                            $response = false;
+                        }
+                    }
+                } else {
+                    if($key == $index){
+                        $isset = $response = true;
+                        break;
+                    } else {
+                        $response = false;
+                    }
                 }
+
             }
             if($isset){
                 if($bEmpty){
                     if($object->$index != "" && $object->$index != [] && $object->$index != null){
-                        return true;
+                        return $response;
                     } else {
-                        return false;
+                        return $response;
                     }
                 } else {
-                    return true;
+                    return $response;
                 }
             } else {
                 return false;

@@ -1414,6 +1414,9 @@ class CI_Migration
             $data["validateUserSavedForRolling2"] = $this->load->view(["template_ES_Ctrl" => "validateUserSavedForRolling2"], $data, true, true);
             $data["validateUsersSavedForPersonTable1"] = $this->load->view(["template_controller" => "validateUsersSavedForPersonTable1"], $data, true, true);
             $data["validateUsersSavedForPersonTable2"] = $this->load->view(["template_ES_Ctrl" => "validateUsersSavedForPersonTable2"], $data, true, true);
+            $data["validateUsersSavedForEstudentTable1"] = $this->load->view(["template_controller" => "validateUsersSavedForEstudentTable1"], $data, true, true);
+            $data["validateUsersSavedForEstudentTable2"] = $this->load->view(["template_ES_Ctrl" => "validateUsersSavedForEstudentTable2"], $data, true, true);
+
         }
 
         if ($fieldImg != '') {

@@ -43,6 +43,11 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
             $this->initPersonas();
         }
         //<<<validateUsersSavedForPersonTable2>>>
+        //>>>validateUsersSavedForEstudentTable2<<<
+        if(validate_modulo('admin','estudiantes')) {
+            $this->initEstudiantes();
+        }
+        //<<<validateUsersSavedForEstudentTable2>>>
         $this->subjectP = 'lcTableP';
         $this->subjectS = 'lcTableS';
     }

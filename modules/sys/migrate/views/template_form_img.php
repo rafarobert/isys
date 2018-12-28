@@ -5,7 +5,7 @@
     <div class="col-sm-10 dropzone" action="#">
         <div class="dropzone-previews"></div>
     </div>
-        <?php $files = $oUcObjTableS->getFiles($oUcObjTableS); ?>
+        <?php $files = $oUcObjTableS->getFiles(); ?>
     <script>
         oDropZone.inputName = 'lcObjField';
         oDropZone.inputId = 'inputUcObjField';

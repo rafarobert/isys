@@ -104,11 +104,24 @@ class ES_Controller extends ES_Ctrl_Vars
             $this->data["subview"] = "$mod/$class/$method";
         } else if(isset($this->printView) && $this->printView) {
             unset($this->printView);
+
             return $this->load->view("$mod/$class/$method", $this->data, true);
         } else {
             $this->data["subview"] = "$mod/$class/$method";
         }
 
+        $object = 'o'.ucfirst($this->subjectS);
+        foreach ($this->input->post() as $keyPost => $dataPost){
+            if(objectHas($this->data[$object],$keyPost,false)){
+                $this->data[$object]->$keyPost = $dataPost;
+            } else if(objectHas($this->data[$object],setObject($keyPost),false)){
+                $this->data[$object]->{setObject($keyPost)}= $dataPost;
+            } else if(objectHas($this->data[$object],ucfirst(setObject($keyPost)),false)){
+                $this->data[$object]->{ucfirst(setObject($keyPost))} = $dataPost;
+            } else if($response = objectHas($this->data[$object],ucfirst(setObject($keyPost)),false, true, true)){
+                $this->data[$object]->{is_string($response) ? $response : ucfirst(setObject($keyPost))} = $dataPost;
+            }
+        }
     }
 
     public function filterIdOrView($id, $view){
@@ -167,11 +180,17 @@ class ES_Controller extends ES_Ctrl_Vars
     public function returnResponse($oObject, $responseView = '', $responseRedirect = '')
     {
         if(isset($_FILES)){unset($_FILES);}
-        $responseView = !isString($responseView) ? $this->uri->segment(1).'/'.$this->uri->segment(2).'/'.$this->uri->segment(3) : $responseView;
-        $responseRedirect = !isString($responseRedirect) ? $this->uri->segment(1).'/'.$this->uri->segment(2) : $responseRedirect;
-        if(strstr($responseView, 'sys/ajax/')){
-            $responseView = str_replace('sys/ajax/','', $responseView);
+
+        if(strstr($responseView, 'sys/ajax/') || strstr($this->uri->uri_string(),'sys/ajax')){
+
+            $responseView = !isString($responseView) ? $this->uri->segment(3).'/'.$this->uri->segment(4).'/'.$this->uri->segment(5) : $responseView;
+
+        } else {
+
+            $responseView = !isString($responseView) ? $this->uri->segment(1).'/'.$this->uri->segment(2).'/'.$this->uri->segment(3) : $responseView;
         }
+        $responseRedirect = !isString($responseRedirect) ? $this->uri->segment(1).'/'.$this->uri->segment(2) : $responseRedirect;
+
         if($this->fromAjax){
             if ($this->error == 'ok') {
                 $data = isset($this->data['aData']) ? $this->data['aData'] : (isset($oObject->aData) ? $oObject->aData : []);
