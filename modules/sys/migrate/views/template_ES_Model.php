@@ -158,9 +158,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         }
         // Obtiene a todos los lcTableP
         $oUcObjTableP = $this->get();
-       //>>>setForeignTableFields<<<
-        $oUcObjTableP = $this->setForeignFields($this->lcFkObjFieldP, 'idFkLcTableP', $oUcObjTableP, 'idLocalLcTableP', true);
-        //<<<setForeignTableFields>>>
+
         //>>>validateFieldsImgsIndex<<<
         $oUcObjTableP = $this->getThumbs($oUcObjTableP);
         //<<<validateFieldsImgsIndex>>>
@@ -276,7 +274,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
             $data['uriString'] = $this->uriString;
         }
         $funct = function($val){
-            return isNumeric($val,false) ? valNumeric($val) : $val;
+            return isNumeric($val,false) ? valNumeric($val) : ($val == null ? '' : $val);
         };
         $data = array_map($funct,$data);
         if(isset($this->foreigns)){
