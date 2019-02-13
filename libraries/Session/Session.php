@@ -1092,8 +1092,8 @@ class CI_Session {
         } else {
             $this->CI->load->model('base/model_users_roles');
 
-            $emailPost = $this->CI->input->post('email');
-            $passwordPost = $this->hash($this->CI->input->post('password'));
+            $emailPost = $this->CI->input->get_post_request('email');
+            $passwordPost = $this->hash($this->CI->input->get_post_request('password'));
 
             $ngEmailPost = $this->CI->input->post('ngemail');
             $ngPasswordPost = $this->hash($this->CI->input->post('ngpassword'));
@@ -1127,10 +1127,15 @@ class CI_Session {
                 $this->set_userdata($this->sessKey,$data);
                 $uri = $this->CI->input->post('uri_string') ? WEBSERVER.$this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? WEBSERVER.$this->CI->uri->uri_string() :
                     ($oUser->id_role == 1 ? WEBSERVER.'base/dashboard' : WEBSERVER.'admin/dashboard'));
-                if($this->CI->input->post('login') == 'Desbloquear'){
-                    redirect('admin/dashboard');
+
+                if(isset($_SERVER['SHELL'])){
+                  return $oUser;
                 } else {
+                  if($this->CI->input->post('login') == 'Desbloquear'){
+                    redirect('admin/dashboard');
+                  } else {
                     redirect($uri);
+                  }
                 }
             } else {
                 $this->CI->data['errors']['login'] = 'El usuario no ';

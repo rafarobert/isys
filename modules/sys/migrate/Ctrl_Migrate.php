@@ -128,7 +128,8 @@ class Ctrl_Migrate extends ES_Controller
         }
 
         if ($it_worked) {
-            echo "All migration has been worked";
+            echo "All migration has been worked
+            ";
         } else {
             if ($migration_error != '') {
                 show_error('Error en Migration - ' . $this->migration->_table_name . '<br>' . $this->migration->error_string());
@@ -137,7 +138,8 @@ class Ctrl_Migrate extends ES_Controller
                     show_error('Error en Migration - ' . $key_migr_error . '<br>' . $value);
                 }
             }
-            echo "Migration doesn't worked";
+            echo "Migration doesn't worked
+            ";
         }
     }
 
@@ -239,8 +241,13 @@ class Ctrl_Migrate extends ES_Controller
     public function fromdatabase()
     {
         $this->load->library('session');
+
+        $oUser = $this->session->login();
+
         $sessUser = $this->session->getObjectUserLoggued();
+
         $mainModules = count(config_item('main_modules_enabled')) ? config_item('main_modules_enabled') : ['ci','dfa'];
+
         if(!isObject($sessUser)){
             show_error('Debes iniciar sesion para realizar esta accion');
             exit();
@@ -249,6 +256,7 @@ class Ctrl_Migrate extends ES_Controller
             show_error('No tiene permisos para realizar esta accion, por favor contactese con los administradores del sistema');
             exit();
         }
+
         $this->initTables(true);
         $dbTables = $this->dbforge->getArrayFieldsFromTable();
         unset($dbTables['migrations']);
@@ -340,6 +348,5 @@ class Ctrl_Migrate extends ES_Controller
         $this->setTableTrait();
 
 //        dump(shell_exec('composer update'));
-        echo "All migration has been worked";
     }
 }

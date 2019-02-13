@@ -114,23 +114,32 @@ if(is_file(DOCUMENTROOT."orm/map/ES_Table_Vars.php")){
  *  Defining Proyect Settings
  * ------------------------------------------------------
  */
-if(file_exists(DOCUMENTROOT . 'app/config/config.php'))
-{
-    require_once DOCUMENTROOT . 'app/config/config.php';
 
-    $proyName = $config['proy_name'];
+if (file_exists(DOCUMENTROOT . 'app/config/config.php')) {
 
-    $currentPath = $config['proy_current_path'];
+  require_once DOCUMENTROOT . 'app/config/config.php';
 
-    $hostName = $config['proy_hostname'];
+} else if (file_exists(PWD . 'app/config/config.php')) {
 
-    $protocol = $config['proy_protocol'];
+  require_once PWD . 'app/config/config.php';
+
+}
+
+if(isset($config)){
+
+  $proyName = $config['proy_name'];
+
+  $currentPath = $config['proy_current_path'];
+
+  $hostName = $config['proy_hostname'];
+
+  $protocol = $config['proy_protocol'];
 
 } else {
 
-    echo 'No se encontro el archivo de configuracion';
+  echo 'No se encontro el archivo de configuracion';
 
-    exit(1);
+  exit(1);
 }
 
 /*
@@ -189,13 +198,13 @@ else {
 
 $assets = $webServer.'assets/';
 
-define('DIRECTORY',$rootPath);
-define('ROOTPATH', $rootPath);
+define('DIRECTORY',is_dir($rootPath) ? $rootPath : PWD);
+define('ROOTPATH', is_dir($rootPath) ? $rootPath : PWD);
 define('WEBSERVER', $webServer);
 define('WEBASSETS', $assets);
 define('WEBROOT', $webServer);
 define('PROTOCOL', $protocol);
-define('SERVERNAME', $_SERVER['SERVER_NAME']);
+define('SERVERNAME', isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : $hostName);
 
 
 
@@ -258,6 +267,10 @@ if(file_exists(DOCUMENTROOT . 'app/config/config_frt.php'))
 {
     require_once DOCUMENTROOT . 'app/config/config_frt.php';
 
+} else if(file_exists(PWD . 'app/config/config_frt.php')) {
+
+  require_once PWD . 'app/config/config_frt.php';
+
 } else {
 
     echo 'No se encontro el archivo de configuracion';
@@ -304,6 +317,21 @@ $orm_folder = 'orm';
  * NO TRAILING SLASH!
  */
 $view_folder = 'layouts';
+
+/*
+ *---------------------------------------------------------------
+ * ORM FOLDER NAME
+ *---------------------------------------------------------------
+ *
+ * If you want to move the view folder out of the application
+ * folder set the path to the folder here. The folder can be renamed
+ * and relocated anywhere on your server. If blank, it will default
+ * to the standard location inside your application folder. If you
+ * do move this, use the full server path to this folder.
+ *
+ * NO TRAILING SLASH!
+ */
+$orm_folder = 'orm';
 
 
 /*
@@ -369,24 +397,31 @@ if (defined('STDIN'))
 {
     chdir(dirname(__FILE__));
 }
+//
+//if (($_temp = realpath($system_path)) !== FALSE)
+//{
+//    $system_path = $_temp.'/';
+//}
+//else
+//{
+//    // Ensure there's a trailing slash
+//    $system_path = rtrim($system_path, '/').'/';
+//}
 
-if (($_temp = realpath($system_path)) !== FALSE)
+if ( ! is_dir($system_path) && validateVar(PWD))
 {
-    $system_path = $_temp.'/';
+  $system_path = PWD.$system_path;
 }
-else
-{
-    // Ensure there's a trailing slash
-    $system_path = rtrim($system_path, '/').'/';
+if( ! is_dir($application_folder) && validateVar(PWD)){
+
+  $application_folder = PWD.$application_folder;
+}
+if ( ! is_dir($orm_folder) && validateVar(PWD)) {
+
+  $orm_folder = PWD.$orm_folder;
 }
 
 // Is the system path correct?
-if ( ! is_dir($system_path))
-{
-    header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
-    echo 'Your system folder path does not appear to be set correctly. Please open the following file and correct this: '.pathinfo(__FILE__, PATHINFO_BASENAME);
-    exit(3); // EXIT_CONFIG
-}
 
 /*
  * -------------------------------------------------------------------
@@ -396,24 +431,42 @@ if ( ! is_dir($system_path))
 // The name of THIS file
 define('SELF', pathinfo(__FILE__, PATHINFO_BASENAME));
 
-// Path to the orm folder
-define('ORMPATH', str_replace('\\', '/', $orm_folder . '/'));
 
 // Path to the front controller (this file)
 define('FCPATH', str_replace('\\', '/', dirname(__FILE__).'/'));
 
-// Name of the "system folder"
-define('SYSDIR', trim(strrchr(trim(BASEPATH, '/'), '/'), '/'));
+
+// Is the system path correct?
+
+if (is_dir($system_path))
+{
+  if (($_temp = realpath($system_path)) !== FALSE)
+  {
+    $system_path = $_temp.DIRECTORY_SEPARATOR;
+  }
+}
+else
+{
+  if ( ! is_dir(BASEPATH.$system_path.DIRECTORY_SEPARATOR))
+  {
+    header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+    echo 'Your system folder path does not appear to be set correctly. Please open the following file and correct this: '.pathinfo(__FILE__, PATHINFO_BASENAME);
+    exit(3); // EXIT_CONFIG
+  }
+}
+
+
 
 // The path to the "application" folder
+
 if (is_dir($application_folder))
 {
     if (($_temp = realpath($application_folder)) !== FALSE)
     {
-        $application_folder = $_temp;
+//        $application_folder = $_temp.DIRECTORY_SEPARATOR;
     }
 
-    define('APPPATH', str_replace('\\', '/', $application_folder.DIRECTORY_SEPARATOR));
+    define('APPPATH', str_replace('\\', '/', $_temp.DIRECTORY_SEPARATOR));
 }
 else
 {
@@ -427,35 +480,85 @@ else
     define('APPPATH', str_replace('\\', '/', BASEPATH.$application_folder.DIRECTORY_SEPARATOR));
 }
 
-// The path to the "views" folder
-if ( ! is_dir($view_folder))
-{
-    if ( ! empty($view_folder) && is_dir(APPPATH.$view_folder.DIRECTORY_SEPARATOR))
-    {
-        $view_folder = APPPATH.$view_folder;
-    }
-    elseif ( ! is_dir(APPPATH.'views'.DIRECTORY_SEPARATOR))
-    {
-        header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
-        echo 'Your view folder path does not appear to be set correctly. Please open the following file and correct this: '.SELF;
-        exit(3); // EXIT_CONFIG
-    }
-    else
-    {
-        $view_folder = APPPATH.'layouts';
-    }
-}
+// The path to the "orm" folder
 
-if (($_temp = realpath($view_folder)) !== FALSE)
+if (is_dir($orm_folder))
 {
-    $view_folder = $_temp.DIRECTORY_SEPARATOR;
+    if (($_temp = realpath($orm_folder)) !== FALSE)
+    {
+//      $orm_folder= $_temp.DIRECTORY_SEPARATOR;
+    }
+
+    define('ORMPATH', str_replace('\\', '/', $_temp.DIRECTORY_SEPARATOR));
 }
 else
 {
-    $view_folder = rtrim($view_folder, '/\\').DIRECTORY_SEPARATOR;
+    if ( ! is_dir($orm_folder.DIRECTORY_SEPARATOR))
+    {
+        header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+        echo 'Your application folder path does not appear to be set correctly. Please open the following file and correct this: '.SELF;
+        exit(3); // EXIT_CONFIG
+    }
+
+    define('ORMPATH', str_replace('\\', '/', $orm_folder.DIRECTORY_SEPARATOR));
 }
 
-define('VIEWPATH', $view_folder);
+// The path to the "$view_folder" folder
+if(validateVar(APPPATH)){
+
+  if (is_dir(APPPATH.$view_folder))
+  {
+    if (($_temp = realpath(APPPATH.$view_folder)) !== FALSE)
+    {
+//      $view_folder = $_temp.DIRECTORY_SEPARATOR;
+    }
+
+    define('VIEWPATH', str_replace('\\', '/', $_temp.DIRECTORY_SEPARATOR));
+  }
+  else
+  {
+    if ( ! is_dir(APPPATH.$view_folder.DIRECTORY_SEPARATOR))
+    {
+      header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+      echo 'Your view folder path does not appear to be set correctly. Please open the following file and correct this: '.SELF;
+      exit(3); // EXIT_CONFIG
+    }
+
+    define('VIEWPATH', str_replace('\\', '/', APPPATH.$view_folder.DIRECTORY_SEPARATOR));
+  }
+
+}
+//
+//// The path to the "views" folder
+//if ( ! is_dir($view_folder))
+//{
+//    if ( ! empty($view_folder) && is_dir($view_folder.DIRECTORY_SEPARATOR))
+//    {
+//        $view_folder = APPPATH.$view_folder;
+//    }
+//    elseif ( ! is_dir(APPPATH.'views'.DIRECTORY_SEPARATOR))
+//    {
+//        header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+//        echo 'Your view folder path does not appear to be set correctly. Please open the following file and correct this: '.SELF;
+//        exit(3); // EXIT_CONFIG
+//    }
+//    else
+//    {
+//        $view_folder = APPPATH.'layouts';
+//    }
+//}
+//
+//if (($_temp = realpath($view_folder)) !== FALSE)
+//{
+//    $view_folder = $_temp.DIRECTORY_SEPARATOR;
+//}
+//else
+//{
+//    $view_folder = rtrim($view_folder, '/\\').DIRECTORY_SEPARATOR;
+//}
+
+// Name of the "system folder"
+define('SYSDIR', trim(strrchr(trim(BASEPATH, '/'), '/'), '/'));
 
 /*
  * --------------------------------------------------------------------
@@ -1084,7 +1187,7 @@ $CI->data['response'] = $response;
             $CI->load->view($CI->data['layout'], $CI->data);
         }
 
-    } else {
+    } else if(!isset($_SERVER['SHELL'])){
 
         // if not it displays the content
         $CI->data['subview'] = isset($CI->data['subview']) ? $CI->data['subview'] : 'ajax';

@@ -242,6 +242,18 @@ class CI_Input {
 		return $this->_fetch_from_array($_GET, $index, $xss_clean);
 	}
 
+	/**
+	 * Fetch an item from the REQUEST array
+	 *
+	 * @param	mixed	$index		Index for item to be fetched from $_REQUEST
+	 * @param	bool	$xss_clean	Whether to apply XSS filtering
+	 * @return	mixed
+	 */
+	public function request($index = NULL, $xss_clean = NULL)
+	{
+		return $this->_fetch_from_array($_REQUEST, $index, $xss_clean);
+	}
+
     public function validate($index = NULL)
 	{
 	    if(isset($_GET[$index])){
@@ -309,6 +321,21 @@ class CI_Input {
 		return isset($_GET[$index])
 			? $this->get($index, $xss_clean)
 			: $this->post($index, $xss_clean);
+	}
+
+	/**
+	 * Fetch an item from GET data with fallback to POST then with fallback to REQUEST
+	 *
+	 * @param	string	$index		Index for item to be fetched from $_GET or $_POST or $_REQUEST
+	 * @param	bool	$xss_clean	Whether to apply XSS filtering
+	 * @return	mixed
+	 */
+	public function get_post_request($index, $xss_clean = NULL)
+	{
+		return isset($_GET[$index])
+			? $this->get($index, $xss_clean)
+			: (isset($_POST[$index]) ? $this->post($index, $xss_clean) :
+      $this->request($index, $xss_clean));
 	}
 
 	// --------------------------------------------------------------------
