@@ -67,7 +67,15 @@ class CI_Session {
 
 	protected $_driver = 'files';
 	protected $_config;
+
+	/**
+     * @var CI_Controller $CI
+     */
     protected $CI;
+
+    /**
+     * @var CI_Model $MI
+     */
     protected $MI;
     protected $db;
 	// ------------------------------------------------------------------------
@@ -993,12 +1001,15 @@ class CI_Session {
         $this->CI->data['subLayout'] = "start";
     }
 
+    /**
+     * @var CI_Controller $CI
+     */
     public function login(){
 //        $data = array(
 //            'email' => $this->CI->input->post('email'),
 //            'password' => $this->hash($this->CI->input->post('password')),
 //        );
-        $oUsuario = $this->MI->get_by(array(
+        $oUsuario = $this->CI->model_usuarios->get_by(array(
             'email' => $this->CI->input->post('email'),
             'password' => $this->hash($this->CI->input->post('password')),
             0 => 'id_opcion_role',
