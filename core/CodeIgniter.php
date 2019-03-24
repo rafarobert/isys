@@ -95,7 +95,7 @@ date_default_timezone_set('America/La_Paz');
  *  Defining Document Root
  * ------------------------------------------------------
  */
-define('DOCUMENTROOT',$_SERVER['DOCUMENT_ROOT'] . '/');
+define('DOCUMENTROOT',PWD !== '' ? PWD : $_SERVER['DOCUMENT_ROOT'] . '/');
 
 /*
  * ------------------------------------------------------

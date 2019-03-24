@@ -46,7 +46,14 @@ class Ctrl_Migrate extends ES_Controller
 //            $_POST['bReset'] = true;
 //        }
 
-        $migrations = $this->migration->_migration_files;
+      $this->load->library('session');
+
+      // inicia sesion automaticamente se se dio las credenciales correctas
+      if(!$this->session->isLoguedin()){
+        $this->session->login();
+      }
+
+      $migrations = $this->migration->_migration_files;
 
         if($modulo == 'fromdatabase'){
             $this->fromdatabase();
@@ -240,10 +247,6 @@ class Ctrl_Migrate extends ES_Controller
 
     public function fromdatabase()
     {
-        $this->load->library('session');
-
-        $oUser = $this->session->login();
-
         $sessUser = $this->session->getObjectUserLoggued();
 
         $mainModules = count(config_item('main_modules_enabled')) ? config_item('main_modules_enabled') : ['ci','dfa'];
@@ -272,7 +275,7 @@ class Ctrl_Migrate extends ES_Controller
         $migIndex = 1;
         $modInit = '';
         $submodInit = '';
-        $framePath = "orm/migrations/";
+        $framePath = PWD."orm/migrations/";
 
         // ***************** refresh *********************
 //        rrmdir('orm/migrations');

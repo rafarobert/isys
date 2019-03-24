@@ -983,11 +983,40 @@ class CI_Session {
     }
 
     public function isLoguedin(){
-        if($this->has_userdata($this->sessKey)) {
+
+        if($this->has_userdata(config_item('base_loggedin'))) {
+            return true;
+        } else if($this->has_userdata(config_item('admin_loggedin'))) {
+            return true;
+        } else if($this->has_userdata(config_item('sys_loggedin'))) {
             return true;
         }
         return false;
     }
+
+  public function isLoguedinBase(){
+    $this->sessKey = config_item('base_loggedin');
+    if($this->has_userdata($this->sessKey)) {
+      return true;
+    }
+    return false;
+  }
+
+  public function isLoguedinAdmin(){
+    $this->sessKey = config_item('admin_loggedin');
+    if($this->has_userdata($this->sessKey)) {
+      return true;
+    }
+    return false;
+  }
+
+  public function isLoguedinSys(){
+    $this->sessKey = config_item('sys_loggedin');
+    if($this->has_userdata($this->sessKey)) {
+      return true;
+    }
+    return false;
+  }
 
     public function _unique_email($id = ''){
         // Do NOT validate if email already exists
@@ -1078,7 +1107,7 @@ class CI_Session {
         }
     }
 
-    public function login(){
+    public function login($mod = null){
 
         if (is_object($oUser = $this->getDataUserLoggued())){
             $uri = $this->CI->input->post('uri_string') ? $this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? $this->CI->uri->uri_string() :

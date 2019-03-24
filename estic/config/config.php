@@ -30,6 +30,7 @@ $config['sys_name'] = 'Estic Framework para desarrollo agil';
 
 $config['sess_key_admin'] = 'admin_loggedin';
 $config['sess_key_base'] = 'base_loggedin';
+$config['sess_key_sys'] = 'sys_loggedin';
 $config['sess_key'] = 'loggedin';
 $config['sess_table'] = 'ci_users';
 $config['sess_idTable'] = 'id_user';

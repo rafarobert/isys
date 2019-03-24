@@ -2,8 +2,8 @@
 /**
  * Created by Estic.
  * User: rafaelgutierrez
- * Date: 12/02/2019
- * Time: 6:35 pm
+ * Date: 19/02/2019
+ * Time: 1:35 pm
  */
 
 if (!function_exists('initStaticTableVars')) {

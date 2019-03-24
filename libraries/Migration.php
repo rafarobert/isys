@@ -2077,7 +2077,7 @@ class CI_Migration
         $aFksOfTables = $this->dbforge->getForeignKeyOfTables();
         $aPKorFKofTables = array_merge($aPksOfTables, $aFksOfTables);
         $aIdsPkOrFk = array_keys($aPKorFKofTables);
-        $aTablesPkOrFk = array_values($aPKorFKofTables);
+//        $aTablesPkOrFk = array_values($aPKorFKofTables);
 //        $aFlipedPksOfTables = array_flip($aPKorFKofTables);
         list($vFields, $numFields) = $this->getValidatedFieldsWithTableSettings($fields, $validFields, $tableSettings);
         $numFields = $numFields == 0 ? 5 : $numFields;
