@@ -984,11 +984,11 @@ class CI_Session {
 
     public function isLoguedin(){
 
-        if($this->has_userdata(config_item('base_loggedin'))) {
+        if($this->has_userdata(config_item('sess_key_base'))) {
             return true;
-        } else if($this->has_userdata(config_item('admin_loggedin'))) {
+        } else if($this->has_userdata(config_item('sess_key_admin'))) {
             return true;
-        } else if($this->has_userdata(config_item('sys_loggedin'))) {
+        } else if($this->has_userdata(config_item('sess_key_sys'))) {
             return true;
         }
         return false;
