@@ -26,7 +26,7 @@
 $config['base_url'] = WEBSERVER;
 
 $config['sys_title'] = 'Estic - Admin';
-$config['sys_name'] = 'axis Framework para desarrollo agil';
+$config['sys_name'] = 'estic Framework para desarrollo agil';
 
 $config['sess_key_admin'] = 'admin_loggedin';
 $config['sess_key_base'] = 'base_loggedin';
