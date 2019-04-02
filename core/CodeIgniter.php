@@ -889,9 +889,9 @@ if (isset($assign_to_config) && is_array($assign_to_config))
 	{
 		require_once APPPATH.'core/'.$CFG->config['subclass_prefix'].'Controller.php';
 	}
-	else if(file_exists(BASEPATH.'estic/'.$CFG->config['subclass_prefix'].'Controller.php'))
+	else if(file_exists(BASEPATH.'axis/'.$CFG->config['subclass_prefix'].'Controller.php'))
 	{
-        require_once BASEPATH.'estic/'.$CFG->config['subclass_prefix'].'Controller.php';
+        require_once BASEPATH.'axis/'.$CFG->config['subclass_prefix'].'Controller.php';
     }
 
 	// Set a mark point for benchmarking

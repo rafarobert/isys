@@ -296,7 +296,7 @@ class CI_Loader {
 		if ( ! class_exists('CI_Model', FALSE))
 		{
 			$app_path = APPPATH.'core'.DIRECTORY_SEPARATOR;
-			$isys_path = BASEPATH.'estic'.DIRECTORY_SEPARATOR;
+			$isys_path = BASEPATH.'axis'.DIRECTORY_SEPARATOR;
 			if (file_exists($app_path.'Model.php'))
 			{
 				require_once($app_path.'Model.php');

@@ -157,7 +157,7 @@ class Modules
                 include_once $location;
                 return;
             }
-            else if(is_file($location = BASEPATH.'estic/'.ucfirst($class).EXT))
+            else if(is_file($location = BASEPATH.'axis/'.ucfirst($class).EXT))
             {
                 include_once $location;
                 return;

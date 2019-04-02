@@ -168,9 +168,9 @@ class CI_Router {
 		{
 			include(APPPATH.'config/routes.php');
 		}
-        if (file_exists(BASEPATH.'estic/config/routes.php'))
+        if (file_exists(BASEPATH.'axis/config/routes.php'))
         {
-            include(BASEPATH.'estic/config/routes.php');
+            include(BASEPATH.'axis/config/routes.php');
         }
 		if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/routes.php'))
 		{

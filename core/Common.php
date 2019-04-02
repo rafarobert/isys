@@ -176,13 +176,13 @@ if ( ! function_exists('load_class'))
 			{
 				require_once(APPPATH.$directory.'/'.$name.'.php');
 			}
-		} else if(file_exists(BASEPATH.'estic/'.config_item('subclass_prefix').$class.'.php'))
+		} else if(file_exists(BASEPATH.'axis/'.config_item('subclass_prefix').$class.'.php'))
 		{
             $name = config_item('subclass_prefix').$class;
 
             if (class_exists($name, FALSE) === FALSE)
             {
-                require_once(BASEPATH.'estic/'.$name.'.php');
+                require_once(BASEPATH.'axis/'.$name.'.php');
             }
         } else if(file_exists($directory)){
             $name = $class;
@@ -264,7 +264,7 @@ if ( ! function_exists('get_config'))
 				require($file_path);
 			}
 
-            $file_path = BASEPATH . 'estic/config/config.php';
+            $file_path = BASEPATH . 'axis/config/config.php';
             $found = FALSE;
             if (file_exists($file_path))
             {
