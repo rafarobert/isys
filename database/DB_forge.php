@@ -1412,7 +1412,7 @@ abstract class CI_DB_forge
         $CI = CI_Controller::get_instance();
         $database = $CI->db->database;
 
-        $sql = "SELECT COLUMN_NAME, TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'herbalife_dev' AND COLUMN_KEY = 'MUL'";
+        $sql = "SELECT COLUMN_NAME, TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '$database' AND COLUMN_KEY = 'MUL'";
         $result = $CI->db->query($sql)->result();
         if (count((array)$result)) {
             $aColumnNames = array_column(json_decode(json_encode($result), true), "COLUMN_NAME");
