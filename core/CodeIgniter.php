@@ -148,61 +148,83 @@ if(isset($config)){
  * ------------------------------------------------------
  */
 
+$jsonServers = file_get_contents(DOCUMENTROOT . "/config/servers.json");
+
+$aServer = json_decode($jsonServers, true);
+
+// ----------------------- Enviroment Rules ------------------------
+
+if($aServer['type-env'] == 'dev'){
+
+    define('ENVIRONMENT', 'development');
+
+} else if($aServer['type-env'] == 'test') {
+
+    define('ENVIRONMENT', 'development');
+
+} else if($aServer['type-env'] == 'prod') {
+
+    define('ENVIRONMENT', 'production');
+}
+
+
+
 // ----------------------- Configuraciones para desarrollo ---------------------------
-if($hostName == '127.0.0.1' || $hostName == 'localhost')
-{
-    define('ENVIRONMENT', 'development');
-    define('LOCALFOLDER', "$proyName/");
-    $rootPath = strhas(DOCUMENTROOT, $proyName) ? DOCUMENTROOT : DOCUMENTROOT . "$proyName/";
-    $webServer = "$protocol://$hostName/$proyName/";
-}
-else if ($hostName == "local.$proyName.com" || strstr($hostName,'127.0.0.'))
-{
-    define('ENVIRONMENT', 'development');
-    define('LOCALFOLDER', "$proyName/");
-    $rootPath = strhas(DOCUMENTROOT, $proyName) ? DOCUMENTROOT : DOCUMENTROOT . "$proyName/";
-    $webServer = "$protocol://$hostName/";
-}
-else if ($hostName == '192.168.1.10' || $hostName == '192.168.2.103' )
-{
-    define('ENVIRONMENT', 'development');
-    define('LOCALFOLDER', '');
-    $rootPath = DOCUMENTROOT;
-    $webServer = "$protocol://$hostName/";
-}
+//if($hostName == '127.0.0.1' || $hostName == 'localhost')
+//{
+//    define('ENVIRONMENT', 'development');
+//    define('LOCALFOLDER', "$proyName/");
+//    $rootPath = strhas(DOCUMENTROOT, $proyName) ? DOCUMENTROOT : DOCUMENTROOT . "$proyName/";
+//    $webServer = "$protocol://$hostName/$proyName/";
+//}
+//else if ($hostName == "local.$proyName.com" || strstr($hostName,'127.0.0.'))
+//{
+//    define('ENVIRONMENT', 'development');
+//    define('LOCALFOLDER', "$proyName/");
+//    $rootPath = strhas(DOCUMENTROOT, $proyName) ? DOCUMENTROOT : DOCUMENTROOT . "$proyName/";
+//    $webServer = "$protocol://$hostName/";
+//}
+//else if ($hostName == '192.168.1.10' || $hostName == '192.168.2.103' )
+//{
+//    define('ENVIRONMENT', 'development');
+//    define('LOCALFOLDER', '');
+//    $rootPath = DOCUMENTROOT;
+//    $webServer = "$protocol://$hostName/";
+//}
 // ------------------------------------------------------------------------------------
 // ------------------------ Configuraciones para Testing ------------------------------
-else if ($hostName == "test.$proyName.com" || $hostName == '192.168.1.11')
-{
-    define('ENVIRONMENT', 'testing');
-    define('LOCALFOLDER', '');
-    $rootPath = DOCUMENTROOT;
-    $webServer = "$protocol://$hostName/";
-}
+//else if ($hostName == "test.$proyName.com" || $hostName == '192.168.1.11')
+//{
+//    define('ENVIRONMENT', 'testing');
+//    define('LOCALFOLDER', '');
+//    $rootPath = DOCUMENTROOT;
+//    $webServer = "$protocol://$hostName/";
+//}
 // ------------------------------------------------------------------------------
 // ------------------ Configuraciones para produccion --------------------------
-else if ($hostName == "desarrollo.defensoria.gob.bo" || $hostName == '192.168.2.21')
-{
-    define('ENVIRONMENT', 'production');
-    define('LOCALFOLDER', '');
-    $rootPath = DOCUMENTROOT;
-    $webServer = "$protocol://$hostName/";
-}
+//else if ($hostName == "desarrollo.estic.com.bo" || $hostName == '192.168.2.21')
+//{
+//    define('ENVIRONMENT', 'production');
+//    define('LOCALFOLDER', '');
+//    $rootPath = DOCUMENTROOT;
+//    $webServer = "$protocol://$hostName/";
+//}
 // ------------------------------------------------------------------------------
 
-else {
-    echo "<h2>Ocurrio un error con la direccion IP o el nombre del hostname: $hostName, verifica que el mismo este configurado en el servidor</h2>";
-    echo dump($_SERVER);
-    exit();
-}
+//else {
+//    echo "<h2>Ocurrio un error con la direccion IP o el nombre del hostname: $hostName, verifica que el mismo este configurado en el servidor</h2>";
+//    echo dump($_SERVER);
+//    exit();
+//}
+$origin = $aServer['origin'];
+$assets = $origin.'assets/';
+define('LOCALFOLDER', $aServer['local-folder']);
 
-$assets = $webServer.'assets/';
-
-define('DIRECTORY',is_dir($rootPath) ? $rootPath : PWD);
-define('ROOTPATH', is_dir($rootPath) ? $rootPath : PWD);
-define('WEBSERVER', $webServer);
+define('DIRECTORY',is_dir($aServer['root-path']) ? $aServer['root-path'] : PWD);
+define('ROOTPATH', is_dir($aServer['root-path']) ? $aServer['root-path'] : PWD);
+define('WEBSERVER', $origin);
 define('WEBASSETS', $assets);
-define('WEBROOT', $webServer);
+define('WEBROOT', $origin);
 define('PROTOCOL', $protocol);
 define('SERVERNAME', isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : $hostName);
 
