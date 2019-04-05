@@ -125,32 +125,58 @@ if (file_exists(DOCUMENTROOT . 'app/config/config.php')) {
 
 }
 
-if(isset($config)){
-
-  $proyName = $config['proy_name'];
-
-  $currentPath = $config['proy_current_path'];
-
-  $hostName = $config['proy_hostname'];
-
-  $protocol = $config['proy_protocol'];
-
-} else {
-
-  echo 'No se encontro el archivo de configuracion';
-
-  exit(1);
-}
+//if(isset($config)){
+//
+//  $proyName = $config['proy_name'];
+//
+//  $currentPath = $config['proy_current_path'];
+//
+//  $hostName = $config['proy_hostname'];
+//
+//  $protocol = $config['proy_protocol'];
+//
+//} else {
+//
+//  echo 'No se encontro el archivo de configuracion';
+//
+//  exit(1);
+//}
 
 /*
  * ------------------------------------------------------
  *  Defining Proyect Settings
  * ------------------------------------------------------
  */
+$proyName = $config['proy_name'];
 
 $jsonServers = file_get_contents(DOCUMENTROOT . "/config/servers.json");
 
-$aServer = json_decode($jsonServers, true);
+$aServers = json_decode($jsonServers, true)[$proyName];
+
+$aServer = [];
+
+foreach ($aServers as $server) {
+
+    if($server['hostname'] == $_SERVER['SERVER_NAME']){
+
+        $aServer = $server;
+
+        break;
+    }
+}
+
+if(!isArray($aServer)){
+
+    echo 'The application does not have a correct path, review the properties at the config/servers folder.';
+
+    exit();
+}
+
+$config['proy_current_path'] = $aServer['root-path'];
+$config['proy_hostname'] = $aServer['hostname'];
+$config['proy_protocol'] = $aServer['protocol'];
+
+
 
 // ----------------------- Enviroment Rules ------------------------
 
@@ -160,7 +186,7 @@ if($aServer['type-env'] == 'dev'){
 
 } else if($aServer['type-env'] == 'test') {
 
-    define('ENVIRONMENT', 'development');
+    define('ENVIRONMENT', 'testing');
 
 } else if($aServer['type-env'] == 'prod') {
 
@@ -216,17 +242,15 @@ if($aServer['type-env'] == 'dev'){
 //    echo dump($_SERVER);
 //    exit();
 //}
-$origin = $aServer['origin'];
-$assets = $origin.'assets/';
-define('LOCALFOLDER', $aServer['local-folder']);
 
-define('DIRECTORY',is_dir($aServer['root-path']) ? $aServer['root-path'] : PWD);
-define('ROOTPATH', is_dir($aServer['root-path']) ? $aServer['root-path'] : PWD);
-define('WEBSERVER', $origin);
-define('WEBASSETS', $assets);
-define('WEBROOT', $origin);
-define('PROTOCOL', $protocol);
-define('SERVERNAME', isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : $hostName);
+define('LOCALFOLDER', $aServer['root-path']);
+define('DIRECTORY',DOCUMENTROOT.$aServer['root-path']);
+define('ROOTPATH', DOCUMENTROOT.$aServer['root-path']);
+define('WEBSERVER', $aServer['origin']);
+define('WEBASSETS', $aServer['origin'].'assets/');
+define('WEBROOT', $aServer['origin']);
+define('PROTOCOL', $aServer['protocol']);
+define('SERVERNAME', isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : $aServer['hostname']);
 
 
 
