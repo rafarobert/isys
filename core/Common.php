@@ -199,6 +199,10 @@ if ( ! function_exists('load_class'))
 			// Note: We use exit() rather than show_error() in order to avoid a
 			// self-referencing loop with the Exceptions class
 			set_status_header(503);
+			if(compareStrStr(ENVIRONMENT, 'production')){
+			    include APPPATH."layouts/pages/error_503.php";
+			    exit();
+            }
 			echo 'Unable to locate the specified class: '.$class.'.php';
 			exit(5); // EXIT_UNK_CLASS
 		}

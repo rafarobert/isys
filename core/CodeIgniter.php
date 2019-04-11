@@ -1212,6 +1212,10 @@ if(is_object($CI->oUserLogguedIn)){
 
     $response = call_user_func_array(array(&$CI, $method), $params);
 
+} else if($method == 'index' && $class == 'dashboard') {
+
+    $response = call_user_func_array(array(&$CI, $method), $params);
+
 } else {
 
     $response = [];
