@@ -64,7 +64,7 @@ class CI_Session {
 	public $userdata;
 	public $userTable;
     public $userIdTable;
-    public $ci_sessions;
+    public $es_sessions;
     public $sessKey;
 
 
@@ -938,8 +938,8 @@ class CI_Session {
 		$this->unmark_temp($key);
 	}
 
-	public function create_table_ci_sessions(){
-        $this->ci_sessions = $this->MI->create_ci_sessions();
+	public function create_table_es_sessions(){
+        $this->es_sessions = $this->MI->create_es_sessions();
     }
 
     public function getId(){

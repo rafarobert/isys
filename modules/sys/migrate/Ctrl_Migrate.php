@@ -24,7 +24,7 @@ class Ctrl_Migrate extends ES_Controller
         $this->load->library('migration');
         $this->tab_excepts = config_item('tab_excepts');
         $this->sys = config_item('sys');
-        if(validate_modulo('base','users')){
+        if(validate_modulo('estic','users')){
             $this->load->model('base/model_users');
         }
         set_time_limit(900);

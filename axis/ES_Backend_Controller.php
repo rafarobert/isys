@@ -37,7 +37,7 @@ class ES_Backend_Controller extends ES_Controller
         $excepts = ['ajax'];
         $this->load->library('migration');
         if (!$CI) {
-            if (validate_modulo('base', 'users')) {
+            if (validate_modulo('estic', 'users')) {
                 if(!in_array($this->router->class, $excepts)){
                     $this->onLoad();
                 }
@@ -59,12 +59,12 @@ class ES_Backend_Controller extends ES_Controller
         $this->load->library('encryption');
 //        $this->form_validation->set_error_delimiters('<p class="error">', '</p>');
 
-        if (validate_modulo('base', 'users')) {
+        if (validate_modulo('estic', 'users')) {
             $this->load->model('base/model_users');
         } else {
             show_error('No se pudo cargar el modulo users');
         }
-        if (validate_modulo('base', 'sessions')) {
+        if (validate_modulo('estic', 'sessions')) {
             $this->load->model('base/model_users');
             $this->session->userTable = 'ci_users';
             $this->session->userIdTable = 'id_user';
@@ -99,7 +99,7 @@ class ES_Backend_Controller extends ES_Controller
 //                    ->find();
 
             if (is_object($this->oUserLogguedIn)) {
-                if (validate_modulo('base', 'tables')) {
+                if (validate_modulo('estic', 'tables')) {
                     $this->load->model('base/model_tables');
                 }
                 if (validate_modulo('admin', 'empleados')) {

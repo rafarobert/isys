@@ -895,7 +895,7 @@ class CI_Migration
 
     private function saveTable($tableSettings, $tableName, $tablePk)
     {
-        if (validate_modulo('base', 'tables')) {
+        if (validate_modulo('estic', 'tables')) {
             $sys = config_item('sys');
             $modMigIndex = config_item('mod_migIndex');
             $modTable = config_item('mod_table');
@@ -928,7 +928,7 @@ class CI_Migration
                 exit();
             }
 
-            if(!validate_modulo('base','users')){
+            if(!validate_modulo('estic','users')){
                 show_error_handled("El modulo users no se encuentraba creado, debido a ello no se pudo registrar la tabla $tableName, al momento de la migracion: $id_migration, verifica que el modulo base/usere se encuentra creado para evitar este error");
                 return $id_migration;
             }
@@ -2398,7 +2398,7 @@ class CI_Migration
     private function getExtraFunctions($tableName)
     {
         $content = "";
-        if ($tableName == 'ci_sessions') {
+        if ($tableName == 'es_sessions') {
             $content .= '
             public function login(){
                 $this->session->login();

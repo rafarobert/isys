@@ -34,7 +34,7 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
         }
         //<<<validateFieldImgUpload4>>>
         //>>>validateUserSavedForRolling2<<<
-        if(validate_modulo('base','users_roles')){
+        if(validate_modulo('estic','users_roles')){
             $this->initUsersRoles();
         }
         //<<<validateUserSavedForRolling2>>>

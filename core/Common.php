@@ -454,17 +454,26 @@ if ( ! function_exists('show_error'))
         /**
          * @var Model_Logs $CI
          */
-        if(!strstr($message,'base/logs')){
-            if(validate_modulo('base','logs')){
-                $CI = Ctrl_Logs::create()->init();
-                $data['heading'] = $heading;
-                $data['action'] = $CI->uri->uri_string;
-                $data['message'] = $message;
-                $data['exit_status'] = $exit_status;
-                $data['code'] = $status_code;
-                $data['post'] = $CI->input->post();$data['level'] = $_error->ob_level;
-                $CI->model_logs->save($data);
+        if(!strstr($message,'estic/logs')){
+
+
+          $framePath = getframePath('estic','logs');
+          if(is_dir($framePath)){
+            if(file_exists($framePath.'Ctrl_Logs.php') &&
+              file_exists($framePath.'Model_Logs.php') &&
+              is_dir($framePath.'views/')){
+
+              $CI = Ctrl_Logs::create()->init();
+              $data['heading'] = $heading;
+              $data['action'] = $CI->uri->uri_string;
+              $data['message'] = $message;
+              $data['exit_status'] = $exit_status;
+              $data['code'] = $status_code;
+              $data['post'] = $CI->input->post();$data['level'] = $_error->ob_level;
+              $CI->model_logs->save($data);
             }
+          }
+          show_error("El modulo estic/logs no pudo ser encontrado, revisa que la direccion este bien establecida");
         }
 
 		echo $_error->show_error($heading, $message, 'error_general', $status_code);
@@ -718,7 +727,7 @@ if ( ! function_exists('_error_handler'))
         /**
          * @var Model_Logs $CI
          */
-        if(validate_modulo('base','logs')){
+        if(validate_modulo('estic','logs')){
             $CI = Ctrl_Logs::create()->init();
             $data['severity'] = $severity;
             $data['message'] = $message;
@@ -765,7 +774,7 @@ if ( ! function_exists('_exception_handler'))
 		/**
          * @var Model_Logs $CI
          */
-		if(validate_modulo('base','logs')){
+		if(validate_modulo('estic','logs')){
             $CI = Ctrl_Logs::create()->init();
             $data['message'] = $exception->getMessage();
             $data['code'] = $exception->getCode();

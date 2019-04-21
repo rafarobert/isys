@@ -297,8 +297,8 @@ Class ES_Model extends ES_Model_Vars {
         return $options;
     }
 
-    public function create_ci_sessions(){
-        $this->dbforge->create_ci_sessions();
+    public function create_es_sessions(){
+        $this->dbforge->create_es_sessions();
     }
 //
 //    public function get_pk_table($table){
