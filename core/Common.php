@@ -474,9 +474,11 @@ if ( ! function_exists('show_error'))
             }
           }
           show_error("El modulo estic/logs no pudo ser encontrado, revisa que la direccion este bien establecida");
+          return true;
+        } else{
+          echo $_error->show_error($heading, $message, 'error_general', $status_code);
         }
 
-		echo $_error->show_error($heading, $message, 'error_general', $status_code);
 //		exit($exit_status);
 	}
 }
@@ -2117,7 +2119,7 @@ if (!function_exists('cleanString')) {
 
 if (!function_exists('validate_modulo')) {
 
-    function validate_modulo($mod,$subMod){
+    function validate_modulo($mod, $subMod, $status = 500, $heading = ''){
 
         $CI = CI_Controller::get_instance();
         $sys = config_item('sys');

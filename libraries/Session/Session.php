@@ -939,17 +939,40 @@ class CI_Session {
     }
 
     public function getIdUserLoggued(){
-	    $this->CI->initUsers(true);
-	    $this->sessKey = config_item('sess_key_admin');
-        if($this->has_userdata($this->sessKey)) {
-            $aDataSession = $this->userdata($this->sessKey);
-            return validateArray($aDataSession, 'IdUser') ? $aDataSession['IdUser'] : (validateArray($aDataSession, 'id_user') ? $aDataSession['id_user'] : '');
-        } else if(inArray($this->sessKey, $this->userdata)){
-            return $this->userdata[$this->sessKey]['id_user'];
-        } else {
-            return null;
+
+      $CI = CI_Controller::get_instance();
+      $sys = config_item('sys');
+      $DIRS = config_item('dirs');
+      $mod_type = $sys['estic'];
+
+      if($CI->db->table_exists('estic'.'_users')){
+        $framePath = getframePath('estic','users');
+        if(is_dir($framePath)){
+          if(file_exists($framePath.'Ctrl_'.ucfirst('users').'.php') &&
+            file_exists($framePath.'Model_'.ucfirst('users').'.php') &&
+            is_dir($framePath.'views/')){
+
+
+            $this->CI->initUsers(true);
+            $this->sessKey = config_item('sess_key_admin');
+            if($this->has_userdata($this->sessKey)) {
+              $aDataSession = $this->userdata($this->sessKey);
+              return validateArray($aDataSession, 'IdUser') ? $aDataSession['IdUser'] : (validateArray($aDataSession, 'id_user') ? $aDataSession['id_user'] : '');
+            } else if(inArray($this->sessKey, $this->userdata)){
+              return $this->userdata[$this->sessKey]['id_user'];
+            } else {
+              return null;
+            }
+
+
+          }
         }
-    }
+        echo "El modulo estis/users no pudo ser encontrado, revisa que la direccion este bien establecida";
+      } else {
+        echo "La tabla ".$sys['estic']."_users no se encuentra en la base de datos";
+      }
+
+	}
 
     public function getDataUserLoggued(){
         $this->sessKey = config_item('sess_key_admin');
