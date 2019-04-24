@@ -46,11 +46,15 @@ class Ctrl_Migrate extends ES_Controller
 //            $_POST['bReset'] = true;
 //        }
 
-      $this->load->library('session');
+      if (validate_modulo('estic','sessions')) {
 
-      // inicia sesion automaticamente se se dio las credenciales correctas
-      if(!$this->session->isLoguedin()){
-        $this->session->login();
+        $this->load->library('session');
+
+        // inicia sesion automaticamente se se dio las credenciales correctas
+        if(!$this->session->isLoguedin()){
+
+          $this->session->login();
+        }
       }
 
       $migrations = $this->migration->_migration_files;
@@ -154,7 +158,7 @@ class Ctrl_Migrate extends ES_Controller
         $aDBTables = $this->dbforge->getArrayDBTables();
         $this->data = $this->setDefaultData($this->data);
         $fileName = "ES_Table_Trait.php";
-        $framePath = "orm/map/";
+        $framePath = ORMPATH."map/";
         $this->data['setInitFunctions'] = '';
         foreach ($aDBTables as $key => $dbTable) {
             if(!in_array($dbTable, $this->tab_excepts)){
@@ -185,7 +189,7 @@ class Ctrl_Migrate extends ES_Controller
         $fileName = "ES_Table_Vars.php";
         $fileModelVarsName = "ES_Model_Vars.php";
         $fileCtrlVarsName = "ES_Ctrl_Vars.php";
-        $framePath = "orm/map/";
+        $framePath = ORMPATH."map/";
 
         $this->data['setInitStaticTableVars'] = '';
         $this->data['setInitStaticVars'] = '';
@@ -247,9 +251,12 @@ class Ctrl_Migrate extends ES_Controller
 
     public function fromdatabase()
     {
-        $sessUser = $this->session->getObjectUserLoggued();
 
-        $mainModules = count(config_item('main_modules_enabled')) ? config_item('main_modules_enabled') : ['ci','dfa'];
+      $mainModules = count(config_item('main_modules_enabled')) ? config_item('main_modules_enabled') : ['ci','dfa'];
+
+      if(validate_modulo('estic','sessions')){
+
+        $sessUser = $this->session->getObjectUserLoggued();
 
         if(!isObject($sessUser)){
             show_error('Debes iniciar sesion para realizar esta accion');
@@ -259,8 +266,13 @@ class Ctrl_Migrate extends ES_Controller
             show_error('No tiene permisos para realizar esta accion, por favor contactese con los administradores del sistema');
             exit();
         }
+      }
 
+      if (validate_modulo('estic','tables')){
         $this->initTables(true);
+      } else {
+        $ciMigIndex = 0;
+      }
         $dbTables = $this->dbforge->getArrayFieldsFromTable();
         unset($dbTables['migrations']);
 
@@ -286,16 +298,17 @@ class Ctrl_Migrate extends ES_Controller
         }
 
         foreach ($modules as $modName => $tables){
-//            $migIndex = 900;
             foreach ($tables as $name => $fields){
+              if (validate_modulo('estic','tables')){
                 $oTableFromCiTables = $this->model_tables->findOneByTableName($name);
                 if(isObject($oTableFromCiTables)){
                     $ciMigIndex = $oTableFromCiTables->getIdTable();
                 } else {
-//                    $migIndex++;
-//                    $ciMigIndex = 0;
                     show_error("La tabla $name que intentas migrar no se encuentra registrada en la tabla ci_tables");
                 }
+              } else {
+                $ciMigIndex++;
+              }
                 foreach ($fields as $fieldName => $fieldValues){
                     $aJsonFields = $this->dbforge->getFieldCommentsFromDB($fieldName,$name);
                     if(validateVar($aJsonFields, 'array')){

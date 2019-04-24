@@ -535,7 +535,7 @@ if (is_dir($orm_folder))
 //      $orm_folder= $_temp.DIRECTORY_SEPARATOR;
     }
 
-    define('ORMPATH', str_replace('\\', '/', $_temp.DIRECTORY_SEPARATOR));
+    define('ORMPATH', str_replace('\\', '/', PWD.$orm_folder.DIRECTORY_SEPARATOR));
 }
 else
 {
@@ -546,7 +546,7 @@ else
         exit(3); // EXIT_CONFIG
     }
 
-    define('ORMPATH', str_replace('\\', '/', $orm_folder.DIRECTORY_SEPARATOR));
+    define('ORMPATH', str_replace('\\', '/', PWD.$orm_folder.DIRECTORY_SEPARATOR));
 }
 
 // The path to the "$view_folder" folder

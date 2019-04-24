@@ -11,7 +11,7 @@ use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
 defined("BASEPATH") OR exit("No direct script access allowed");
 
-class Ctrl_Ajax extends ES_Base_Controller
+class Ctrl_Ajax extends ES_Estic_Controller
 {
     function __construct()
     {

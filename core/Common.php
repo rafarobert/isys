@@ -457,23 +457,25 @@ if ( ! function_exists('show_error'))
         if(!strstr($message,'estic/logs')){
 
 
-          $framePath = getframePath('estic','logs');
+          $framePath = getframePath('es','logs');
           if(is_dir($framePath)){
             if(file_exists($framePath.'Ctrl_Logs.php') &&
               file_exists($framePath.'Model_Logs.php') &&
               is_dir($framePath.'views/')){
 
-              $CI = Ctrl_Logs::create()->init();
-              $data['heading'] = $heading;
-              $data['action'] = $CI->uri->uri_string;
-              $data['message'] = $message;
-              $data['exit_status'] = $exit_status;
-              $data['code'] = $status_code;
-              $data['post'] = $CI->input->post();$data['level'] = $_error->ob_level;
-              $CI->model_logs->save($data);
+              if(class_exists('Ctrl_Logs')){
+                $CI = Ctrl_Logs::create()->init();
+                $data['heading'] = $heading;
+                $data['action'] = $CI->uri->uri_string;
+                $data['message'] = $message;
+                $data['exit_status'] = $exit_status;
+                $data['code'] = $status_code;
+                $data['post'] = $CI->input->post();$data['level'] = $_error->ob_level;
+                $CI->model_logs->save($data);
+              }
             }
           }
-          show_error("El modulo estic/logs no pudo ser encontrado, revisa que la direccion este bien establecida");
+          echo"El modulo estic/logs no pudo ser encontrado, revisa que la direccion este bien establecida";
           return true;
         } else{
           echo $_error->show_error($heading, $message, 'error_general', $status_code);

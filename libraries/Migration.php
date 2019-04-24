@@ -1404,12 +1404,12 @@ class CI_Migration
             }
         }
 
-        if($tableName == 'ci_files'){
+        if($tableName == 'es_files'){
             $data["validateFieldImgUpload1"] = $this->load->view(["template_controller" => "validateFieldImgUpload1"], $data, true, true);
             $data["validateFieldImgUpload2"] = $this->load->view(["template_controller" => "validateFieldImgUpload2"], $data, true, true);
             $data["validateFieldImgUpload4"] = $this->load->view(["template_ES_Ctrl" => "validateFieldImgUpload4"], $data, true, true);
         }
-        if($tableName == 'ci_users'){
+        if($tableName == 'es_users'){
             $data["validateUserSavedForRolling1"] = $this->load->view(["template_controller" => "validateUserSavedForRolling1"], $data, true, true);
             $data["validateUserSavedForRolling2"] = $this->load->view(["template_ES_Ctrl" => "validateUserSavedForRolling2"], $data, true, true);
             $data["validateUsersSavedForPersonTable1"] = $this->load->view(["template_controller" => "validateUsersSavedForPersonTable1"], $data, true, true);
