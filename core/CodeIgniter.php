@@ -962,6 +962,8 @@ if (isset($assign_to_config) && is_array($assign_to_config))
         } else {
             if(is_array($SYS[$modulo])){
                 $modulo = $SYS[$modulo]['name'];
+            } else {
+                $modulo = $SYS[$modulo];
             }
         }
         $directory = $RTR->directory;
@@ -1199,6 +1201,7 @@ $methodsExcepts = ['signup','login'];
 $classExcepts = ['ajax','migrate','files'];
 
 // if User logu¿gued in continue
+
 if(is_object($CI->oUserLogguedIn)){
 
     $response = call_user_func_array(array(&$CI, $method), $params);

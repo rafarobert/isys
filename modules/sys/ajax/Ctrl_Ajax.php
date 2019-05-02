@@ -52,7 +52,7 @@ class Ctrl_Ajax extends ES_Estic_Controller
     }
 
     public function export($module = '', $class = '', $method = '', $id= ''){
-        $SYS = config_item('sys');
+        $sys = config_item('sys');
 
         $methodExcepts = ['index'];
 
@@ -166,7 +166,6 @@ class Ctrl_Ajax extends ES_Estic_Controller
 
         $response = array();
         if($this->{"init".ucfirst(setObject($class))}(true)) {
-            $acr = $sys[$modulo];
             if($response = $this->{"model_$class"}->{$method}($pk)) {
                 if(inArray('tableRef',$post) && inArray('idTableRef',$post) && inArray('fieldTableRef',$post)){
                     $tableRef = $post['tableRef'];

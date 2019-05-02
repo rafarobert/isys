@@ -473,9 +473,14 @@ if ( ! function_exists('show_error'))
                 $data['post'] = $CI->input->post();$data['level'] = $_error->ob_level;
                 $CI->model_logs->save($data);
               }
+            } else {
+              echo "El modulo estic/logs no pudo ser encontrado, revisa que la direccion este bien establecida
+              ";
             }
+          } else {
+            echo "El modulo estic/logs no pudo ser encontrado, revisa que la direccion este bien establecida
+            ";
           }
-          echo"El modulo estic/logs no pudo ser encontrado, revisa que la direccion este bien establecida";
           return true;
         } else{
           echo $_error->show_error($heading, $message, 'error_general', $status_code);
@@ -815,6 +820,8 @@ if ( ! function_exists('_shutdown_handler'))
 	 */
 	function _shutdown_handler()
 	{
+
+
 		$last_error = error_get_last();
 		if (isset($last_error) &&
 			($last_error['type'] & (E_ERROR | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING)))
@@ -2125,24 +2132,27 @@ if (!function_exists('validate_modulo')) {
 
         $CI = CI_Controller::get_instance();
         $sys = config_item('sys');
-        $DIRS = config_item('dirs');
-        $mod_type = $sys[$mod];
+        if(validateVar($mod) && validateVar($subMod)){
 
-        if($CI->db->table_exists("$mod_type"."_$subMod")){
-            $framePath = getframePath($mod_type,$subMod);
-            if(is_dir($framePath)){
-                if(file_exists($framePath.'Ctrl_'.ucfirst($subMod).'.php') &&
-                    file_exists($framePath.'Model_'.ucfirst($subMod).'.php') &&
-                    is_dir($framePath.'views/')){
+          $modSign = isset($sys[$mod]['sign']) ? $sys[$mod]['sign'] : $mod;
 
-                    return true;
-                }
-            }
-            show_error("El modulo $mod/$subMod no pudo ser encontrado, revisa que la direccion este bien establecida");
-        } else {
-            show_error("La tabla ".$sys[$mod].'_'.$subMod." no se encuentra en la base de datos");
+          if($CI->db->table_exists("$modSign"."_$subMod")){
+              $framePath = getframePath($modSign,$subMod);
+              if(is_dir($framePath)){
+                  if(file_exists($framePath.'Ctrl_'.ucfirst($subMod).'.php') &&
+                      file_exists($framePath.'Model_'.ucfirst($subMod).'.php') &&
+                      is_dir($framePath.'views/') &&
+                      class_exists('Ctrl_'.ucfirst($subMod))
+                  ){
+
+                      return true;
+                  }
+              }
+              show_error("El modulo $mod/$subMod no pudo ser encontrado, revisa que la direccion este bien establecida");
+          } else {
+              show_error("La tabla ".$modSign.'_'.$subMod." no se encuentra en la base de datos");
+          }
+          return false;
         }
-        $tableName = $sys[$mod].'_'.$subMod;
-        return false;
     }
 }

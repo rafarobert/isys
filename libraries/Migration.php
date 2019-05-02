@@ -323,7 +323,7 @@ class CI_Migration
      * @param    string $target_version Target schema version
      * @return    mixed    TRUE if no migrations are found, current version string on success, FALSE on failure
      */
-    public function version($target_version, $mod = '')
+    public function version($target_version, $modSign = '')
     {
         // Note: We use strings, so that timestamp versions work on 32-bit systems
         $current_version = $this->_get_version();
@@ -334,15 +334,15 @@ class CI_Migration
             $target_version = (string)$target_version;
         }
 
-        if ($mod != '') {
-            $mod = (string)$mod;
+        if ($modSign != '') {
+            $modSign = (string)$modSign;
         }
 
         $migrations = $this->_migration_files;
 
-        if ($mod != '') {
-            if (isset($migrations[$mod][$target_version])) {
-                if ($target_version > 0 && !isset($migrations[$mod][$target_version])) {
+        if ($modSign != '') {
+            if (isset($migrations[$modSign][$target_version])) {
+                if ($target_version > 0 && !isset($migrations[$modSign][$target_version])) {
                     $this->_error_string = sprintf($this->lang->line('migration_not_found'), $target_version);
                     return FALSE;
                 }
@@ -360,8 +360,8 @@ class CI_Migration
         } elseif ($target_version < $current_version) {
             $method = 'down';
             // We need this so that migrations are applied in reverse order
-            if ($mod != '') {
-                krsort($migrations[$mod]);
+            if ($modSign != '') {
+                krsort($migrations[$modSign]);
             } else {
                 krsort($migrations);
             }
@@ -378,7 +378,7 @@ class CI_Migration
         //
         // See https://github.com/bcit-ci/CodeIgniter/issues/4539
         $pending = array();
-        foreach ($migrations[$mod] as $number => $file) {
+        foreach ($migrations[$modSign] as $number => $file) {
             // Ignore versions out of our range.
             //
             // Because we've previously sorted the $migrations array depending on the direction,
@@ -505,14 +505,14 @@ class CI_Migration
     {
         $migrations = array();
         if ($this->_dir_migration_tables == null) {
-            $this->_dir_migration_tables = config_item('dirMigrationTables');
+            $this->_dir_migration_tables[] = DOCUMENTROOT.config_item('mig_path');
         }
 
         if ($bWithSubModules) {
-            $sys_config = config_item('sys');
-            foreach ($sys_config as $mod => $setting) {
+            $sys = config_item('sys');
+            foreach ($sys as $modSign => $setting) {
                 foreach ($this->_dir_migration_tables as $dir) {
-                    foreach (glob($dir . $mod . '/' . '*_*.php') as $file) {
+                    foreach (glob($dir . $modSign . '/' . '*_*.php') as $file) {
                         $name = basename($file, '.php');
 
                         // Filter out non-migration files
@@ -520,12 +520,12 @@ class CI_Migration
                             $number = $this->_get_migration_number($name);
 
                             // There cannot be duplicate migration numbers
-                            if (isset($migrations[$mod][$number])) {
+                            if (isset($migrations[$modSign][$number])) {
                                 $this->_error_string = sprintf($this->lang->line('migration_multiple_version'), $number);
                                 show_error($this->_error_string);
                             }
 
-                            $migrations[$mod][$number] = $file;
+                            $migrations[$modSign][$number] = $file;
                         }
                     }
                 }
@@ -710,8 +710,8 @@ class CI_Migration
                             }
                         } else {
                             $migIndex = $this->getMigrationIndexFromTableName($settings['table']);
-                            list($mod, $submod) = getModSubMod($settings['table']);
-                            redirect("base/migrate/$mod/$migIndex");
+                            list($modSign, $submod) = getModSubMod($settings['table']);
+                            redirect("base/migrate/$modSign/$migIndex");
                         }
                     }
                 }
@@ -721,12 +721,12 @@ class CI_Migration
 
     public function getMigrationIndexFromTableName($tableLocal)
     {
-        list($mod, $subMod) = getModSubMod($tableLocal);
+        list($modSign, $subMod) = getModSubMod($tableLocal);
         $files = $this->CI->migrationFiles;
-        if ($mod == null) {
-            $mod = $subMod;
+        if ($modSign == null) {
+            $modSign = $subMod;
         }
-        $migrationTabs = $files[$mod];
+        $migrationTabs = $files[$modSign];
         foreach ($migrationTabs as $index => $name) {
             if (strpos($name, $tableLocal)) {
                 return $index;
@@ -895,15 +895,21 @@ class CI_Migration
 
     private function saveTable($tableSettings, $tableName, $tablePk)
     {
+        $sys = config_item('sys');
         if (validate_modulo('estic', 'tables')) {
-            $sys = config_item('sys');
-            $modMigIndex = config_item('mod_migIndex');
-            $modTable = config_item('mod_table');
-            list($mod, $submod) = getModSubMod($tableName);
-            list($modMod, $modSubmod) = getModSubMod($modTable);
-            $modIdTable = $this->dbforge->getPrimaryKeyFromTable($modTable);
-            $modModName = $sys[$modMod]['name'];
-            $modModId = $sys[$mod]['id'];
+          $core = $sys['core'];
+            $migIndex = $sys[$core]['id'];
+            $migSign = $sys[$core]['sign'];
+            $migTable = config_item('mig_table');
+
+
+            list($modSign, $submod) = getModSubMod($tableName);
+            $modName = $sys[$modSign];
+            list($modModSign, $modSubmod) = getModSubMod($migTable);
+            $modModName = $sys[$modModSign];
+            $modIdTable = $this->dbforge->getPrimaryKeyFromTable($migTable);
+            $modModName = $sys[$modModName]['name'];
+            $modModId = $sys[$modName]['id'];
 
 
             if ($this->input->validate('id_migration')) {
@@ -916,74 +922,78 @@ class CI_Migration
 //            $idModuleTable = intval($idMigTable.'0');
             $this->load->library('session');
 
-            $sessUser = $this->session->getDataUserLoggued();
-
-            if(isObject($sessUser)) {
-                if($sessUser->id_role != 1){
-                    show_error('El cambio que se desea realizar, requiere permisos del administrador, porfavor contactate con sistemas para continuar');
-                    exit();
-                }
-            } else {
-                show_error('Para realizar esta accion debes iniciar sesion.');
-                exit();
+            if (validate_modulo('estic','sessions')){
+              $sessUser = $this->session->getDataUserLoggued();
+              if(isObject($sessUser)) {
+                  if($sessUser->id_role != 1){
+                      show_error('El cambio que se desea realizar, requiere permisos del administrador, porfavor contactate con sistemas para continuar');
+                      exit();
+                  }
+              } else {
+                  show_error('Para realizar esta accion debes iniciar sesion.');
+                  exit();
+              }
             }
 
             if(!validate_modulo('estic','users')){
                 show_error_handled("El modulo users no se encuentraba creado, debido a ello no se pudo registrar la tabla $tableName, al momento de la migracion: $id_migration, verifica que el modulo base/usere se encuentra creado para evitar este error");
                 return $id_migration;
             }
+            if (validate_modulo('estic', 'tables') && validate_modulo('estic','tables_roles')){
 
-            if (validate_modulo($modModName, $modSubmod)) {
-                $sessUser = $this->session->getObjectUserLoggued();
+              if (validate_modulo($modModName, $modSubmod)) {
+                  // $sessUser = $this->session->getObjectUserLoggued();
 
-//                $this->CI->initModulesTables(true);
-//                $oModuleTable = $this->CI->model_modules_tables->findOneByIdModuleTable($id_migration);
+  //                $this->CI->initModulesTables(true);
+  //                $oModuleTable = $this->CI->model_modules_tables->findOneByIdModuleTable($id_migration);
 
-                $data = array(
-                    'title' => validateArray($tableSettings, 'title') ? $tableSettings['title'] : setLabel($submod,true),
-                    'table_name' => $tableName,
-                    'icon' => validateArray($tableSettings, 'icon') ? $tableSettings['icon'] : '',
-                    'url_edit' => validateArray($tableSettings, 'url') ? $tableSettings['url'].'/edit' : config_item('sys')[$mod]['dir'] . "$submod/edit",
-                    'url_index' => validateArray($tableSettings, 'url') ? $tableSettings['url'].'/index' : config_item('sys')[$mod]['dir'] . "$submod/index",
-                    'url' => validateArray($tableSettings, 'url') ? $tableSettings['url'] : config_item('sys')[$mod]['dir'] . "$submod",
-                    'description' => validateArray($tableSettings, 'descripcion') ? $tableSettings['descripcion'] : '',
-                    'status' => validateArray($tableSettings, 'estado') ? $tableSettings['estado'] : 'enabled',
-                    'listed' => validateArray($tableSettings, 'bIsListed') ? $tableSettings['bIsListed'] : 'enabled',
-                    'id_module' => $modModId,
-                    'id_role' => 1
+                  $data = array(
+                      'title' => validateArray($tableSettings, 'title') ? $tableSettings['title'] : setLabel($submod,true),
+                      'table_name' => $tableName,
+                      'icon' => validateArray($tableSettings, 'icon') ? $tableSettings['icon'] : '',
+                      'url_edit' => validateArray($tableSettings, 'url') ? $tableSettings['url'].'/edit' : $sys[$modName]['dir'] . "$submod/edit",
+                      'url_index' => validateArray($tableSettings, 'url') ? $tableSettings['url'].'/index' : $sys[$modName]['dir'] . "$submod/index",
+                      'url' => validateArray($tableSettings, 'url') ? $tableSettings['url'] : $sys[$modName]['dir'] . "$submod",
+                      'description' => validateArray($tableSettings, 'descripcion') ? $tableSettings['descripcion'] : '',
+                      'status' => validateArray($tableSettings, 'estado') ? $tableSettings['estado'] : 'enabled',
+                      'listed' => validateArray($tableSettings, 'bIsListed') ? $tableSettings['bIsListed'] : 'enabled',
+                      'id_module' => $modModId,
+                      'id_role' => 1
+                  );
 
-                );
-                if($this->CI->initTables(true)){
-                    $oTable = $this->CI->model_tables->findOneByIdTable($id_migration);
-                    $data['change_count'] = isObject($oTable) ? $oTable->getChangeCount() : 0;
-                    if (isObject($oTable)) {
-                        $data = $this->CI->model_tables->save($data, $id_migration);
-                    } else {
-                        show_error("Se intenta crear una nueva tabla $tableName, con la migracion $id_migration, para ello debe estar registraba en la tabla ci_tables");
-//                    $data = $this->CI->model_tables->save($data, null, $id_migration);
-                    }
-                };
+                  if($this->CI->initTables(true)){
+                      $oTable = $this->CI->model_tables->findOneByIdTable($id_migration);
+                      $data['change_count'] = isObject($oTable) ? $oTable->getChangeCount() : 0;
+                      if (isObject($oTable)) {
+                          $data = $this->CI->model_tables->save($data, $id_migration);
+                      } else {
+                          show_error("Se intenta crear una nueva tabla $tableName, con la migracion $id_migration, para ello debe estar registraba en la tabla es_tables");
+  //                    $data = $this->CI->model_tables->save($data, null, $id_migration);
+                      }
+                  };
 
+                  if($this->CI->initTablesRoles(true)){
+                      $oTableRoles = $this->CI->model_tables_roles->findOneByIdTable($id_migration);
+                      $data['id_role'] = 1;
+                      if(isObject($oTableRoles)){
+                          $data = $this->CI->model_tables_roles->save($data,$id_migration);
+                      } else {
+                          $data = $this->CI->model_tables_roles->save($data,null,$id_migration);
+                      }
+                  };
 
-                if($this->CI->initTablesRoles(true)){
-                    $oTableRoles = $this->CI->model_tables_roles->findOneByIdTable($id_migration);
-                    $data['id_role'] = 1;
-                    if(isObject($oTableRoles)){
-                        $data = $this->CI->model_tables_roles->save($data,$id_migration);
-                    } else {
-                        $data = $this->CI->model_tables_roles->save($data,null,$id_migration);
-                    }
-                };
+  //                $data['id_module'] = $modModId;
+  //                if(isObject($oModuleTable)){
+  //                    $data = $this->CI->model_modules_tables->save($data,$id_migration);
+  //                } else {
+  //                    $data = $this->CI->model_modules_tables->save($data,null,$id_migration);
+  //                }
 
-//                $data['id_module'] = $modModId;
-//                if(isObject($oModuleTable)){
-//                    $data = $this->CI->model_modules_tables->save($data,$id_migration);
-//                } else {
-//                    $data = $this->CI->model_modules_tables->save($data,null,$id_migration);
-//                }
-
-            } else if ($tableName != $modTable) {
-                redirect("sys/migrate/ci/$modMigIndex");
+              } else if ($tableName != $migTable) {
+                  redirect("sys/migrate/$migSign/$migIndex");
+              }
+            } else if ($tableName != $migTable) {
+              redirect("sys/migrate/$migSign/$migIndex");
             }
             return $id_migration;
         }
@@ -991,9 +1001,9 @@ class CI_Migration
 
     private function getIdUserDefault()
     {
-        if ($this->db->table_exists('ci_users')) {
+        if ($this->db->table_exists('es_users')) {
             $this->db->where('id_user', 1);
-            $oUser = $this->db->get('ci_users')->row();
+            $oUser = $this->db->get('es_users')->row();
             $siteDomain = config_item('site_domain');
             if (is_object($oUser)) {
                 return valNumeric($oUser->id_user);
@@ -1008,7 +1018,7 @@ class CI_Migration
                     'date_modified' => date('Y-m-d H:i:s')
                 );
                 $this->db->set($data);
-                if ($this->db->insert('ci_users')) {
+                if ($this->db->insert('es_users')) {
                     $idUser =  $data['id_user'];
                 };
                 $this->updateUserRoleDefault($idUser);
@@ -1018,17 +1028,17 @@ class CI_Migration
 
     private function updateUserRoleDefault($idUser = null)
     {
-        if ($this->db->table_exists('ci_roles')) {
+        if ($this->db->table_exists('es_roles')) {
             $this->db->where('id_role', 1);
-            $oRole = $this->db->get('ci_roles')->row();
+            $oRole = $this->db->get('es_roles')->row();
             if (is_object($oRole)) {
                 $this->db->where('id_user', $idUser);
-                $oUser = $this->db->get('ci_users')->row();
+                $oUser = $this->db->get('es_users')->row();
                 $data = array(
                     'id_role' => $oRole->id_role
                 );
                 $this->db->set($data);
-                $this->db->update('ci_users', $data);
+                $this->db->update('es_users', $data);
                 return $oRole->id_role;
             } else {
                 $data = array(
@@ -1041,22 +1051,23 @@ class CI_Migration
                     'date_modified' => date('Y-m-d H:i:s')
                 );
                 $this->db->set($data);
-                $this->db->insert('ci_roles');
+                $this->db->insert('es_roles');
 
                 $this->db->where('id_user', $idUser);
-                $oUser = $this->db->get('ci_users')->row();
+                $oUser = $this->db->get('es_users')->row();
                 $data = array(
                     'id_user' => $idUser,
                     'id_role' => $data['id_role']
                 );
                 $this->db->set($data);
-                $this->db->update('ci_users', $data);
+                $this->db->update('es_users', $data);
             }
         }
     }
 
     public function setDataDefault($tableName, $pkTable, $fields, $idMigTable, $tableSettings)
     {
+        $sys = config_item('sys');
         $excepts = array_merge(config_item('controlFields'), [$pkTable]);
         $allFields = array_keys($fields);
         $aFieldsColumnsKey = $this->dbforge->getArrayColumnsKey($tableName);
@@ -1077,10 +1088,10 @@ class CI_Migration
         foreach ((array)$vFieldsNames as $name) {
             $vFields[setObject($name)] = $fields[$name];
         }
-        $sys = config_item('sys');
-        list($mod, $submod) = getModSubMod($tableName);
+        list($modSign, $submod) = getModSubMod($tableName);
         list($subModS, $subModP) = setSingularPlural($submod);
-        list($modS, $modP) = setSingularPlural($sys[$mod]['name']);
+        $modName = $sys[$modSign];
+        list($modS, $modP) = setSingularPlural($modName);
         $data = array();
 
         list($vFieldsChecked, $fieldImg, $fieldPass, $fieldHidden, $data) = $this->checkInputFields($vFields, $data);
@@ -1109,15 +1120,15 @@ class CI_Migration
         $data["lcTableP"] = lcfirst($subModP);
         $data['$lcTableS'] = '$' . lcfirst($subModS);
         $data['lcTableS'] = lcfirst($subModS);
-        $data["lcModS"] = lcfirst($sys[$mod]['name']);
-        $data["lcmodType"] = strtolower($mod);
+        $data["lcModS"] = lcfirst($modName);
+        $data["lcmodSign"] = strtolower($modSign);
         $data["tableTitle"] = validateArray($tableSettings, 'title') ? $tableSettings['title'] : setLabel($subModS);
         $data['editView'] = '';
 
 
         list($data, $aEditViewsPhpContent) = $this->loadEditViews($fields, $vFieldsViews, $data, $tableName);
 
-        return [$mod, $submod, $subModS, $subModP, $data, $vFields, $aEditViewsPhpContent, $fieldImg, $fieldPass, $fieldHidden];
+        return [$modSign, $submod, $subModS, $subModP, $data, $vFields, $aEditViewsPhpContent, $fieldImg, $fieldPass, $fieldHidden];
     }
 
     public function checkInputFields($vFields, $data)
@@ -1171,8 +1182,8 @@ class CI_Migration
                         return $idSettings;
                     }
                 } else {
-                    show_error("Para armar la vista $editView, se necesita una relacion en la tabla: $tableName con la la tabla ci_settings, 
-                    introduce una fila en la tabla que se relacione con ci_options, por ejemplo: id_option_tipo_$editView, 
+                    show_error("Para armar la vista $editView, se necesita una relacion en la tabla: $tableName con la la tabla es_settings, 
+                    introduce una fila en la tabla que se relacione con es_options, por ejemplo: id_option_tipo_$editView, 
                     y que filtre en base a ese tipo de opciones");
                 }
             }
@@ -1273,12 +1284,12 @@ class CI_Migration
     }
     public function createCtrl2($tableName, $pkTable, $fields, $default = [])
     {
+        $sys = config_item('sys');
         $aDBTablesPks = $this->dbforge->getPrimaryKeysOfTables(true);
         $aDBTablesFks = $this->dbforge->getForeignKeyOfTables(true);
         $aMixDbPkFk = array_merge($aDBTablesPks,$aDBTablesFks);
-        $sys = config_item('sys');
         $excepts = array_merge(config_item('controlFields'), [$pkTable]);
-        list($mod, $submod, $subModS, $subModP, $data, $vFields, $aEditViewsPhpContent, $fieldImg, $fieldPass, $fieldHidden) = $default;
+        list($modSign, $submod, $subModS, $subModP, $data, $vFields, $aEditViewsPhpContent, $fieldImg, $fieldPass, $fieldHidden) = $default;
 
         $data['initVarsForeignTable'] = '';
         $data['loadModelsForeignTable'] = '';
@@ -1296,9 +1307,10 @@ class CI_Migration
         $relationsWithOutExcepts = $this->verifyRelatedTables($relationsWithOutExcepts);
 
         foreach ((array)$relationsUnique as $fkName => $settings) {
-            list($fMod, $fSubmod) = getModSubMod($settings['table']);
+            list($fModSign, $fSubmod) = getModSubMod($settings['table']);
+            $fModName = $sys[$fModSign];
             list($fSubModS, $fSubModP) = setSingularPlural($fSubmod);
-            list($fModS, $fModP) = setSingularPlural($sys[$fMod]['name']);
+            list($fModS, $fModP) = setSingularPlural($sys[$fModName]['name']);
             $data['lcFkObjFieldP'] = '$' . lcfirst(setObject($fSubModP));
             $data['UcFkObjFieldP'] = ucfirst(setObject($fSubModP));
             $data['lcFkTableP'] = lcfirst($fSubModP);
@@ -1326,9 +1338,10 @@ class CI_Migration
                 } else {
                     $data['divider'] = ' ';
                 }
-                list($fMod, $fSubmod) = getModSubMod($settings['table']);
+                list($fModSign, $fSubmod) = getModSubMod($settings['table']);
+                $fModName = $sys[$fModSign];
                 list($fSubModS, $fSubModP) = setSingularPlural($fSubmod);
-                list($fModS, $fModP) = setSingularPlural($sys[$fMod]['name']);
+                list($fModS, $fModP) = setSingularPlural($sys[$fModName]['name']);
                 if ($fSubModP == "options") {
                     if (validateArray($settings, 'field')) {
                         $object = strhas($settings['field'], 'id_') ? explode('id_', $settings['field'])[1] : $settings['field'];
@@ -1432,11 +1445,11 @@ class CI_Migration
             $data["validateFieldPassword"] = $this->load->view(["template_controller" => "validateFieldPassword"], $data, true, true);
         }
         $data["extraFunctions"] = $this->getExtraFunctions($tableName);
-        $mod = $sys[$mod]['dir'];
+        $modName = $sys[$modSign];
         $phpCrudContent = $this->load->view("template_ES_Ctrl", $data, true, true, true);
         $phpCtrlContent = $this->load->view("template_controller", $data, true, true, true);
-        $framePathOrm = ROOTPATH . 'orm/crud/' . $mod;
-        $framePathApp = ROOTPATH . 'app/modules/' . $mod;
+        $framePathOrm = ROOTPATH . "orm/crud/$modName/";
+        $framePathApp = ROOTPATH . "app/modules/$modName/";
         if (createFolder($framePathOrm)) {
             if (createFolder($framePathOrm . "$submod/")) {
                 write_file($framePathOrm . "$submod/ES_Ctrl_" . ucfirst($submod) . $this->_ext_php, $phpCrudContent);
@@ -1489,7 +1502,7 @@ class CI_Migration
     {
         $sys = config_item('sys');
 
-        list($mod, $submod, $subModS, $subModP, $data, $vFields) = $default;
+        list($modSign, $submod, $subModS, $subModP, $data, $vFields) = $default;
         $data['setForeignTableFields'] = inArray('setForeignTableFields',$ctrlData) ? $ctrlData['setForeignTableFields'] : null;
         $data['validateFieldsImgsIndex'] = inArray('validateFieldsImgsIndex', $ctrlData) ? $ctrlData['validateFieldsImgsIndex'] : null;
         $data['loadModelsForeignTable'] = inArray('loadModelsForeignTable', $ctrlData) ? $ctrlData['loadModelsForeignTable'] : null;
@@ -1498,12 +1511,12 @@ class CI_Migration
 //        $data = $this->getPhpFieldsRules($vFields, $pkTable, $data,true);
         $data = $this->getPhpStdFields($tableName, $pkTable, $data);
 
-        $mod = $sys[$mod]['dir'];
+        $modName = $sys[$modSign];
         $phpModelContent = $this->load->view("template_model", $data, true, true, true);
         $phpTraitContent = $this->load->view("template_ES_Model", $data, true, true, true);
 
-        $framePathOrm = ROOTPATH . 'orm/crud/' . $mod;
-        $framePathApp = ROOTPATH . 'app/modules/' . $mod;
+        $framePathOrm = ROOTPATH . "orm/crud/$modName/";
+        $framePathApp = ROOTPATH . "app/modules/$modName/";
         if (createFolder($framePathOrm)) {
             if (createFolder($framePathOrm . "$submod/")) {
                 write_file($framePathOrm . "$submod/ES_Model_" . ucfirst($submod) . $this->_ext_php, $phpTraitContent);
@@ -1524,13 +1537,13 @@ class CI_Migration
     {
         $sys = config_item('sys');
 
-        list($mod, $submod, $subModS, $subModP, $data, $vFields) = $default;
+        list($modSign, $submod, $subModS, $subModP, $data, $vFields) = $default;
         $data["tableHeaderHtmlTitles"] = $this->setHtmlHeaderTitles($fields, $vFields, $tableSettings);
         $data["tableBodyHtmlFields"] = $this->setHtmlBodyFields($fields, $vFields, $tableSettings, $subModS, $subModP);
 //        list($data) = $this->loadEditViews($fields, $vFieldsViews, $data, $tableSettings);
         $phpContent = $this->load->view("template_index", $data, true, true, true);
-        $mod = $sys[$mod]['dir'];
-        $frameAppPath = ROOTPATH . 'app/modules/' . $mod;
+        $modName = $sys[$modSign];
+        $frameAppPath = ROOTPATH . "app/modules/$modName/";
         if (createFolder($frameAppPath)) {
             if (createFolder($frameAppPath . "$submod/")) {
                 if (createFolder($frameAppPath . "$submod/views/")) {
@@ -1546,7 +1559,7 @@ class CI_Migration
     public function createViewEdit($tableName, $pkTable, $fields, $tableSettings = [], $default = [])
     {
         $sys = config_item('sys');
-        list($mod, $submod, $subModS, $subModP, $data, $vFields, $aPhpContentEditViews) = $default;
+        list($modSign, $submod, $subModS, $subModP, $data, $vFields, $aPhpContentEditViews) = $default;
         list($htmlFormContent, $aEachNames, $modalsContent) = $this->setInputFields($fields, $vFields, $data, $tableName);
         list($data) = $this->setEachFields($fields, $aEachNames, $data);
         $data['htmlFieldsEditForm'] = $htmlFormContent;
@@ -1556,8 +1569,8 @@ class CI_Migration
         $phpContent = $this->load->view("template_edit", $data, true, true, true);
         $phpContent .= $modalsContent;
 
-        $mod = $sys[$mod]['dir'];
-        $frameAppPath = ROOTPATH . 'app/modules/' . $mod;
+        $modName = $sys[$modSign];
+        $frameAppPath = ROOTPATH . "app/modules/$modName/";
         if (createFolder($frameAppPath)) {
             if (createFolder($frameAppPath . "$submod/")) {
                 if (createFolder($frameAppPath . "$submod/views/")) {
@@ -1603,11 +1616,11 @@ class CI_Migration
 
     private function setInputFields($fields, $vFields, $data, $tableName = '')
     {
+        $sys = config_item('sys');
         $modal = false;
         $htmlFormContent = '';
         $aEachNames = [];
         $modalsContent = '';
-        $sys = config_item('sys');
         $bIsTextArea = false;
         $aRdsChks = ['radios','radio','checkbox','checkboxes'];
         foreach ($vFields as $name => $settings) {
@@ -2345,7 +2358,7 @@ class CI_Migration
 
     private function getPhpStdFields($tableName, $pkTable, $data)
     {
-        list($mod, $submod) = getModSubMod($tableName);
+        list($modSign, $submod) = getModSubMod($tableName);
         list($subModS, $subModP) = setSingularPlural($submod);
         $result = $this->dbforge->getTableFields($tableName);
         $object = new stdClass();
@@ -2446,9 +2459,9 @@ class CI_Migration
     private function verifyAppOrBase()
     {
         if (isset($this->CI->uri->segments[3])) {
-            $this->_base_path = $this->CI->uri->segments[3] == 'ci' || $this->CI->uri->segments[3] == 'tic' ? BASEPATH : APPPATH;
-            $this->_dir_migrations_files = $this->CI->uri->segments[3] == 'ci' || $this->CI->uri->segments[3] == 'tic' ? BASEPATH . "migrations/tables/" : APPPATH . "migrations/tables/";
-            $this->_dir_root_store = $this->CI->uri->segments[3] == 'ci' || $this->CI->uri->segments[3] == 'tic' ? BASEPATH . "migrations/storage/" : APPPATH . "migrations/storage/";
+            $this->_base_path = $this->CI->uri->segments[3] == 'es' || $this->CI->uri->segments[3] == 'tic' ? BASEPATH : APPPATH;
+            $this->_dir_migrations_files = $this->CI->uri->segments[3] == 'es' || $this->CI->uri->segments[3] == 'tic' ? BASEPATH . "migrations/tables/" : APPPATH . "migrations/tables/";
+            $this->_dir_root_store = $this->CI->uri->segments[3] == 'es' || $this->CI->uri->segments[3] == 'tic' ? BASEPATH . "migrations/storage/" : APPPATH . "migrations/storage/";
         }
     }
 
@@ -2717,7 +2730,7 @@ class CI_Migration
 
                                         // ************** para setear el setOfFkSettings ***********
                                         $newTableSettings = $fkTableFields[$vFkTableFieldRef];
-                                        list($fMod, $fSubmod) = getModSubMod($newTableSettings['table']);
+                                        list($fModSign, $fSubmod) = getModSubMod($newTableSettings['table']);
                                         list($fSubModS, $fSubModP) = setSingularPlural($fSubmod);
                                         $data['setOfFkSettings']['t1FieldRef'] = $newTableSettings['field'];
                                         $data['setOfFkSettings']['t2Contents'] = setObject($fSubModP, true, true);
@@ -2764,9 +2777,10 @@ class CI_Migration
             } else {
                 show_error("3. El parametro $vFkTableFieldRef no existe en la tabla $fkTableName, revisa los parametros json de la tabla: " . $tableName . '.');
             }
-            list($fMod, $fSubmod) = getModSubMod($fkTableName);
+            list($fModSign, $fSubmod) = getModSubMod($fkTableName);
+            $fModName = $sys[$fModSign];
             list($fSubModS, $fSubModP) = setSingularPlural($fSubmod);
-            list($fModS, $fModP) = setSingularPlural($sys[$fMod]['name']);
+            list($fModS, $fModP) = setSingularPlural($sys[$fModName]['name']);
             $bIsForeing = true;
 
             if (validateArray($fkTableFieldRefSettings, 'idForeign') && validateArray($fkTableFieldRefSettings, 'selectBy')) {

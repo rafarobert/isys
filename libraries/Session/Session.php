@@ -942,8 +942,6 @@ class CI_Session {
 
       $CI = CI_Controller::get_instance();
       $sys = config_item('sys');
-      $DIRS = config_item('dirs');
-      $mod_type = $sys['estic'];
 
       if($CI->db->table_exists('estic'.'_users')){
         $framePath = getframePath('estic','users');
@@ -967,11 +965,10 @@ class CI_Session {
 
           }
         }
-        echo "El modulo estis/users no pudo ser encontrado, revisa que la direccion este bien establecida";
+        echo "El modulo estic/users no pudo ser encontrado, revisa que la direccion este bien establecida";
       } else {
-        echo "La tabla ".$sys['estic']."_users no se encuentra en la base de datos";
+        echo "La tabla es_users no se encuentra en la base de datos";
       }
-
 	}
 
     public function getDataUserLoggued(){
@@ -992,7 +989,7 @@ class CI_Session {
 
     public function getObjectUserLoggued(){
 	    if(validate_modulo('estic','users')){
-            $this->CI->load->model('base/model_users');
+            $this->CI->load->model('estic/model_users');
             $data = $this->getDataUserLoggued();
             if($data){
                 return $this->CI->model_users->setFromData($data);
@@ -1069,19 +1066,17 @@ class CI_Session {
     public function signUp($mod = 'users'){
         if (is_object($oUser = $this->getDataUserLoggued())){
             $uri = $this->CI->input->post('uri_string') ? $this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? $this->CI->uri->uri_string() :
-                ($oUser->id_role == 1 ? 'base/dashboard' : 'admin/dashboard'));
-            if($uri == 'base/sessions/signup'){
-                $uri = WEBSERVER.($oUser->id_role == 1 ? 'base/dashboard' : 'admin/dashboard');
+                ($oUser->id_role == 1 ? 'estic/dashboard' : 'admin/dashboard'));
+            if($uri == 'estic/sessions/signup'){
+                $uri = WEBSERVER.($oUser->id_role == 1 ? 'estic/dashboard' : 'admin/dashboard');
             } else {
                 $uri = WEBSERVER.$uri;
             }
             redirect($uri);
         } else {
             // Redirect a user if he's already logged in
-            $this->CI->load->model('base/model_roles');
-            $this->CI->load->model('base/model_users_roles');
-            $this->CI->load->model('admin/model_personas');
-            $this->CI->load->model('admin/model_empleados');
+            $this->CI->load->model('estic/model_roles');
+            $this->CI->load->model('estic/model_users_roles');
             $dashboard = "admin/dashboard";
             $this->isLoguedin() == FALSE || redirect($dashboard);
             $roles = $this->CI->model_roles->find();
@@ -1109,8 +1104,6 @@ class CI_Session {
                         $data['id_unidad'] = 100;
                         $data['from_session'] = true;
                         $this->CI->model_users_roles->save($data);
-                        $this->CI->model_empleados->save($data);
-                        $this->CI->model_personas->save($data);
 
                         $this->login();
                         redirect($dashboard);
@@ -1134,15 +1127,15 @@ class CI_Session {
 
         if (is_object($oUser = $this->getDataUserLoggued())){
             $uri = $this->CI->input->post('uri_string') ? $this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? $this->CI->uri->uri_string() :
-                ($oUser->id_role == 1 ? 'base/dashboard' : 'admin/dashboard'));
-            if($uri == 'base/sessions/login'){
-                $uri = WEBSERVER.($oUser->id_role == 1 ? 'base/dashboard' : 'admin/dashboard');
+                ($oUser->id_role == 1 ? 'estic/dashboard' : 'admin/dashboard'));
+            if($uri == 'estic/sessions/login'){
+                $uri = WEBSERVER.($oUser->id_role == 1 ? 'estic/dashboard' : 'admin/dashboard');
             } else {
                 $uri = WEBSERVER.$uri;
             }
             redirect($uri);
         } else {
-            $this->CI->load->model('base/model_users_roles');
+            $this->CI->load->model('estic/model_users_roles');
 
             $emailPost = $this->CI->input->get_post_request('email');
             $passwordPost = $this->hash($this->CI->input->get_post_request('password'));
@@ -1178,7 +1171,7 @@ class CI_Session {
                 $data['loggedin'] = TRUE;
                 $this->set_userdata($this->sessKey,$data);
                 $uri = $this->CI->input->post('uri_string') ? WEBSERVER.$this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? WEBSERVER.$this->CI->uri->uri_string() :
-                    ($oUser->id_role == 1 ? WEBSERVER.'base/dashboard' : WEBSERVER.'admin/dashboard'));
+                    ($oUser->id_role == 1 ? WEBSERVER.'estic/dashboard' : WEBSERVER.'admin/dashboard'));
 
                 if(isset($_SERVER['SHELL'])){
                   return $oUser;
@@ -1214,7 +1207,11 @@ class CI_Session {
     }
 
     public function hash($string){
-        return hash('sha512', $string . config_item('encryption_key'));
+      if($string != null){
+          return hash('sha512', $string . config_item('encryption_key'));
+      } else {
+        return null;
+      }
     }
 }
 

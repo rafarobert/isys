@@ -25,7 +25,7 @@ class Ctrl_Migrate extends ES_Controller
         $this->tab_excepts = config_item('tab_excepts');
         $this->sys = config_item('sys');
         if(validate_modulo('estic','users')){
-            $this->load->model('base/model_users');
+            $this->load->model('estic/model_users');
         }
         set_time_limit(900);
     }
@@ -35,7 +35,6 @@ class Ctrl_Migrate extends ES_Controller
         $migrations_errors = array();
         $migration_error = '';
         $it_worked = false;
-//        $sys = array_keys(config_item('sys'));
 
         //*************************************************************
         //******* si se hace la reescritura por defecto ***************
@@ -70,6 +69,7 @@ class Ctrl_Migrate extends ES_Controller
         if (validateVar($modulo, self::STRING && validateVar($submod, self::NUMERIC))) {
             foreach ($migrations as $mod => $migration_keys) {
                 if ($mod == $modulo && !$it_worked) {
+                  if(isset($migration_keys[$submod])){
                     $this->dbforge->fields = array();
                     $this->dbforge->keys = array();
                     $this->migration->start($submod);
@@ -80,6 +80,10 @@ class Ctrl_Migrate extends ES_Controller
                     } else {
                         $it_worked = true;
                     }
+                  } else {
+                    $migration_error = 'El Id de la tabla introducido no existe';
+                    $it_worked = false;
+                  }
                 }
             }
         }
@@ -155,6 +159,7 @@ class Ctrl_Migrate extends ES_Controller
     }
 
     public function setTableTrait(){
+        $sys = config_item('sys');
         $aDBTables = $this->dbforge->getArrayDBTables();
         $this->data = $this->setDefaultData($this->data);
         $fileName = "ES_Table_Trait.php";
@@ -162,10 +167,11 @@ class Ctrl_Migrate extends ES_Controller
         $this->data['setInitFunctions'] = '';
         foreach ($aDBTables as $key => $dbTable) {
             if(!in_array($dbTable, $this->tab_excepts)){
-                list($mod, $table) = getModSubMod($dbTable);
+                list($modSign, $table) = getModSubMod($dbTable);
                 list($tableS, $tableP) = setSingularPlural($table);
-                $this->data['lcMod'] = $lcMod = lcfirst($this->sys[$mod]['name']);
-                $this->data['UcMod'] = $ucMod = ucfirst($this->sys[$mod]['name']);
+                $modName = $sys[$modSign];
+                $this->data['lcMod'] = $lcMod = lcfirst($sys[$modName]['name']);
+                $this->data['UcMod'] = $ucMod = ucfirst($sys[$modName]['name']);
                 $this->data['lcTableP'] = lcfirst($tableP);
                 $this->data['lcObjTableP'] = lcfirst(setObject($tableP));
                 $this->data['UcTableP'] = ucfirst($tableP);
@@ -251,8 +257,19 @@ class Ctrl_Migrate extends ES_Controller
 
     public function fromdatabase()
     {
+      $sys = config_item('sys');
+      $signs = config_item('signs');
 
-      $mainModules = count(config_item('main_modules_enabled')) ? config_item('main_modules_enabled') : ['ci','dfa'];
+      $softIdUser = config_item('soft_user_id');
+      $softUser = config_item('soft_user');
+      $softNameUser = config_item('soft_user_name');
+      $softUserRole = config_item('soft_user_role');
+
+      foreach ($sys as $key => $value){
+        if(is_array($value)){
+          $mainModules[$value['sign']] = $value['name'];
+        }
+      }
 
       if(validate_modulo('estic','sessions')){
 
@@ -267,20 +284,18 @@ class Ctrl_Migrate extends ES_Controller
             exit();
         }
       }
-
+      $ciMigIndex = 0;
       if (validate_modulo('estic','tables')){
         $this->initTables(true);
-      } else {
-        $ciMigIndex = 0;
       }
         $dbTables = $this->dbforge->getArrayFieldsFromTable();
         unset($dbTables['migrations']);
 
         $modules = [];
         foreach ($dbTables as $tabName => $tabFields){
-            foreach ($mainModules as $main){
-                if(strstr($tabName,$main.'_')){
-                    $modules[$main][$tabName] = $tabFields;
+            foreach ($mainModules as $sign => $name){
+                if(strstr($tabName,$sign.'_')){
+                    $modules[$sign][$tabName] = $tabFields;
                 }
             }
         }
@@ -297,8 +312,12 @@ class Ctrl_Migrate extends ES_Controller
             createFolder($framePath."tables/");
         }
 
-        foreach ($modules as $modName => $tables){
-            foreach ($tables as $name => $fields){
+        foreach ($modules as $modSign => $tabName){
+          if (!validate_modulo('estic','tables')) {
+            $modName = $sys[$modSign];
+            $ciMigIndex = $sys[$modName]['id'] * 100;
+          }
+            foreach ($tabName as $name => $fields){
               if (validate_modulo('estic','tables')){
                 $oTableFromCiTables = $this->model_tables->findOneByTableName($name);
                 if(isObject($oTableFromCiTables)){
@@ -329,7 +348,9 @@ class Ctrl_Migrate extends ES_Controller
                 $tablePrimaryKey = $this->dbforge->getPrimaryKeyFromTable($name);
                 $tableName = $name;
                 $tableFields = $fields;
-                list($mod,$submod) = getModSubMod($tableName);
+                list($modSign,$submod) = getModSubMod($tableName);
+                $modName = $sys[$modSign];
+
                 if($ciMigIndex == 0){
                     $strMigIndex = str_pad("$migIndex", 3, "0", STR_PAD_LEFT);
                 } else {
@@ -351,10 +372,43 @@ class Ctrl_Migrate extends ES_Controller
                 $phpContent = $this->load->view("template_migrations",$this->data, true, true);
                 if (createFolder($framePath)) {
                     if (createFolder($framePath."tables/")) {
-                        if (createFolder($framePath."tables/$mod")) {
-                            write_file($framePath."tables/$mod/$fileName",$phpContent);
+                        if (createFolder($framePath."tables/$modSign")) {
+                            write_file($framePath."tables/$modSign/$fileName",$phpContent);
                         }
                     }
+                }
+                if(!validate_modulo('estic','tables')){
+                  $data = array(
+                    'title' => validateArray($tableSettings, 'title') ? $tableSettings['title'] : setLabel($submod,true),
+                    'table_name' => $tableName,
+                    'icon' => validateArray($tableSettings, 'icon') ? $tableSettings['icon'] : '',
+                    'url_edit' => validateArray($tableSettings, 'url') ? $tableSettings['url'].'/edit' : $sys[$modName]['dir'] . "$submod/edit",
+                    'url_index' => validateArray($tableSettings, 'url') ? $tableSettings['url'].'/index' : $sys[$modName]['dir'] . "$submod/index",
+                    'url' => validateArray($tableSettings, 'url') ? $tableSettings['url'] : $sys[$modName]['dir'] . "$submod",
+                    'description' => validateArray($tableSettings, 'descripcion') ? $tableSettings['descripcion'] : '',
+                    'status' => validateArray($tableSettings, 'estado') ? $tableSettings['estado'] : 'enabled',
+                    'listed' => validateArray($tableSettings, 'bIsListed') ? $tableSettings['bIsListed'] : 'enabled',
+                    'id_module' => $sys[$modName]['id'],
+                    'id_role' => $softUserRole,
+                    'id_user_created' => $softIdUser,
+                    'id_user_modified' => $softIdUser,
+                    'date_created' => date('Y-m-d H:i:s'),
+                    'date_modified' => date('Y-m-d H:i:s')
+                  );
+
+                  $this->db->where('id_table',$ciMigIndex);
+                  $oTableField = $this->db->get('es_tables')->result();
+
+                  if($oTableField == null){
+                    $data['id_table'] = $ciMigIndex;
+                    $this->db->set($data);
+                    $this->db->insert('es_tables');
+                  } else {
+                    unset($data['date_created']);
+                    $this->db->set($data);
+                    $this->db->where('id_table', $ciMigIndex);
+                    $this->db->update('es_tables');
+                  }
                 }
             }
         }

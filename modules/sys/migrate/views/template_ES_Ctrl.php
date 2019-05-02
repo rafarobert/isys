@@ -28,26 +28,11 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
 
             $this->model_initialized = $this->CI_global->model_lcTableP;
         }
-        //>>>validateFieldImgUpload4<<<
-        if(validate_modulo('admin','archivos')) {
-            $this->initArchivos();
-        }
-        //<<<validateFieldImgUpload4>>>
         //>>>validateUserSavedForRolling2<<<
         if(validate_modulo('estic','users_roles')){
             $this->initUsersRoles();
         }
         //<<<validateUserSavedForRolling2>>>
-        //>>>validateUsersSavedForPersonTable2<<<
-        if(validate_modulo('admin','personas')) {
-            $this->initPersonas();
-        }
-        //<<<validateUsersSavedForPersonTable2>>>
-        //>>>validateUsersSavedForEstudentTable2<<<
-        if(validate_modulo('admin','estudiantes')) {
-            $this->initEstudiantes();
-        }
-        //<<<validateUsersSavedForEstudentTable2>>>
         $this->subjectP = 'lcTableP';
         $this->subjectS = 'lcTableS';
     }
