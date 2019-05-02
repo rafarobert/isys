@@ -149,9 +149,7 @@ if (file_exists(DOCUMENTROOT . 'app/config/config.php')) {
  */
 $proyName = $config['proy_name'];
 
-$jsonServers = file_get_contents(DOCUMENTROOT . "/config/servers.json");
-
-$aServers = json_decode($jsonServers, true)[$proyName];
+$aServers = $config[$proyName];
 
 $aServer = [];
 
