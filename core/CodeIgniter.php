@@ -115,6 +115,16 @@ if(is_file(DOCUMENTROOT."orm/map/ES_Table_Vars.php")){
  * ------------------------------------------------------
  */
 
+if (file_exists(BASEPATH. 'axis/config/config.php')) {
+
+  require_once  BASEPATH. 'axis/config/config.php';
+
+} else if (file_exists(PWD . 'isys/axis/config/config.php')) {
+
+  require_once PWD . 'isys/axis/config/config.php';
+
+}
+
 if (file_exists(DOCUMENTROOT . 'app/config/config.php')) {
 
   require_once DOCUMENTROOT . 'app/config/config.php';
