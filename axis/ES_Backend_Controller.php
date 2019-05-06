@@ -60,13 +60,13 @@ class ES_Backend_Controller extends ES_Controller
 //        $this->form_validation->set_error_delimiters('<p class="error">', '</p>');
 
         if (validate_modulo('estic', 'users')) {
-            $this->load->model('base/model_users');
+            $this->load->model('estic/model_users');
         } else {
             show_error('No se pudo cargar el modulo users');
         }
         if (validate_modulo('estic', 'sessions')) {
-            $this->load->model('base/model_users');
-            $this->session->userTable = 'ci_users';
+            $this->load->model('estic/model_users');
+            $this->session->userTable = 'es_users';
             $this->session->userIdTable = 'id_user';
             $this->session->sessKey = config_item('sess_key_admin');
 
@@ -100,7 +100,7 @@ class ES_Backend_Controller extends ES_Controller
 
             if (is_object($this->oUserLogguedIn)) {
                 if (validate_modulo('estic', 'tables')) {
-                    $this->load->model('base/model_tables');
+                    $this->load->model('estic/model_tables');
                 }
                 if (validate_modulo('admin', 'empleados')) {
                     $this->load->model('admin/model_empleados');
@@ -115,7 +115,7 @@ class ES_Backend_Controller extends ES_Controller
                         if (!in_array($sessRole, $this->aRolesFromSess)) {
                             $this->aRolesFromSess[] = $sessRole;
                         }
-                        $tablesEnabled[] = CiTablesRolesQuery::create()
+                        $tablesEnabled[] = EsTablesRolesQuery::create()
                             ->select(['id_table'])
                             ->filterByIdRole($sessRole)
                             ->find()
@@ -129,23 +129,23 @@ class ES_Backend_Controller extends ES_Controller
                     foreach ($tables as $idTable) {
                         if (!in_array($idTable, $aTablesUrls)) {
                             $aTablesIds[] = $idTable;
-                            $aTablesUrls[] = CiTablesQuery::create()
+                            $aTablesUrls[] = EsTablesQuery::create()
                                 ->select(['url'])
                                 ->findOneByIdTable($idTable);
                         }
                     }
                 }
 
-                $aExcepts = ['admin/', 'base/', 'base/sessions', 'admin/dashboard', 'base/dashboard', 'sys/migrate', 'sys/ajax'];
+                $aExcepts = ['admin/', 'estic/', 'estic/sessions', 'admin/dashboard', 'estic/dashboard', 'sys/migrate', 'sys/ajax'];
                 $aTablesUrls = array_merge($aTablesUrls, $aExcepts);
                 $uri = $this->uri->segment(1) . '/' . $this->uri->segment(2);
                 if (in_array($uri, $aTablesUrls)) {
                     if ($this->oUserLogguedIn->getIdRole() == 1) {
-                        $this->data['oSysTables'] = CiTablesQuery::create()->find();
-                        $this->data['oSysModules'] = CiModulesQuery::create()->find();
+                        $this->data['oSysTables'] = EsTablesQuery::create()->find();
+                        $this->data['oSysModules'] = EsModulesQuery::create()->find();
                     } else {
-                        $this->data['oSysModules'] = CiModulesQuery::create()->find();
-                        $this->data['oSysTables'] = CiTablesQuery::create()->filterByIdTable($aTablesIds, Criteria::IN)->find();
+                        $this->data['oSysModules'] = EsModulesQuery::create()->find();
+                        $this->data['oSysTables'] = EsTablesQuery::create()->filterByIdTable($aTablesIds, Criteria::IN)->find();
                     }
 //                    if($this->aSessData->id_role == 1){
 //                        $this->data['oSysTables'] = Model_Tables::create()->find();

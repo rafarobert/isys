@@ -943,14 +943,14 @@ class CI_Session {
       $CI = CI_Controller::get_instance();
       $sys = config_item('sys');
 
-      if($CI->db->table_exists('estic'.'_users')){
+      if($CI->db->table_exists('es_users')){
         $framePath = getframePath('estic','users');
         if(is_dir($framePath)){
-          if(file_exists($framePath.'Ctrl_'.ucfirst('users').'.php') &&
-            file_exists($framePath.'Model_'.ucfirst('users').'.php') &&
-            is_dir($framePath.'views/')){
-
-
+          if(file_exists($framePath.'Ctrl_Users.php') &&
+            file_exists($framePath.'Model_Users.php') &&
+            is_dir($framePath.'views/') &&
+            class_exists('Ctrl_Users')
+          ){
             $this->CI->initUsers(true);
             $this->sessKey = config_item('sess_key_admin');
             if($this->has_userdata($this->sessKey)) {
@@ -961,8 +961,6 @@ class CI_Session {
             } else {
               return null;
             }
-
-
           }
         }
         echo "El modulo estic/users no pudo ser encontrado, revisa que la direccion este bien establecida";

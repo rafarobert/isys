@@ -43,7 +43,7 @@ class ES_Controller extends ES_Ctrl_Vars
         $this->data['metaViewport'] = config_item('meta_viewport');
         $this->data['metaImage'] = config_item('meta_image');
         $this->data['favIcon'] = config_item('fav_icon');
-        $this->data['layout'] = $this->uri->segment(1) == 'base' || $this->uri->segment(1) == 'admin' || $this->uri->segment(1) == 'sys' ? 'backend/_layout' : ($this->uri->segment(1) == 'front' ? 'frontend/_layout' : '');
+        $this->data['layout'] = $this->uri->segment(1) == 'estic' || $this->uri->segment(1) == 'admin' || $this->uri->segment(1) == 'sys' ? 'backend/_layout' : ($this->uri->segment(1) == 'front' ? 'frontend/_layout' : '');
     }
 
     public function loadTemplates($view, $data = array()){
