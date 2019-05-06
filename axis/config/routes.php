@@ -8,7 +8,7 @@
 
 // ================= Base routes ====================
 $route['sys'] = 'backend/sys/dashboard';
-$route['base'] = 'backend/base/dashboard';
+$route['base'] = 'backend/estic/dashboard';
 $route['sys/dashboard'] = 'backend/sys/dashboard';
 // ================= Migration paths ================
 $route['sys/migrate/fromdatasys'] = 'sys/migrate/fromdatabase';

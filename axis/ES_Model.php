@@ -783,7 +783,7 @@ Class ES_Model extends ES_Model_Vars {
         }
         if(validate_modulo('estic','files')){
 
-          $this->load->model("base/model_files");
+          $this->load->model("estic/model_files");
           if(isArray($idsFiles) || isObject($idsFiles)){
               $aIdsFiles = $idsFiles;
           } else if(isNumeric($idsFiles)){
