@@ -165,7 +165,7 @@ $aServer = [];
 
 foreach ($aServers as $server) {
 
-    if($server['hostname'] == $_SERVER['SERVER_NAME']){
+    if($server['hostname'] == $_SERVER['SERVER_NAME'] || $server['hostname-core'] == $_SERVER['SERVER_NAME']){
 
         $aServer = $server;
 
@@ -260,7 +260,7 @@ define('WEBROOT', $aServer['origin']);
 define('PROTOCOL', $aServer['protocol']);
 define('SERVERNAME', isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : $aServer['hostname']);
 
-
+$config['base_url'] = WEBSERVER;
 
 /*
  *---------------------------------------------------------------
@@ -346,16 +346,6 @@ if(file_exists(DOCUMENTROOT . 'app/config/config_frt.php'))
  * NO TRAILING SLASH!
  */
 $application_folder = 'app';
-
-/*
- *---------------------------------------------------------------
- * ORM FOLDER NAME
- *---------------------------------------------------------------
- *
- *
- * NO TRAILING SLASH!
- */
-$orm_folder = 'orm';
 
 /*
  *---------------------------------------------------------------
@@ -543,7 +533,7 @@ if (is_dir($orm_folder))
 //      $orm_folder= $_temp.DIRECTORY_SEPARATOR;
     }
 
-    define('ORMPATH', str_replace('\\', '/', PWD.$orm_folder.DIRECTORY_SEPARATOR));
+    define('ORMPATH', str_replace('\\', '/', $orm_folder.DIRECTORY_SEPARATOR));
 }
 else
 {

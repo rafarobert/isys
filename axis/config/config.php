@@ -23,7 +23,7 @@
 | environments.
 |
 */
-$config['base_url'] = WEBSERVER;
+$config['base_url'] = '';
 
 $config['sys_title'] = 'Estic - Admin';
 $config['sys_name'] = 'estic Framework para desarrollo agil';
