@@ -16,7 +16,6 @@ else
     cd ../..
     composer update
     cd isys/scripts
-    exit 1
   else
     if test $# = 2
     then
@@ -24,7 +23,6 @@ else
       cd ../..
       composer update
         cd isys/scripts
-      exit 1
     fi
   fi
 fi

@@ -1238,7 +1238,12 @@ $CI->data['response'] = $response;
             $CI->load->view($CI->data['layout'], $CI->data);
         }
 
-    } else if(!isset($_SERVER['SHELL'])){
+    } else if(isset($_SERVER['SHELL'])) {
+
+      echo 'done!';
+      exit(1);
+
+    } else{
 
         // if not it displays the content
         $CI->data['subview'] = isset($CI->data['subview']) ? $CI->data['subview'] : 'ajax';

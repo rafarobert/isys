@@ -1,4 +1,4 @@
-permitions.sh
+./permitions.sh
 cd ../../orm
 ./propel-reverse-dev.sh
 ./propel.sh
