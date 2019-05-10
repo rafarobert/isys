@@ -1240,7 +1240,8 @@ $CI->data['response'] = $response;
 
     } else if(isset($_SERVER['SHELL'])) {
 
-      echo 'done!';
+      echo 'done!
+      ';
       exit(1);
 
     } else{
