@@ -36,7 +36,9 @@
  * @filesource
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
-header('Access-Control-Allow-Origin: http://localhost:4200');
+if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == 'localhost:4200'){
+    header('Access-Control-Allow-Origin: http://localhost:4200');
+}
 
 /**
  * System Initialization File
@@ -81,7 +83,7 @@ set_time_limit(2000);
  * ------------------------------------------------------
  */
 
-ini_set("zlib.output_compression", "On");
+//ini_set("zlib.output_compression", "Off");
 
 /*
  * ------------------------------------------------------
