@@ -45,7 +45,7 @@ class Ctrl_Migrate extends ES_Controller
 //            $_POST['bReset'] = true;
 //        }
 
-      if (validate_modulo('estic','sessions')) {
+      if (validate_modulo('estic','sessions') && validate_modulo('estic','users')) {
 
         $this->load->library('session');
 

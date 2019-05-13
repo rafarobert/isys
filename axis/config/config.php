@@ -6,6 +6,7 @@
  * Time: 12:31 AM
  */
 
+use Symfony\Component\Yaml\Yaml;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +24,6 @@
 | environments.
 |
 */
-$config['base_url'] = '';
 
 $config['sys_title'] = 'Estic - Admin';
 $config['sys_name'] = 'estic Framework para desarrollo agil';
@@ -119,3 +119,32 @@ $config['appDirs'] = array(
     'front' => 'HMVC'
   ],
 );
+
+
+$file_content = file_get_contents(PWD.'orm/propel.yml');
+$options = Yaml::parse($file_content);
+$config['database']['dev']['name'] = '';
+$config['database']['dev']['user'] = '';
+$config['database']['dev']['pass'] = '';
+$config['database']['prod']['name'] = '';
+$config['database']['prod']['user'] = '';
+$config['database']['prod']['pass'] = '';
+$config['database']['test']['name'] = '';
+$config['database']['test']['user'] = '';
+$config['database']['test']['pass'] = '';
+
+foreach ($options['propel']['database']['connections'] as $dbName => $dbSettings){
+  if(strstr($dbName,'dev')){
+    $config['database']['dev']['name'] = $dbName;
+    $config['database']['dev']['user'] = $dbSettings['user'];
+    $config['database']['dev']['pass'] = $dbSettings['password'];
+  } else if(strstr($dbName,'prod')){
+    $config['database']['prod']['name'] = $dbName;
+    $config['database']['prod']['user'] = $dbSettings['user'];
+    $config['database']['prod']['pass'] = $dbSettings['password'];
+  } else if(strstr($dbName,'test')){
+    $config['database']['test']['name'] = $dbName;
+    $config['database']['test']['user'] = $dbSettings['user'];
+    $config['database']['test']['pass'] = $dbSettings['password'];
+  }
+}

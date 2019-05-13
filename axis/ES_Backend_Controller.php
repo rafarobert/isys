@@ -102,12 +102,7 @@ class ES_Backend_Controller extends ES_Controller
                 if (validate_modulo('estic', 'tables')) {
                     $this->load->model('estic/model_tables');
                 }
-                if (validate_modulo('admin', 'empleados')) {
-                    $this->load->model('admin/model_empleados');
-                }
-                if (isset($this->model_empleados)) {
-                    $this->data['oEmpleado'] = $this->model_empleados->findOneByIdUser($this->oUserLogguedIn->getIdUser());
-                }
+
                 $this->aRolesFromSess[] = $this->oUserLogguedIn->getIdRole();
                 $tablesEnabled = array();
                 if (isset($this->aSessData->ids_roles)) {

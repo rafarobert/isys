@@ -114,24 +114,6 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                         $this->model_users_roles->save($data);
                     }
                     //<<<validateUserSavedForRolling1>>>
-                    //>>>validateUsersSavedForPersonTable1<<<
-                    $oPersona = $this->model_personas->findOneByIdUser($oUcObjTableS->getIdUser());
-                    if(isObject($oPersona)){
-                        $oPersona->saveOrUpdate($data);
-                    } else {
-                        $this->model_personas->save($data);
-                    }
-                    //<<<validateUsersSavedForPersonTable1>>>
-                    //>>>validateUsersSavedForEstudentTable1<<<
-                    if($this->input->post('idCurso') || $this->input->post('id_curso')){
-                        $oEstudiante = $this->model_estudiantes->findOneByIdUser($oUcObjTableS->getIdUser());
-                        if(isObject($oUcObjTableS)){
-                            $oUcObjTableS->saveOrUpdate($data);
-                        } else {
-                            $this->model_estudiantes->save($data);
-                        }
-                    }
-                    //<<<validateUsersSavedForEstudentTable1>>>
                     //>>>validateFieldImgUpload2<<<
                     $oUcObjTableS = $this->saveThumbs($oUcObjTableS);
                     //<<<validateFieldImgUpload2>>>

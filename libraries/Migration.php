@@ -922,7 +922,7 @@ class CI_Migration
 //            $idModuleTable = intval($idMigTable.'0');
             $this->load->library('session');
 
-            if (validate_modulo('estic','sessions')){
+            if (validate_modulo('estic','sessions') && validate_modulo('estic','users')){
               $sessUser = $this->session->getDataUserLoggued();
               if(isObject($sessUser)) {
                   if($sessUser->id_role != 1){
@@ -933,9 +933,7 @@ class CI_Migration
                   show_error('Para realizar esta accion debes iniciar sesion.');
                   exit();
               }
-            }
-
-            if(!validate_modulo('estic','users')){
+            } else if(!validate_modulo('estic','users')){
                 show_error_handled("El modulo users no se encuentraba creado, debido a ello no se pudo registrar la tabla $tableName, al momento de la migracion: $id_migration, verifica que el modulo base/usere se encuentra creado para evitar este error");
                 return $id_migration;
             }

@@ -950,8 +950,10 @@ Class ES_Model extends ES_Model_Vars {
         if(isArray($aIds)){
             foreach ($aIds as $k => $id){
                 $oFile = $this->findOneByIdFile($id);
-                $oFile->setThumbs();
-                $aFiles[$k] = $oFile->toArray();
+                if (is_object($oFile)){
+                  $oFile->setThumbs();
+                  $aFiles[$k] = $oFile->toArray();
+                }
             }
         }
         return $aFiles;

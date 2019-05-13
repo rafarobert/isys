@@ -36,6 +36,8 @@
  * @filesource
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
+use Symfony\Component\Yaml\Yaml;
+
 if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == 'localhost:4200'){
     header('Access-Control-Allow-Origin: http://localhost:4200');
 }
@@ -98,6 +100,8 @@ date_default_timezone_set('America/La_Paz');
  * ------------------------------------------------------
  */
 define('DOCUMENTROOT',PWD !== '' ? PWD : $_SERVER['DOCUMENT_ROOT'] . '/');
+
+require_once PWD . 'vendor/autoload.php';
 
 /*
  * ------------------------------------------------------
@@ -262,7 +266,6 @@ define('WEBROOT', $aServer['origin']);
 define('PROTOCOL', $aServer['protocol']);
 define('SERVERNAME', isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : $aServer['hostname']);
 
-$config['base_url'] = WEBSERVER;
 
 /*
  *---------------------------------------------------------------
@@ -618,12 +621,13 @@ define('MODULEPATH',APPPATH.'modules/');
 define('STORAGE_PATH',APPPATH.'migrations/storage/');
 
 // Composer autoload
-require_once ROOTPATH . 'vendor/autoload.php';
+// require_once ROOTPATH . 'vendor/autoload.php';
 
 // Propel2 config load
 //require_once ROOTPATH . 'vendor/propel/propel/src/Propel/Runtime/Propel.php';
 require_once ROOTPATH . 'orm/config/config.php';
 //Propel::init(ROOTPATH . 'orm/config/config.php');
+
 
 //require_once ROOTPATH . 'vendor/propel/propel/bin/Propel.php';
 
