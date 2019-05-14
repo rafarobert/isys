@@ -937,7 +937,7 @@ Class ES_Model extends ES_Model_Vars {
         if(is_object($ids)){
             $aIds = std2array($ids);
         }
-        if(isString($ids) && strstr($ids,'|')){
+        if(isString($ids) && strstr($ids,'|') && $ids != '|'){
             $aIds = explode('|',trim($ids,'|'));
         }
         if(isNumeric($ids)){

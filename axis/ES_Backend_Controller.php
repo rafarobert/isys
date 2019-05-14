@@ -84,7 +84,7 @@ class ES_Backend_Controller extends ES_Controller
             } else if ($this->input->post('login') == 'Ingresar' || $this->input->post('login') == 'Desbloquear') {
                 $this->session->login();
             } else {
-                $this->data['subLayout'] = 'login';
+                $this->data['subLayout'] = 'pages/login';
                 if ($this->input->post('signup') == 'Registrarse') {
                     $this->session->signUp();
                 } else if ($this->input->post('login') == 'Ingresar') {
