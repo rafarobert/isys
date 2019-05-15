@@ -5,3 +5,4 @@ cd ../../orm
 cd ..
 composer update
 cd isys/scripts
+./gruntback.sh
