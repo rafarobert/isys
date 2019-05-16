@@ -769,12 +769,12 @@ Class ES_Model extends ES_Model_Vars {
         $this->CI = CI_Controller::get_instance();
         $aIdsFiles = array();
         if($oModel == null){
-            if($this->_table_name == 'es_files'){
+            if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
                 $oModel = $this;
             }
         }
         if($idsFiles == null) {
-            if($this->_table_name == 'es_files'){
+            if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
                 /**
                  * @var Model_Files $oModel
                  */
@@ -795,7 +795,7 @@ Class ES_Model extends ES_Model_Vars {
                   $oFile = $this->model_files->findOneByIdFile($idFile);
                   $this->files[$key] = $oFile;
                   if (isObject($oFile)) {
-                      $oThumbFiles = $this->model_files->filterByIdParent($oFile->getIdFile());
+                      $oThumbFiles = $this->model_files->filterByIdParent($oFile->getIdFile(),null,false);
                       if (isObject($oThumbFiles) || isArray($oThumbFiles)) {
                           /**
                            * @var ES_Model_Files $thumb
@@ -997,7 +997,7 @@ Class ES_Model extends ES_Model_Vars {
         }
         if($response = $this->dbforge->setDeleted($this->_table_name,$this->_primary_key,$id)){
             // ------------------ se aplica a archivos con thumbnails ---------------------
-            if($this->_table_name == 'es_files'){
+            if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
                 $oData = $this->filterByIdParent($id);
                 foreach ($oData as $file){
                     $this->dbforge->setDeleted($this->_table_name,$this->_primary_key,$file->id_file);
@@ -1117,11 +1117,25 @@ Class ES_Model extends ES_Model_Vars {
 
                                   $this->thread++;
 
-                                  $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->setThumbs()->toArray();
+                                  if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
+
+                                    $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->setThumbs()->toArray();
+
+                                  } else {
+
+                                    $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->toArray();
+                                  }
 
                               } else {
 
+                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
+
                                   $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->setThumbs()->toArray();
+
+                                } else {
+
+                                  $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->toArray();
+                                }
                               }
 
                           } else if (is_array($data) && isset($data[setObject($idLocal)]) && $data[setObject($idLocal)] != null) {
@@ -1132,11 +1146,26 @@ Class ES_Model extends ES_Model_Vars {
 
                                   $this->thread++;
 
+                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
+
                                   $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->setThumbs()->toArray();
+
+                                } else {
+
+                                  $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->toArray();
+                                }
 
                               } else {
 
+                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
+
                                   $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->setThumbs()->toArray();
+
+                                } else {
+
+                                  $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->toArray();
+
+                                }
                               }
 
                           } else if (is_array($data) && isset($data[ucfirst(setObject($idLocal))]) && $data[ucfirst(setObject($idLocal))] != null) {
@@ -1147,11 +1176,28 @@ Class ES_Model extends ES_Model_Vars {
 
                                   $this->thread++;
 
+                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
+
                                   $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->setThumbs()->toArray();
+
+                                } else {
+
+                                  $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->toArray();
+
+                                }
 
                               } else {
 
+                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
+
                                   $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->setThumbs()->toArray();
+
+                                } else {
+
+                                  $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->toArray();
+
+                                }
+
                               }
 
                           } else if (is_object($data) && objectHas($data,$idLocal) && $data->$idLocal != null) {
@@ -1162,11 +1208,27 @@ Class ES_Model extends ES_Model_Vars {
 
                                   $this->thread++;
 
+                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
+
                                   $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->setThumbs()->toArray();
+
+                                } else {
+
+                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->toArray();
+
+                                }
 
                               } else {
 
+                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
+
                                   $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->setThumbs()->toArray();
+
+                                } else {
+
+                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->toArray();
+
+                                }
                               }
 
                           } else if (is_object($data) && objectHas($data,setObject($idLocal)) && $data->{setObject($idLocal)} != null) {
@@ -1177,11 +1239,27 @@ Class ES_Model extends ES_Model_Vars {
 
                                   $this->thread++;
 
+                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
+
                                   $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->setThumbs()->toArray();
+
+                                } else {
+
+                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->toArray();
+                                }
 
                               } else {
 
+                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
+
                                   $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->setThumbs()->toArray();
+
+                                } else {
+
+                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->toArray();
+
+                                }
+
                               }
 
                           } else if (is_object($data) && objectHas($data,ucfirst(setObject($idLocal))) && $data->{ucfirst(setObject($idLocal))} != null) {
@@ -1192,11 +1270,27 @@ Class ES_Model extends ES_Model_Vars {
 
                                   $this->thread++;
 
+                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
+
                                   $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->setThumbs()->toArray();
+
+                                } else {
+
+                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->toArray();
+
+                                }
 
                               } else {
 
+                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
+
                                   $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->setThumbs()->toArray();
+
+                                } else {
+
+                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->toArray();
+
+                                }
                               }
                           }
                       }
