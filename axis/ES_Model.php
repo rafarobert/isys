@@ -805,7 +805,7 @@ Class ES_Model extends ES_Model_Vars {
                               if(is_array($thumb)){
                                   $this->thumbs[$keyThumb] = $thumb;
                                   $this->files[$key]->{'thumbs'}[$keyThumb] = $thumb;
-                              } else {
+                              } else if (isset($thumb->_table_name)){
                                   $this->thumbs[$keyThumb] = $thumb->toArray();
                                   $this->files[$key]->{'thumbs'}[$keyThumb] = $thumb->toArray();
                               }
