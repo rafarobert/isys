@@ -141,6 +141,26 @@ if (file_exists(DOCUMENTROOT . 'app/config/config.php')) {
 
 }
 
+if (file_exists(DOCUMENTROOT . 'app/config/config_host.php')) {
+
+  require_once DOCUMENTROOT . 'app/config/config_host.php';
+
+} else if (file_exists(PWD . 'app/config/config_host.php')) {
+
+  require_once PWD . 'app/config/config_host.php';
+
+}
+
+if (file_exists(DOCUMENTROOT . 'app/config/config_sys.php')) {
+
+  require_once DOCUMENTROOT . 'app/config/config_sys.php';
+
+} else if (file_exists(PWD . 'app/config/config_sys.php')) {
+
+  require_once PWD . 'app/config/config_sys.php';
+
+}
+
 //if(isset($config)){
 //
 //  $proyName = $config['proy_name'];
@@ -322,20 +342,20 @@ switch (ENVIRONMENT)
  *  Defining Proyect Front Settings
  * ------------------------------------------------------
  */
-if(file_exists(DOCUMENTROOT . 'app/config/config_frt.php'))
-{
-    require_once DOCUMENTROOT . 'app/config/config_frt.php';
-
-} else if(file_exists(PWD . 'app/config/config_frt.php')) {
-
-  require_once PWD . 'app/config/config_frt.php';
-
-} else {
-
-    echo 'No se encontro el archivo de configuracion';
-
-    exit(1);
-}
+//if(file_exists(DOCUMENTROOT . 'app/config/config_frt.php'))
+//{
+//    require_once DOCUMENTROOT . 'app/config/config_frt.php';
+//
+//} else if(file_exists(PWD . 'app/config/config_frt.php')) {
+//
+//  require_once PWD . 'app/config/config_frt.php';
+//
+//} else {
+//
+//    echo 'No se encontro el archivo de configuracion';
+//
+//    exit(1);
+//}
 
 /*
  *---------------------------------------------------------------
@@ -982,6 +1002,8 @@ if (isset($assign_to_config) && is_array($assign_to_config))
         $bIsDir = false;
         foreach ($DIRS as $root => $dirs){
             foreach ($dirs as $dir => $mods){
+              if(is_array($mods)){
+
                 foreach ($mods as $mod => $type){
                     if($type == "HMVC"){
                         if(is_dir($ruta = ROOTPATH . "$root/$directory/$class/") && $class != ''){
@@ -1039,6 +1061,18 @@ if (isset($assign_to_config) && is_array($assign_to_config))
                         }
                     }
                 }
+              } else {
+                if($subMod == ''){
+                  return ROOTPATH."$root/";
+                } else {
+                  $directorio = ROOTPATH."$root/$dir/$modulo/$subMod/";
+                  if(is_dir($directorio)){
+                    return $directorio;
+                  } else {
+                    return ROOTPATH."$root/";
+                  }
+                }
+              }
             }
         }
         return null;
@@ -1085,7 +1119,12 @@ if (isset($assign_to_config) && is_array($assign_to_config))
 
 
     $RTR->framePath =  $framePath;
-    $file = "$framePath".$directory."$class/$ctrlClass.php";
+
+    if(strstr($directory,"/$class/")){
+      $file = "$framePath".$directory."$ctrlClass.php";
+    } else {
+      $file = "$framePath".$directory."$class/$ctrlClass.php";
+    }
 
 	if (empty($class) OR ! file_exists($file))
 	{
@@ -1202,11 +1241,11 @@ if (isset($assign_to_config) && is_array($assign_to_config))
  */
 $methodsExcepts = ['signup','login'];
 
-$classExcepts = ['ajax','migrate','files'];
+$classExcepts = ['ajax'];
 
 // if User logu¿gued in continue
 
-if(is_object($CI->oUserLogguedIn)){
+if(objectHas($CI,'oUserLogguedIn')){
 
     $response = call_user_func_array(array(&$CI, $method), $params);
 
@@ -1240,20 +1279,32 @@ $CI->data['response'] = $response;
 
         } else {
 
-            $CI->data['subLayout'] = 'lockscreen';
+            $CI->data['subLayout'] = 'pages/lockscreen';
             $CI->load->view($CI->data['layout'], $CI->data);
         }
 
     } else if(isset($_SERVER['SHELL'])) {
 
-      echo 'done!
-      ';
+      if(objectHas($CI,'oUserLogguedIn')){
+
+        echo 'done!
+        ';
+      } else {
+
+        echo 'Algo salio mal, probablemente debes iniciar sesión
+        ';
+      }
+
       exit(1);
 
     } else{
 
+      if(!objectHas($CI,'oUserLogguedIn')){
+
+          $CI->data['subLayout'] = 'pages/login';
+      }
         // if not it displays the content
-        $CI->data['subview'] = isset($CI->data['subview']) ? $CI->data['subview'] : 'ajax';
+        $CI->data['subview'] = isset($CI->data['subview']) ? $CI->data['subview'] : '';
         $CI->load->view($CI->data['layout'], $CI->data);
     }
 

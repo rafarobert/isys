@@ -15,12 +15,19 @@ if($CFG->item('modules_locations') == null){
     $got = false;
     Modules::$locations[APPPATH] = "/";
     foreach ($DIRS as $root => $dirs){
+
         foreach ($dirs as $dir => $mods){
+          if(is_array($mods)){
             foreach ($mods as $mod => $type){
                 if($type == "HMVC"){
                     Modules::$locations[ROOTPATH."$root/$dir/"] = "$dir/";
                 }
             }
+          } else {
+            if($mods == "HMVC"){
+              Modules::$locations[ROOTPATH."$root/$dir/"] = "$dir/";
+            }
+          }
         }
     }
 //    Modules::$locations[APPPATH.'modules/'] = 'modules/';

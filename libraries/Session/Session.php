@@ -653,7 +653,12 @@ class CI_Session {
 	 */
 	public function sess_destroy()
 	{
-		session_destroy();
+	  $sess = session_status();
+    if($sess == 2){
+      session_destroy();
+    } else {
+	    unset($_SESSION);
+    }
 	}
 
 	// ------------------------------------------------------------------------
@@ -1002,7 +1007,7 @@ class CI_Session {
 
     public function isLoguedin(){
 
-        if($this->has_userdata(config_item('sess_key_base'))) {
+        if($this->has_userdata(config_item('sess_key_estic'))) {
             return true;
         } else if($this->has_userdata(config_item('sess_key_admin'))) {
             return true;
@@ -1194,14 +1199,13 @@ class CI_Session {
 
     public function logout(){
         $this->sess_destroy();
-        $this->CI->data['subLayout'] = '';
-        $this->CI->data['subview'] = 'admin/start';
+        $this->CI->data['subLayout'] = 'pages/login';
         redirect(WEBSERVER.'admin');
     }
 
     public function locked(){
         $this->sess_destroy();
-        $this->CI->data['subLayout'] = 'lockscreen';
+        $this->CI->data['subLayout'] = 'pages/lockscreen';
     }
 
     public function hash($string){
