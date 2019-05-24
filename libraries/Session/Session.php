@@ -1002,7 +1002,7 @@ class CI_Session {
 
     public function isLoguedin(){
 
-        if($this->has_userdata(config_item('sess_key_base'))) {
+        if($this->has_userdata(config_item('sess_key_estic'))) {
             return true;
         } else if($this->has_userdata(config_item('sess_key_admin'))) {
             return true;
@@ -1201,7 +1201,7 @@ class CI_Session {
 
     public function locked(){
         $this->sess_destroy();
-        $this->CI->data['subLayout'] = 'lockscreen';
+        $this->CI->data['subLayout'] = 'pages/lockscreen';
     }
 
     public function hash($string){

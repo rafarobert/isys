@@ -20,7 +20,7 @@ class ES_Backend_Controller extends ES_Controller
         $this->data['metaTitle'] = config_item('meta_title');
         $this->data['metaName'] = config_item('meta_name');
         $this->data['metaKeywords'] = config_item('meta_keywords');
-        $this->data['metaThemeColor'] = config_item('meta_theme-color"');
+        $this->data['metaThemeColor'] = config_item('meta_theme_color"');
         $this->data['metaDescription'] = config_item('meta_descripcion');
 
         // ------------- img configurations ----------------

@@ -1240,7 +1240,7 @@ $CI->data['response'] = $response;
 
         } else {
 
-            $CI->data['subLayout'] = 'lockscreen';
+            $CI->data['subLayout'] = 'pages/lockscreen';
             $CI->load->view($CI->data['layout'], $CI->data);
         }
 
