@@ -61,6 +61,7 @@ use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 class ES_UcClassAcron_Vars extends CI_UcClassType
 {
     use ES_Table_Trait;
+    use ES_Config_Trait;
     // **************** tables Charged ****************
     //>>>setInitGlobalVars<<<
     public $table_lcAcMod_lcTableP;

@@ -653,7 +653,12 @@ class CI_Session {
 	 */
 	public function sess_destroy()
 	{
-		session_destroy();
+	  $sess = session_status();
+    if($sess == 2){
+      session_destroy();
+    } else {
+	    unset($_SESSION);
+    }
 	}
 
 	// ------------------------------------------------------------------------
@@ -1194,8 +1199,7 @@ class CI_Session {
 
     public function logout(){
         $this->sess_destroy();
-        $this->CI->data['subLayout'] = '';
-        $this->CI->data['subview'] = 'admin/start';
+        $this->CI->data['subLayout'] = 'pages/login';
         redirect(WEBSERVER.'admin');
     }
 

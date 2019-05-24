@@ -73,7 +73,8 @@ $config['dirs'] = array(
         'layouts' => [
             'backend' => 'HMVC',
             'frontend' => 'HMVC'
-        ]
+        ],
+        'services' => 'HMVC',
     ],
     'orm' => [
         'crud' => [

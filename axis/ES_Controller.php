@@ -30,21 +30,170 @@ class ES_Controller extends ES_Ctrl_Vars
     public $data = array();
 
     function __construct(){
-        parent::__construct();
-        $this->load->helper('security');
-        $this->img_path = realpath(ROOTPATH.'assets/img/');
-        $this->fromAjax = $this->input->post('fromAjax');
-        $this->data['errors'] = array();
-        $this->data['siteTitle'] = config_item('site_title');;
-        $this->data['siteName'] = config_item('site_name');
-        $this->data['siteDomain'] = config_item('site_domain');
-        $this->data['metaReplyTo'] = config_item('meta_reply_to');
-        $this->data['metaLanguaje'] = config_item('meta_languaje');
-        $this->data['metaViewport'] = config_item('meta_viewport');
-        $this->data['metaImage'] = config_item('meta_image');
-        $this->data['favIcon'] = config_item('fav_icon');
-        $this->data['layout'] = $this->uri->segment(1) == 'estic' || $this->uri->segment(1) == 'admin' || $this->uri->segment(1) == 'sys' ? 'backend/_layout' : ($this->uri->segment(1) == 'front' ? 'frontend/_layout' : '');
+
+      $CI = $this->initLoaded();
+      parent::__construct();
+
+      $this->load->helper('security');
+      $this->img_path = realpath(ROOTPATH.'assets/img/');
+
+      $this->data['siteTitle'] = config_item('site_title');;
+      $this->data['siteName'] = config_item('site_name');
+      $this->data['siteDomain'] = config_item('site_domain');
+      $this->data['metaReplyTo'] = config_item('meta_reply_to');
+      $this->data['metaLanguaje'] = config_item('meta_languaje');
+      $this->data['metaViewport'] = config_item('meta_viewport');
+      $this->data['metaImage'] = config_item('meta_image');
+      $this->data['favIcon'] = config_item('fav_icon');
+
+      $this->fromAjax = $this->input->post('fromAjax');
+      $this->data['layout'] = $this->uri->segment(1) == 'front' ? 'frontend/_layout' : 'backend/_layout';
+      $this->data['subLayout'] = 'backend/_subLayout';
+      $this->data['errors'] = array();
+      $this->load->library('session');
+      $this->fromAjax = $this->input->post('fromAjax') ? true : false;
+      $this->fromFiles = isset($_FILES) && validateVar($_FILES,'array');
+      $this->data['uri_string'] = $this->uri->uri_string();
+      $excepts = ['ajax'];
+      $this->load->library('migration');
+      if (!$CI) {
+        if (validate_modulo('estic', 'users')) {
+          if(!in_array($this->router->class, $excepts)){
+            $this->onLoad();
+          }
+        }
+      }
+      $this->CI_global = $vars = get_defined_vars()['CI'];
+
+//        $editTagsSet = CiSettingsQuery::create()->select(['EditTag'])->find()->getData();
+//        $editTagsOpt = CiOptionsQuery::create()->select(['EditTag'])->find()->getData();
+//        $editTags = array_merge($editTagsSet,$editTagsOpt);
+//        $this->data['editTags'] = $editTags;
     }
+
+  public function onLoad()
+  {
+    $this->load->helper('form');
+    $this->load->library('form_validation');
+//        $this->load->library('request');
+    $this->load->library('encryption');
+//        $this->form_validation->set_error_delimiters('<p class="error">', '</p>');
+
+    if (validate_modulo('estic', 'users')) {
+      $this->load->model('estic/model_users');
+    } else {
+      show_error('No se pudo cargar el modulo users');
+    }
+    if (validate_modulo('estic', 'sessions')) {
+      $this->load->model('estic/model_users');
+      $this->session->userTable = 'es_users';
+      $this->session->userIdTable = 'id_user';
+      $this->session->sessKey = config_item('sess_key_admin');
+
+      if ($this->session->isLoguedin()) {
+        $this->CI->data['subview'] = 'admin/dashboard/index';
+        $this->setSessData();
+      } else if (compareStrStr($this->input->get_post_request('login'),'Ingresar') || compareStrStr($this->input->get_post_request('login'), 'Desbloquear')) {
+        $this->session->login();
+        $this->setSessData();
+      } else {
+        $this->data['subLayout'] = 'pages/login';
+        if (compareStrStr($this->input->get_post_request('signup'),'Registrarse')) {
+          $this->session->signUp();
+          $this->setSessData();
+        } else if (compareStrStr($this->input->get_post_request('login'),'Ingresar')) {
+          $this->session->login();
+          $this->setSessData();
+        }
+      }
+
+//                $this->data['oSysOptions'] = CiOptionsQuery::create()->find();
+//                $this->data['oSysSettings'] = CiSettingsQuery::create()->find();
+//                $this->data['oSysOptionsForTables'] = CiOptionsQuery::create()
+//                    ->filterByIdSetting(1)
+//                    ->find();
+
+      if (is_object($this->oUserLogguedIn)) {
+        if (validate_modulo('estic', 'tables')) {
+          $this->load->model('estic/model_tables');
+        }
+
+        $this->aRolesFromSess[] = $this->oUserLogguedIn->getIdRole();
+        $tablesEnabled = array();
+        if (isset($this->aSessData->ids_roles)) {
+          foreach ($this->aSessData->ids_roles as $sessRole) {
+            if (!in_array($sessRole, $this->aRolesFromSess)) {
+              $this->aRolesFromSess[] = $sessRole;
+            }
+            $tablesEnabled[] = EsTablesRolesQuery::create()
+              ->select(['id_table'])
+              ->filterByIdRole($sessRole)
+              ->find()
+              ->toArray();
+          }
+        }
+        $this->data['aRolesFromSess'] = $this->aRolesFromSess;
+        $aTablesIds = array();
+        $aTablesUrls = array();
+        foreach ($tablesEnabled as $tables) {
+          foreach ($tables as $idTable) {
+            if (!in_array($idTable, $aTablesUrls)) {
+              $aTablesIds[] = $idTable;
+              $aTablesUrls[] = EsTablesQuery::create()
+                ->select(['url'])
+                ->findOneByIdTable($idTable);
+            }
+          }
+        }
+
+        $aExcepts = [
+          'admin/',
+          'estic/',
+          'estic/sessions',
+          'admin/dashboard',
+          'estic/dashboard',
+          'sys/migrate',
+          'sys/ajax',
+        ];
+        $aTablesUrls = array_merge($aTablesUrls, $aExcepts);
+        $uri = $this->uri->segment(1) . '/' . $this->uri->segment(2);
+        if (in_array($uri, $aTablesUrls)) {
+          if ($this->oUserLogguedIn->getIdRole() == 1) {
+            $this->data['oSysTables'] = EsTablesQuery::create()->find();
+            $this->data['oSysModules'] = EsModulesQuery::create()->find();
+          } else {
+            $this->data['oSysModules'] = EsModulesQuery::create()->find();
+            $this->data['oSysTables'] = EsTablesQuery::create()->filterByIdTable($aTablesIds, Criteria::IN)->find();
+          }
+//                    if($this->aSessData->id_role == 1){
+//                        $this->data['oSysTables'] = Model_Tables::create()->find();
+//                        $this->data['oSysModules'] = Model_Modules::create()->find();
+//                    } else {
+//                        $this->data['oSysModules'] = Model_Modules::create()->find();
+//                        $this->data['oSysTables'] = Model_Tables::create()->filterByIdNivelRole($this->oUserLogguedIn->id_role);
+//                    }
+        } else {
+          $this->data['oSysTables'] = array();
+          $this->data['oSysModules'] = array();
+          unset($this->oUserLogguedIn);
+          $this->session->locked();
+        }
+
+      }
+    }
+  }
+
+  public function setSessData(){
+    $this->aSessData = (object)$this->session->get_userdata()[config_item('sess_key_admin')];
+    $this->data['aSessData'] = std2array($this->aSessData);
+    $this->data['oUserLogguedIn'] = $this->oUserLogguedIn = $this->model_users->setFromData($this->aSessData);
+    $this->data['aUserLogguedIn'] = $this->oUserLogguedIn->getArrayData();
+    $data = array(
+      'id_user' => $this->oUserLogguedIn->getIdUser()
+    );
+
+    $this->session->set_userdata($data);
+  }
 
     public function loadTemplates($view, $data = array()){
         $this->load->view("header");

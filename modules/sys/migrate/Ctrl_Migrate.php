@@ -20,7 +20,6 @@ class Ctrl_Migrate extends ES_Controller
 
     function __construct(){
         parent::__construct();
-        $this->data['subLayout'] = '';
         $this->load->library('migration');
         $this->tab_excepts = config_item('tab_excepts');
         $this->sys = config_item('sys');

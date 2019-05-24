@@ -1365,7 +1365,7 @@ if (!function_exists('objectHas')) {
                     if($object->$index != "" && $object->$index != [] && $object->$index != null){
                         return $response;
                     } else {
-                        return $response;
+                        return false;
                     }
                 } else {
                     return $response;
@@ -1484,6 +1484,8 @@ if (!function_exists('setObject')) {
             $aNames = explode('_',$nameWithDashes);
         } else if(strstr($nameWithDashes, ' ')){
             $aNames = explode(' ',$nameWithDashes);
+        } else if(strstr($nameWithDashes,'-')){
+          $aNames = explode('-',$nameWithDashes);
         } else {
             $aNames[] = $nameWithDashes;
         }
