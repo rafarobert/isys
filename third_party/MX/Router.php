@@ -214,8 +214,22 @@ class MX_Router extends CI_Router
 		if ( ! empty($_route))
 		{
 			// Are module/directory/controller/method segments being specified?
-			$sgs = sscanf($_route, '%[^/]/%[^/]/%[^/]/%s', $module, $directory, $class, $method);
-			
+
+            $_route =  trim($_route,'/');
+
+            $nSlash = substr_count($_route,'/');
+
+            if($nSlash == 3){
+
+			    $sgs = sscanf($_route, '%[^/]/%[^/]/%[^/]/%[^/]/%s', $module, $directory1, $directory2, $class, $method);
+
+			    $directory = "$directory1/$directory2";
+            } else {
+
+			    $sgs = sscanf($_route, '%[^/]/%[^/]/%[^/]/%s', $module, $directory, $class, $method);
+
+            }
+
 			// set the module/controller directory location if found
 			if ($this->locate(array($module, $directory, $class)))
 			{
