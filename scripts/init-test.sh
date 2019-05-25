@@ -1,5 +1,5 @@
 ./permitions.sh
-./propel-reverse-dev.sh
+./propel-reverse-test.sh
 ./propel.sh
 ./propel-build-sql.sh
 cd ..
