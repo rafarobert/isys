@@ -2157,4 +2157,54 @@ if (!function_exists('validate_modulo')) {
           return false;
         }
     }
+
+
+}
+
+
+
+if (!function_exists('arrayKey')) {
+
+    function arrayKey($ind,$array){
+
+        $keyNum = -1;
+
+        foreach ($array as $key => $val){
+
+            if($ind == $val || strhas($val,$ind)){
+
+                $keyNum = $key;
+
+                break;
+            }
+        }
+
+        return $keyNum;
+
+    }
+
+
+}
+
+
+if (!function_exists('strGet')) {
+
+    function strGet($str,$key){
+
+        $strToReturn = '';
+
+        if(strstr($str,$key)){
+
+            $aExploded = explode($key,$str);
+
+            return $aExploded[1];
+
+        } else {
+
+            return '';
+
+        }
+    }
+
+
 }

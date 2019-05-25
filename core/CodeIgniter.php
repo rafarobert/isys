@@ -1245,31 +1245,44 @@ $classExcepts = ['ajax'];
 
 // if User logu¿gued in continue
 
-if(objectHas($CI,'oUserLogguedIn')){
+if($RTR->module == 'frontend'){
 
     $response = call_user_func_array(array(&$CI, $method), $params);
 
-    // or if the url is in an except path
-} else if(in_array($method ,$methodsExcepts) || in_array($class,$classExcepts)){
+    $CI->data['subview'] = isset($CI->data['subview']) ? $CI->data['subview'] : '';
 
-    $response = call_user_func_array(array(&$CI, $method), $params);
-
-} else if($CI->fromFiles){
-
-    $response = call_user_func_array(array(&$CI, $method), $params);
-
-} else if($method == 'index' && $class == 'dashboard') {
-
-    $response = call_user_func_array(array(&$CI, $method), $params);
+    $CI->load->view($CI->data['layout'], $CI->data);
 
 } else {
 
-    $response = [];
-}
 
-$CI->data['response'] = $response;
+    if(objectHas($CI,'oUserLogguedIn')){
+
+        $response = call_user_func_array(array(&$CI, $method), $params);
+
+        // or if the url is in an except path
+    } else if(in_array($method ,$methodsExcepts) || in_array($class,$classExcepts)){
+
+        $response = call_user_func_array(array(&$CI, $method), $params);
+
+    } else if($CI->fromFiles){
+
+        $response = call_user_func_array(array(&$CI, $method), $params);
+
+    } else if($method == 'index' && $class == 'dashboard') {
+
+        $response = call_user_func_array(array(&$CI, $method), $params);
+
+    } else {
+
+        $response = [];
+    }
+
+    $CI->data['response'] = $response;
 
 // If the url comes from ajax show as json
+
+
 
     if($CI->fromAjax || $ctrlClass == 'Ctrl_Ajax' || $CI->input->post('fromAjax') || $class == 'ajax'){
 
@@ -1285,28 +1298,30 @@ $CI->data['response'] = $response;
 
     } else if(isset($_SERVER['SHELL'])) {
 
-      if(objectHas($CI,'oUserLogguedIn')){
+        if(objectHas($CI,'oUserLogguedIn')){
 
-        echo 'done!
+            echo 'done!
         ';
-      } else {
+        } else {
 
-        echo 'Algo salio mal, probablemente debes iniciar sesión
+            echo 'Algo salio mal, probablemente debes iniciar sesión
         ';
-      }
+        }
 
-      exit(1);
+        exit(1);
 
-    } else{
+    } else {
 
-      if(!objectHas($CI,'oUserLogguedIn')){
+        if(!objectHas($CI,'oUserLogguedIn')){
 
-          $CI->data['subLayout'] = 'pages/login';
-      }
+            $CI->data['subLayout'] = 'pages/login';
+        }
         // if not it displays the content
         $CI->data['subview'] = isset($CI->data['subview']) ? $CI->data['subview'] : '';
         $CI->load->view($CI->data['layout'], $CI->data);
     }
+
+}
 
 	// Mark a benchmark end point
 	$BM->mark('controller_execution_time_( '.$class.' / '.$method.' )_end');
