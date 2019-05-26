@@ -200,7 +200,7 @@ foreach ($aPartHost as $i => $item){
 
         foreach ($config['hosts'] as $name => $settings){
 
-            if($name == $item || strhas($name,$item)){
+            if($name == $item || strhas($item,$name)){
 
                 define('PROY_NAME', $name);
 
