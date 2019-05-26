@@ -1158,7 +1158,7 @@ if (isset($assign_to_config) && is_array($assign_to_config))
 	}
 	else
 	{
-		require_once($framePath.$RTR->directory.$class.'/'.$ctrlClass.'.php');
+		require_once($file);
 
 		if ( ! class_exists($ctrlClass, FALSE) OR $method[0] === '_' OR method_exists('CI_Controller', $method))
 		{
