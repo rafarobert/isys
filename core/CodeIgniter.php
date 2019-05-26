@@ -183,15 +183,41 @@ if (file_exists(DOCUMENTROOT . 'app/config/config_sys.php')) {
  *  Defining Proyect Settings
  * ------------------------------------------------------
  */
-$proyName = $config['proy_name'];
 
-$aServers = $config[$proyName];
+$serverName = $_SERVER['SERVER_NAME'];
+$httpHost = $_SERVER['HTTP_HOST'];
+
+$host = isset($httpHost) ? $httpHost :
+    isset($serverName) ? $serverName : '';
+
+$aPartHost = explode('.',$host);
+
+$aServers = [];
+
+foreach ($aPartHost as $i => $item){
+
+    if(!isArray($aServers)){
+
+        foreach ($config['hosts'] as $name => $settings){
+
+            if($name == $item || strhas($item,$name)){
+
+                define('PROY_NAME', $name);
+
+                $aServers = $config['hosts'][$name];
+
+                break;
+            }
+        }
+    }
+}
+
 
 $aServer = [];
 
 foreach ($aServers as $server) {
 
-    if($server['hostname'] == $_SERVER['SERVER_NAME'] || $server['hostname-core'] == $_SERVER['SERVER_NAME']){
+    if($server['hostname'] == $serverName || $server['hostname-core'] == $serverName){
 
         $aServer = $server;
 
@@ -201,7 +227,7 @@ foreach ($aServers as $server) {
 
 if(!isArray($aServer)){
 
-    echo 'The application does not have a correct path, review the properties at the config/servers folder.';
+    echo 'The application does not have a correct path, review the properties at app/config folder.';
 
     exit();
 }
@@ -1132,7 +1158,7 @@ if (isset($assign_to_config) && is_array($assign_to_config))
 	}
 	else
 	{
-		require_once($framePath.$RTR->directory.$class.'/'.$ctrlClass.'.php');
+		require_once($file);
 
 		if ( ! class_exists($ctrlClass, FALSE) OR $method[0] === '_' OR method_exists('CI_Controller', $method))
 		{

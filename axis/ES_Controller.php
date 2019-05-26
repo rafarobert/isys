@@ -154,6 +154,7 @@ class ES_Controller extends ES_Ctrl_Vars
           'estic/dashboard',
           'sys/migrate',
           'sys/ajax',
+          'twilio/send'
         ];
         $aTablesUrls = array_merge($aTablesUrls, $aExcepts);
         $uri = $this->uri->segment(1) . '/' . $this->uri->segment(2);

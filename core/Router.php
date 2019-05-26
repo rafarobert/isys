@@ -180,10 +180,30 @@ class CI_Router {
 		// Validate & get reserved routes
 		if (isset($route) && is_array($route))
 		{
-			isset($route['default_controller']) && $this->default_controller = $route['default_controller'];
-			isset($route['translate_uri_dashes']) && $this->translate_uri_dashes = $route['translate_uri_dashes'];
-			unset($route['default_controller'], $route['translate_uri_dashes']);
-			$this->routes = $route;
+		    if(isset($route['default_controller'])){
+                isset($route['default_controller']) && $this->default_controller = $route['default_controller'];
+                isset($route['translate_uri_dashes']) && $this->translate_uri_dashes = $route['translate_uri_dashes'];
+                unset($route['default_controller'], $route['translate_uri_dashes']);
+                $this->routes = $route;
+            } else {
+		        $aRoutes = array_keys($route);
+		        foreach ($aRoutes as $routeKey){
+		            if(strhas($routeKey,'default_controller_')){
+
+		                $aDefaultController = explode('default_controller_',$routeKey);
+		                $proyName = $aDefaultController[1];
+
+		                if($proyName == PROY_NAME){
+                            $route['default_controller'] = $route["default_controller_$proyName"];
+                            isset($route['default_controller']) && $this->default_controller = $route['default_controller'];
+                            isset($route['translate_uri_dashes']) && $this->translate_uri_dashes = $route['translate_uri_dashes'];
+                            unset($route['default_controller'], $route['translate_uri_dashes']);
+                            $this->routes = $route;
+                            break;
+                        }
+                    }
+                }
+            }
 		}
 
 		// Are query strings enabled in the config file? Normally CI doesn't utilize query strings
