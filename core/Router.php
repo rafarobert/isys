@@ -193,7 +193,7 @@ class CI_Router {
 		                $aDefaultController = explode('default_controller_',$routeKey);
 		                $proyName = $aDefaultController[1];
 
-		                if($proyName == PROY_NAME){
+		                if($proyName == PROYNAME){
                             $route['default_controller'] = $route["default_controller_$proyName"];
                             isset($route['default_controller']) && $this->default_controller = $route['default_controller'];
                             isset($route['translate_uri_dashes']) && $this->translate_uri_dashes = $route['translate_uri_dashes'];

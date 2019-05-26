@@ -141,26 +141,6 @@ if (file_exists(DOCUMENTROOT . 'app/config/config.php')) {
 
 }
 
-if (file_exists(DOCUMENTROOT . 'app/config/config_host.php')) {
-
-  require_once DOCUMENTROOT . 'app/config/config_host.php';
-
-} else if (file_exists(PWD . 'app/config/config_host.php')) {
-
-  require_once PWD . 'app/config/config_host.php';
-
-}
-
-if (file_exists(DOCUMENTROOT . 'app/config/config_sys.php')) {
-
-  require_once DOCUMENTROOT . 'app/config/config_sys.php';
-
-} else if (file_exists(PWD . 'app/config/config_sys.php')) {
-
-  require_once PWD . 'app/config/config_sys.php';
-
-}
-
 //if(isset($config)){
 //
 //  $proyName = $config['proy_name'];
@@ -202,7 +182,7 @@ foreach ($aPartHost as $i => $item){
 
             if($name == $item || strhas($item,$name)){
 
-                define('PROY_NAME', $name);
+                define('PROYNAME', $name);
 
                 $aServers = $config['hosts'][$name];
 
@@ -221,7 +201,9 @@ foreach ($aServers as $server) {
 
         $aServer = $server;
 
-        break;
+        define('BASEURL', $aServer['origin']);
+
+      break;
     }
 }
 
