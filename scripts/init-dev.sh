@@ -1,7 +1,10 @@
 ./permitions.sh
+
 ./propel-reverse-dev.sh
 ./propel.sh
 ./propel-build-sql.sh
+./fromdatabase.sh
+
 cd ..
 cd ..
 composer update
