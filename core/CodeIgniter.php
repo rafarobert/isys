@@ -74,13 +74,26 @@ if(isset($_SERVER['ESTIC_ORIGIN'])){
 
     if (isset($_SERVER['PWD'])){
 
-        if(strstr($_SERVER['PWD'],$_SERVER['ESTIC_ORIGIN'])) {
+        if(!is_dir($_SERVER['PWD'])){
+            $_SERVER['PWD'] = strstr($_SERVER['PWD'],'/c/') ? str_replace('/c/','C:/',$_SERVER['PWD']) : $_SERVER['PWD'];
+        }
+        if(is_dir($_SERVER['PWD'])) {
 
-            $array = explode($_SERVER['ESTIC_ORIGIN'],$_SERVER['PWD']);
+            if(strstr($_SERVER['PWD'],$_SERVER['ESTIC_ORIGIN'])) {
 
-            if(is_array($array)){
+                $array = explode($_SERVER['ESTIC_ORIGIN'],$_SERVER['PWD']);
 
-                $_SERVER['PWD'] = '/'.trim(implode('/',$array),'/');
+                if(is_array($array)){
+
+                    if(isset($_SERVER['SYSTEMDRIVE']) && $_SERVER['SYSTEMDRIVE'] == 'C:'){
+
+                        $_SERVER['PWD'] = trim(implode('/',$array),'/');
+
+                    } else {
+
+                        $_SERVER['PWD'] = '/'.trim(implode('/',$array),'/');
+                    }
+                }
             }
         }
     } else {
@@ -132,6 +145,8 @@ date_default_timezone_set('America/La_Paz');
  * ------------------------------------------------------
  */
 define('DOCUMENTROOT',PWD !== '' ? PWD : $_SERVER['DOCUMENT_ROOT'] . '/');
+
+
 
 require_once PWD . 'vendor/autoload.php';
 

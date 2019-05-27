@@ -1,3 +1,5 @@
+icacls ../../../ /grant rafae:(d,wdac)
+
 chmod -R 777 ../../orm/migrations
 chmod -R 777 ../../orm/config
 chmod -R 777 ../../orm/crud
