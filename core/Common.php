@@ -474,11 +474,13 @@ if ( ! function_exists('show_error'))
                 $CI->model_logs->save($data);
               }
             } else {
-              echo "El modulo estic/logs no pudo ser encontrado, revisa que la direccion este bien establecida
+              echo "$message.
+              El modulo estic/logs no pudo ser encontrado para registrar el error, revisa que el modulo fue creado.
               ";
             }
           } else {
-            echo "El modulo estic/logs no pudo ser encontrado, revisa que la direccion este bien establecida
+            echo "$message
+            El modulo estic/logs no pudo ser encontrado para registrar el error, revisa que el modulo fue creado.
             ";
           }
           return true;
@@ -2150,7 +2152,7 @@ if (!function_exists('validate_modulo')) {
                       return true;
                   }
               }
-              show_error("El modulo $mod/$subMod no pudo ser encontrado, revisa que la direccion este bien establecida");
+              show_error("El modulo $mod/$subMod no pudo ser encontrado, revisa que el modulo fue creado");
           } else {
               show_error("La tabla ".$modSign.'_'.$subMod." no se encuentra en la base de datos");
           }

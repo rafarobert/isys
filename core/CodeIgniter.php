@@ -35,7 +35,6 @@
  * @since	Version 1.0.0
  * @filesource
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
 use Symfony\Component\Yaml\Yaml;
 
 if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == 'localhost:4200'){
@@ -69,6 +68,39 @@ define('CI_VERSION', '3.0.6');
  * @var	string
  *
  */
+$system_path = 'isys';
+
+if(isset($_SERVER['ESTIC_ORIGIN'])){
+
+    if (isset($_SERVER['PWD'])){
+
+        if(strstr($_SERVER['PWD'],$_SERVER['ESTIC_ORIGIN'])) {
+
+            $array = explode($_SERVER['ESTIC_ORIGIN'],$_SERVER['PWD']);
+
+            if(is_array($array)){
+
+                $_SERVER['PWD'] = '/'.trim(implode('/',$array),'/');
+            }
+        }
+    } else {
+        $_SERVER['PWD'] = $_SERVER['ESTIC_ORIGIN'];
+    }
+}
+
+// Path to the system folder
+
+if(isset($_SERVER['PWD'])){
+    define('PWD', str_replace('\\', '/', $_SERVER['PWD']). '/');
+} else if(isset($_SERVER['DOCUMENT_ROOT'])){
+    define('PWD', str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']) . '/');
+} else if(isset($_SERVER['CONTEXT_DOCUMENT_ROOT'])){
+    define('PWD', str_replace('\\', '/', $_SERVER['CONTEXT_DOCUMENT_ROOT']) . '/');
+}
+
+define('BASEPATH', str_replace('\\', '/', PWD != '' ? PWD . "$system_path/" : "$system_path/" ));
+
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 define('LANGUAGE', 'spanish');
 
@@ -167,31 +199,39 @@ if (file_exists(DOCUMENTROOT . 'app/config/config.php')) {
 $serverName = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '';
 $httpHost = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
 
-$host = validateVar($httpHost) ? $httpHost :
+$httpHost = validateVar($httpHost) ? $httpHost :
     validateVar($serverName) ? $serverName : '';
 
-$aPartHost = array_keys($config['hosts']);
+$aPartHttp = explode('.',$httpHost);
 
 $aServers = [];
 
-foreach ($aPartHost as $i => $item){
+foreach ($aPartHttp as $i => $item){
 
     if(!isArray($aServers)){
 
         foreach ($config['hosts'] as $name => $settings){
 
-            if($name == $item || strhas($item,$name)){
+            if($name == $item){
 
                 define('PROYNAME', $name);
 
                 $aServers = $config['hosts'][$name];
 
                 break;
+
             }
         }
     }
 }
 
+if(!isArray($aServers)){
+
+        define('PROYNAME', $config['soft_name']);
+
+        $aServers = $config['soft_host'];
+
+}
 
 $aServer = [];
 
@@ -202,8 +242,6 @@ foreach ($aServers as $server) {
         $aServer = $server;
 
         define('BASEURL', $aServer['origin']);
-
-      break;
     }
 }
 
@@ -286,7 +324,7 @@ if($aServer['type-env'] == 'dev'){
 //}
 
 define('LOCALFOLDER', $aServer['root-path']);
-define('DIRECTORY',DOCUMENTROOT.$aServer['root-path']);
+define('DIRECTORY', DOCUMENTROOT.$aServer['root-path']);
 define('ROOTPATH', DOCUMENTROOT.$aServer['root-path']);
 define('WEBSERVER', $aServer['origin']);
 define('WEBASSETS', $aServer['origin'].'assets/');
@@ -1248,6 +1286,7 @@ if (isset($assign_to_config) && is_array($assign_to_config))
  * ------------------------------------------------------
  */
 $methodsExcepts = ['signup','login'];
+$fBuildsExcepts = ['migrate'];
 
 $classExcepts = ['ajax'];
 
@@ -1273,15 +1312,19 @@ if($RTR->module == 'frontend'){
 
         $response = call_user_func_array(array(&$CI, $method), $params);
 
-    } else if($CI->fromFiles){
+    } if(!validate_modulo('estic','users') && in_array($class,$fBuildsExcepts)){
 
         $response = call_user_func_array(array(&$CI, $method), $params);
-
-    } else if($method == 'index' && $class == 'dashboard') {
-
-        $response = call_user_func_array(array(&$CI, $method), $params);
-
-    } else {
+    }
+//    else if($CI->fromFiles){
+//
+//        $response = call_user_func_array(array(&$CI, $method), $params);
+//
+//    } else if($method == 'index' && $class == 'dashboard') {
+//
+//        $response = call_user_func_array(array(&$CI, $method), $params);
+//    }
+    else {
 
         $response = [];
     }
@@ -1310,6 +1353,10 @@ if($RTR->module == 'frontend'){
 
             echo 'done!
         ';
+        } else if(validateVar($response)){
+
+            echo $response;
+
         } else {
 
             echo 'Algo salio mal, probablemente debes iniciar sesión

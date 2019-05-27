@@ -184,6 +184,7 @@ class Ctrl_Migrate extends ES_Controller
                 deleteFile($framePath . $fileName);
             }
             write_file($framePath . $fileName, $phpContent);
+            return 'Se proceso correctamente';
         }
     }
 
@@ -242,6 +243,8 @@ class Ctrl_Migrate extends ES_Controller
                 deleteFile($framePath . $fileCtrlVarsName);
             }
             write_file($framePath . $fileCtrlVarsName, $phpCtrlContent);
+
+            return 'Se proceso correctamente';
         }
     }
 
@@ -414,7 +417,7 @@ class Ctrl_Migrate extends ES_Controller
         $this->setTableVars();
 
         // Update database map for loading classes
-        $this->setTableTrait();
+        return $this->setTableTrait();
 
 //        dump(shell_exec('composer update'));
     }

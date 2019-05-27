@@ -107,12 +107,26 @@ $config['img_max_height'] = 10000;
 
 // -------------------------- Configuraciones del proyecto -------------------------------
 
-$config['soft_name'] = 'herbalife';
+$config['soft_name'] = 'estic';
 $config['soft_user_id'] = '1';
 $config['soft_user'] = 'rafaelgutierrez';
 $config['soft_user_name'] = 'Rafael Gutierrez Gaspar';
 $config['soft_user_email'] = 'rafarobertgu@gmail.com';
 $config['soft_user_role'] = '1';
+$config['soft_host'] = [
+    [
+        "host" => "local.estic.com.bo",
+        "hostname-core" => "local.estic.com.bo",
+        "hostname" => "local.estic.com.bo",
+        "protocol" => "http:",
+        "port" => "80",
+        "origin" => "http://local.estic.com.bo/",
+        "dest" => "http://local.estic.com.bo/",
+        "root-path" => "",
+        "type-url" => "dns",
+        "type-env" => "dev"
+    ]
+];
 
 $config['appDirs'] = array(
   'modules' => [
