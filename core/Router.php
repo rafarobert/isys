@@ -196,14 +196,15 @@ class CI_Router {
 		                if($proyName == PROYNAME){
                             $route['default_controller'] = $route["default_controller_$proyName"];
                             isset($route['default_controller']) && $this->default_controller = $route['default_controller'];
-                            isset($route['translate_uri_dashes']) && $this->translate_uri_dashes = $route['translate_uri_dashes'];
-                            unset($route['default_controller'], $route['translate_uri_dashes']);
-                            $this->routes = $route;
+
                             break;
                         }
                     }
                 }
             }
+            isset($route['translate_uri_dashes']) && $this->translate_uri_dashes = $route['translate_uri_dashes'];
+            unset($route['default_controller'], $route['translate_uri_dashes']);
+            $this->routes = $route;
 		}
 
 		// Are query strings enabled in the config file? Normally CI doesn't utilize query strings
