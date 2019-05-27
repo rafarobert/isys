@@ -164,13 +164,13 @@ if (file_exists(DOCUMENTROOT . 'app/config/config.php')) {
  * ------------------------------------------------------
  */
 
-$serverName = $_SERVER['SERVER_NAME'];
-$httpHost = $_SERVER['HTTP_HOST'];
+$serverName = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '';
+$httpHost = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
 
-$host = isset($httpHost) ? $httpHost :
-    isset($serverName) ? $serverName : '';
+$host = validateVar($httpHost) ? $httpHost :
+    validateVar($serverName) ? $serverName : '';
 
-$aPartHost = explode('.',$host);
+$aPartHost = array_keys($config['hosts']);
 
 $aServers = [];
 
