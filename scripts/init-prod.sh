@@ -1,8 +1,12 @@
-sh ./permitions.sh
-sh ./propel-reverse-prod.sh
-sh ./propel.sh
-sh ./propel-build-sql.sh
+./permitions.sh
+
+./propel-reverse-dev.sh
+./propel.sh
+./propel-build-sql.sh
+./fromdatabase.sh
+
 cd ..
 cd ..
 composer update
 cd isys/scripts
+./gruntback.sh
