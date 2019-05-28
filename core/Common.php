@@ -1573,20 +1573,25 @@ if (!function_exists('deleteDir')) {
 if (!function_exists('rrmdir')) {
 
     function rrmdir($src) {
-        $dir = opendir($src);
-        while(false !== ( $file = readdir($dir)) ) {
-            if (( $file != '.' ) && ( $file != '..' )) {
-                $full = $src . '/' . $file;
-                if ( is_dir($full) ) {
-                    rrmdir($full);
+        if(is_dir($src)){
+            $src = rtrim($src,'/');
+            $dir = opendir($src);
+            if($dir){
+                while(false !== ( $file = readdir($dir)) ) {
+                    if (( $file != '.' ) && ( $file != '..' )) {
+                        $full = $src . '/' . $file;
+                        if ( is_dir($full) ) {
+                            rrmdir($full);
+                        }
+                        else {
+                            unlink($full);
+                        }
+                    }
                 }
-                else {
-                    unlink($full);
-                }
+                closedir($dir);
+                rmdir($src);
             }
         }
-        closedir($dir);
-        rmdir($src);
     }
 }
 

@@ -70,6 +70,12 @@ define('CI_VERSION', '3.0.6');
  */
 $system_path = 'isys';
 
+if(!isset($_SERVER['PWD'])){
+    $DIR = __FILE__;
+    $aDIR = explode('\\isys\\core\\CodeIgniter.php',$DIR);
+    $_SERVER['PWD'] = $aDIR[0];
+}
+
 if(isset($_SERVER['ESTIC_ORIGIN'])){
 
     if (isset($_SERVER['PWD'])){
@@ -96,8 +102,6 @@ if(isset($_SERVER['ESTIC_ORIGIN'])){
                 }
             }
         }
-    } else {
-        $_SERVER['PWD'] = $_SERVER['ESTIC_ORIGIN'];
     }
 }
 
@@ -145,7 +149,6 @@ date_default_timezone_set('America/La_Paz');
  * ------------------------------------------------------
  */
 define('DOCUMENTROOT',PWD !== '' ? PWD : $_SERVER['DOCUMENT_ROOT'] . '/');
-
 
 
 require_once PWD . 'vendor/autoload.php';
