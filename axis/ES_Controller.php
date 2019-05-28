@@ -86,12 +86,9 @@ class ES_Controller extends ES_Ctrl_Vars
     }
     if (validate_modulo('estic', 'sessions')) {
       $this->load->model('estic/model_users');
-      $this->session->userTable = 'es_users';
-      $this->session->userIdTable = 'id_user';
-      $this->session->sessKey = config_item('sess_key_admin');
 
       if ($this->session->isLoguedin()) {
-        $this->CI->data['subview'] = 'admin/dashboard/index';
+        $this->CI->data['subview'] = $this->session->environment.'/dashboard/index';
         $this->setSessData();
       } else if (compareStrStr($this->input->get_post_request('login'),'Ingresar') || compareStrStr($this->input->get_post_request('login'), 'Desbloquear')) {
         $this->session->login();
@@ -120,8 +117,10 @@ class ES_Controller extends ES_Ctrl_Vars
 
         $this->aRolesFromSess[] = $this->oUserLogguedIn->getIdRole();
         $tablesEnabled = array();
-        if (isset($this->aSessData->ids_roles)) {
-          foreach ($this->aSessData->ids_roles as $sessRole) {
+        $idsRoles = isset($this->aSessData->ids_roles) ? $this->aSessData->ids_roles :
+            isset($this->aSessData['ids_roles']) ? $this->aSessData['ids_roles'] : [];
+
+          foreach ($idsRoles as $sessRole) {
             if (!in_array($sessRole, $this->aRolesFromSess)) {
               $this->aRolesFromSess[] = $sessRole;
             }
@@ -131,7 +130,7 @@ class ES_Controller extends ES_Ctrl_Vars
               ->find()
               ->toArray();
           }
-        }
+
         $this->data['aRolesFromSess'] = $this->aRolesFromSess;
         $aTablesIds = array();
         $aTablesUrls = array();
@@ -154,18 +153,37 @@ class ES_Controller extends ES_Ctrl_Vars
           'estic/dashboard',
           'sys/migrate',
           'sys/ajax',
+            'sys/config',
           'twilio/send'
         ];
         $aTablesUrls = array_merge($aTablesUrls, $aExcepts);
         $uri = $this->uri->segment(1) . '/' . $this->uri->segment(2);
-        if (in_array($uri, $aTablesUrls)) {
-          if ($this->oUserLogguedIn->getIdRole() == 1) {
-            $this->data['oSysTables'] = EsTablesQuery::create()->find();
-            $this->data['oSysModules'] = EsModulesQuery::create()->find();
-          } else {
-            $this->data['oSysModules'] = EsModulesQuery::create()->find();
-            $this->data['oSysTables'] = EsTablesQuery::create()->filterByIdTable($aTablesIds, Criteria::IN)->find();
-          }
+
+        if(!in_array($uri, $aTablesUrls)){
+
+            $this->data['oSysTables'] = array();
+            $this->data['oSysModules'] = array();
+            unset($this->oUserLogguedIn);
+            $this->session->locked();
+            return false;
+
+        } else if($this->session->environment == 'sys' && $this->session->sessKey != config_item('sess_key_estic')){
+
+            $this->data['oSysTables'] = array();
+            $this->data['oSysModules'] = array();
+            unset($this->oUserLogguedIn);
+            $this->session->locked();
+            return false;
+
+        } else {
+
+            if ($this->oUserLogguedIn->getIdRole() == 1) {
+                $this->data['oSysTables'] = EsTablesQuery::create()->find();
+                $this->data['oSysModules'] = EsModulesQuery::create()->find();
+            } else {
+                $this->data['oSysModules'] = EsModulesQuery::create()->find();
+                $this->data['oSysTables'] = EsTablesQuery::create()->filterByIdTable($aTablesIds, Criteria::IN)->find();
+            }
 //                    if($this->aSessData->id_role == 1){
 //                        $this->data['oSysTables'] = Model_Tables::create()->find();
 //                        $this->data['oSysModules'] = Model_Modules::create()->find();
@@ -173,11 +191,6 @@ class ES_Controller extends ES_Ctrl_Vars
 //                        $this->data['oSysModules'] = Model_Modules::create()->find();
 //                        $this->data['oSysTables'] = Model_Tables::create()->filterByIdNivelRole($this->oUserLogguedIn->id_role);
 //                    }
-        } else {
-          $this->data['oSysTables'] = array();
-          $this->data['oSysModules'] = array();
-          unset($this->oUserLogguedIn);
-          $this->session->locked();
         }
 
       }
@@ -185,7 +198,21 @@ class ES_Controller extends ES_Ctrl_Vars
   }
 
   public function setSessData(){
-    $this->aSessData = (object)$this->session->get_userdata()[config_item('sess_key_admin')];
+        $oUserData = (object)$this->session->get_userdata();
+        $sessKeyAdmin = config_item('sess_key_admin');
+        $sessKeyEstic = config_item('sess_key_estic');
+        $sessKeySys = config_item('sess_key_sys');
+
+    if(isset($oUserData->$sessKeyAdmin)){
+        $this->aSessData = $oUserData->$sessKeyAdmin;
+    } else if(isset($oUserData->$sessKeyEstic)){
+        $this->aSessData = $oUserData->$sessKeyEstic;
+    } else if(isset($oUserData->$sessKeyEstic)){
+        $this->aSessData = $oUserData->$sessKeySys;
+    } else {
+        return null;
+    }
+
     $this->data['aSessData'] = std2array($this->aSessData);
     $this->data['oUserLogguedIn'] = $this->oUserLogguedIn = $this->model_users->setFromData($this->aSessData);
     $this->data['aUserLogguedIn'] = $this->oUserLogguedIn->getArrayData();
@@ -194,6 +221,8 @@ class ES_Controller extends ES_Ctrl_Vars
     );
 
     $this->session->set_userdata($data);
+
+    return $this->oUserLogguedIn;
   }
 
     public function loadTemplates($view, $data = array()){

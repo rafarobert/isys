@@ -1427,15 +1427,19 @@ if (!function_exists('createFolder')) {
 
     function createFolder($dir)
     {
+
         if (!is_dir($dir)) {
 
             if (!mkdir($dir, 0777, true)) {
+
+                $error = error_get_last();
+                echo $error['message'];
 
                 die('Fallo al crear el folder ' . $dir);
 
                 return false;
             }
-            chmod($dir, 0777);
+//            chmod($dir, 0777);
 
             $mensaje = "El directorio " . $dir . " se ha creado exitosamente";
 
@@ -1574,7 +1578,6 @@ if (!function_exists('rrmdir')) {
 
     function rrmdir($src) {
         if(is_dir($src)){
-            $src = rtrim($src,'/');
             $dir = opendir($src);
             if($dir){
                 while(false !== ( $file = readdir($dir)) ) {
@@ -1589,8 +1592,8 @@ if (!function_exists('rrmdir')) {
                     }
                 }
                 closedir($dir);
-                rmdir($src);
             }
+            rmdir($src);
         }
     }
 }

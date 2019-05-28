@@ -14,7 +14,7 @@ class ES_Backend_Controller extends ES_Controller
     {
         $CI = $this->initLoaded();
         parent::__construct();
-        $this->data['subLayout'] = 'backend/_subLayout';
+        $this->data['subLayout'] = isset($this->data['subLayout']) ? $this->data['subLayout'] : 'backend/_subLayout';
 
         $this->data['siteTitle'] = config_item('site_title');
         $this->data['metaTitle'] = config_item('meta_title');

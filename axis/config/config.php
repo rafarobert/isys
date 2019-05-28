@@ -32,7 +32,7 @@ $config['sess_key_admin'] = 'admin_loggedin';
 $config['sess_key_estic'] = 'estic_loggedin';
 $config['sess_key_sys'] = 'sys_loggedin';
 $config['sess_key'] = 'loggedin';
-$config['sess_table'] = 'ci_users';
+$config['sess_table'] = 'es_users';
 $config['sess_idTable'] = 'id_user';
 $config['sess_object'] = 'oUser';
 
@@ -53,7 +53,7 @@ $config['isysDirs']= array(
 $config['ormDirs'] = array(
     'crud' => [
         'admin' => 'HMVC',
-        'base' => 'HMVC',
+        'estic' => 'HMVC',
         'front' => 'HMVC'
     ]
 );
@@ -61,13 +61,13 @@ $config['ormDirs'] = array(
 $config['dirs'] = array(
     'isys' => [
         'modules' => [
-            'base' => 'HMVC',
+            'estic' => 'HMVC',
         ],
     ],
     'app' => [
         'modules' => [
             'admin' => 'HMVC',
-            'base' => 'HMVC',
+            'estic' => 'HMVC',
             'front' => 'HMVC'
         ],
         'layouts' => [
@@ -79,7 +79,7 @@ $config['dirs'] = array(
     'orm' => [
         'crud' => [
             'admin' => 'HMVC',
-            'base' => 'HMVC',
+            'estic' => 'HMVC',
             'front' => 'HMVC'
         ],
         'migrations' => [

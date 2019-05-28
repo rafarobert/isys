@@ -309,10 +309,10 @@ class Ctrl_Migrate extends ES_Controller
         // ***************** refresh *********************
 //        rrmdir('orm/migrations');
         // ***************** creating migrations ********************
-        if (createFolder($framePath."tables/")) {
-            rrmdir($framePath."tables/");
-            createFolder($framePath."tables/");
-        }
+//        if (createFolder($framePath."tables/")) {
+//            rrmdir($framePath."tables/");
+//            createFolder($framePath."tables/");
+//        }
 
         foreach ($modules as $modSign => $tabName){
           if (!validate_modulo('estic','tables')) {
@@ -373,7 +373,7 @@ class Ctrl_Migrate extends ES_Controller
                 $this->data["tableSettings"] = var_export($tableSettings,true);
                 $phpContent = $this->load->view("template_migrations",$this->data, true, true);
                 if (createFolder($framePath)) {
-                    if (createFolder($framePath."tables/")) {
+                    if (createFolder($framePath."tables")) {
                         if (createFolder($framePath."tables/$modSign")) {
                             write_file($framePath."tables/$modSign/$fileName",$phpContent);
                         }

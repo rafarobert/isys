@@ -64,6 +64,7 @@ class CI_Session {
     public $userIdTable;
     public $es_sessions;
     public $sessKey;
+    public $environment;
 
 
 	protected $_driver = 'files';
@@ -197,7 +198,17 @@ class CI_Session {
             );
         }
 
+        $this->userTable = config_item('sess_table');
+        $this->userIdTable = config_item('sess_idTable');
+
         $this->_ci_init_vars();
+        $sys = config_item('sys');
+        $env = $this->environment = $this->CI->uri->segment(1);
+        if(inArray($env, $sys)){
+            $this->sessKey = config_item("sess_key_$env");
+        } else if($this->CI->uri->segment(1) == 'sys'){
+            $this->sessKey = config_item('sess_key_estic');
+        }
         log_message('info', "Session: Class initialized using '".$this->_driver."' driver.");
     }
 
@@ -957,7 +968,6 @@ class CI_Session {
             class_exists('Ctrl_Users')
           ){
             $this->CI->initUsers(true);
-            $this->sessKey = config_item('sess_key_admin');
             if($this->has_userdata($this->sessKey)) {
               $aDataSession = $this->userdata($this->sessKey);
               return validateArray($aDataSession, 'IdUser') ? $aDataSession['IdUser'] : (validateArray($aDataSession, 'id_user') ? $aDataSession['id_user'] : '');
@@ -975,7 +985,7 @@ class CI_Session {
 	}
 
     public function getDataUserLoggued(){
-        $this->sessKey = config_item('sess_key_admin');
+//        $this->sessKey = config_item('sess_key_admin');
         if($this->CI->initUsers(true)){
             if($this->has_userdata($this->sessKey)) {
                 $aDataSession = $this->userdata($this->sessKey);
@@ -1186,7 +1196,7 @@ class CI_Session {
                   }
                 }
             } else {
-                $this->CI->data['errors']['login'] = 'El usuario no ';
+                $this->CI->data['errors']['login'] = 'El usuario no fue identificado, vuelve a ingresar la contraseña o usuario';
                 $this->CI->data['subLayout'] = 'login';
                 return false;
             }

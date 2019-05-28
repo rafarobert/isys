@@ -18,4 +18,8 @@ $route['sys/migrate/([a-zA-Z]+)'] = 'sys/migrate/run/$0/$1';
 $route['sys/migrate/([a-zA-Z]+)'] = 'sys/migrate/run/$0/$1';
 $route['sys/migrate/(:num)'] = 'sys/migrate/run/$0/$1';
 $route['sys/migrate/(:num)'] = 'sys/migrate/run/$0/$1';
+$route['sys/config/build'] = 'sys/config/build';
+$route['sys/ajax'] = 'sys/ajax';
+$route['sys/config'] = 'sys/config';
+$route['twilio/send'] = 'twilio/send';
 // ===================================================

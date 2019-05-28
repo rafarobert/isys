@@ -1385,10 +1385,10 @@ if($RTR->module == 'frontend'){
 
     } else {
 
-        if(!objectHas($CI,'oUserLogguedIn')){
-
-            $CI->data['subLayout'] = 'pages/login';
-        }
+//        if(!objectHas($CI,'oUserLogguedIn')){
+//
+//            $CI->data['subLayout'] = 'pages/login';
+//        }
         // if not it displays the content
         $CI->data['subview'] = isset($CI->data['subview']) ? $CI->data['subview'] : '';
         $CI->load->view($CI->data['layout'], $CI->data);
