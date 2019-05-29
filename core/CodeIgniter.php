@@ -72,8 +72,12 @@ $system_path = 'isys';
 
 if(!isset($_SERVER['PWD'])){
     $DIR = __FILE__;
-    $aDIR = explode('\\isys\\core\\CodeIgniter.php',$DIR);
-    $_SERVER['PWD'] = $aDIR[0];
+    if(isset($_SERVER['SYSTEMDRIVE']) && $_SERVER['SYSTEMDRIVE'] == 'C:'){
+      $aDIR = explode('\\isys\\core\\CodeIgniter.php',$DIR);
+    } else {
+      $aDIR = explode('/isys/core/CodeIgniter.php',$DIR);
+    }
+  $_SERVER['PWD'] = $aDIR[0];
 }
 
 if(isset($_SERVER['ESTIC_ORIGIN'])){

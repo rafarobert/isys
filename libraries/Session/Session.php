@@ -200,16 +200,43 @@ class CI_Session {
 
         $this->userTable = config_item('sess_table');
         $this->userIdTable = config_item('sess_idTable');
+        $sessKeyAdmin = config_item('sess_key_admin');
+        $sessKeyEstic = config_item('sess_key_estic');
+        $sessKeySys = config_item('sess_key_sys');
 
         $this->_ci_init_vars();
         $sys = config_item('sys');
-        $env = $this->environment = $this->CI->uri->segment(1);
-        if(inArray($env, $sys)){
-            $this->sessKey = config_item("sess_key_$env");
-        } else if($this->CI->uri->segment(1) == 'sys'){
-            $this->sessKey = config_item('sess_key_estic');
+        $uriString = validateVar($this->CI->input->post('uri_string')) ? $this->CI->input->post('uri_string') : $this->CI->uri->segment(1);
+        $aSessData = $this->get_userdata();
+        $mode = $this->CI->input->post('login');
+
+        if (isArray($aSessData)){
+          if(arrayHas($aSessData,$sessKeyAdmin)){
+            $this->sessKey = $sessKeyAdmin;
+          } else if(arrayHas($aSessData,$sessKeyEstic)){
+            $this->sessKey = $sessKeyEstic;
+          } else if(arrayHas($aSessData,$sessKeySys)) {
+            $this->sessKey = $sessKeySys;
+          } else {
+            $this->sessKey = null;
+          }
         }
-        log_message('info', "Session: Class initialized using '".$this->_driver."' driver.");
+
+      if(compareStrStr($mode,'desbloquear')){
+        $this->sessKey = $sessKeyAdmin;
+      }
+
+      $aUriString = explode('/',$uriString );
+      $env = $this->environment = $aUriString[0];
+
+        if (!isset($this->sessKey)){
+          if(inArray($env, $sys)){
+            $this->sessKey = config_item("sess_key_$env");
+          } else if($this->CI->uri->segment(1) == 'sys'){
+            $this->sessKey = config_item('sess_key_estic');
+          }
+        }
+      log_message('info', "Session: Class initialized using '".$this->_driver."' driver.");
     }
 
     // ------------------------------------------------------------------------
@@ -1182,18 +1209,25 @@ class CI_Session {
                     $data['ids_roles'][] = $oUser->getIdRole();
                 }
                 $data['loggedin'] = TRUE;
-                $this->set_userdata($this->sessKey,$data);
-                $uri = $this->CI->input->post('uri_string') ? WEBSERVER.$this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? WEBSERVER.$this->CI->uri->uri_string() :
-                    ($oUser->id_role == 1 ? WEBSERVER.'estic/dashboard' : WEBSERVER.'admin/dashboard'));
 
-                if(isset($_SERVER['SHELL'])){
-                  return $oUser;
-                } else {
-                  if($this->CI->input->post('login') == 'Desbloquear'){
-                    redirect('admin/dashboard');
+                if (isset($this->sessKey)){
+
+                  $this->set_userdata($this->sessKey,$data);
+                  $uri = $this->CI->input->post('uri_string') ? WEBSERVER.$this->CI->input->post('uri_string') : ($this->CI->uri->uri_string() ? WEBSERVER.$this->CI->uri->uri_string() :
+                      ($oUser->id_role == 1 ? WEBSERVER.'estic/dashboard' : WEBSERVER.'admin/dashboard'));
+
+                  if(isset($_SERVER['SHELL'])){
+                    return $oUser;
                   } else {
-                    redirect($uri);
+                    if($this->CI->input->post('login') == 'Desbloquear'){
+                      redirect('admin/dashboard');
+                    } else {
+                      redirect($uri);
+                    }
                   }
+                } else {
+                  $this->locked();
+                  return false;
                 }
             } else {
                 $this->CI->data['errors']['login'] = 'El usuario no fue identificado, vuelve a ingresar la contraseña o usuario';
