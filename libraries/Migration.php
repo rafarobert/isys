@@ -934,8 +934,8 @@ class CI_Migration
                   exit();
               }
             } else if(!validate_modulo('estic','users')){
-                show_error_handled("El modulo users no se encuentraba creado, debido a ello no se pudo registrar la tabla $tableName, al momento de la migracion: $id_migration, verifica que el modulo base/usere se encuentra creado para evitar este error");
-                return $id_migration;
+                show_error_handled("El modulo users no se encuentra creado, no se pudo registrar la tabla $tableName, en la migracion: $id_migration, verifica que el modulo estic/users se encuentra creado para evitar este error");
+                //return $id_migration;
             }
             if (validate_modulo('estic', 'tables') && validate_modulo('estic','tables_roles')){
 
@@ -1274,7 +1274,9 @@ class CI_Migration
                     break;
                 }
                 if($settings2['pk'] == $idForeign){
-                    unset($relations[$fkName2]);
+                  if(isset($relations[$fkName])){
+                    unset($relations[$fkName]);
+                  }
                 }
             }
         }
@@ -1456,9 +1458,9 @@ class CI_Migration
         if (createFolder($framePathApp)) {
             if (createFolder($framePathApp . "$submod/")) {
                 $ctrlFile = $framePathApp . "$submod/Ctrl_" . ucfirst($submod) . $this->_ext_php;
-                if (!file_exists($ctrlFile)) {
+                //if (!file_exists($ctrlFile)) {
                     write_file($ctrlFile, $phpCtrlContent);
-                }
+                //}
             }
         }
         return $data;
@@ -1523,9 +1525,9 @@ class CI_Migration
         if (createFolder($framePathApp)) {
             if (createFolder($framePathApp . "$submod/")) {
                 $modelFile = $framePathApp . "$submod/Model_" . ucfirst($submod) . $this->_ext_php;
-                if (!file_exists($modelFile)) {
+                //if (!file_exists($modelFile)) {
                     write_file($modelFile, $phpModelContent);
-                }
+                //}
             }
         }
         return $data;
@@ -1546,9 +1548,9 @@ class CI_Migration
             if (createFolder($frameAppPath . "$submod/")) {
                 if (createFolder($frameAppPath . "$submod/views/")) {
                     $filePath = $frameAppPath . "$submod/views/index" . $this->_ext_php;
-                    if (!file_exists($filePath)) {
+                    //if (!file_exists($filePath)) {
                         write_file($filePath, $phpContent);
-                    }
+                    //}
                 }
             }
         }
@@ -2673,8 +2675,8 @@ class CI_Migration
 
                 if (!validateArray($fkTableFields, $vFkTableFieldRef) && in_array($vFkTableFieldRef, $tab_titles)){
                     unset($fields[$idLocal]['selectBy']);
-                    unset($vFkTableFieldRefArray);
-                    unset($vFkTableFieldRef);
+                    $vFkTableFieldRefArray = array();
+                    $vFkTableFieldRef = '';
                     foreach ($tab_titles as $title){
                         if(validateArray($fkTableFields, $title)){
                             $vFkTableFieldRef = $title;

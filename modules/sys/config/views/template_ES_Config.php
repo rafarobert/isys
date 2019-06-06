@@ -8,10 +8,10 @@
 
 use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
-trait ES_Config_Trait
+class ES_Config
 {
   //>>>setInitFunctions<<<
-  public function configUcObjItem()
+  public static function configUcObjItem()
   {
     return config_item('lcItem');
   }

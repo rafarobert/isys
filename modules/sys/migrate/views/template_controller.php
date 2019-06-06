@@ -29,14 +29,12 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
         return self::$instance;
     }
 
-    public static function create($bWithInit = false)
+    public static function create($bWithInit = true)
     {
         if (!self::$instance) {
             self::$instance = new self();
         }
         if($bWithInit){
-            self::$instance->init();
-        } else if(!self::$initialized){
             self::$instance->init();
         }
         return self::$instance;

@@ -2193,6 +2193,21 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			.($this->qb_limit ? ' LIMIT '.$this->qb_limit : '');
 	}
 
+  /**
+   * Virtual Delete statement
+   *
+   * Generates a platform-specific delete string from the supplied data
+   *
+   * @param	string	the table name
+   * @return	string
+   */
+	protected function _virtual_delete($table)
+	{
+
+		return 'FROM '.$table.$this->_compile_wh('qb_where')
+			.($this->qb_limit ? ' LIMIT '.$this->qb_limit : '');
+	}
+
 	// --------------------------------------------------------------------
 
 	/**

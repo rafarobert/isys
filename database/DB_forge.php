@@ -1303,8 +1303,13 @@ abstract class CI_DB_forge
                 if (in_array($colName, $excepts)) {
                     if (compareStrStr($colName, 'estado')) {
                         $aFields['label'] = "Estado";
-                        $aFields['input'] = "radio";
-                        $aFields['options'] = ["ENABLED", "DISABLED"];
+                        $aFields['input'] = "radios";
+                        $aFields['options'] = ["ENABLED", "DISABLED", "DELETED"];
+                    }
+                    if (compareStrStr($colName, 'status')) {
+                        $aFields['label'] = "Status";
+                        $aFields['input'] = "radios";
+                        $aFields['options'] = ["ENABLED", "DISABLED", "DELETED"];
                     }
                     if (compareStrStr($colName, 'change_count')) {
                         $aFields['label'] = "Numero de Cambios de este registro";
@@ -1312,12 +1317,12 @@ abstract class CI_DB_forge
                     }
                     if (compareStrStr($colName, 'id_user_modified')) {
                         $aFields['label'] = "Nombre del usuario que modifico el registro";
-                        $aFields['selectBy'] = ["name", "lastname"];
+                        $aFields['selectBy'] = ["id_person"];
                         $aFields['input'] = "disabled";
                     }
                     if (compareStrStr($colName, 'id_user_created')) {
                         $aFields['label'] = "Nombre del usuario que creo el registro";
-                        $aFields['selectBy'] = ["name", "lastname"];
+                        $aFields['selectBy'] = ["id_person"];
                         $aFields['input'] = "disabled";
                     }
                     if (compareStrStr($colName, 'date_modified')) {

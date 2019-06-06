@@ -93,8 +93,9 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     //>>>packSettersFunctions<<<
     public function setUcObjField($lcObjField = ''){
         if(objectHas($this,'lcField', false)){
-            return $this->lcLocalField = $lcObjField;
+            $this->lcLocalField = $lcObjField;
         }
+        return $this;
     }
     //<<<packSettersFunctions>>>
 
@@ -172,7 +173,7 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         return $oModelUcObjTableP;
     }
 
-    public function setFromData($oData, $oUcTableS = null){
+    public function setFromData($oData){
 
         if(isArray($oData)){
             $oData = array2std($oData);
@@ -181,9 +182,9 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
             $oData = verifyArraysInResult($oData);
 
-            if(isObject($oUcTableS)){
+            if(isObject($this)){
 
-                $oModelUcObjTableP = $oUcTableS;
+                $oModelUcObjTableP = $this;
 
             } else {
 

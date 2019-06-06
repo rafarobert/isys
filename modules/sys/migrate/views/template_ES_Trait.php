@@ -20,12 +20,24 @@ trait ES_Table_Trait
             }
             $this->model_lcTableP = Model_UcTableP::create($bWithInit);
 
-            return true;
+            return $this;
 
         } else {
 
-            return false;
+            return $this;
         }
     }
     //<<<setInitFunctions>>>
+
+
+  //>>>setModelInitFunctions<<<
+  public function modelUcObjTableP()
+  {
+    if(validate_modulo('lcMod','lcTableP')){
+
+      return Model_UcTableP::create();
+
+    }
+  }
+  //<<<setModelInitFunctions>>>
 }

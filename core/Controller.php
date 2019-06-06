@@ -76,7 +76,9 @@ class CI_Controller {
             if (isset($this->$var)) {
                 $this->$var =& $this->$var;
             } else {
+              if($var != 'migration'){
                 $this->$var =& load_class($class);
+              }
             }
         }
 

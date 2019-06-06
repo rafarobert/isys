@@ -830,9 +830,9 @@ if ( ! function_exists('form_button'))
 			'type' => 'button'
 		);
 
-		if (is_array($data) && isset($data['content']))
+		if (is_array($data))
 		{
-			$content = $data['content'];
+			$content = isset($data['content'] )? $data['content'] : isset($data['value']) ? $data['value'] : '';
 			unset($data['content']); // content is not an attribute
 		}
 

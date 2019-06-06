@@ -475,7 +475,7 @@ Class ES_Model extends ES_Model_Vars {
         }
 
         // insert
-        if (($id == null || $id == 0) && !isset($data[$this->_primary_key])) {
+        if (($id == null || ($id == 0 && is_int($id)) || $id == '') && !isset($data[$this->_primary_key])) {
             $data[$this->_primary_key] = null;
             if (is_numeric($with_id) || is_string($with_id)) {
                 $id = $with_id;
@@ -612,7 +612,7 @@ Class ES_Model extends ES_Model_Vars {
         // Settings for images
         $aFileTypes = explode('|',config_item('file_types'));
         $config = array(
-            'allowed_types'     => config_item('file_types'),
+            'allowed_types'     => Ctrl_Types_files::create()->model_types_files->selectBy('name',true),
             'max_size'          => config_item('img_max_size'),
             'max_width'         => config_item('img_max_width'),
             'max_height'        => config_item('img_max_height'),
@@ -808,6 +808,9 @@ Class ES_Model extends ES_Model_Vars {
                               } else if (isset($thumb->_table_name)){
                                   $this->thumbs[$keyThumb] = $thumb->toArray();
                                   $this->files[$key]->{'thumbs'}[$keyThumb] = $thumb->toArray();
+                              } else if(isObject($thumb)){
+                                  $this->thumbs[$keyThumb] = std2array($thumb);
+                                  $this->files[$key]->{'thumbs'}[$keyThumb] = std2array($thumb);
                               }
                           }
                       }
@@ -919,7 +922,7 @@ Class ES_Model extends ES_Model_Vars {
         return [];
     }
 
-    public function selectBy($selects = null){
+    public function selectBy($selects = null, $bAsArray = false){
         $aSelects = array();
         if(isArray($selects)){
             $aSelects = $selects;
@@ -929,6 +932,11 @@ Class ES_Model extends ES_Model_Vars {
         $aData = $this->get_by(array (
             0 => $aSelects,
         ),true);
+
+        if($bAsArray){
+            $bkpData = std2array($aData);
+            $aData = array_column($aData,'name');
+        }
         return $aData;
     }
 
@@ -1053,7 +1061,12 @@ Class ES_Model extends ES_Model_Vars {
 
                               foreach ($foreignDatas as $foreignData){
 
+                                if($orderBy) {
                                   $aForeignsFields[] = $foreignData->toArray();
+                                } else {
+                                  $aForeignsFields[] = std2array($foreignData);
+                                }
+
                               }
                               $data['foreigns'][lcfirst($field)] = $aForeignsFields;
 
@@ -1063,7 +1076,12 @@ Class ES_Model extends ES_Model_Vars {
 
                               foreach ($foreignDatas as $foreignData){
 
+                                if($orderBy) {
                                   $aForeignsFields[] = $foreignData->toArray();
+                                } else {
+                                  $aForeignsFields[] = std2array($foreignData);
+                                }
+
                               }
                               $data['foreigns'][lcfirst($field)] = $aForeignsFields;
 
@@ -1073,7 +1091,12 @@ Class ES_Model extends ES_Model_Vars {
 
                               foreach ($foreignDatas as $foreignData){
 
+                                if($orderBy) {
                                   $aForeignsFields[] = $foreignData->toArray();
+                                } else {
+                                  $aForeignsFields[] = std2array($foreignData);
+                                }
+
                               }
                               $data['foreigns'][lcfirst($field)] = $aForeignsFields;
 
@@ -1083,7 +1106,12 @@ Class ES_Model extends ES_Model_Vars {
 
                               foreach ($foreignDatas as $foreignData){
 
+                                if($orderBy) {
                                   $aForeignsFields[] = $foreignData->toArray();
+                                } else {
+                                  $aForeignsFields[] = std2array($foreignData);
+                                }
+
                               }
                               $data->{'foreigns'}[lcfirst($field)] = $aForeignsFields;
 
@@ -1093,7 +1121,12 @@ Class ES_Model extends ES_Model_Vars {
 
                               foreach ($foreignDatas as $foreignData){
 
+                                if($orderBy) {
                                   $aForeignsFields[] = $foreignData->toArray();
+                                } else {
+                                  $aForeignsFields[] = std2array($foreignData);
+                                }
+
                               }
                               $data->{'foreigns'}[lcfirst($field)] = $aForeignsFields;
 
@@ -1103,7 +1136,12 @@ Class ES_Model extends ES_Model_Vars {
 
                               foreach ($foreignDatas as $foreignData){
 
+                                if($orderBy) {
                                   $aForeignsFields[] = $foreignData->toArray();
+                                } else {
+                                  $aForeignsFields[] = std2array($foreignData);
+                                }
+
                               }
                               $data->{'foreigns'}[lcfirst($field)] = $aForeignsFields;
                           }

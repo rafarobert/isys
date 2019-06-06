@@ -1310,7 +1310,7 @@ if (isset($assign_to_config) && is_array($assign_to_config))
 $methodsExcepts = ['signup','login'];
 $fBuildsExcepts = ['migrate'];
 
-$classExcepts = ['ajax'];
+//$classExcepts = ['ajax'];
 
 // if User logu¿gued in continue
 
@@ -1330,11 +1330,11 @@ if($RTR->module == 'frontend'){
         $response = call_user_func_array(array(&$CI, $method), $params);
 
         // or if the url is in an except path
-    } else if(in_array($method ,$methodsExcepts) || in_array($class,$classExcepts)){
+    } else if(in_array($method ,$methodsExcepts)){
 
         $response = call_user_func_array(array(&$CI, $method), $params);
 
-    } if(!validate_modulo('estic','users') && in_array($class,$fBuildsExcepts)){
+    } else if(!validate_modulo('estic','users') && in_array($class,$fBuildsExcepts)){
 
         $response = call_user_func_array(array(&$CI, $method), $params);
     }
@@ -1357,7 +1357,7 @@ if($RTR->module == 'frontend'){
 
 
 
-    if($CI->fromAjax || $ctrlClass == 'Ctrl_Ajax' || $CI->input->post('fromAjax') || $class == 'ajax'){
+    if($CI->fromAjax || $ctrlClass == 'Ctrl_Ajax' || $CI->input->post('fromAjax') || $class == 'ajax') {
 
         if($response){
 
@@ -1371,11 +1371,11 @@ if($RTR->module == 'frontend'){
 
     } else if(isset($_SERVER['SHELL'])) {
 
-        if(objectHas($CI,'oUserLogguedIn')){
+        if(objectHas($CI,'oUserLogguedIn')) {
 
             echo 'done!
         ';
-        } else if(validateVar($response)){
+        } else if(validateVar($response)) {
 
             echo $response;
 

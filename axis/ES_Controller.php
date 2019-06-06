@@ -22,8 +22,10 @@ class ES_Controller extends ES_Ctrl_Vars
     public $CI_global;
     /**
      * @var Model_Users $oUserLogguedIn
+     * @var Model_Persons $oPersonLogguedIn
      */
     public $oUserLogguedIn;
+    public $oPersonLogguedIn;
     public $aSessData;
     public $aRolesFromSess;
 
@@ -46,21 +48,19 @@ class ES_Controller extends ES_Ctrl_Vars
       $this->data['metaImage'] = config_item('meta_image');
       $this->data['favIcon'] = config_item('fav_icon');
 
-      $this->fromAjax = $this->input->post('fromAjax');
+      //$this->fromAjax = $this->input->post('fromAjax');
+      $this->fromAjax = $this->router->class == 'ajax' ? true : $this->input->post('fromAjax');
       $this->data['layout'] = $this->uri->segment(1) == 'front' ? 'frontend/_layout' : 'backend/_layout';
       $this->data['subLayout'] = 'backend/_subLayout';
       $this->data['errors'] = array();
       $this->load->library('session');
-      $this->fromAjax = $this->input->post('fromAjax') ? true : false;
       $this->fromFiles = isset($_FILES) && validateVar($_FILES,'array');
       $this->data['uri_string'] = $this->uri->uri_string();
-      $excepts = ['ajax'];
+      //$excepts = ['ajax'];
       $this->load->library('migration');
       if (!$CI) {
         if (validate_modulo('estic', 'users')) {
-          if(!in_array($this->router->class, $excepts)){
             $this->onLoad();
-          }
         }
       }
       $this->CI_global = $vars = get_defined_vars()['CI'];
@@ -79,28 +79,33 @@ class ES_Controller extends ES_Ctrl_Vars
     $this->load->library('encryption');
 //        $this->form_validation->set_error_delimiters('<p class="error">', '</p>');
 
+    if (validate_modulo('estic', 'persons')) {
+      $this->load->model('estic/model_persons');
+    } else {
+      show_error('No se pudo cargar el modulo persons');
+    }
     if (validate_modulo('estic', 'users')) {
       $this->load->model('estic/model_users');
     } else {
       show_error('No se pudo cargar el modulo users');
     }
     if (validate_modulo('estic', 'sessions')) {
-      $this->load->model('estic/model_users');
+      $this->load->model('estic/model_sessions');
 
       if ($this->session->isLoguedin()) {
         $this->CI->data['subview'] = $this->session->environment.'/dashboard/index';
-        $this->setSessData();
+        list($this->oUserLogguedIn,$this->oPersonLogguedIn) = $this->setSessData();
       } else if (compareStrStr($this->input->get_post_request('login'),'Ingresar') || compareStrStr($this->input->get_post_request('login'), 'Desbloquear')) {
         $this->session->login();
-        $this->setSessData();
+        list($this->oUserLogguedIn, $this->oPersonLogguedIn) = $this->setSessData();
       } else {
         $this->data['subLayout'] = 'pages/login';
         if (compareStrStr($this->input->get_post_request('signup'),'Registrarse')) {
           $this->session->signUp();
-          $this->setSessData();
+          list($this->oUserLogguedIn, $this->oPersonLogguedIn) = $this->setSessData();
         } else if (compareStrStr($this->input->get_post_request('login'),'Ingresar')) {
           $this->session->login();
-          $this->setSessData();
+          list($this->oUserLogguedIn, $this->oPersonLogguedIn) = $this->setSessData();
         }
       }
 
@@ -110,40 +115,46 @@ class ES_Controller extends ES_Ctrl_Vars
 //                    ->filterByIdSetting(1)
 //                    ->find();
 
-      if (is_object($this->oUserLogguedIn)) {
-        if (validate_modulo('estic', 'tables')) {
-          $this->load->model('estic/model_tables');
-        }
+      if (is_object($this->oUserLogguedIn) && is_object($this->oPersonLogguedIn)) {
 
-        $this->aRolesFromSess[] = $this->oUserLogguedIn->getIdRole();
-        $tablesEnabled = array();
-        $idsRoles = isset($this->aSessData->ids_roles) ? $this->aSessData->ids_roles :
-            isset($this->aSessData['ids_roles']) ? $this->aSessData['ids_roles'] : [];
-
-          foreach ($idsRoles as $sessRole) {
-            if (!in_array($sessRole, $this->aRolesFromSess)) {
-              $this->aRolesFromSess[] = $sessRole;
-            }
-            $tablesEnabled[] = EsTablesRolesQuery::create()
-              ->select(['id_table'])
-              ->filterByIdRole($sessRole)
-              ->find()
-              ->toArray();
-          }
-
-        $this->data['aRolesFromSess'] = $this->aRolesFromSess;
-        $aTablesIds = array();
+        $uri = $this->uri->segment(1) . '/' . $this->uri->segment(2);
         $aTablesUrls = array();
-        foreach ($tablesEnabled as $tables) {
-          foreach ($tables as $idTable) {
-            if (!in_array($idTable, $aTablesUrls)) {
-              $aTablesIds[] = $idTable;
-              $aTablesUrls[] = EsTablesQuery::create()
-                ->select(['url'])
-                ->findOneByIdTable($idTable);
+
+        if($uri != 'sys/ajax'){
+          if (validate_modulo('estic', 'tables')) {
+            $this->load->model('estic/model_tables');
+            $this->aRolesFromSess[] = $this->oUserLogguedIn->getIdRole();
+            $tablesEnabled = array();
+            $idsRoles = isset($this->aSessData->ids_roles) ? $this->aSessData->ids_roles :
+              isset($this->aSessData['ids_roles']) ? $this->aSessData['ids_roles'] : [];
+
+            foreach ($idsRoles as $sessRole) {
+              if (!in_array($sessRole, $this->aRolesFromSess)) {
+                $this->aRolesFromSess[] = $sessRole;
+              }
+              $tablesEnabled[] = EsTablesRolesQuery::create()
+                ->select(['id_table'])
+                ->filterByIdRole($sessRole)
+                ->find()
+                ->toArray();
+            }
+
+            $this->data['aRolesFromSess'] = $this->aRolesFromSess;
+            $aTablesIds = array();
+            $aTablesUrls = array();
+            foreach ($tablesEnabled as $tables) {
+              foreach ($tables as $idTable) {
+                if (!in_array($idTable, $aTablesUrls)) {
+                  $aTablesIds[] = $idTable;
+                  $aTablesUrls[] = EsTablesQuery::create()
+                    ->select(['url'])
+                    ->findOneByIdTable($idTable);
+                }
+              }
             }
           }
         }
+
 
         $aExcepts = [
           'admin/',
@@ -157,7 +168,6 @@ class ES_Controller extends ES_Ctrl_Vars
           'twilio/send'
         ];
         $aTablesUrls = array_merge($aTablesUrls, $aExcepts);
-        $uri = $this->uri->segment(1) . '/' . $this->uri->segment(2);
 
         if(!in_array($uri, $aTablesUrls)){
 
@@ -167,6 +177,10 @@ class ES_Controller extends ES_Ctrl_Vars
             $this->session->locked();
             return false;
 
+        } else if($uri == 'sys/ajax') {
+
+          return true;
+
         } else if($this->session->environment == 'sys' && $this->session->sessKey != config_item('sess_key_estic')){
 
             $this->data['oSysTables'] = array();
@@ -174,6 +188,7 @@ class ES_Controller extends ES_Ctrl_Vars
             unset($this->oUserLogguedIn);
             $this->session->locked();
             return false;
+
 
         } else {
 
@@ -191,9 +206,12 @@ class ES_Controller extends ES_Ctrl_Vars
 //                        $this->data['oSysModules'] = Model_Modules::create()->find();
 //                        $this->data['oSysTables'] = Model_Tables::create()->filterByIdNivelRole($this->oUserLogguedIn->id_role);
 //                    }
+          return true;
         }
 
       }
+    } else {
+      show_error('No se pudo cargar el modulo sessions');
     }
   }
 
@@ -214,15 +232,24 @@ class ES_Controller extends ES_Ctrl_Vars
     }
 
     $this->data['aSessData'] = std2array($this->aSessData);
-    $this->data['oUserLogguedIn'] = $this->oUserLogguedIn = $this->model_users->setFromData($this->aSessData);
-    $this->data['aUserLogguedIn'] = $this->oUserLogguedIn->getArrayData();
+
+    /**
+     * @var Model_Users $oUserLogguedIn
+     * @var Model_Persons $oPersonLogguedIn
+     */
+
+    $this->data['oUserLogguedIn'] = $oUserLogguedIn = $this->model_users->setFromData($this->aSessData);
+    $this->data['aUserLogguedIn'] = $oUserLogguedIn->getArrayData();
+    $this->data['oPersonLogguedIn'] = $oPersonLogguedIn = $this->model_persons->findOneByIdPerson($oUserLogguedIn->getIdPerson());
+    $this->data['aPersonLogguedIn'] = $oPersonLogguedIn->getArrayData();
     $data = array(
-      'id_user' => $this->oUserLogguedIn->getIdUser()
+      'id_user' => $oUserLogguedIn->getIdUser(),
+      'id_person' => $oUserLogguedIn->getIdPerson()
     );
 
     $this->session->set_userdata($data);
 
-    return $this->oUserLogguedIn;
+    return [$oUserLogguedIn, $oPersonLogguedIn];
   }
 
     public function loadTemplates($view, $data = array()){
@@ -273,6 +300,7 @@ class ES_Controller extends ES_Ctrl_Vars
             if (validateVar($error)){
                 return [
                     'view' => $this->load->view("$mod/$class/$method", $this->data, true),
+                    'message' => validation_errors(),
                     'required' => validation_errors(),
                     'error' => $error,
                     'errors' => $this->errors
@@ -368,7 +396,15 @@ class ES_Controller extends ES_Ctrl_Vars
 
             $responseView = !isString($responseView) ? $this->uri->segment(1).'/'.$this->uri->segment(2).'/'.$this->uri->segment(3) : $responseView;
         }
-        $responseRedirect = !isString($responseRedirect) ? $this->uri->segment(1).'/'.$this->uri->segment(2) : $responseRedirect;
+
+        if(in_array('ajax',$this->uri->segments)){
+
+          $responseRedirect = !isString($responseRedirect) ? $this->uri->segment(3).'/'.$this->uri->segment(4) : $responseRedirect;
+
+        } else {
+
+          $responseRedirect = !isString($responseRedirect) ? $this->uri->segment(1).'/'.$this->uri->segment(2) : $responseRedirect;
+        }
 
         if($this->fromAjax){
             if ($this->error == 'ok') {
@@ -388,6 +424,7 @@ class ES_Controller extends ES_Ctrl_Vars
             } else {
                 $aReturn['error'] = $error = ucfirst($this->subjectS)." con datos incompletos, porfavor revisa los datos";
                 $aReturn['errors'] = $this->errors;
+                $aReturn['message'] = validation_errors();
                 $aReturn['required'] = validation_errors();
                 $aReturn['view'] = $this->load->view($responseView, $this->data, true);
                 return $aReturn;

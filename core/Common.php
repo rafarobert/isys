@@ -433,6 +433,8 @@ if ( ! function_exists('show_error'))
 	 */
 	function show_error($message, $status_code = 500, $heading = 'An Error Was Encountered')
 	{
+    $CI = class_exists('CI_Controller') ? CI_Controller::get_instance() : null;
+
 		$status_code = abs($status_code);
 		if ($status_code < 100)
 		{
@@ -459,25 +461,42 @@ if ( ! function_exists('show_error'))
 
           $framePath = getframePath('es','logs');
           if(is_dir($framePath)){
-            if(file_exists($framePath.'Ctrl_Logs.php') &&
-              file_exists($framePath.'Model_Logs.php') &&
-              is_dir($framePath.'views/')){
 
-              if(class_exists('Ctrl_Logs')){
-                $CI = Ctrl_Logs::create()->init();
-                $data['heading'] = $heading;
-                $data['action'] = $CI->uri->uri_string;
-                $data['message'] = $message;
-                $data['exit_status'] = $exit_status;
-                $data['code'] = $status_code;
-                $data['post'] = $CI->input->post();$data['level'] = $_error->ob_level;
-                $CI->model_logs->save($data);
+            if(file_exists($framePath.'Ctrl_Users.php') &&
+              file_exists($framePath.'Model_Users.php') &&
+              is_dir($framePath.'views/') &&
+              class_exists('Ctrl_Users')
+            ){
+
+              if(file_exists($framePath.'Ctrl_Logs.php') &&
+                file_exists($framePath.'Model_Logs.php') &&
+                is_dir($framePath.'views/') &&
+                class_exists('Ctrl_Logs')
+              ){
+
+                  $CI = Ctrl_Logs::create();
+                  $data['heading'] = $heading;
+                  $data['action'] = $CI->uri->uri_string;
+                  $data['message'] = $message;
+                  $data['exit_status'] = $exit_status;
+                  $data['code'] = $status_code;
+                  $data['post'] = $CI->input->post();
+                  $data['level'] = $_error->ob_level;
+                  $data['id_user_modified'] = $CI->session->getIdUserLoggued();
+                  $data['id_user_created'] = $CI->session->getIdUserLoggued();
+                  $CI->model_logs->save($data);
+
+              } else {
+                echo "$message.
+                El modulo estic/logs no pudo ser encontrado para registrar el error, revisa que el modulo fue creado.
+                ";
               }
             } else {
               echo "$message.
-              El modulo estic/logs no pudo ser encontrado para registrar el error, revisa que el modulo fue creado.
-              ";
+                El modulo estic/users no pudo ser encontrado para registrar el error, revisa que el modulo fue creado.
+                ";
             }
+
           } else {
             echo "$message
             El modulo estic/logs no pudo ser encontrado para registrar el error, revisa que el modulo fue creado.
@@ -773,6 +792,8 @@ if ( ! function_exists('_exception_handler'))
 
 	function _exception_handler($exception)
 	{
+    $CI = class_exists('CI_Controller') ? CI_Controller::get_instance() : null;
+
 		$_error =& load_class('Exceptions', 'core');
 		$_error->log_exception('error', 'Exception: '.$exception->getMessage(), $exception->getFile(), $exception->getLine());
 
@@ -1439,7 +1460,7 @@ if (!function_exists('createFolder')) {
 
                 return false;
             }
-//            chmod($dir, 0777);
+            chmod($dir, 0777);
 
             $mensaje = "El directorio " . $dir . " se ha creado exitosamente";
 

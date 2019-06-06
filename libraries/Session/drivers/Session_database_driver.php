@@ -235,26 +235,29 @@ class CI_Session_database_driver extends CI_Session_driver implements SessionHan
 		}
         $idUserSession = isset($this->CI->session) ? $this->CI->session->getIdUserLoggued() :
             (isset($_SESSION['id_user']) ? $_SESSION['id_user'] : null);
-		if ($this->_row_exists === FALSE)
-		{
-			$insert_data = array(
-				'id' => $session_id,
-				'ip_address' => $_SERVER['REMOTE_ADDR'],
-				'timestamp' => time(),
-				'data' => ($this->_platform === 'postgre' ? base64_encode($session_data) : $session_data),
-                'last_activity' => date("Y-m-d H:i:s"),
-                'id_user' => $idUserSession
-			);
+    if ($this->_row_exists === FALSE) {
+      $insert_data = array(
+        'id' => $session_id,
+        'ip_address' => $_SERVER['REMOTE_ADDR'],
+        'timestamp' => time(),
+        'data' => ($this->_platform === 'postgre' ? base64_encode($session_data) : $session_data),
+        'last_activity' => date("Y-m-d H:i:s"),
+        'activity' => 'active',
+        'id_user' => $idUserSession,
+        'id_user_modified' => $idUserSession ? $idUserSession : ES_Config::configSoftUserId(),
+        'id_user_created' => $idUserSession ? $idUserSession : ES_Config::configSoftUserId(),
+        'date_created' => date("Y-m-d H:i:s"),
+        'date_modified' => date("Y-m-d H:i:s"),
+      );
+        if ($this->_db->insert($this->_config['save_path'], $insert_data)) {
+          $this->_fingerprint = md5($session_data);
+          $this->_row_exists = TRUE;
 
-			if ($this->_db->insert($this->_config['save_path'], $insert_data))
-			{
-				$this->_fingerprint = md5($session_data);
-				$this->_row_exists = TRUE;
-				return $this->_success;
-			}
+          return $this->_success;
+        }
+        return $this->_fail();
 
-			return $this->_fail();
-		}
+    }
 
 		$this->_db->where('id', $session_id);
 		if ($this->_config['match_ip'])
@@ -264,8 +267,11 @@ class CI_Session_database_driver extends CI_Session_driver implements SessionHan
 
 		$update_data = array(
 		    'timestamp' => time(),
-            'id_user' => $idUserSession
-        );
+      'activity' => "active",
+      'id_user' => $idUserSession,
+            'id_user_modified' => $idUserSession ? $idUserSession : ES_Config::configSoftUserId(),
+      'date_modified' => date("Y-m-d H:i:s"),
+    );
 
 		if ($this->_fingerprint !== md5($session_data))
 		{
@@ -274,14 +280,15 @@ class CI_Session_database_driver extends CI_Session_driver implements SessionHan
 				: $session_data;
 		}
 
-		if ($this->_db->update($this->_config['save_path'], $update_data))
-		{
-			$this->_fingerprint = md5($session_data);
-			return $this->_success;
-		}
 
-		return $this->_fail();
-	}
+      if ($this->_db->update($this->_config['save_path'], $update_data)) {
+        $this->_fingerprint = md5($session_data);
+        return $this->_success;
+      }
+
+      return $this->_fail();
+
+  }
 
 	// ------------------------------------------------------------------------
 
@@ -375,7 +382,7 @@ class CI_Session_database_driver extends CI_Session_driver implements SessionHan
 			if ($this->_db->query("SELECT GET_LOCK('".$arg."', 300) AS es_session_lock")->row()->es_session_lock)
 			{
 				$this->_lock = $arg;
-				return TRUE;
+        return TRUE;
 			}
 
 			return FALSE;
