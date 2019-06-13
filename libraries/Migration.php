@@ -867,7 +867,8 @@ class CI_Migration
 
     public function set_settings($tableSettings, $tableName)
     {
-        if (count($tableSettings)) {
+      ini_set('memory_limit', '-1');
+      if (count($tableSettings)) {
             $this->fields = $fields = $this->dbforge->fields != [] ? $this->dbforge->fields : ($this->_fields == [] ? header("Refresh:0") : $this->_fields);
 
             $pkTable = $this->dbforge->getPrimaryKeyFromTable($tableName);
@@ -1381,8 +1382,8 @@ class CI_Migration
                             list($filterS,$filterP) = setSingularPlural($filter);
                             $data['UcObjField'] = ucfirst(setObject($field));
                             $data['indexFilterBy'] = $filter;
-                            $data['lcObjFilterByP'] = lcfirst(setObject($filterP));
-                            $data['UcObjFilterByP'] = ucfirst(setObject($filterP));
+                            $data['lcObjFilterByP'] = validateVar($filterP) ? lcfirst(setObject($filterP)) : lcfirst(setObject($field));
+                            $data['UcObjFilterByP'] = validateVar($filterP) ? ucfirst(setObject($filterP)) : lcfirst(setObject($field));
                             $data['initFieldsFilterBy'] .= $this->load->view(["template_ES_Ctrl" => 'initFieldsFilterBy'], $data, true, true, true);
                             $data['setObjFieldsFilterBy'] .= $this->load->view(["template_ES_Ctrl" => 'setObjFieldsFilterBy'], $data, true, true, true);
                         }
@@ -2212,10 +2213,10 @@ class CI_Migration
         $data["foreignPackForGetData"] = '';
         $data["foreignPackForToArray"] = '';
         $data["packFindOneByFunctions"] = '';
-        $data["packFilterByFunctions"] = '';
+      $data["packSettersFunctions"] = '';
+      $data["packFilterByFunctions"] = '';
         $data["packSelectByFunctions"] = '';
         $data["packGettersFunctions"] = '';
-        $data["packSettersFunctions"] = '';
         $data["globalLocalFieldsVars"]  = '';
         $data["globalStaticFieldName"]  = '';
         $data["globalStaticLocalVars"]  = '';
@@ -2271,7 +2272,8 @@ class CI_Migration
             $data["packSettersFunctions"] .= $this->load->view(["template_ES_Model" => "packSettersFunctions"], $data, true, true, true);
             $data["packFindOneByFunctions"] .= $this->load->view(["template_ES_Model" => "packFindOneByFunctions"], $data, true, true, true);
             $data["packFilterByFunctions"] .= $this->load->view(["template_ES_Model" => "packFilterByFunctions"], $data, true, true, true);
-//            $data["packSelectByFunctions"] .= $this->load->view(["template_ES_Model" => "packSelectByFunctions"], $data, true, true, true);
+
+            $data["packSelectByFunctions"] .= $this->load->view(["template_ES_Model" => "packSelectByFunctions"], $data, true, true, true);
             // ----------------------------------------------------------------------
 
             // --------------------- setting Global Vars ---------------------------------------

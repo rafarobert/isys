@@ -433,7 +433,11 @@ if ( ! function_exists('show_error'))
 	 */
 	function show_error($message, $status_code = 500, $heading = 'An Error Was Encountered')
 	{
-    $CI = class_exists('CI_Controller') ? CI_Controller::get_instance() : null;
+
+	  $CI = class_exists('CI_Controller') ? CI_Controller::get_instance() : null;
+
+    $CI->error = $message;
+    $CI->errors[] = $message;
 
 		$status_code = abs($status_code);
 		if ($status_code < 100)
@@ -459,18 +463,20 @@ if ( ! function_exists('show_error'))
         if(!strstr($message,'estic/logs')){
 
 
-          $framePath = getframePath('es','logs');
-          if(is_dir($framePath)){
+          $framePathLogs = getframePath('es','logs');
+          $framePathUsers = getframePath('es','users');
 
-            if(file_exists($framePath.'Ctrl_Users.php') &&
-              file_exists($framePath.'Model_Users.php') &&
-              is_dir($framePath.'views/') &&
+            if(is_dir($framePathUsers) &&
+              file_exists($framePathUsers.'Ctrl_Users.php') &&
+              file_exists($framePathUsers.'Model_Users.php') &&
+              is_dir($framePathUsers.'views/') &&
               class_exists('Ctrl_Users')
             ){
 
-              if(file_exists($framePath.'Ctrl_Logs.php') &&
-                file_exists($framePath.'Model_Logs.php') &&
-                is_dir($framePath.'views/') &&
+              if(is_dir($framePathLogs) &&
+                file_exists($framePathLogs.'Ctrl_Logs.php') &&
+                file_exists($framePathLogs.'Model_Logs.php') &&
+                is_dir($framePathLogs.'views/') &&
                 class_exists('Ctrl_Logs')
               ){
 
@@ -486,6 +492,7 @@ if ( ! function_exists('show_error'))
                   $data['id_user_created'] = $CI->session->getIdUserLoggued();
                   $CI->model_logs->save($data);
 
+
               } else {
                 echo "$message.
                 El modulo estic/logs no pudo ser encontrado para registrar el error, revisa que el modulo fue creado.
@@ -497,11 +504,6 @@ if ( ! function_exists('show_error'))
                 ";
             }
 
-          } else {
-            echo "$message
-            El modulo estic/logs no pudo ser encontrado para registrar el error, revisa que el modulo fue creado.
-            ";
-          }
           return true;
         } else{
           echo $_error->show_error($heading, $message, 'error_general', $status_code);
@@ -1337,14 +1339,21 @@ if (!function_exists('arrayHas')) {
     function arrayHas($array, $index, $bEmpty = true)
     {
         if(isArray($array,$bEmpty) && (isString($index,$bEmpty) || isNumeric($index,$bEmpty))){
-            if(isset($array[$index]) && $array[$index] != "" && $array[$index] != []){
+          if($bEmpty){
+            if(isset($array[$index]) && $array[$index] != "" && $array[$index] != [] && $array[$index] != null){
                 return true;
             } else {
                 return false;
             }
+          } else {
+            if(isset($array[$index])){
+              return true;
+            }
+          }
         } else {
             return false;
         }
+        return false;
     }
 }
 
@@ -1639,11 +1648,14 @@ if (!function_exists('array2str')) {
 if (!function_exists('array2std')) {
 
     function array2std($array) {
-        if(!is_array($array)) {
+        if(isObject($array)) {
             return $array;
         }
-
-        $stdClass = json_decode(json_encode($array), false);
+        if(isArray($array)){
+          $stdClass = json_decode(json_encode($array), false);
+        } else {
+          return $array;
+        }
 
         if(is_object($stdClass)) {
             return $stdClass;
@@ -1665,10 +1677,17 @@ if (!function_exists('std2array')) {
 
     function std2array($std)
     {
+      if(isset($std->_table_name)){
+        $std = $std->getArrayData();
+      }
         if(isArray($std)){
             return $std;
         }
-        $array = json_decode(json_encode($std), true);
+        if(isObject($std)){
+          $array = json_decode(json_encode($std), true);
+        } else {
+          return $std;
+        }
 
         if(isArray($array)){
             return $array;
@@ -1864,7 +1883,12 @@ if (!function_exists('str2array')) {
 if (!function_exists('verifyArraysInResult')) {
 
     function verifyArraysInResult($result){
+      if(isset($result->_table_name)){
+        $result = $result->getArrayData();
+      }
+      if(isObject($result)){
         $result = std2array($result);
+      }
         if(validateVar($result, 'array')){
             if(validateVar($result,'array')){
                 $result = array_map('str2array',$result);
@@ -1952,6 +1976,8 @@ if (!function_exists('setSingularPlural')) {
 
     function setSingularPlural($sub_mod)
     {
+      if(validateVar($sub_mod)){
+
 //        (1 letra) mañanas, detalles, vasos
 //        (2 letras) sesiones,
         if(strpos($sub_mod,'_') > -1){
@@ -2032,6 +2058,9 @@ if (!function_exists('setSingularPlural')) {
         $_sub_mod_p = count($namesPlural) > 1 ? implode('_', $namesPlural) : $namesPlural[0];
 
         return [$_sub_mod_s, $_sub_mod_p];
+      } else {
+        return ['',''];
+      }
     }
 }
 
@@ -2157,7 +2186,118 @@ if (!function_exists('cleanString')) {
     }
 }
 
+if (!function_exists('moduleCreated')) {
 
+  function moduleCreated($table, $status = 500, $heading = '')
+  {
+    list($modSign,$submod) = getModSubMod($table);
+
+    return validate_modulo($modSign,$submod) ? true : false;
+  }
+
+}
+
+if (!function_exists('exists')) {
+
+  function exists($array, $key, $bEmpty = true)
+  {
+    if(isObject($array)){
+
+      if(isset($array->_table_name)){
+
+        $aData = std2array($array->getArrayData());
+
+      } else {
+
+        $aData = std2array($array);
+      }
+
+    } else {
+
+      $aData = $array;
+    }
+
+    if(is_array($aData)){
+
+      if(arrayHas($aData,$key,$bEmpty)){
+
+        return 1;
+
+      } else if(arrayHas($aData,setObject($key),$bEmpty)){
+
+        return 2;
+
+      } else if(arrayHas($aData,ucfirst(setObject($key)),$bEmpty)){
+
+        return 3;
+
+      } else if(objectHas($aData,$key,$bEmpty)){
+
+        return 4;
+
+      } else if(objectHas($aData,setObject($key),$bEmpty)){
+
+        return 5;
+
+      } else if(objectHas($aData,ucfirst(setObject($key)),$bEmpty)){
+
+        return 6;
+
+      }
+    }
+  }
+}
+
+if (!function_exists('asExists')) {
+
+  function asExists($array, $key)
+  {
+    if(isObject($array)){
+
+      if(isset($array->_table_name)){
+
+        $aData = std2array($array->getArrayData());
+
+      } else {
+
+        $aData = std2array($array);
+      }
+
+    } else {
+
+      $aData = $array;
+    }
+
+    if(is_array($aData)){
+
+      if(exists($aData,$key) == 1){
+
+        return $aData[$key];
+
+      } else if(exists($aData,$key) == 2){
+
+        return $aData[setObject($key)];
+
+      } else if(exists($aData,$key) == 3){
+
+        return $aData[ucfirst(setObject($key))];
+
+      } else if(exists($aData,$key) == 4){
+
+        return $aData->$key;
+
+      } else if(exists($aData,$key) == 5){
+
+        return $aData->{setObject($key)};
+
+      } else if(exists($aData,$key) == 6){
+
+        return $aData->{ucfirst(setObject($key))};
+
+      }
+    }
+  }
+}
 
 if (!function_exists('validate_modulo')) {
 

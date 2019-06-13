@@ -209,6 +209,8 @@ class ES_Controller extends ES_Ctrl_Vars
           return true;
         }
 
+      } else {
+        show_error('Debes iniciar sesión');
       }
     } else {
       show_error('No se pudo cargar el modulo sessions');
@@ -293,28 +295,29 @@ class ES_Controller extends ES_Ctrl_Vars
         } else if(substr_count($path,'/') == 0){
             list($method) = explode('/',$path);
         }
-        $method = isString($method) ? $method : $this->router->method;
-        $class = isString($class) ? $class : $this->router->class;
-        $mod = isString($mod) ? $mod : $this->router->module;
-        if ($this->input->post('fromAjax') || compareStrStr($this->router->class,'ajax') || isArray($_FILES)) {
-            if (validateVar($error)){
+        $method = isString($method) ? "$method" : '';
+        $class = isString($class) ? "$class/" : '';
+        $mod = isString($mod) ? "$mod/" : '';
+        if ($this->input->post('fromAjax') || $this->fromAjax || isArray($_FILES)) {
+            if (isString($this->error) || isArray($this->errors)){
                 return [
-                    'view' => $this->load->view("$mod/$class/$method", $this->data, true),
                     'message' => validation_errors(),
                     'required' => validation_errors(),
-                    'error' => $error,
-                    'errors' => $this->errors
+                    'error' => $this->error,
+                    'errors' => $this->errors,
+                    'redirect' => isObject($this->oUserLogguedIn) ? '' : '/sys/ajax/locked',
+                    'view' => $this->load->view($mod.$class.$method , $this->data, true)
                 ];
             } else {
                 return $this->load->view("$mod/$class/$method", $this->data, true);
             }
-            $this->data["subview"] = "$mod/$class/$method";
+            $this->data["subview"] = $mod.$class.$method;
         } else if(isset($this->printView) && $this->printView) {
             unset($this->printView);
 
-            return $this->load->view("$mod/$class/$method", $this->data, true);
+            return $this->load->view($mod.$class.$method, $this->data, true);
         } else {
-            $this->data["subview"] = "$mod/$class/$method";
+            $this->data["subview"] = $mod.$class.$method;
         }
 
         $object = 'o'.ucfirst($this->subjectS);
@@ -346,43 +349,43 @@ class ES_Controller extends ES_Ctrl_Vars
         return [$id,$view];
     }
 
-    public function doUpload($oFile){
-        $id = $oFile->getIdFile();
-        if (!$this->model_files->do_upload("file", $id) && $id == null) {
-            $this->data['errors'] = $this->error = array('error' => $this->upload->display_errors());
-            $this->fromAjax = true;
-        } else if($id != null){
-            $this->fromAjax = true;
-
+    /**
+     * @var Model_Files $oFile
+     */
+    public function doUpload($oFile = null){
+        if (!$oFile->doUpload()) {
+            $this->errors[] = $this->upload->display_errors();
+            $this->error = $this->upload->display_errors();
         } else {
-            $this->data["file"] = $this->upload->data();
-            $oFile = $this->model_files->setFromData($this->upload->data(),$oFile);
-            $this->fromAjax = true;
+            $oFile->setFromData($oFile->getFileData());
         }
         return $oFile;
     }
 
-    public function saveThumbs($oFile){
-        if(isset($oFile->aData)){
-            $this->data['aData'] = $oFile->aData;
-        }
-        $id = $oFile->getIdFile();
-        if(validateVar($this->upload->data_thumbs,'array') || validateVar($this->upload->data_thumbs,'object')){
-            foreach ($this->upload->data_thumbs as $index => $thumb){
-                $thumb['id_parent'] = $id;
-                $this->data['aData']['thumbs'][$index] = $this->model_files->save($thumb);
-            }
-            $oFile->setThumbs();
-        } else if($oFile->getIdFile() !== null && $oFile->getNroThumbs() > 0){
-            $thumbs = $this->model_files->filterByIdParent($oFile->getIdFile());
-            foreach ($thumbs as $index => $thumb){
-                $thumb = $this->model_files->setFromData($this->input->post(),$thumb);
-                $this->data['aData']['thumbs'][$index] = $thumb->saveOrUpdate($thumb->getIdFile());
-            }
-            $oFile->setThumbs();
-        }
-        return $oFile;
-    }
+  /**
+   * @var Model_Files $oFile
+   */
+//    public function saveThumbs($oFile = null){
+//        if(isset($oFile->aData)){
+//            $this->data['aData'] = $oFile->aData;
+//        }
+//        $id = $oFile->getIdFile();
+//        if(validateVar($this->upload->data_thumbs,'array') || validateVar($this->upload->data_thumbs,'object')){
+//            foreach ($this->upload->data_thumbs as $index => $thumb){
+//                $thumb['id_parent'] = $id;
+//                $this->data['aData']['thumbs'][$index] = $this->model_files->save($thumb);
+//            }
+//            $oFile->setThumbs();
+//        } else if($oFile->getIdFile() !== null && $oFile->getNroThumbs() > 0){
+//            $thumbs = $this->model_files->filterByIdParent($id);
+//            foreach ($thumbs as $index => $thumb){
+//                $thumb = $this->model_files->setFromData($this->input->post(),$thumb);
+//                $this->data['aData']['thumbs'][$index] = $thumb->saveOrUpdate($thumb->getIdFile());
+//            }
+//            $oFile->setThumbs();
+//        }
+//        return $oFile;
+//    }
 
     public function returnResponse($oObject, $responseView = '', $responseRedirect = '')
     {

@@ -44,7 +44,7 @@ class ES_Ctrl_UcTableP extends ES_UcModS_Controller
         }
         $this->load->model("lcFkModS/model_lcFkTableP");
         //<<<loadModelsForeignTable>>>
-        $this->initLoaded();
+        $this->model_lcTableP->CI = $this->initLoaded();
         //>>>initFieldsFilterBy<<<
         $this->lcObjFilterByP = $this->model_lcFkTableP->filterByUcObjField('indexFilterBy','$fFieldsRef',false);
         //<<<initFieldsFilterBy>>>

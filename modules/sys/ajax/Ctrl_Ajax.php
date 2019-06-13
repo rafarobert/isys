@@ -51,6 +51,12 @@ class Ctrl_Ajax extends ES_Estic_Controller
         return $response;
     }
 
+    public function locked(){
+      $this->fromAjax = false;
+      $this->data['subLayout'] = 'pages/lockscreen';
+      return $this->loadView('pages/lockscreen');
+    }
+
     public function export($module = '', $class = '', $method = '', $id= ''){
         $sys = config_item('sys');
 
@@ -202,7 +208,7 @@ class Ctrl_Ajax extends ES_Estic_Controller
                 $response = array();
                 $view = $this->{"ctrl_$class"}->index();
                 if(validateVar($view,'array')){
-                    list($response['view'], $response['error']) = $view;
+                    $response = $view;
                 } else {
                     $response['error'] = 'ok';
                     $response['view'] = $view;

@@ -422,7 +422,7 @@ class Ctrl_Migrate extends ES_Controller
                     $oTableFromCiTables->setFromData($data)->save();
                   } else {
                     $oTableFromCiTables = Model_Tables::create()->getNew();
-                    $oTableFromCiTables->setIdTable($ciMigIndex)->setFromData($data)->save();
+                    $oTableFromCiTables->setFromData($data)->setIdTable($ciMigIndex)->save();
                   }
                 }
               $bAnotherMod = false;

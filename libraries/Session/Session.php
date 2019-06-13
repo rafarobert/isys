@@ -590,16 +590,16 @@ class CI_Session
   {
     $sess = session_status();
     $idUser = $this->getIdUserLoggued();
-    $sessions = Ctrl_Sessions::create()->model_sessions->filterByIdUser($idUser);
-    if (count($sessions)) {
-	    /**
-       * @var Model_Sessions $session
-       */
-      foreach ($sessions as $session) {
-        $session->setActivity(Model_Sessions::$optInactive)->save();
-        $session->setStatus(Model_Sessions::$optDISABLED)->save();
-      }
-    }
+    //$sessions = Ctrl_Sessions::create()->model_sessions->filterByIdUser($idUser);
+//    if (count($sessions)) {
+//	    /**
+//       * @var Model_Sessions $session
+//       */
+//      foreach ($sessions as $session) {
+//        $session->setActivity(Model_Sessions::$optInactive)->save();
+//        $session->setStatus(Model_Sessions::$optDISABLED)->save();
+//      }
+//    }
     if ($sess == 2) {
       session_destroy();
     } else {

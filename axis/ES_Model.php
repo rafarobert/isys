@@ -13,7 +13,7 @@ Class ES_Model extends ES_Model_Vars {
     /**
      * @var ES_Controller $CI
      */
-    protected $CI;
+    public $CI;
     protected $thread = 0;
 
     /*
@@ -36,6 +36,9 @@ Class ES_Model extends ES_Model_Vars {
      * @var        array
      */
     public $files = null;
+    public $filesConfig;
+    public $fileData;
+    public $fileTypes;
 
     /**
      * Value for virtual thumb files files.
@@ -181,7 +184,7 @@ Class ES_Model extends ES_Model_Vars {
         $this->db->where($where);
         return $this->get(null, $single);
     }
-    public function get_by($where, $bSelecting = false, $single = false, $orderBy = '', $direction = 'desc'){
+    public function get_by($where, $bSelecting = false, $single = false, $orderBy = '', $sense = 'desc'){
         $select = isString($where) ? '' : $this->_primary_key;
         $aWheres = [];
         $i = 0;
@@ -257,7 +260,7 @@ Class ES_Model extends ES_Model_Vars {
             }
         }
         if(isString($orderBy)){
-            $this->_order_by = "$orderBy $direction";
+            $this->_order_by = "$orderBy $sense";
         }
         return $this->get(null, $single);
     }
@@ -323,8 +326,8 @@ Class ES_Model extends ES_Model_Vars {
     public function save($data = null, $id = null, $with_id = true){
 
         $data = $this->verifyDataWithPost($data );
-
-        $this->CI = CI_Controller::get_instance();
+        $CI = $this->CI;
+        //$this->CI = CI_Controller::get_instance();
         $idToInsert = null;
         $fromEditPerfil = false;
         if($data == null){
@@ -469,6 +472,7 @@ Class ES_Model extends ES_Model_Vars {
         $keys = array_map($funct_k, array_keys($data));
         $vals = array_map($funct_v, array_keys($data), array_values($data));
         $data = array_combine($keys,$vals);
+        $this->CI = $CI;
         unset($data[null]);
         if(inArray($this->_primary_key,$data) ){
             unset($data[$this->_primary_key]);
@@ -476,25 +480,44 @@ Class ES_Model extends ES_Model_Vars {
 
         // insert
         if (($id == null || ($id == 0 && is_int($id)) || $id == '') && !isset($data[$this->_primary_key])) {
-            $data[$this->_primary_key] = null;
-            if (is_numeric($with_id) || is_string($with_id)) {
-                $id = $with_id;
-                $data[$this->_primary_key] = $with_id;
-            }
-            $this->db->set($data);
-            $this->db->insert($this->_table_name);
-            $id = $this->db->insert_id();
+            $data = $this->justInsert($data,$with_id);
             // update
         } else {
-            $filter = $this->_primary_filter;
-            unset($data[$this->_primary_key]);
-            $id = $filter($id);
-            $this->db->set($data);
-            $this->db->where($this->_primary_key, $id);
-            $this->db->update($this->_table_name);
+            $data = $this->justUpdate($id,$data);
         }
-        $data[$this->_primary_key] = $id;
         return $data;
+    }
+
+    public function justInsert($data,$with_id = false){
+      $data[$this->_primary_key] = null;
+      if (is_numeric($with_id) || is_string($with_id)) {
+        $data[$this->_primary_key] = $with_id;
+      }
+      $this->db->set($data);
+      $this->db->insert($this->_table_name);
+      $data[$this->_primary_key] = $this->db->insert_id();
+      return $data;
+    }
+
+    public function justUpdate($id,$data){
+      $filter = $this->_primary_filter;
+      unset($data[$this->_primary_key]);
+      $id = $filter($id);
+      $object = $this->findOneByPk($id);
+      if(isObject($object)){
+        $this->db->set($data);
+        $this->db->where($this->_primary_key, $id);
+        $this->db->update($this->_table_name);
+        return $data;
+      } else{
+        $this->justInsert($data,$id);
+      }
+
+    }
+
+    public function findOneByPk($pk){
+      $aData = $this->get_by([$this->_primary_key => $pk],false,true);
+      return $this->setForeigns($aData);
     }
 //    public function getThumbs($obj,$file = '',$field = ''){
 //
@@ -504,12 +527,11 @@ Class ES_Model extends ES_Model_Vars {
     {
         $data = $this->input->post();
         if(validateVar($data,'array')){
-            $oModelUcObjTableS = $this->setFromData($data,$object);
-            return $oModelUcObjTableS;
-        } else {
-            return $this;
+            $this->setFromData($data);
         }
     }
+
+
 
     public function getThumbs($objs, $file = '', $field = ''){
         if(isset($objs->{$this->_primary_key})){
@@ -602,7 +624,41 @@ Class ES_Model extends ES_Model_Vars {
         return $CI;
     }
 
-    public function do_upload($field, $id){
+    public function getFileData(){
+      if(isArray($this->fileData)){
+        return $this->fileData;
+      } else {
+        return false;
+      }
+    }
+
+  /**
+   * @var Model_Files $oFile
+   */
+  public function saveThumbs(){
+    if(isset($this->aData)){
+      $this->CI->data['aData'] = $this->aData;
+    }
+    $id = $this->getIdFile();
+    if(validateVar($this->CI->upload->data_thumbs,'array') || validateVar($this->CI->upload->data_thumbs,'object')){
+      foreach ($this->CI->upload->data_thumbs as $index => $thumb){
+        $thumb['id_parent'] = $id;
+        $this->CI->data['aData']['thumbs'][$index] = $this->save($thumb);
+      }
+    } else if($this->getIdFile() !== null && $this->getNroThumbs() > 0){
+      $thumbs = $this->filterByIdParent($id);
+      foreach ($thumbs as $index => $thumb){
+        $thumb = $this->setFromData($this->CI->input->post(),$thumb);
+        $this->CI->data['aData']['thumbs'][$index] = $thumb->saveOrUpdate($thumb->getIdFile());
+      }
+    }
+      $this->setThumbs();
+    return $this;
+  }
+
+  public function doUpload(){
+
+        //$this->fileTypes = Ctrl_Files_settings::create()->model_files_settings->selectByName(true);
 
         //$this->initLoaded();
         list($modSign,$submod) = getModSubMod($this->_table_name);
@@ -611,8 +667,8 @@ Class ES_Model extends ES_Model_Vars {
         createFolder($dirPictures);
         // Settings for images
         $aFileTypes = explode('|',config_item('file_types'));
-        $config = array(
-            'allowed_types'     => Ctrl_Types_files::create()->model_types_files->selectBy('name',true),
+        $this->filesConfig = $config = array(
+            'allowed_types'     => $aFileTypes,
             'max_size'          => config_item('img_max_size'),
             'max_width'         => config_item('img_max_width'),
             'max_height'        => config_item('img_max_height'),
@@ -656,7 +712,7 @@ Class ES_Model extends ES_Model_Vars {
                 $aFiles = explode('|',config_item('file_without_tumbs'));
                 $aThumbs = [];
                 if (isArray($files[$fName])) {
-                    if (!$this->upload->do_upload($fName) && $id == null) {
+                    if (!$this->upload->do_upload($fName)) {
                         return false;
                     } else {
                         $this->upload->bFileUploaded = true;
@@ -681,6 +737,8 @@ Class ES_Model extends ES_Model_Vars {
                                     $aThumbs[$i]['url'] = "/assets/$submod/$fName/thumbs/".$this->image_lib->dest_name;
                                     $aThumbs[$i]['raw_name'] = $this->image_lib->dest_name;
                                     $aThumbs[$i]['ext'] = $this->image_lib->dest_ext;
+                                    $aThumbs[$i]['type'] = $this->upload->image_type;
+                                    $aThumbs[$i]['id_file_setting'] = $this->upload->image_id_setting;
                                     $aThumbs[$i]['path'] = $this->image_lib->dest_folder_db;
                                     $aThumbs[$i]['full_path'] = $this->image_lib->full_dst_path_db;
                                     $config['width'] = $config['width'] + 400;
@@ -695,10 +753,11 @@ Class ES_Model extends ES_Model_Vars {
                     $this->upload->file_type = $files[$fName]['type'];
                 }
             }
-            return true;
+            $this->fileData = $data = $this->upload->data();
+          return $this->setFromData($data);
+
         } else {
             $this->upload->error_msg[] = 'Algo salio mal, no se pudo subir el archivo';
-            return false;
         }
     }
 
@@ -766,19 +825,18 @@ Class ES_Model extends ES_Model_Vars {
 
     public function setThumbs($oModel = null, $idsFiles = null)
     {
-        $this->CI = CI_Controller::get_instance();
         $aIdsFiles = array();
-        if($oModel == null){
+       /* if($oModel == null){
             if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
-                $oModel = $this;
+                $this = $this;
             }
-        }
+        }*/
         if($idsFiles == null) {
             if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
                 /**
-                 * @var Model_Files $oModel
+                 * @var Model_Files $this
                  */
-                $aIdsFiles[] = $oModel->getIdFile();
+                $aIdsFiles[] = $this->getIdFile();
             }
         }
         if(validate_modulo('estic','files')){
@@ -922,7 +980,7 @@ Class ES_Model extends ES_Model_Vars {
         return [];
     }
 
-    public function selectBy($selects = null, $bAsArray = false){
+    public function selectBy($selects = null, $bAsArray = false, $orderBy = '', $sense = 'ASC'){
         $aSelects = array();
         if(isArray($selects)){
             $aSelects = $selects;
@@ -931,11 +989,15 @@ Class ES_Model extends ES_Model_Vars {
         }
         $aData = $this->get_by(array (
             0 => $aSelects,
-        ),true);
+        ),true, false,$orderBy,$sense);
 
         if($bAsArray){
+          foreach ($selects as $select){
             $bkpData = std2array($aData);
-            $aData = array_column($aData,'name');
+            $aValues = array_column($aData,$select);
+            $aKeys = array_column($aData,$this->getPrimaryKey());
+          }
+          $aData = array_combine($aKeys,$aValues);
         }
         return $aData;
     }
@@ -1026,25 +1088,32 @@ Class ES_Model extends ES_Model_Vars {
     public function saveOrUpdate($id = null, $withId = false){
         $data = $this->getArrayData();
         $data = $this->save($data,$id,$withId);
-        $this->setFromData($data,$this);
+        $this->setFromData($data);
         $this->aData = $data;
         return $data;
     }
 
-    public function setForeigns($data, $orderBy = '', $direction = 'ASC'){
-      $sys = config_item('sys');
+    public function setForeigns($data = null, $orderBy = '', $sense = 'ASC'){
+
+//      $sys = config_item('sys');
         $bFirstThread = is_bool($orderBy) ? $orderBy : false;
-        $this->setFromData($data,$this);
         $foreignKeys = $this->dbforge->getTableRelations($this->_table_name);
-        $localKeys = array_column($foreignKeys,'idLocal');
-        if($data != null){
+//        $localKeys = array_column($foreignKeys,'idLocal');
+
+        if($data == null) {
+          $data = $this->getArrayData();
+        }
+        if(isObject($data)){
+          $data = std2array($data);
+        }
+
+          //$this->setFromData($data);
 
             foreach ($foreignKeys as $fKey => $ffSettings){
-                if(isset($ffSettings['table'])){
 
-                    list($modSign,$submod) = getModSubMod($ffSettings['table']);
-                    $modName = $sys[$modSign];
-                    if (validate_modulo($modName,$submod)){
+                if(isset($ffSettings['table'])){
+                  list($modSign,$submod) = getModSubMod($ffSettings['table']);
+                    if (moduleCreated($ffSettings['table'])){
                       list($submodS,$submodP) = setSingularPlural($submod);
                       $this->{"init".ucfirst(setObject($submodP))}();
                       $idLocal = $ffSettings['idLocal'];
@@ -1055,13 +1124,13 @@ Class ES_Model extends ES_Model_Vars {
 
                           $aForeignsFields = array();
 
-                          if(is_array($data) && isset($data[$idLocal])){
+                          if(exists($data,$idLocal)){
 
-                              $foreignDatas = $this->{'filterBy'.ucfirst(setObject($ffSettings['idLocal']))}($data[$idForeign],null,$orderBy,$direction);
+                              $foreignDatas = $this->{'filterBy'.ucfirst((setObject($ffSettings['idLocal'])))}(asExists($data,$idForeign),null,$orderBy,$sense);
 
                               foreach ($foreignDatas as $foreignData){
 
-                                if($orderBy) {
+                                if(isset($foreignData->_table_name)) {
                                   $aForeignsFields[] = $foreignData->toArray();
                                 } else {
                                   $aForeignsFields[] = std2array($foreignData);
@@ -1069,93 +1138,19 @@ Class ES_Model extends ES_Model_Vars {
 
                               }
                               $data['foreigns'][lcfirst($field)] = $aForeignsFields;
-
-                          } else if(is_array($data) && isset($data[setObject($idLocal)])){
-
-                              $foreignDatas = $this->{'filterBy'.ucfirst(setObject($ffSettings['idLocal']))}($data[setObject($idForeign)],null,$orderBy,$direction);
-
-                              foreach ($foreignDatas as $foreignData){
-
-                                if($orderBy) {
-                                  $aForeignsFields[] = $foreignData->toArray();
-                                } else {
-                                  $aForeignsFields[] = std2array($foreignData);
-                                }
-
-                              }
-                              $data['foreigns'][lcfirst($field)] = $aForeignsFields;
-
-                          } else if(is_array($data) && isset($data[ucfirst(setObject($idLocal))])){
-
-                              $foreignDatas = $this->{'filterBy'.ucfirst(setObject($ffSettings['idLocal']))}($data[ucfirst(setObject($idForeign))],null,$orderBy,$direction);
-
-                              foreach ($foreignDatas as $foreignData){
-
-                                if($orderBy) {
-                                  $aForeignsFields[] = $foreignData->toArray();
-                                } else {
-                                  $aForeignsFields[] = std2array($foreignData);
-                                }
-
-                              }
-                              $data['foreigns'][lcfirst($field)] = $aForeignsFields;
-
-                          } else if(is_object($data) && objectHas($data,$idLocal,false) && $data->{$idLocal} == null){
-
-                              $foreignDatas = $this->{'filterBy'.ucfirst(setObject($ffSettings['idLocal']))}($data->{$idForeign},null,$orderBy,$direction);
-
-                              foreach ($foreignDatas as $foreignData){
-
-                                if($orderBy) {
-                                  $aForeignsFields[] = $foreignData->toArray();
-                                } else {
-                                  $aForeignsFields[] = std2array($foreignData);
-                                }
-
-                              }
-                              $data->{'foreigns'}[lcfirst($field)] = $aForeignsFields;
-
-                          } else if(is_object($data) && objectHas($data,setObject($idLocal),false) && $data->{setObject($idLocal)} == null){
-
-                              $foreignDatas = $this->{'filterBy'.ucfirst(setObject($ffSettings['idLocal']))}($data->{setObject($idForeign)},null,$orderBy,$direction);
-
-                              foreach ($foreignDatas as $foreignData){
-
-                                if($orderBy) {
-                                  $aForeignsFields[] = $foreignData->toArray();
-                                } else {
-                                  $aForeignsFields[] = std2array($foreignData);
-                                }
-
-                              }
-                              $data->{'foreigns'}[lcfirst($field)] = $aForeignsFields;
-
-                          } else if(is_object($data) && objectHas($data,ucfirst(setObject($idLocal)),false) && $data->{ucfirst(setObject($idLocal))} == null){
-
-                              $foreignDatas = $this->{'filterBy'.ucfirst(setObject($ffSettings['idLocal']))}($data->{ucfirst(setObject($idForeign))},null,$orderBy,$direction);
-
-                              foreach ($foreignDatas as $foreignData){
-
-                                if($orderBy) {
-                                  $aForeignsFields[] = $foreignData->toArray();
-                                } else {
-                                  $aForeignsFields[] = std2array($foreignData);
-                                }
-
-                              }
-                              $data->{'foreigns'}[lcfirst($field)] = $aForeignsFields;
                           }
+
                       } else {
 
-                          if (is_array($data) && isset($data[$idLocal]) && $data[$idLocal] != null) {
+                          if (exists($data,$idLocal)) {
 
-                              $foreignData = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data[$idLocal]], false, true));
+                              $foreignData = std2array($this->{'model_' . $submodP}->get_by([$idForeign => asExists($data,$idLocal)], false, true));
 
                               if($bFirstThread){
 
                                   $this->thread++;
 
-                                  if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
+                                  if($this->_table_name == 'es_files'){
 
                                     $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->setThumbs()->toArray();
 
@@ -1166,178 +1161,26 @@ Class ES_Model extends ES_Model_Vars {
 
                               } else {
 
-                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
+                                if($this->_table_name == 'es_files'){
 
                                   $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->setThumbs()->toArray();
 
                                 } else {
 
                                   $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->toArray();
-                                }
-                              }
-
-                          } else if (is_array($data) && isset($data[setObject($idLocal)]) && $data[setObject($idLocal)] != null) {
-
-                              $foreignData = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data[setObject($idLocal)]], false, true));
-
-                              if($bFirstThread) {
-
-                                  $this->thread++;
-
-                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
-
-                                  $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->setThumbs()->toArray();
-
-                                } else {
-
-                                  $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->toArray();
-                                }
-
-                              } else {
-
-                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
-
-                                  $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->setThumbs()->toArray();
-
-                                } else {
-
-                                  $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->toArray();
-
-                                }
-                              }
-
-                          } else if (is_array($data) && isset($data[ucfirst(setObject($idLocal))]) && $data[ucfirst(setObject($idLocal))] != null) {
-
-                              $foreignData = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data[ucfirst(setObject($idLocal))]], false, true));
-
-                              if($bFirstThread) {
-
-                                  $this->thread++;
-
-                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
-
-                                  $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->setThumbs()->toArray();
-
-                                } else {
-
-                                  $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->toArray();
-
-                                }
-
-                              } else {
-
-                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
-
-                                  $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->setThumbs()->toArray();
-
-                                } else {
-
-                                  $data['foreigns'][lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->toArray();
-
-                                }
-
-                              }
-
-                          } else if (is_object($data) && objectHas($data,$idLocal) && $data->$idLocal != null) {
-
-                              $foreignData = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->$idLocal], false, true));
-
-                              if($bFirstThread) {
-
-                                  $this->thread++;
-
-                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
-
-                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->setThumbs()->toArray();
-
-                                } else {
-
-                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->toArray();
-
-                                }
-
-                              } else {
-
-                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
-
-                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->setThumbs()->toArray();
-
-                                } else {
-
-                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->toArray();
-
-                                }
-                              }
-
-                          } else if (is_object($data) && objectHas($data,setObject($idLocal)) && $data->{setObject($idLocal)} != null) {
-
-                              $foreignData = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->{setObject($idLocal)}], false, true));
-
-                              if($bFirstThread) {
-
-                                  $this->thread++;
-
-                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
-
-                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->setThumbs()->toArray();
-
-                                } else {
-
-                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->toArray();
-                                }
-
-                              } else {
-
-                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
-
-                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->setThumbs()->toArray();
-
-                                } else {
-
-                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->toArray();
-
-                                }
-
-                              }
-
-                          } else if (is_object($data) && objectHas($data,ucfirst(setObject($idLocal))) && $data->{ucfirst(setObject($idLocal))} != null) {
-
-                              $foreignData = std2array($this->{'model_' . $submodP}->get_by([$idForeign => $data->{ucfirst(setObject($idLocal))}], false, true));
-
-                              if($bFirstThread) {
-
-                                  $this->thread++;
-
-                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
-
-                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->setThumbs()->toArray();
-
-                                } else {
-
-                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setForeigns($foreignData,false)->toArray();
-
-                                }
-
-                              } else {
-
-                                if($this->_table_name == 'es_files' && $this->nro_thumbs != null){
-
-                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->setThumbs()->toArray();
-
-                                } else {
-
-                                  $data->{'foreigns'}[lcfirst($field)] = $this->{'model_' . $submodP}->setFromData($foreignData)->toArray();
-
                                 }
                               }
                           }
+
+                          // Caso Especial para archivos
+
+
                       }
                     }
-
                 }
             }
 
-            $foreignsCommons = [
+            /*$foreignsCommons = [
                 'files' => [
                     'ids_files',
                 ],
@@ -1346,94 +1189,47 @@ Class ES_Model extends ES_Model_Vars {
 
             foreach ($foreignsCommons as $fSubMod => $fCommon){
 
-                if(is_array($fCommon)){
+              if(isString($fCommon)) {
 
-                    foreach ($fCommon as $fSubMod2 => $fCommon2){
+                $aForeignCommonName = explode('_',$fCommon);
+                unset($aForeignCommonName[0]);
+                $fCommonName = implode('_',$aForeignCommonName);
+                list($fCommonS,$fCommonP) = setSingularPlural($fCommonName);
 
-                        $aForeignsFields = array();
-                        $aForeignCommonName = explode('_',$fCommon2);
-                        unset($aForeignCommonName[0]);
-                        $fCommonName = implode('_',$aForeignCommonName);
-                        list($fCommonS,$fCommonP) = setSingularPlural($fCommonName);
+                if(!isset($this->{"model_$fSubMod"})){
+                    $this->{'init'.ucfirst(setObject($fSubMod))}();
+                  }
+                  if(in_array($fCommon,$localKeys)){
+                    $data['foreigns'][lcfirst(setObject($fCommonS))] = $this->{"model_$fSubMod"}->{'findOneBy'.ucfirst(setObject('id_file'))}($this->{'get'.ucfirst(setObject($fCommon))}());
+                  } else {
+                    $data['foreigns'][$fCommonP] = $this->{"model_$fSubMod"}->{'findBy'.ucfirst(setObject($fCommon))}($this->{'get'.ucfirst(setObject($fCommon))}());
+                  }
+              } else {
 
-                        if(is_object($data) && objectHas($this,$fCommon2) && (
-                                validateVar($this->{$fCommon2}) ||
-                                validateVar($this->{$fCommon2}, 'numeric') ||
-                                validateVar($this->{$fCommon2}, 'array') ||
-                                validateVar($this->{$fCommon2}, 'object'))
-                        ){
-                            if(!isset($this->{"model_$fCommonP"})){
+                foreach ($fCommon as $fSubMod2 => $fCommon2){
 
-                                $this->{'init'.ucfirst(setObject($fSubMod))}();
-                            }
-                            if(in_array($fCommon2,$localKeys)){
+                  $aForeignCommonName = explode('_',$fCommon2);
+                  unset($aForeignCommonName[0]);
+                  $fCommonName = implode('_',$aForeignCommonName);
+                  list($fCommonS,$fCommonP) = setSingularPlural($fCommonName);
 
-                                $data->foreigns[lcfirst(setObject($fCommonS))] = $this->{"model_$fSubMod"}->{'findOneBy'.ucfirst(setObject('id_file'))}($this->{'get'.ucfirst(setObject($fCommon2))}());
+                    if(!isset($this->{"model_$fSubMod"})){
 
-                            } else {
-
-                                $data->foreigns[$fCommonP] = $this->{"model_$fSubMod"}->{'findBy'.ucfirst(setObject($fCommon2))}($this->{'get'.ucfirst(setObject($fCommon2))}());
-                            }
-
-                        } else if(is_array($data) && objectHas($this,$fCommon2) && (
-                                validateVar($this->{$fCommon2}) ||
-                                validateVar($this->{$fCommon2}, 'numeric') ||
-                                validateVar($this->{$fCommon2}, 'array') ||
-                                validateVar($this->{$fCommon2}, 'object'))
-                        ) {
-                            if(!isset($this->{"model_$fSubMod"})){
-
-                                $this->{'init'.ucfirst(setObject($fSubMod))}();
-                            }
-                            if(in_array($fCommon2,$localKeys)){
-
-                                $data['foreigns'][lcfirst(setObject($fCommonS))] = $this->{"model_$fSubMod"}->{'findOneBy'.ucfirst(setObject('id_file'))}($this->{'get'.ucfirst(setObject($fCommon2))}());
-
-                            } else {
-
-                                $data['foreigns'][$fCommonP] = $this->{"model_$fSubMod"}->{'findBy'.ucfirst(setObject($fCommon2))}($this->{'get'.ucfirst(setObject($fCommon2))}());
-                            }
-                        }
+                      $this->{'init'.ucfirst(setObject($fSubMod))}();
                     }
-                } else {
 
-                    $aForeignCommonName = explode('_',$fCommon);
-                    unset($aForeignCommonName[0]);
-                    $fCommonName = implode('_',$aForeignCommonName);
-                    list($fCommonS,$fCommonP) = setSingularPlural($fCommonName);
+                    if(in_array($fCommon2,$localKeys)){
 
-                    if(is_object($data) && isset($this->{$fCommon}) && (
-                            validateVar($this->{$fCommon}) ||
-                            validateVar($this->{$fCommon}, 'numeric') ||
-                            validateVar($this->{$fCommon}, 'array') ||
-                            validateVar($this->{$fCommon}, 'object'))
-                    ){
-                        if(!isset($this->{"model_$fCommonP"})){
-                            $this->{'init'.ucfirst(setObject($fSubMod))}();
-                        }
-                        if(in_array($fCommon,$localKeys)){
-                            $data->foreigns[lcfirst(setObject($fCommonS))] = $this->{"model_$fSubMod"}->{'findOneBy'.ucfirst(setObject('id_file'))}($this->{'get'.ucfirst(setObject($fCommon))}());
-                        } else {
-                            $data->foreigns[$fCommonP] = $this->{"model_$fSubMod"}->{'findBy'.ucfirst(setObject($fCommon))}($this->{'get'.ucfirst(setObject($fCommon))}());
-                        }
-                    } else if(is_array($data) && isset($this->{$fCommon}) && (
-                            validateVar($this->{$fCommon}) ||
-                            validateVar($this->{$fCommon}, 'numeric') ||
-                            validateVar($this->{$fCommon}, 'array') ||
-                            validateVar($this->{$fCommon}, 'object'))
-                    ) {
-                        if(!isset($this->{"model_$fSubMod"})){
-                            $this->{'init'.ucfirst(setObject($fSubMod))}();
-                        }
-                        if(in_array($fCommon,$localKeys)){
-                            $data['foreigns'][lcfirst(setObject($fCommonS))] = $this->{"model_$fSubMod"}->{'findOneBy'.ucfirst(setObject('id_file'))}($this->{'get'.ucfirst(setObject($fCommon))}());
-                        } else {
-                            $data['foreigns'][$fCommonP] = $this->{"model_$fSubMod"}->{'findBy'.ucfirst(setObject($fCommon))}($this->{'get'.ucfirst(setObject($fCommon))}());
-                        }
+                      $data['foreigns'][lcfirst(setObject($fCommonS))] = $this->{"model_$fSubMod"}->{'findOneBy'.ucfirst(setObject('id_file'))}($this->{'get'.ucfirst(setObject($fCommon2))}());
+
+                    } else {
+
+                      $data['foreigns'][$fCommonP] = $this->{"model_$fSubMod"}->{'findBy'.ucfirst(setObject($fCommon2))}($this->{'get'.ucfirst(setObject($fCommon2))}());
                     }
                 }
-            }
-        }
+              }
+            }*/
+
         return $data != null ? $this->setFromData($data) : $data;
     }
 }

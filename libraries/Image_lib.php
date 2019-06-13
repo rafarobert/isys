@@ -403,21 +403,21 @@ class CI_Image_lib {
     /**
      * Thumb Extention
      *
-     * @var bool
+     * @var stringç
      */
     public  $dest_ext;
 
     /**
      * Thumb Name
      *
-     * @var bool
+     * @var string
      */
     public $dest_name;
 
     /**
      * Thumb Name
      *
-     * @var bool
+     * @var string
      */
     public $dest_raw_name;
     /**
@@ -639,6 +639,7 @@ class CI_Image_lib {
 		$this->full_dst_path_db = $this->dest_folder_db.$filename.$this->thumb_marker.$file_ext;
 		$this->dest_name = $filename.$this->thumb_marker.$file_ext;
 		$this->dest_raw_name = $filename.$this->thumb_marker;
+		$this->dest_ext = $file_ext;
 		$this->dest_ext = $file_ext;
 
 		/* Should we maintain image proportions?

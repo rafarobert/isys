@@ -280,23 +280,30 @@ class CI_Upload {
 	/**
 	 * Filename sent by the client
 	 *
-	 * @var	bool
+	 * @var	string
 	 */
 	public $client_name = '';
 
 	/**
 	 * Thumbs data for saving in database
 	 *
-	 * @var	bool
+	 * @var	string
 	 */
 	public $data_thumbs = '';
 
 	/**
 	 * Number of Thumbs for saving in database
 	 *
-	 * @var	bool
+	 * @var	int
 	 */
 	public $num_thumbs = '';
+
+	/**
+	 * Id of Setting for saving in database
+	 *
+	 * @var	int
+	 */
+	public $image_id_setting = '';
 
 	// --------------------------------------------------------------------
 
@@ -637,6 +644,11 @@ class CI_Upload {
 	 */
 	public function data($index = NULL)
 	{
+	  $imageType = $this->image_type == '' ? explode('.',$this->file_ext)[1] : $this->image_type;
+	  /**
+     * @var Model_Files_settings $aFilesSettings
+     */
+	  $aFilesSettings = Ctrl_Files_settings::create()->model_files_settings->findOneByName($imageType);
 		$data = array(
 				'name'		=> $this->orig_name,
 				'path'		=> $this->upload_path_db,
@@ -652,8 +664,8 @@ class CI_Upload {
 //				'is_image'		=> $this->is_image(),
 				'width'		=> $this->image_width,
 				'height'		=> $this->image_height,
-				'type'		=> $this->image_type == '' ? explode('.',$this->file_ext)[1] : $this->image_type,
-//				'image_size_str'	=> $this->image_size_str,
+				'type'		=> $this->image_type = $imageType,
+				'id_file_setting'	=> $this->image_id_setting = $aFilesSettings->getIdFileSetting(),
 			);
 
 		if ( ! empty($index))

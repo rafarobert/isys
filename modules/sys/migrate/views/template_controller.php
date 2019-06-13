@@ -53,6 +53,9 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
         return $this->loadView('lcModS/lcTableP/index', $view);
     }
 
+  /**
+   * @var Model_UcTableP $oUcObjTableS
+   */
     public function edit($id = NULL)
     {
         $this->init();
@@ -93,9 +96,9 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
 
             if ($this->form_validation->run() == true) {
 
-                $oUcObjTableS = $this->model_lcTableP->getDataFromPost($oUcObjTableS);
+                $oUcObjTableS->getDataFromPost();
                 //>>>validateFieldImgUpload1<<<
-                $oUcObjTableS = $this->doUpload($oUcObjTableS);
+                $oUcObjTableS->doUpload();
                 //<<<validateFieldImgUpload1>>>
                 //>>>validateFieldPassword<<<
                 if ($id == NULL) {
@@ -113,7 +116,7 @@ class Ctrl_UcTableP extends ES_Ctrl_UcTableP
                     }
                     //<<<validateUserSavedForRolling1>>>
                     //>>>validateFieldImgUpload2<<<
-                    $oUcObjTableS = $this->saveThumbs($oUcObjTableS);
+                    $oUcObjTableS->saveThumbs($oUcObjTableS);
                     //<<<validateFieldImgUpload2>>>
                     $this->data['oUcObjTableS'] = $oUcObjTableS;
                     return $this->returnResponse($oUcObjTableS);

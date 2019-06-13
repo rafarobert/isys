@@ -102,14 +102,9 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     //>>>packFindOneByFunctions<<<
     public function findOneByUcObjField($lcObjField,$orderBy = '', $direction = 'ASC'){
         $aData = $this->get_by(['lcField' => $lcObjField],false,true,$orderBy,$direction);
-        $aData = $this->setForeigns($aData,$orderBy,$direction);
-        if(isArray($aData)){
-            return $this->setFromData($aData[0]);
-        } else if(isObject($aData)){
-            return $this->setFromData($aData);
-        } else {
-            return null;
-        }
+        $oUcObjTableS = $this->setForeigns($aData,$orderBy,$direction);
+        $oUcObjTableS->CI = $this->CI;
+        return $oUcObjTableS;
     }
     //<<<packFindOneByFunctions>>>
 
@@ -143,14 +138,26 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         return $aData;
     }
     //<<<packFilterByFunctions>>>
+    //>>>packSelectByFunctions<<<
+  public function selectByUcObjField($bAsArray = false, $orderBy ='', $sense = 'ASC'){
+    $aSetttings = array();
+    $aSetttings[] = 'lcField';
+      $aData = $this->selectBy($aSetttings, $bAsArray, $orderBy);
+    if(!$bAsArray) {
+        $oDatas = array();
+        foreach ($aData as $data){
+          $oDatas[] = $this->setForeigns($data,$orderBy,$sense);
+        }
+    }
+    return $aData;
+  }
+    //<<<packSelectByFunctions>>>
 
     public function getNewUcObjTableS()
     {
-        $post = $this->input->post();
-
-        $this->lcTableS = $this->setFromData($post);
-
-        return $this->lcTableS;
+      $oUcObjTableS = new Model_UcTableP();
+      $oUcObjTableS->CI = $this->CI;
+      return $oUcObjTableS;
     }
 
     public function find($bCreateCtrl = false){
@@ -166,72 +173,53 @@ class ES_Model_UcTableP extends ES_UcModS_Model
 
         $oModelUcObjTableP = array();
 
-        foreach ($oUcObjTableP as $lcTableS){
+        foreach ($oUcObjTableP as $i => $lcTableS){
 
-            $oModelUcObjTableP[] = $this->setForeigns($lcTableS);
+          $oUcObjTableS = $this->getNewUcObjTableS();
+
+          $oModelUcObjTableP[$i] = $oUcObjTableS->setForeigns($lcTableS);
         }
+
         return $oModelUcObjTableP;
     }
 
-    public function setFromData($oData){
+  public function setFromData($oData)
+  {
 
-        if(isArray($oData)){
-            $oData = array2std($oData);
-        }
-        if(isObject($oData)){
-
-            $oData = verifyArraysInResult($oData);
-
-            if(isObject($this)){
-
-                $oModelUcObjTableP = $this;
-
-            } else {
-
-                $oModelUcObjTableP = new Model_UcTableP();
-            }
-            $aFields = $this->getArrayData(true);
-            $aData = std2array($oData);
-            foreach ($aFields as $key => $value){
-
-                if(objectHas($oData,$key,false)){
-
-                    $oModelUcObjTableP->$key = isNumeric($oData->$key) ? valNumeric($oData->$key) : $oData->$key;
-
-                } else if(objectHas($oData,setObject($key),false)){
-
-                    $oModelUcObjTableP->$key = isNumeric($oData->{setObject($key)}) ? valNumeric($oData->{setObject($key)}) : ($oData->{setObject($key)} == "" ? $value : $oData->{setObject($key)});
-
-                } else if(objectHas($oData,ucfirst(setObject($key)),false)){
-
-                    $oModelUcObjTableP->$key = isNumeric($oData->{ucfirst(setObject($key))}) ? valNumeric($oData->{ucfirst(setObject($key))}) : ($oData->{ucfirst(setObject($key))} == "" ? $value : $oData->{ucfirst(setObject($key))});
-                }
-                if(in_array($key,$this->uriStrings) && isset($oData->$key) && validateVar($oData->$key)){
-
-                    $oModelUcObjTableP->uriString = clean($oData->$key);
-
-                } else if(in_array($key,$this->uriStrings) && isset($oData->{setObject($key)}) && validateVar($oData->{setObject($key)})){
-
-                    $oModelUcObjTableP->uriString = clean($oData->{setObject($key)});
-
-                } else if(in_array($key,$this->uriStrings) && isset($oData->{ucfirst(setObject($key))}) && validateVar($oData->{ucfirst(setObject($key))})){
-
-                    $oModelUcObjTableP->uriString = clean($oData->{ucfirst(setObject($key))});
-                }
-                if(isset($aData[$key])) {
-                    unset($aData[$key]);
-                }
-            }
-            foreach ($aData as $dataKey => $dataValue){
-                $oModelUcObjTableP->$dataKey = $dataValue;
-            }
-            return $oModelUcObjTableP;
-
-        } else {
-
-            return new Model_UcTableP();
-        }
+    if (isArray($oData)) {
+      $oData = array2std($oData);
     }
+    if (isObject($oData)) {
+
+      $oData = verifyArraysInResult($oData);
+
+      $aFields = $this->getArrayData(true);
+      $aData = std2array($oData);
+
+      foreach ($aFields as $key => $value) {
+
+        if (exists($oData, $key, false)) {
+          $this->$key = isNumeric(asExists($oData, $key)) ? valNumeric(asExists($oData, $key)) : asExists($oData, $key);
+        }
+        if (in_array($key, $this->uriStrings) && asExists($oData, $key) && isString(asExists($oData, $key))) {
+          $this->uriString = clean(asExists($oData, $key));
+        }
+        if (isset($aData[$key])) {
+          unset($aData[$key]);
+        }
+      }
+
+      foreach ($aData as $dataKey => $dataValue) {
+        $this->$dataKey = $dataValue;
+      }
+
+      return $this;
+
+    } else {
+
+      return new Model_UcTableP();
+    }
+  }
 
     public function getArrayData($bWithForeign = false){
         $data = array(

@@ -1307,7 +1307,7 @@ if (isset($assign_to_config) && is_array($assign_to_config))
  *  Call the requested method
  * ------------------------------------------------------
  */
-$methodsExcepts = ['signup','login'];
+$methodsExcepts = ['signup','login','locked'];
 $fBuildsExcepts = ['migrate'];
 
 //$classExcepts = ['ajax'];
@@ -1357,16 +1357,17 @@ if($RTR->module == 'frontend'){
 
 
 
-    if($CI->fromAjax || $ctrlClass == 'Ctrl_Ajax' || $CI->input->post('fromAjax') || $class == 'ajax') {
+    if($CI->fromAjax || $CI->input->post('fromAjax')) {
 
-        if($response){
+        if(objectHas($CI,'oUserLogguedIn')) {
 
             echo safe_json_encode($response);
 
         } else {
+;
+          $response = $CI->loadView('pages/lockscreen');
 
-            $CI->data['subLayout'] = 'pages/lockscreen';
-            $CI->load->view($CI->data['layout'], $CI->data);
+            echo safe_json_encode($response);
         }
 
     } else if(isset($_SERVER['SHELL'])) {
