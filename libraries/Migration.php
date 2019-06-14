@@ -1274,11 +1274,11 @@ class CI_Migration
                 if($break){
                     break;
                 }
-                if($settings2['pk'] == $idForeign){
+                /*if($settings2['pk'] == $idForeign){
                   if(isset($relations[$fkName])){
                     unset($relations[$fkName]);
                   }
-                }
+                }*/
             }
         }
         return $relations;

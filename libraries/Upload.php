@@ -664,7 +664,7 @@ class CI_Upload {
 //				'is_image'		=> $this->is_image(),
 				'width'		=> $this->image_width,
 				'height'		=> $this->image_height,
-				'type'		=> $this->image_type = $imageType,
+				'type'		=> 'origin',
 				'id_file_setting'	=> $this->image_id_setting = $aFilesSettings->getIdFileSetting(),
 			);
 

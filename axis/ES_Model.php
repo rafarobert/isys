@@ -94,8 +94,6 @@ Class ES_Model extends ES_Model_Vars {
 
     function __construct() {
         parent::__construct();
-        $this->img_path = realpath(APPPATH.'../assets/img/');
-        createFolder($this->img_path);
     }
 
     public static function create()
@@ -284,6 +282,9 @@ Class ES_Model extends ES_Model_Vars {
         }
         $primary ='';
         foreach ($fields as $field){
+          if(isset($field->_primary_key)){
+            $field = array2std($field->getArrayData());
+          }
             $primary_key = $this->_primary_key;
             if(isset($field->$primary_key)){
                 $key = $field->$primary_key;
@@ -737,7 +738,7 @@ Class ES_Model extends ES_Model_Vars {
                                     $aThumbs[$i]['url'] = "/assets/$submod/$fName/thumbs/".$this->image_lib->dest_name;
                                     $aThumbs[$i]['raw_name'] = $this->image_lib->dest_name;
                                     $aThumbs[$i]['ext'] = $this->image_lib->dest_ext;
-                                    $aThumbs[$i]['type'] = $this->upload->image_type;
+                                    $aThumbs[$i]['type'] = 'thumb';
                                     $aThumbs[$i]['id_file_setting'] = $this->upload->image_id_setting;
                                     $aThumbs[$i]['path'] = $this->image_lib->dest_folder_db;
                                     $aThumbs[$i]['full_path'] = $this->image_lib->full_dst_path_db;
@@ -1126,7 +1127,8 @@ Class ES_Model extends ES_Model_Vars {
 
                           if(exists($data,$idLocal)){
 
-                              $foreignDatas = $this->{'filterBy'.ucfirst((setObject($ffSettings['idLocal'])))}(asExists($data,$idForeign),null,$orderBy,$sense);
+
+                              $foreignDatas = $this->{'filterBy'.ucfirst((setObject($ffSettings['idLocal'])))}(asExists($data,$idForeign),false,null,$orderBy,$sense);
 
                               foreach ($foreignDatas as $foreignData){
 

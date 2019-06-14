@@ -14,14 +14,14 @@ else
   then
     php -B "\$_REQUEST = array('email' => 'rafael@estic.com.bo', 'password' => '123', 'login' => 'ingresar');" -F ../../index.php sys/migrate/$1
     cd ../..
-    composer update
+composer dump-autoload -o
     cd isys/scripts
   else
     if test $# = 2
     then
       php -B "\$_REQUEST = array('email' => 'rafael@estic.com.bo', 'password' => '123', 'login' => 'ingresar');" -F ../../index.php sys/migrate/$1/$2
       cd ../..
-      composer update
+composer dump-autoload -o
         cd isys/scripts
     fi
   fi

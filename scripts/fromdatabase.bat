@@ -7,5 +7,5 @@ set XDEBUG_CONFIG=remote_enable=1 remote_mode=req remote_port=9000 remote_host=1
 php -B "$_REQUEST = array('email' => 'rafael@estic.com.bo', 'password' => '123', 'login' => 'ingresar');" -F ../../index.php sys/migrate/fromdatabase
 echo -e "\012"
 cd ../..
-composer update
+composer dump-autoload -o
 cd isys/scripts

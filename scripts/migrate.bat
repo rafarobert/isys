@@ -15,7 +15,7 @@ else
   then
     php -B "\$_REQUEST = array('email' => 'rafael@estic.com.bo', 'password' => '123');" -F ../../index.php sys/migrate/$1
     cd ../..
-    composer update
+composer dump-autoload -o
     cd isys/scripts
     exit 1
   else
@@ -23,7 +23,7 @@ else
     then
       php -B "\$_REQUEST = array('email' => 'rafael@estic.com.bo', 'password' => '123');" -F ../../index.php sys/migrate/$1/$2
       cd ../..
-      composer update
+composer dump-autoload -o
         cd isys/scripts
       exit 1
     fi

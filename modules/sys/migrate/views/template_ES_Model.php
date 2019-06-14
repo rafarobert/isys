@@ -109,10 +109,10 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     //<<<packFindOneByFunctions>>>
 
     //>>>packFilterByFunctions<<<
-    public function filterByUcObjField($lcObjField, $selecting = null, $orderByOrAsModel = true, $direction = 'ASC'){
+    public function filterByUcObjField($lcObjField, $bAsModel = true, $selecting = null, $orderBy = '', $direction = 'ASC'){
         $bSelecting = true;
         $aSetttings = array();
-        $bAsModel = true;
+
         if(isArray($selecting)){
             $aSetttings = $selecting;
         } else if(isString($selecting)){
@@ -122,16 +122,11 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         }
         $aSetttings['lcField'] = $lcObjField;
 
-        if(isString($orderByOrAsModel)){
-            $orderBy = $orderByOrAsModel;
-        } else if(is_bool($orderByOrAsModel)){
-            $bAsModel = $orderByOrAsModel;
-        }
-        $aData = $this->get_by($aSetttings, $bSelecting, null, $orderByOrAsModel, $direction);
+        $aData = $this->get_by($aSetttings, $bSelecting, null, $orderBy, $direction);
         if($bAsModel){
             $oDatas = array();
             foreach ($aData as $data){
-                $oDatas[] = $this->setForeigns($data,$orderByOrAsModel,$direction);
+                $oDatas[] = $this->setForeigns($data,$orderBy,$direction);
             }
             return $oDatas;
         }

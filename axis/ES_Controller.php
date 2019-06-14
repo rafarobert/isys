@@ -37,7 +37,6 @@ class ES_Controller extends ES_Ctrl_Vars
       parent::__construct();
 
       $this->load->helper('security');
-      $this->img_path = realpath(ROOTPATH.'assets/img/');
 
       $this->data['siteTitle'] = config_item('site_title');;
       $this->data['siteName'] = config_item('site_name');
