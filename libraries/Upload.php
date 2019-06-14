@@ -159,6 +159,20 @@ class CI_Upload {
 	public $file_ext = '';
 
 	/**
+	 * Filename extension
+	 *
+	 * @var	string
+	 */
+	public $id_table = '';
+
+	/**
+	 * Filename extension
+	 *
+	 * @var	string
+	 */
+	public $title = '';
+
+	/**
 	 * Filename Url
 	 *
 	 * @var	string
@@ -666,6 +680,8 @@ class CI_Upload {
 				'height'		=> $this->image_height,
 				'type'		=> 'origin',
 				'id_file_setting'	=> $this->image_id_setting = $aFilesSettings->getIdFileSetting(),
+        'id_table' => $this->id_table,
+        'title' => $this->title
 			);
 
 		if ( ! empty($index))

@@ -716,10 +716,19 @@ Class ES_Model extends ES_Model_Vars {
                     if (!$this->upload->do_upload($fName)) {
                         return false;
                     } else {
+                      list($fNameS,$fNameP) = setSingularPlural($fName);
+                      /**
+                       * @var Model_Tables $oTable
+                       */
+                      $oTable = Model_Tables::create()->model_tables->findOneByTitle(ucfirst($fNameP));
                         $this->upload->bFileUploaded = true;
                         $this->upload->num_thumbs = $config['num_thumbs'];
                         $this->upload->file_url = "/assets/$submod/$fName/".$this->upload->orig_name;
                         $file = $this->upload->data();
+                        if(isObject($oTable)){
+                          $this->upload->id_table = $oTable->getIdTable();
+                        }
+                        $this->upload->title = $fName;
                         $config['source_image'] = ROOTPATH.$file['full_path'];
                         for ($i = 0; $i < $config['num_thumbs']; $i++) {
                             if($this->image_lib->initialize($config)){
@@ -742,6 +751,8 @@ Class ES_Model extends ES_Model_Vars {
                                     $aThumbs[$i]['id_file_setting'] = $this->upload->image_id_setting;
                                     $aThumbs[$i]['path'] = $this->image_lib->dest_folder_db;
                                     $aThumbs[$i]['full_path'] = $this->image_lib->full_dst_path_db;
+                                    $aThumbs[$i]['id_table'] = $this->upload->id_table;
+                                    $aThumbs[$i]['title'] = $this->upload->title;
                                     $config['width'] = $config['width'] + 400;
                                     $config['height'] = $config['height'] + 400;
                                     $config['thumb_marker'] = '-thumb_' . $config['width'];
@@ -754,6 +765,7 @@ Class ES_Model extends ES_Model_Vars {
                     $this->upload->file_type = $files[$fName]['type'];
                 }
             }
+
             $this->fileData = $data = $this->upload->data();
           return $this->setFromData($data);
 
@@ -988,9 +1000,10 @@ Class ES_Model extends ES_Model_Vars {
         } else if(isString($selects)){
             $aSelects[] = $selects;
         }
-        $aData = $this->get_by(array (
-            0 => $aSelects,
-        ),true, false,$orderBy,$sense);
+        if($this->getTableName() == 'es_files'){
+          $aSelects['type'] = Model_Files::$optOrigin;
+        }
+        $aData = $this->get_by($aSelects,true, false,$orderBy,$sense);
 
         if($bAsArray){
           foreach ($selects as $select){

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 14-06-2019 a las 08:42:31
+-- Tiempo de generación: 15-06-2019 a las 01:51:43
 -- Versión del servidor: 10.1.37-MariaDB
 -- Versión de PHP: 7.2.14
 
@@ -19,13 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `ibolsast_crm_dev`
---
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `crm_actividades`
+-- Base de datos: `estic_dev`
 --
 
 -- --------------------------------------------------------
@@ -35,27 +29,27 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `es_cities` (
-                           `id_city` int(10) UNSIGNED NOT NULL,
-                           `name` varchar(300) DEFAULT NULL,
-                           `description` varchar(500) DEFAULT NULL COMMENT '{"validate":0}',
-                           `abbreviation` varchar(200) DEFAULT NULL COMMENT '{"validate":0}',
-                           `id_capital` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0,"selectBy":"name","filterBy":{"tipo":"capital"}}',
-                           `id_region` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0,"selectBy":"name","filterBy":{"tipo":"region"}}',
-                           `lat` decimal(10,6) DEFAULT NULL COMMENT '{"validate":0}',
-                           `lng` decimal(10,6) DEFAULT NULL COMMENT '{"validate":0}',
-                           `area` int(11) DEFAULT NULL COMMENT '{"validate":0}',
-                           `nro_municipios` int(11) DEFAULT NULL COMMENT '{"validate":0}',
-                           `surface` decimal(10,0) DEFAULT NULL COMMENT '{"validate":0}',
-                           `ids_files` varchar(490) DEFAULT NULL COMMENT '{"validate":0,"input":"file"}',
-                           `id_cover_picture` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0,"input":"hidden"}',
-                           `height` decimal(10,0) DEFAULT NULL COMMENT '{"validate":0}',
-                           `tipo` varchar(490) DEFAULT NULL COMMENT '{"validate":0,"input":"radios","options":["region","ciudad","capital"]}',
-                           `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-                           `change_count` int(11) NOT NULL DEFAULT '0',
-                           `id_user_modified` int(11) UNSIGNED NOT NULL,
-                           `id_user_created` int(11) UNSIGNED NOT NULL,
-                           `date_modified` datetime NOT NULL,
-                           `date_created` datetime NOT NULL
+  `id_city` int(10) UNSIGNED NOT NULL,
+  `name` varchar(300) DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL COMMENT '{"validate":0}',
+  `abbreviation` varchar(200) DEFAULT NULL COMMENT '{"validate":0}',
+  `id_capital` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0,"selectBy":"name","filterBy":{"tipo":"capital"}}',
+  `id_region` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0,"selectBy":"name","filterBy":{"tipo":"region"}}',
+  `lat` decimal(10,6) DEFAULT NULL COMMENT '{"validate":0}',
+  `lng` decimal(10,6) DEFAULT NULL COMMENT '{"validate":0}',
+  `area` int(11) DEFAULT NULL COMMENT '{"validate":0}',
+  `nro_municipios` int(11) DEFAULT NULL COMMENT '{"validate":0}',
+  `surface` decimal(10,0) DEFAULT NULL COMMENT '{"validate":0}',
+  `ids_files` varchar(490) DEFAULT NULL COMMENT '{"validate":0,"input":"file"}',
+  `id_cover_picture` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0,"input":"hidden"}',
+  `height` decimal(10,0) DEFAULT NULL COMMENT '{"validate":0}',
+  `tipo` varchar(490) DEFAULT NULL COMMENT '{"validate":0,"input":"radios","options":["region","ciudad","capital"]}',
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -88,18 +82,18 @@ INSERT INTO `es_cities` (`id_city`, `name`, `description`, `abbreviation`, `id_c
 --
 
 CREATE TABLE `es_domains` (
-                            `id_domain` int(11) NOT NULL,
-                            `host` varchar(450) DEFAULT NULL,
-                            `hostname` varchar(450) DEFAULT NULL,
-                            `protocol` varchar(10) DEFAULT NULL,
-                            `port` int(11) DEFAULT NULL,
-                            `origin` varchar(450) DEFAULT NULL,
-                            `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-                            `change_count` int(11) NOT NULL DEFAULT '0',
-                            `id_user_modified` int(11) UNSIGNED NOT NULL,
-                            `id_user_created` int(11) UNSIGNED NOT NULL,
-                            `date_modified` datetime NOT NULL,
-                            `date_created` datetime NOT NULL
+  `id_domain` int(11) NOT NULL,
+  `host` varchar(450) DEFAULT NULL,
+  `hostname` varchar(450) DEFAULT NULL,
+  `protocol` varchar(10) DEFAULT NULL,
+  `port` int(11) DEFAULT NULL,
+  `origin` varchar(450) DEFAULT NULL,
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -109,35 +103,47 @@ CREATE TABLE `es_domains` (
 --
 
 CREATE TABLE `es_files` (
-                          `id_file` int(10) UNSIGNED NOT NULL,
-                          `name` varchar(256) DEFAULT NULL COMMENT '{"validate":0}',
-                          `url` varchar(450) DEFAULT NULL COMMENT '{"validate":0}',
-                          `ext` varchar(100) DEFAULT NULL COMMENT '{"validate":0}',
-                          `raw_name` varchar(400) DEFAULT NULL COMMENT '{"validate":0}',
-                          `full_path` varchar(400) DEFAULT NULL COMMENT '{"validate":0}',
-                          `path` varchar(400) DEFAULT NULL COMMENT '{"validate":0}',
-                          `width` int(11) DEFAULT NULL COMMENT '{"validate":0}',
-                          `height` int(11) DEFAULT NULL COMMENT '{"validate":0}',
-                          `size` decimal(10,0) DEFAULT NULL COMMENT '{"validate":0}',
-                          `library` varchar(20) DEFAULT NULL COMMENT '{"validate":0}',
-                          `nro_thumbs` int(11) DEFAULT NULL COMMENT '{"validate":0}',
-                          `id_parent` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0,"selectBy":["name"],"filterBy":{"type":"origin"}}',
-                          `thumb_marker` varchar(200) DEFAULT NULL COMMENT '{"validate":0}',
-                          `type` varchar(100) DEFAULT NULL COMMENT '{"validate":0,"options":["origin","thumb"]}',
-                          `x` decimal(20,10) DEFAULT NULL COMMENT '{"validate":0}',
-                          `y` decimal(20,10) DEFAULT NULL COMMENT '{"validate":0}',
-                          `fix_width` decimal(20,10) DEFAULT NULL COMMENT '{"validate":0}',
-                          `fix_height` decimal(20,10) DEFAULT NULL COMMENT '{"validate":0}',
-                          `id_file_setting` int(11) UNSIGNED DEFAULT NULL COMMENT '{"validate":0,"selectBy":"name"}',
-                          `ids_tags` int(11) DEFAULT NULL COMMENT '{"validate":0,"input":"checkboxes","selectBy":"name","table":"es_files_tags","idForeign":"id_file_tag"}',
-                          `ids_folders` int(11) DEFAULT NULL COMMENT '{"validate":0,"input":"checkboxes","selectBy":"name","table":"es_files_folders","idForeign":"id_file_folder"}',
-                          `status` varchar(15) DEFAULT 'ENABLED',
-                          `change_count` int(11) NOT NULL DEFAULT '0',
-                          `id_user_modified` int(11) UNSIGNED NOT NULL,
-                          `id_user_created` int(11) UNSIGNED NOT NULL,
-                          `date_modified` datetime NOT NULL,
-                          `date_created` datetime NOT NULL
+  `id_file` int(10) UNSIGNED NOT NULL,
+  `name` varchar(256) DEFAULT NULL COMMENT '{"validate":0}',
+  `url` varchar(450) DEFAULT NULL COMMENT '{"validate":0}',
+  `ext` varchar(100) DEFAULT NULL COMMENT '{"validate":0}',
+  `raw_name` varchar(400) DEFAULT NULL COMMENT '{"validate":0}',
+  `full_path` varchar(400) DEFAULT NULL COMMENT '{"validate":0}',
+  `path` varchar(400) DEFAULT NULL COMMENT '{"validate":0}',
+  `width` int(11) DEFAULT NULL COMMENT '{"validate":0}',
+  `height` int(11) DEFAULT NULL COMMENT '{"validate":0}',
+  `size` decimal(10,0) DEFAULT NULL COMMENT '{"validate":0}',
+  `library` varchar(20) DEFAULT NULL COMMENT '{"validate":0}',
+  `nro_thumbs` int(11) DEFAULT NULL COMMENT '{"validate":0}',
+  `id_parent` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0,"selectBy":["name"],"filterBy":{"type":"origin"}}',
+  `thumb_marker` varchar(200) DEFAULT NULL COMMENT '{"validate":0}',
+  `type` varchar(100) DEFAULT NULL COMMENT '{"validate":0,"options":["origin","thumb"]}',
+  `x` decimal(20,10) DEFAULT NULL COMMENT '{"validate":0}',
+  `y` decimal(20,10) DEFAULT NULL COMMENT '{"validate":0}',
+  `fix_width` decimal(20,10) DEFAULT NULL COMMENT '{"validate":0}',
+  `fix_height` decimal(20,10) DEFAULT NULL COMMENT '{"validate":0}',
+  `id_file_setting` int(11) UNSIGNED DEFAULT NULL COMMENT '{"validate":0,"selectBy":"name"}',
+  `ids_tags` int(11) DEFAULT NULL COMMENT '{"validate":0,"input":"checkboxes","selectBy":"name","table":"es_files_tags","idForeign":"id_file_tag"}',
+  `ids_folders` int(11) DEFAULT NULL COMMENT '{"validate":0,"input":"checkboxes","selectBy":"name","table":"es_files_folders","idForeign":"id_file_folder"}',
+  `title` varchar(300) DEFAULT NULL COMMENT '{"validate":0}',
+  `id_table` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0}',
+  `status` varchar(15) DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `es_files`
+--
+
+INSERT INTO `es_files` (`id_file`, `name`, `url`, `ext`, `raw_name`, `full_path`, `path`, `width`, `height`, `size`, `library`, `nro_thumbs`, `id_parent`, `thumb_marker`, `type`, `x`, `y`, `fix_width`, `fix_height`, `id_file_setting`, `ids_tags`, `ids_folders`, `title`, `id_table`, `status`, `change_count`, `id_user_modified`, `id_user_created`, `date_modified`, `date_created`) VALUES
+(1, '1560554798_13765700102019628102279701647510958796308226o.jpg', '/assets/files/person/1560554798_13765700102019628102279701647510958796308226o.jpg', '.jpg', '13765700102019628102279701647510958796308226o', 'assets/files/person/13765700102019628102279701647510958796308226o.jpg', 'assets/files/person/', 1152, 2048, '135', '', 3, NULL, '', 'origin', '0.0000000000', '0.0000000000', '0.0000000000', '0.0000000000', 10, NULL, NULL, 'person', 111, 'ENABLED', 0, 1, 1, '2019-06-14 19:26:38', '2019-06-14 19:26:38'),
+(2, '1560554798_13765700102019628102279701647510958796308226o-thumb_50.jpg', '/assets/files/person/thumbs/1560554798_13765700102019628102279701647510958796308226o-thumb_50.jpg', '.jpg', '1560554798_13765700102019628102279701647510958796308226o-thumb_50.jpg', 'assets/files/person/thumbs/1560554798_13765700102019628102279701647510958796308226o-thumb_50.jpg', 'assets/files/person/thumbs/', 29, 50, '135', 'gd2', NULL, 1, '-thumb_50', 'thumb', NULL, NULL, NULL, NULL, 10, NULL, NULL, 'person', 111, 'ENABLED', 0, 1, 1, '2019-06-14 19:26:38', '2019-06-14 19:26:38'),
+(3, '1560554798_13765700102019628102279701647510958796308226o-thumb_450.jpg', '/assets/files/person/thumbs/1560554798_13765700102019628102279701647510958796308226o-thumb_450.jpg', '.jpg', '1560554798_13765700102019628102279701647510958796308226o-thumb_450.jpg', 'assets/files/person/thumbs/1560554798_13765700102019628102279701647510958796308226o-thumb_450.jpg', 'assets/files/person/thumbs/', 254, 450, '135', 'gd2', NULL, 1, '-thumb_450', 'thumb', NULL, NULL, NULL, NULL, 10, NULL, NULL, 'person', 111, 'ENABLED', 0, 1, 1, '2019-06-14 19:26:38', '2019-06-14 19:26:38'),
+(4, '1560554798_13765700102019628102279701647510958796308226o-thumb_850.jpg', '/assets/files/person/thumbs/1560554798_13765700102019628102279701647510958796308226o-thumb_850.jpg', '.jpg', '1560554798_13765700102019628102279701647510958796308226o-thumb_850.jpg', 'assets/files/person/thumbs/1560554798_13765700102019628102279701647510958796308226o-thumb_850.jpg', 'assets/files/person/thumbs/', 479, 850, '135', 'gd2', NULL, 1, '-thumb_850', 'thumb', NULL, NULL, NULL, NULL, 10, NULL, NULL, 'person', 111, 'ENABLED', 0, 1, 1, '2019-06-14 19:26:38', '2019-06-14 19:26:38');
 
 -- --------------------------------------------------------
 
@@ -146,15 +152,15 @@ CREATE TABLE `es_files` (
 --
 
 CREATE TABLE `es_files_folders` (
-                                  `id_file_folder` int(11) UNSIGNED NOT NULL,
-                                  `name` varchar(200) DEFAULT NULL,
-                                  `description` varchar(500) DEFAULT NULL,
-                                  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-                                  `change_count` int(11) NOT NULL DEFAULT '0',
-                                  `id_user_modified` int(11) UNSIGNED NOT NULL,
-                                  `id_user_created` int(11) UNSIGNED NOT NULL,
-                                  `date_modified` datetime NOT NULL,
-                                  `date_created` datetime NOT NULL
+  `id_file_folder` int(11) UNSIGNED NOT NULL,
+  `name` varchar(200) DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL,
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -164,20 +170,20 @@ CREATE TABLE `es_files_folders` (
 --
 
 CREATE TABLE `es_files_settings` (
-                                   `id_file_setting` int(11) UNSIGNED NOT NULL,
-                                   `name` varchar(200) DEFAULT NULL,
-                                   `description` varchar(500) DEFAULT NULL COMMENT '{"validate":0}',
-                                   `type` varchar(200) DEFAULT NULL COMMENT '{"validate":0,"input":"radios","options":["imagenes","documentos","comprimidos","videos","audios"]}',
-                                   `max_width` int(11) DEFAULT NULL,
-                                   `max_height` int(11) DEFAULT NULL,
-                                   `max_size` int(11) DEFAULT NULL,
-                                   `nro_thumbs` int(11) DEFAULT NULL,
-                                   `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-                                   `change_count` int(11) NOT NULL DEFAULT '0',
-                                   `id_user_modified` int(11) UNSIGNED NOT NULL,
-                                   `id_user_created` int(11) UNSIGNED NOT NULL,
-                                   `date_modified` datetime NOT NULL,
-                                   `date_created` datetime NOT NULL
+  `id_file_setting` int(11) UNSIGNED NOT NULL,
+  `name` varchar(200) DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL COMMENT '{"validate":0}',
+  `type` varchar(200) DEFAULT NULL COMMENT '{"validate":0,"input":"radios","options":["imagenes","documentos","comprimidos","videos","audios"]}',
+  `max_width` int(11) DEFAULT NULL,
+  `max_height` int(11) DEFAULT NULL,
+  `max_size` int(11) DEFAULT NULL,
+  `nro_thumbs` int(11) DEFAULT NULL,
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -203,15 +209,15 @@ INSERT INTO `es_files_settings` (`id_file_setting`, `name`, `description`, `type
 --
 
 CREATE TABLE `es_files_tags` (
-                               `id_file_tag` int(11) NOT NULL,
-                               `name` varchar(200) DEFAULT NULL,
-                               `description` varchar(500) DEFAULT NULL,
-                               `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-                               `change_count` int(11) NOT NULL DEFAULT '0',
-                               `id_user_modified` int(11) UNSIGNED NOT NULL,
-                               `id_user_created` int(11) UNSIGNED NOT NULL,
-                               `date_modified` datetime NOT NULL,
-                               `date_created` datetime NOT NULL
+  `id_file_tag` int(11) NOT NULL,
+  `name` varchar(200) DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL,
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -221,45 +227,43 @@ CREATE TABLE `es_files_tags` (
 --
 
 CREATE TABLE `es_logs` (
-                         `id_log` int(11) NOT NULL,
-                         `heading` varchar(499) DEFAULT NULL,
-                         `message` text,
-                         `action` varchar(499) DEFAULT NULL,
-                         `code` varchar(200) DEFAULT NULL,
-                         `level` int(11) DEFAULT NULL COMMENT '{"options":{1:"Error",2:"Warning",4:"Parsing Error",8:"Notice",16:"Core Error",32:"Core Warning",64:"Compile Error",128:"Compile Warnig",256:"User Error",512:"User Warning",1024:"User Notice",2048:"Runtime Error"}}',
-                         `file` varchar(1000) DEFAULT NULL,
-                         `line` int(11) DEFAULT NULL,
-                         `trace` text,
-                         `previous` varchar(499) DEFAULT NULL,
-                         `xdebug_message` text,
-                         `type` int(11) DEFAULT NULL,
-                         `post` varchar(1000) DEFAULT NULL,
-                         `severity` varchar(400) DEFAULT NULL,
-                         `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-                         `change_count` int(11) NOT NULL DEFAULT '0',
-                         `id_user_modified` int(11) UNSIGNED NOT NULL,
-                         `id_user_created` int(11) UNSIGNED NOT NULL,
-                         `date_modified` datetime NOT NULL,
-                         `date_created` datetime NOT NULL
+  `id_log` int(11) NOT NULL,
+  `heading` varchar(499) DEFAULT NULL,
+  `message` text,
+  `action` varchar(499) DEFAULT NULL,
+  `code` varchar(200) DEFAULT NULL,
+  `level` int(11) DEFAULT NULL COMMENT '{"options":{1:"Error",2:"Warning",4:"Parsing Error",8:"Notice",16:"Core Error",32:"Core Warning",64:"Compile Error",128:"Compile Warnig",256:"User Error",512:"User Warning",1024:"User Notice",2048:"Runtime Error"}}',
+  `file` varchar(1000) DEFAULT NULL,
+  `line` int(11) DEFAULT NULL,
+  `trace` text,
+  `previous` varchar(499) DEFAULT NULL,
+  `xdebug_message` text,
+  `type` int(11) DEFAULT NULL,
+  `post` varchar(1000) DEFAULT NULL,
+  `severity` varchar(400) DEFAULT NULL,
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `es_modules`
 --
 
 CREATE TABLE `es_modules` (
-                            `id_module` int(10) UNSIGNED NOT NULL,
-                            `name` varchar(256) DEFAULT NULL,
-                            `uri` varchar(200) DEFAULT NULL,
-                            `description` varchar(500) DEFAULT NULL,
-                            `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-                            `change_count` int(11) NOT NULL DEFAULT '0',
-                            `id_user_modified` int(11) UNSIGNED NOT NULL,
-                            `id_user_created` int(11) UNSIGNED NOT NULL,
-                            `date_modified` datetime NOT NULL,
-                            `date_created` datetime NOT NULL
+  `id_module` int(10) UNSIGNED NOT NULL,
+  `name` varchar(256) DEFAULT NULL,
+  `uri` varchar(200) DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL,
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -277,16 +281,16 @@ INSERT INTO `es_modules` (`id_module`, `name`, `uri`, `description`, `status`, `
 --
 
 CREATE TABLE `es_numbers` (
-                            `id_number` int(11) UNSIGNED NOT NULL,
-                            `code` int(11) DEFAULT NULL,
-                            `number` varchar(100) DEFAULT NULL,
-                            `tipo` varchar(200) DEFAULT NULL COMMENT '{"validate":0,"input":"radios","options":["cellphone","phone"]}',
-                            `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-                            `change_count` int(11) NOT NULL DEFAULT '0',
-                            `id_user_modified` int(11) UNSIGNED NOT NULL,
-                            `id_user_created` int(11) UNSIGNED NOT NULL,
-                            `date_modified` datetime NOT NULL,
-                            `date_created` datetime NOT NULL
+  `id_number` int(11) UNSIGNED NOT NULL,
+  `code` int(11) DEFAULT NULL,
+  `number` varchar(100) DEFAULT NULL,
+  `tipo` varchar(200) DEFAULT NULL COMMENT '{"validate":0,"input":"radios","options":["cellphone","phone"]}',
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -296,30 +300,30 @@ CREATE TABLE `es_numbers` (
 --
 
 CREATE TABLE `es_persons` (
-                            `id_person` int(11) UNSIGNED NOT NULL,
-                            `name` varchar(256) DEFAULT NULL,
-                            `lastname` varchar(256) DEFAULT NULL COMMENT '{"validate":0}',
-                            `email` varchar(100) NOT NULL DEFAULT '' COMMENT '{"validate":["email"]}',
-                            `address` varchar(500) DEFAULT NULL COMMENT '{"label":"Domicilio","validate":0}',
-                            `birthdate` date DEFAULT NULL COMMENT '{"validate":0,"input":"date"}',
-                            `age` int(11) DEFAULT NULL COMMENT '{"validate":0}',
-                            `carnet` varchar(30) DEFAULT NULL COMMENT '{"label":"Carnet de Identidad","validate":0}',
-                            `sexo` varchar(15) DEFAULT NULL COMMENT '{"input":"radios","options":["Masculino","Femenino"],"validate":0}',
-                            `ids_files` varchar(450) DEFAULT NULL COMMENT '{"label":"Foto de perfil","input":"file","validate":0}',
-                            `id_cover_picture` int(10) UNSIGNED DEFAULT NULL COMMENT '{"input":"hidden","validate":0}',
-                            `id_city` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0}',
-                            `id_provincia` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0}',
-                            `country_code` varchar(50) DEFAULT NULL COMMENT '{"validate":0}',
-                            `lat` decimal(10,6) DEFAULT NULL COMMENT '{"validate":0}',
-                            `lng` decimal(10,6) DEFAULT NULL COMMENT '{"validate":0}',
-                            `id_main_number` int(11) UNSIGNED DEFAULT NULL COMMENT '{"selectBy":"number","validate":0}',
-                            `ids_numbers` int(11) DEFAULT NULL COMMENT '{"validate":0,"input":"checkboxes","selectBy":["code","number"],"table":"es_numbers","idForeign":"id_number"}',
-                            `change_count` int(11) NOT NULL DEFAULT '0',
-                            `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-                            `date_modified` datetime NOT NULL,
-                            `date_created` datetime NOT NULL,
-                            `id_user_modified` int(11) UNSIGNED NOT NULL,
-                            `id_user_created` int(11) UNSIGNED NOT NULL
+  `id_person` int(11) UNSIGNED NOT NULL,
+  `name` varchar(256) DEFAULT NULL,
+  `lastname` varchar(256) DEFAULT NULL COMMENT '{"validate":0}',
+  `email` varchar(100) NOT NULL DEFAULT '' COMMENT '{"validate":["email"]}',
+  `address` varchar(500) DEFAULT NULL COMMENT '{"label":"Domicilio","validate":0}',
+  `birthdate` date DEFAULT NULL COMMENT '{"validate":0,"input":"date"}',
+  `age` int(11) DEFAULT NULL COMMENT '{"validate":0}',
+  `carnet` varchar(30) DEFAULT NULL COMMENT '{"label":"Carnet de Identidad","validate":0}',
+  `sexo` varchar(15) DEFAULT NULL COMMENT '{"input":"radios","options":["Masculino","Femenino"],"validate":0}',
+  `ids_files` varchar(450) DEFAULT NULL COMMENT '{"label":"Foto de perfil","input":"file","validate":0}',
+  `id_cover_picture` int(10) UNSIGNED DEFAULT NULL COMMENT '{"input":"hidden","validate":0}',
+  `id_city` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0}',
+  `id_provincia` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0}',
+  `country_code` varchar(50) DEFAULT NULL COMMENT '{"validate":0}',
+  `lat` decimal(10,6) DEFAULT NULL COMMENT '{"validate":0}',
+  `lng` decimal(10,6) DEFAULT NULL COMMENT '{"validate":0}',
+  `id_main_number` int(11) UNSIGNED DEFAULT NULL COMMENT '{"selectBy":"number","validate":0}',
+  `ids_numbers` int(11) DEFAULT NULL COMMENT '{"validate":0,"input":"checkboxes","selectBy":["code","number"],"table":"es_numbers","idForeign":"id_number"}',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL,
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='{"indexFields":["name","lastname","email","address"],"numListed":5}';
 
 --
@@ -327,7 +331,7 @@ CREATE TABLE `es_persons` (
 --
 
 INSERT INTO `es_persons` (`id_person`, `name`, `lastname`, `email`, `address`, `birthdate`, `age`, `carnet`, `sexo`, `ids_files`, `id_cover_picture`, `id_city`, `id_provincia`, `country_code`, `lat`, `lng`, `id_main_number`, `ids_numbers`, `change_count`, `status`, `date_modified`, `date_created`, `id_user_modified`, `id_user_created`) VALUES
-(1, 'Rafael', 'Gutierrez', 'rafael@estic.com.bo', '', '1991-06-26', 0, '', 'masculino', NULL, NULL, NULL, NULL, 'BO', '0.000000', '0.000000', NULL, NULL, 28, 'ENABLED', '2019-06-13 10:59:44', '2018-08-29 09:45:30', 1, 1);
+(1, 'Rafael', 'Gutierrez', 'rafael@estic.com.bo', '', '1991-06-26', 0, '', 'masculino', '|1|', 1, NULL, NULL, 'BO', '0.000000', '0.000000', NULL, NULL, 30, 'ENABLED', '2019-06-14 19:26:45', '2018-08-29 09:45:30', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -336,19 +340,19 @@ INSERT INTO `es_persons` (`id_person`, `name`, `lastname`, `email`, `address`, `
 --
 
 CREATE TABLE `es_provincias` (
-                               `id_provincia` int(10) UNSIGNED NOT NULL,
-                               `name` varchar(300) DEFAULT NULL,
-                               `area` varchar(900) DEFAULT NULL COMMENT '{"validate":0}',
-                               `lat` int(11) DEFAULT NULL COMMENT '{"validate":0}',
-                               `lng` int(11) DEFAULT NULL COMMENT '{"validate":0}',
-                               `id_municipio` int(11) UNSIGNED DEFAULT NULL COMMENT '{"validate":0}',
-                               `id_ciudad` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0}',
-                               `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-                               `change_count` int(11) NOT NULL DEFAULT '0',
-                               `id_user_modified` int(11) UNSIGNED NOT NULL,
-                               `id_user_created` int(11) UNSIGNED NOT NULL,
-                               `date_modified` datetime NOT NULL,
-                               `date_created` datetime NOT NULL
+  `id_provincia` int(10) UNSIGNED NOT NULL,
+  `name` varchar(300) DEFAULT NULL,
+  `area` varchar(900) DEFAULT NULL COMMENT '{"validate":0}',
+  `lat` int(11) DEFAULT NULL COMMENT '{"validate":0}',
+  `lng` int(11) DEFAULT NULL COMMENT '{"validate":0}',
+  `id_municipio` int(11) UNSIGNED DEFAULT NULL COMMENT '{"validate":0}',
+  `id_ciudad` int(10) UNSIGNED DEFAULT NULL COMMENT '{"validate":0}',
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -358,17 +362,17 @@ CREATE TABLE `es_provincias` (
 --
 
 CREATE TABLE `es_roles` (
-                          `id_role` int(11) UNSIGNED NOT NULL,
-                          `name` varchar(256) DEFAULT NULL,
-                          `description` varchar(500) DEFAULT NULL COMMENT '{"validate":0}',
-                          `write` varchar(10) DEFAULT NULL COMMENT '{"input":"radios","options":["on","off"]}',
-                          `read` varchar(10) DEFAULT NULL COMMENT '{"input":"radios","options":["on","off"]}',
-                          `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-                          `change_count` int(11) NOT NULL DEFAULT '0',
-                          `id_user_modified` int(11) UNSIGNED DEFAULT NULL,
-                          `id_user_created` int(11) UNSIGNED DEFAULT NULL,
-                          `date_modified` datetime NOT NULL,
-                          `date_created` datetime NOT NULL
+  `id_role` int(11) UNSIGNED NOT NULL,
+  `name` varchar(256) DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL COMMENT '{"validate":0}',
+  `write` varchar(10) DEFAULT NULL COMMENT '{"input":"radios","options":["on","off"]}',
+  `read` varchar(10) DEFAULT NULL COMMENT '{"input":"radios","options":["on","off"]}',
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED DEFAULT NULL,
+  `id_user_created` int(11) UNSIGNED DEFAULT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -394,21 +398,21 @@ INSERT INTO `es_roles` (`id_role`, `name`, `description`, `write`, `read`, `stat
 --
 
 CREATE TABLE `es_sessions` (
-                             `id` varchar(128) NOT NULL,
-                             `ip_address` varchar(45) NOT NULL,
-                             `timestamp` int(10) UNSIGNED NOT NULL DEFAULT '0',
-                             `data` blob NOT NULL COMMENT '{"label":"Datos en sesion","input":"textarea"}',
-                             `last_activity` datetime DEFAULT '0000-00-00 00:00:00',
-                             `id_user` int(11) UNSIGNED DEFAULT NULL COMMENT '{"label":"Nombre del Usuario","selectBy":["name","lastname"]}',
-                             `lng` int(11) DEFAULT NULL,
-                             `lat` int(11) DEFAULT NULL,
-                             `activity` varchar(100) DEFAULT NULL COMMENT '{"input":"radios","options":["active","inactive"]}',
-                             `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-                             `change_count` int(11) NOT NULL DEFAULT '0',
-                             `id_user_modified` int(11) UNSIGNED NOT NULL,
-                             `id_user_created` int(11) UNSIGNED NOT NULL,
-                             `date_modified` datetime NOT NULL,
-                             `date_created` datetime NOT NULL
+  `id` varchar(128) NOT NULL,
+  `ip_address` varchar(45) NOT NULL,
+  `timestamp` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `data` blob NOT NULL COMMENT '{"label":"Datos en sesion","input":"textarea"}',
+  `last_activity` datetime DEFAULT '0000-00-00 00:00:00',
+  `id_user` int(11) UNSIGNED DEFAULT NULL COMMENT '{"label":"Nombre del Usuario","selectBy":["name","lastname"]}',
+  `lng` int(11) DEFAULT NULL,
+  `lat` int(11) DEFAULT NULL,
+  `activity` varchar(100) DEFAULT NULL COMMENT '{"input":"radios","options":["active","inactive"]}',
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='{"title":"Sesiones del Sistema","indexFields":["ip_address","timestamp","last_activity","id_user"],"numListed":4}';
 
 -- --------------------------------------------------------
@@ -418,25 +422,24 @@ CREATE TABLE `es_sessions` (
 --
 
 CREATE TABLE `es_tables` (
-                           `id_table` int(11) UNSIGNED NOT NULL,
-                           `id_module` int(10) UNSIGNED DEFAULT NULL COMMENT '{"label":"Modulo","input":"select","selectBy":["name"]}',
-                           `id_role` int(10) UNSIGNED DEFAULT NULL COMMENT '{"label":"Roles Admitidos","input":"radios"}',
-                           `title` varchar(100) NOT NULL,
-                           `table_name` varchar(255) DEFAULT NULL COMMENT '{"label":"Tablas","input":"select","options":"db_tabs"}',
-                           `listed` varchar(15) NOT NULL DEFAULT 'ENABLED' COMMENT '{"input":"radios","options":{"ENABLED":"enabled","DISABLED":"disabled"}}',
-                           `description` text COMMENT '{"validate":0}',
-                           `icon` varchar(200) NOT NULL COMMENT '{"validate":0}',
-                           `url` varchar(400) NOT NULL,
-                           `url_edit` varchar(450) DEFAULT NULL,
-                           `url_index` varchar(450) DEFAULT NULL,
-                           `status` varchar(255) DEFAULT 'ENABLED',
-                           `change_count` int(11) NOT NULL DEFAULT '0',
-                           `id_user_modified` int(11) UNSIGNED NOT NULL,
-                           `id_user_created` int(11) UNSIGNED NOT NULL,
-                           `date_modified` datetime NOT NULL,
-                           `date_created` datetime NOT NULL
+  `id_table` int(11) UNSIGNED NOT NULL,
+  `id_module` int(10) UNSIGNED DEFAULT NULL COMMENT '{"label":"Modulo","input":"select","selectBy":["name"]}',
+  `id_role` int(10) UNSIGNED DEFAULT NULL COMMENT '{"label":"Roles Admitidos","input":"radios"}',
+  `title` varchar(100) NOT NULL,
+  `table_name` varchar(255) DEFAULT NULL COMMENT '{"label":"Tablas","input":"select","options":"db_tabs"}',
+  `listed` varchar(15) NOT NULL DEFAULT 'ENABLED' COMMENT '{"input":"radios","options":{"ENABLED":"enabled","DISABLED":"disabled"}}',
+  `description` text COMMENT '{"validate":0}',
+  `icon` varchar(200) NOT NULL COMMENT '{"validate":0}',
+  `url` varchar(400) NOT NULL,
+  `url_edit` varchar(450) DEFAULT NULL,
+  `url_index` varchar(450) DEFAULT NULL,
+  `status` varchar(255) DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 -- --------------------------------------------------------
 
@@ -444,37 +447,39 @@ CREATE TABLE `es_tables` (
 -- Estructura de tabla para la tabla `es_tables_roles`
 --
 
-  CREATE TABLE `es_tables_roles` (
-`id_table_role` int(11) NOT NULL,
-`id_table` int(10) UNSIGNED DEFAULT NULL,
-`id_role` int(10) UNSIGNED DEFAULT NULL,
-`status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-`change_count` int(11) NOT NULL DEFAULT '0',
-`id_user_modified` int(11) UNSIGNED NOT NULL,
-`id_user_created` int(11) UNSIGNED NOT NULL,
-`date_modified` datetime NOT NULL,
-`date_created` datetime NOT NULL
-  ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `es_tables_roles` (
+  `id_table_role` int(11) NOT NULL,
+  `id_table` int(10) UNSIGNED DEFAULT NULL,
+  `id_role` int(10) UNSIGNED DEFAULT NULL,
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `es_users`
 --
 
-  CREATE TABLE `es_users` (
-`id_user` int(11) UNSIGNED NOT NULL,
-`username` varchar(200) DEFAULT NULL,
-`password` varchar(200) DEFAULT NULL COMMENT '{"validate":["password"],"input":"password"}',
-`id_role` int(10) UNSIGNED DEFAULT NULL COMMENT '{"label":"Role","input":"radios","selectBy":["name"]}',
-`signin_method` varchar(200) DEFAULT NULL COMMENT '{"validate":0}',
-`uid` varchar(499) DEFAULT NULL COMMENT '{"validate":0}',
-`id_person` int(11) UNSIGNED DEFAULT NULL COMMENT '{"selectBy":["name","lastname"]}',
-`status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-`change_count` int(11) NOT NULL DEFAULT '0',
-`id_user_modified` int(11) UNSIGNED NOT NULL,
-`id_user_created` int(11) UNSIGNED NOT NULL,
-`date_modified` datetime NOT NULL,
-`date_created` datetime NOT NULL
-  ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='{"indexFields":["username","id_person","id_role","signin_method"],"numListed":5}';
+CREATE TABLE `es_users` (
+  `id_user` int(11) UNSIGNED NOT NULL,
+  `username` varchar(200) DEFAULT NULL,
+  `password` varchar(200) DEFAULT NULL COMMENT '{"validate":["password"],"input":"password"}',
+  `id_role` int(10) UNSIGNED DEFAULT NULL COMMENT '{"label":"Role","input":"radios","selectBy":["name"]}',
+  `signin_method` varchar(200) DEFAULT NULL COMMENT '{"validate":0}',
+  `uid` varchar(499) DEFAULT NULL COMMENT '{"validate":0}',
+  `id_person` int(11) UNSIGNED DEFAULT NULL COMMENT '{"selectBy":["name","lastname"]}',
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='{"indexFields":["username","id_person","id_role","signin_method"],"numListed":5}';
 
 --
 -- Volcado de datos para la tabla `es_users`
@@ -490,15 +495,15 @@ INSERT INTO `es_users` (`id_user`, `username`, `password`, `id_role`, `signin_me
 --
 
 CREATE TABLE `es_users_roles` (
-                                `id_user_role` int(11) NOT NULL,
-                                `id_user` int(10) UNSIGNED DEFAULT NULL,
-                                `id_role` int(10) UNSIGNED DEFAULT NULL,
-                                `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
-                                `change_count` int(11) NOT NULL DEFAULT '0',
-                                `id_user_modified` int(11) UNSIGNED NOT NULL,
-                                `id_user_created` int(11) UNSIGNED NOT NULL,
-                                `date_modified` datetime NOT NULL,
-                                `date_created` datetime NOT NULL
+  `id_user_role` int(11) NOT NULL,
+  `id_user` int(10) UNSIGNED DEFAULT NULL,
+  `id_role` int(10) UNSIGNED DEFAULT NULL,
+  `status` varchar(15) NOT NULL DEFAULT 'ENABLED',
+  `change_count` int(11) NOT NULL DEFAULT '0',
+  `id_user_modified` int(11) UNSIGNED NOT NULL,
+  `id_user_created` int(11) UNSIGNED NOT NULL,
+  `date_modified` datetime NOT NULL,
+  `date_created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -523,7 +528,11 @@ CREATE TABLE `migrations` (
 --
 
 INSERT INTO `migrations` (`version`) VALUES
-(215);
+(116);
+
+--
+-- Índices para tablas volcadas
+--
 
 --
 -- Indices de la tabla `es_cities`
@@ -555,7 +564,8 @@ ALTER TABLE `es_files`
   ADD KEY `es_files_ibfk_1` (`id_user_created`),
   ADD KEY `es_files_ibfk_2` (`id_user_modified`),
   ADD KEY `es_files_ibfk_3` (`id_parent`),
-  ADD KEY `es_files_ibfk_4` (`id_file_setting`);
+  ADD KEY `es_files_ibfk_4` (`id_file_setting`),
+  ADD KEY `es_files_ibfk_5` (`id_table`);
 
 --
 -- Indices de la tabla `es_files_folders`
@@ -738,7 +748,7 @@ ALTER TABLE `es_files_tags`
 -- AUTO_INCREMENT de la tabla `es_logs`
 --
 ALTER TABLE `es_logs`
-  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1904;
+  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1909;
 
 --
 -- AUTO_INCREMENT de la tabla `es_modules`
@@ -816,7 +826,8 @@ ALTER TABLE `es_files`
   ADD CONSTRAINT `es_files_ibfk_1` FOREIGN KEY (`id_user_created`) REFERENCES `es_persons` (`id_person`),
   ADD CONSTRAINT `es_files_ibfk_2` FOREIGN KEY (`id_user_modified`) REFERENCES `es_persons` (`id_person`),
   ADD CONSTRAINT `es_files_ibfk_3` FOREIGN KEY (`id_parent`) REFERENCES `es_files` (`id_file`),
-  ADD CONSTRAINT `es_files_ibfk_4` FOREIGN KEY (`id_file_setting`) REFERENCES `es_files_settings` (`id_file_setting`);
+  ADD CONSTRAINT `es_files_ibfk_4` FOREIGN KEY (`id_file_setting`) REFERENCES `es_files_settings` (`id_file_setting`),
+  ADD CONSTRAINT `es_files_ibfk_5` FOREIGN KEY (`id_table`) REFERENCES `es_tables` (`id_table`);
 
 --
 -- Filtros para la tabla `es_files_folders`
