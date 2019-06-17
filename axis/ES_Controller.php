@@ -108,22 +108,18 @@ class ES_Controller extends ES_Ctrl_Vars
         }
       }
 
-//                $this->data['oSysOptions'] = CiOptionsQuery::create()->find();
-//                $this->data['oSysSettings'] = CiSettingsQuery::create()->find();
-//                $this->data['oSysOptionsForTables'] = CiOptionsQuery::create()
-//                    ->filterByIdSetting(1)
-//                    ->find();
-
       if (is_object($this->oUserLogguedIn) && is_object($this->oPersonLogguedIn)) {
-
         $uri = $this->uri->segment(1) . '/' . $this->uri->segment(2);
+        $oSysTables = array();
+        $oSysModules = array();
+        $tablesEnabled = array();
+        $aTablesIds = array();
         $aTablesUrls = array();
 
         if($uri != 'sys/ajax'){
           if (validate_modulo('estic', 'tables')) {
             $this->load->model('estic/model_tables');
             $this->aRolesFromSess[] = $this->oUserLogguedIn->getIdRole();
-            $tablesEnabled = array();
             $idsRoles = isset($this->aSessData->ids_roles) ? $this->aSessData->ids_roles :
               isset($this->aSessData['ids_roles']) ? $this->aSessData['ids_roles'] : [];
 
@@ -131,16 +127,19 @@ class ES_Controller extends ES_Ctrl_Vars
               if (!in_array($sessRole, $this->aRolesFromSess)) {
                 $this->aRolesFromSess[] = $sessRole;
               }
-              $tablesEnabled[] = EsTablesRolesQuery::create()
-                ->select(['id_table'])
-                ->filterByIdRole($sessRole)
-                ->find()
-                ->toArray();
+
+              if(validate_modulo('estic','tables_roles')){
+//                $tablesEnabled = Model_Tables_roles::create()->filterByIdRole($sessRole)->toArray();
+//                $tablesEnabled[] = EsTablesRolesQuery::create()
+//                  ->select(['id_table'])
+//                  ->filterByIdRole($sessRole)
+//                  ->find()
+//                  ->toArray();
+              }
             }
 
             $this->data['aRolesFromSess'] = $this->aRolesFromSess;
-            $aTablesIds = array();
-            $aTablesUrls = array();
+
             foreach ($tablesEnabled as $tables) {
               foreach ($tables as $idTable) {
                 if (!in_array($idTable, $aTablesUrls)) {
@@ -163,7 +162,7 @@ class ES_Controller extends ES_Ctrl_Vars
           'estic/dashboard',
           'sys/migrate',
           'sys/ajax',
-            'sys/config',
+          'sys/config',
           'twilio/send'
         ];
         $aTablesUrls = array_merge($aTablesUrls, $aExcepts);
@@ -190,14 +189,14 @@ class ES_Controller extends ES_Ctrl_Vars
 
 
         } else {
-
-            if ($this->oUserLogguedIn->getIdRole() == 1) {
-                $this->data['oSysTables'] = EsTablesQuery::create()->find();
-                $this->data['oSysModules'] = EsModulesQuery::create()->find();
+          if(moduleCreated('es_tables')){
+            /*if ($this->oUserLogguedIn->getIdRole() == 1) {
+                $oSysTables = EsTablesQuery::create()->find();
+                $oSysModules = EsModulesQuery::create()->find();
             } else {
-                $this->data['oSysModules'] = EsModulesQuery::create()->find();
-                $this->data['oSysTables'] = EsTablesQuery::create()->filterByIdTable($aTablesIds, Criteria::IN)->find();
-            }
+                $oSysModules = EsModulesQuery::create()->find();
+                $oSysTables = EsTablesQuery::create()->filterByIdTable($aTablesIds, Criteria::IN)->find();
+            }*/
 //                    if($this->aSessData->id_role == 1){
 //                        $this->data['oSysTables'] = Model_Tables::create()->find();
 //                        $this->data['oSysModules'] = Model_Modules::create()->find();
@@ -205,6 +204,11 @@ class ES_Controller extends ES_Ctrl_Vars
 //                        $this->data['oSysModules'] = Model_Modules::create()->find();
 //                        $this->data['oSysTables'] = Model_Tables::create()->filterByIdNivelRole($this->oUserLogguedIn->id_role);
 //                    }
+          }
+
+          $this->data['oSysTables'] = $oSysTables;
+          $this->data['oSysModules'] = $oSysModules;
+
           return true;
         }
 

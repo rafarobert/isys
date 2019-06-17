@@ -11,12 +11,15 @@ defined("BASEPATH") OR exit("No direct script access allowed");
 
 class ES_Model_UcTableP extends ES_UcModS_Model
 {
+    private $_aResults = array();
+    private $_oResults = null;
+    private $_oResult = null;
+    private $_aResult = array();
     protected $_timestaps = true;
     protected $_order_by = "idTable desc";
     public $_primary_key = "idTable";
     public $_table_name = "lcmodSign_lcTableP";
     public $_es_class = "ES_Model_UcTableP";
-
     //>>>globalStaticLocalVars<<<
     /**
      * Value for lcVarStaticOption static option.
@@ -41,7 +44,6 @@ class ES_Model_UcTableP extends ES_UcModS_Model
      */
     public $lcVarLocalField = '$defaultDataVal';
     //<<<globalLocalFieldsVars>>>
-
     //>>>globalLocalWithForeignFieldsVars<<<
     /**
      * Value for lcLocalField field related with lcForeignField.
@@ -50,7 +52,6 @@ class ES_Model_UcTableP extends ES_UcModS_Model
      */
     public $lcVarLocalField_lcForeignField = null;
     //<<<globalLocalWithForeignFieldsVars>>>
-
     public $rules = '$tableRules';
     public $rules_edit = '$tableRulesEdit';
     //>>>validatedModelFieldsEditView<<<
@@ -61,6 +62,43 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     {
         parent::__construct();
     }
+
+
+  public function getTableName()
+  {
+    return $this->_table_name;
+  }
+
+  public function getTimeStamps()
+  {
+    return $this->_timestaps;
+  }
+
+  public function getOrderBy()
+  {
+    return $this->_order_by;
+  }
+
+  public function getPrimaryKey()
+  {
+    return $this->_primary_key;
+  }
+
+  public function getEsClass()
+  {
+    return $this->_es_class;
+  }
+
+  public function setOrderBy($field, $bDescAsc = false)
+  {
+    $order = $bDescAsc ? 'asc' : 'desc';
+    return $this->_order_by = "$field $order";
+  }
+
+  public function setTimeStamps($bSw = true)
+  {
+    return $this->_timestaps = $bSw;
+  }
 
     public function getNew()
     {
@@ -82,14 +120,12 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         return $this->lcLocalField;
     }
     //<<<packGettersFunctions>>>
-
     //>>>packLocalForeignGettersFunctions<<<
     public function getUcObjLocalFieldUcObjForeignField()
     {
         return $this->lcLocalField_lcForeignField;
     }
     //<<<packLocalForeignGettersFunctions>>>
-
     //>>>packSettersFunctions<<<
     public function setUcObjField($lcObjField = ''){
         if(objectHas($this,'lcField', false)){
@@ -98,7 +134,6 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         return $this;
     }
     //<<<packSettersFunctions>>>
-
     //>>>packFindOneByFunctions<<<
     public function findOneByUcObjField($lcObjField,$orderBy = '', $direction = 'ASC'){
         $aData = $this->get_by(['lcField' => $lcObjField],false,true,$orderBy,$direction);
@@ -107,44 +142,41 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         return $oUcObjTableS;
     }
     //<<<packFindOneByFunctions>>>
-
     //>>>packFilterByFunctions<<<
-    public function filterByUcObjField($lcObjField, $bAsModel = true, $selecting = null, $orderBy = '', $direction = 'ASC'){
+    public function filterByUcObjField($lcObjField, $selecting = null, $orderBy = '', $direction = 'ASC')
+    {
         $bSelecting = true;
         $aSetttings = array();
 
-        if(isArray($selecting)){
-            $aSetttings = $selecting;
-        } else if(isString($selecting)){
-            $aSetttings[] = $selecting;
-        } else if(isBoolean($selecting) || $selecting == null){
-            $bSelecting = false;
+        if (isArray($selecting)) {
+          $aSetttings = $selecting;
+        } else if (isString($selecting)) {
+          $aSetttings[] = $selecting;
+        } else if (isBoolean($selecting) || $selecting == null) {
+          $bSelecting = false;
         }
         $aSetttings['lcField'] = $lcObjField;
 
-        $aData = $this->get_by($aSetttings, $bSelecting, null, $orderBy, $direction);
-        if($bAsModel){
-            $oDatas = array();
-            foreach ($aData as $data){
-                $oDatas[] = $this->setForeigns($data,$orderBy,$direction);
-            }
-            return $oDatas;
+        $this->_aResult = $this->get_by($aSetttings, $bSelecting, null, $orderBy, $direction);
+
+        $oDatas = array();
+        foreach ($this->_aResult as $data) {
+          $this->_oResults[] = $this->setForeigns($data, $orderBy, $direction);
         }
-        return $aData;
+        return $this;
     }
     //<<<packFilterByFunctions>>>
     //>>>packSelectByFunctions<<<
-  public function selectByUcObjField($bAsArray = false, $orderBy ='', $sense = 'ASC'){
+  public function selectByUcObjField($orderBy ='', $sense = 'ASC'){
     $aSetttings = array();
     $aSetttings[] = 'lcField';
-      $aData = $this->selectBy($aSetttings, $bAsArray, $orderBy);
-    if(!$bAsArray) {
-        $oDatas = array();
-        foreach ($aData as $data){
-          $oDatas[] = $this->setForeigns($data,$orderBy,$sense);
+      $this->_aResults = $this->selectBy($aSetttings, false, $orderBy);
+
+        foreach ($this->_aResults as $aResult){
+          $this->_oResults[] = $this->setForeigns($aResult,$orderBy,$sense);
         }
-    }
-    return $aData;
+
+    return $this;
   }
     //<<<packSelectByFunctions>>>
 
@@ -240,7 +272,25 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         return $data;
     }
 
-    public function toArray($bWithForeign = false){
+  public function toArray($bWithForeign = true){
+
+    if($this->_oResults !== null){
+      /**
+       * @var Model_UcTableP $oResult
+       */
+      foreach ($this->_oResults as $oResult){
+        $this->_aResults[$oResult->getPrimaryKey()] = $oResult->setArray($bWithForeign);
+      }
+      return $this->_aResults;
+
+    } else {
+
+      return $this->setArray($bWithForeign);
+    }
+
+  }
+
+    public function setArray($bWithForeign = true){
         $data = array(
             //>>>localPackForToArray<<<
             'UcObjField' => $this->lcField,
@@ -261,6 +311,8 @@ class ES_Model_UcTableP extends ES_UcModS_Model
             return isNumeric($val,false) ? valNumeric($val) : ($val == null ? '' : $val);
         };
         $data = array_map($funct,$data);
+
+        // If foreigns keys was setted
         if(isset($this->foreigns)){
             foreach ($this->foreigns as $fKey => $fValue){
                 $data[$fKey] = $fValue;

@@ -1,1 +1,1 @@
-php ../../vendor/propel/propel/bin/propel database:reverse --config-dir="../../orm" --output-dir="../../orm/schema" prod
+php ../../vendor/propel/propel/bin/propel database:reverse --config-dir="../../orm" --output-dir="../../orm/schemas/prod" --recursive -- prod

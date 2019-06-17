@@ -139,12 +139,6 @@ CREATE TABLE `es_files` (
 -- Volcado de datos para la tabla `es_files`
 --
 
-INSERT INTO `es_files` (`id_file`, `name`, `url`, `ext`, `raw_name`, `full_path`, `path`, `width`, `height`, `size`, `library`, `nro_thumbs`, `id_parent`, `thumb_marker`, `type`, `x`, `y`, `fix_width`, `fix_height`, `id_file_setting`, `ids_tags`, `ids_folders`, `title`, `id_table`, `status`, `change_count`, `id_user_modified`, `id_user_created`, `date_modified`, `date_created`) VALUES
-(1, '1560554798_13765700102019628102279701647510958796308226o.jpg', '/assets/files/person/1560554798_13765700102019628102279701647510958796308226o.jpg', '.jpg', '13765700102019628102279701647510958796308226o', 'assets/files/person/13765700102019628102279701647510958796308226o.jpg', 'assets/files/person/', 1152, 2048, '135', '', 3, NULL, '', 'origin', '0.0000000000', '0.0000000000', '0.0000000000', '0.0000000000', 10, NULL, NULL, 'person', 111, 'ENABLED', 0, 1, 1, '2019-06-14 19:26:38', '2019-06-14 19:26:38'),
-(2, '1560554798_13765700102019628102279701647510958796308226o-thumb_50.jpg', '/assets/files/person/thumbs/1560554798_13765700102019628102279701647510958796308226o-thumb_50.jpg', '.jpg', '1560554798_13765700102019628102279701647510958796308226o-thumb_50.jpg', 'assets/files/person/thumbs/1560554798_13765700102019628102279701647510958796308226o-thumb_50.jpg', 'assets/files/person/thumbs/', 29, 50, '135', 'gd2', NULL, 1, '-thumb_50', 'thumb', NULL, NULL, NULL, NULL, 10, NULL, NULL, 'person', 111, 'ENABLED', 0, 1, 1, '2019-06-14 19:26:38', '2019-06-14 19:26:38'),
-(3, '1560554798_13765700102019628102279701647510958796308226o-thumb_450.jpg', '/assets/files/person/thumbs/1560554798_13765700102019628102279701647510958796308226o-thumb_450.jpg', '.jpg', '1560554798_13765700102019628102279701647510958796308226o-thumb_450.jpg', 'assets/files/person/thumbs/1560554798_13765700102019628102279701647510958796308226o-thumb_450.jpg', 'assets/files/person/thumbs/', 254, 450, '135', 'gd2', NULL, 1, '-thumb_450', 'thumb', NULL, NULL, NULL, NULL, 10, NULL, NULL, 'person', 111, 'ENABLED', 0, 1, 1, '2019-06-14 19:26:38', '2019-06-14 19:26:38'),
-(4, '1560554798_13765700102019628102279701647510958796308226o-thumb_850.jpg', '/assets/files/person/thumbs/1560554798_13765700102019628102279701647510958796308226o-thumb_850.jpg', '.jpg', '1560554798_13765700102019628102279701647510958796308226o-thumb_850.jpg', 'assets/files/person/thumbs/1560554798_13765700102019628102279701647510958796308226o-thumb_850.jpg', 'assets/files/person/thumbs/', 479, 850, '135', 'gd2', NULL, 1, '-thumb_850', 'thumb', NULL, NULL, NULL, NULL, 10, NULL, NULL, 'person', 111, 'ENABLED', 0, 1, 1, '2019-06-14 19:26:38', '2019-06-14 19:26:38');
-
 -- --------------------------------------------------------
 
 --
@@ -331,7 +325,7 @@ CREATE TABLE `es_persons` (
 --
 
 INSERT INTO `es_persons` (`id_person`, `name`, `lastname`, `email`, `address`, `birthdate`, `age`, `carnet`, `sexo`, `ids_files`, `id_cover_picture`, `id_city`, `id_provincia`, `country_code`, `lat`, `lng`, `id_main_number`, `ids_numbers`, `change_count`, `status`, `date_modified`, `date_created`, `id_user_modified`, `id_user_created`) VALUES
-(1, 'Rafael', 'Gutierrez', 'rafael@estic.com.bo', '', '1991-06-26', 0, '', 'masculino', '|1|', 1, NULL, NULL, 'BO', '0.000000', '0.000000', NULL, NULL, 30, 'ENABLED', '2019-06-14 19:26:45', '2018-08-29 09:45:30', 1, 1);
+(1, 'Rafael', 'Gutierrez', 'rafael@estic.com.bo', '', '1991-06-26', 0, '', 'masculino', NULL, NULL, NULL, NULL, 'BO', '0.000000', '0.000000', NULL, NULL, 30, 'ENABLED', '2019-06-14 19:26:45', '2018-08-29 09:45:30', 1, 1);
 
 -- --------------------------------------------------------
 

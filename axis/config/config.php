@@ -150,7 +150,6 @@ $config['database']['test']['pass'] = '';
 
 foreach ($options['propel']['database']['connections'] as $dbMode => $dbSettings){
     $dbName = strGet($dbSettings['dsn'],'dbname=');
-
   if(strstr($dbName,'dev')){
     $config['database']['dev']['name'] = $dbName;
     $config['database']['dev']['user'] = $dbSettings['user'];

@@ -288,7 +288,6 @@ class Ctrl_Migrate extends ES_Controller
             exit();
         }
       }
-      $ciMigIndex = 0;
       $ciMigIndexSecondThread = 0;
 
       if (validate_modulo('estic','tables')){
@@ -305,9 +304,6 @@ class Ctrl_Migrate extends ES_Controller
                 }
             }
         }
-      $migIndex = 1;
-        $modInit = '';
-        $submodInit = '';
         $framePath = PWD."orm/migrations/";
 
         // ***************** refresh *********************
@@ -346,8 +342,6 @@ class Ctrl_Migrate extends ES_Controller
                     $ciMigIndex = $ciMigIndexSecondThread;
                   }
                 }
-              } else {
-                $ciMigIndex++;
               }
 
                 foreach ($fields as $fieldName => $fieldValues){
@@ -373,11 +367,8 @@ class Ctrl_Migrate extends ES_Controller
                 list($modSign,$submod) = getModSubMod($tableName);
                 $modName = $sys[$modSign];
 
-                if($ciMigIndex == 0){
-                    $strMigIndex = str_pad("$migIndex", 3, "0", STR_PAD_LEFT);
-                } else {
-                    $strMigIndex = str_pad("$ciMigIndex", 3, "0", STR_PAD_LEFT);
-                }
+                $strMigIndex = str_pad("$ciMigIndex", 3, "0", STR_PAD_LEFT);
+
                 $fileName = $strMigIndex."_create_$tableName.php";
                 $tableRelations = $this->dbforge->getTableRelations($name);
                 $tableSettings['ctrl'] = isset($tableSettings['ctrl']) ? $tableSettings['ctrl'] : TRUE;
@@ -426,6 +417,7 @@ class Ctrl_Migrate extends ES_Controller
                   }
                 }
               $bAnotherMod = false;
+              $ciMigIndex++;
             }
         }
         $this->setTableVars();

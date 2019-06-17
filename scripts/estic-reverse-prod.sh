@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 export XDEBUG_CONFIG="idekey=123"
 export ESTIC_ORIGIN="isys/scripts"
 export SERVER_NAME="local.estic.com.bo"
@@ -7,6 +8,9 @@ export QUERY_STRING="start_debug=1&debug_host=127.0.0.1&no_remote=1&debug_port=1
 echo -e "\012"
 php -B "\$_REQUEST = array('email' => 'rafael@estic.com.bo', 'password' => '123', 'login' => 'ingresar');" -F ../../index.php sys/migrate/fromdatabase
 echo -e "\012"
+./propel-config.sh
+./propel-reverse-prod.sh
+./propel-build-sql-prod.sh
 cd ../..
 composer dump-autoload -o
 cd isys/scripts

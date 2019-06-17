@@ -13,6 +13,7 @@ else
   if test $# = 1
   then
     php -B "\$_REQUEST = array('email' => 'rafael@estic.com.bo', 'password' => '123', 'login' => 'ingresar');" -F ../../index.php sys/migrate/$1
+    ./propel-prod.sh
     cd ../..
 composer dump-autoload -o
     cd isys/scripts
@@ -20,6 +21,7 @@ composer dump-autoload -o
     if test $# = 2
     then
       php -B "\$_REQUEST = array('email' => 'rafael@estic.com.bo', 'password' => '123', 'login' => 'ingresar');" -F ../../index.php sys/migrate/$1/$2
+      ./propel-prod.sh
       cd ../..
 composer dump-autoload -o
         cd isys/scripts

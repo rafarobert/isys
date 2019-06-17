@@ -27,41 +27,4 @@ class Model_UcTableP extends ES_Model_UcTableP
         }
         return self::$instance;
     }
-
-    public function getTableName()
-    {
-        return $this->_table_name;
-    }
-
-    public function getTimeStamps()
-    {
-        return $this->_timestaps;
-    }
-
-    public function getOrderBy()
-    {
-        return $this->_order_by;
-    }
-
-    public function getPrimaryKey()
-    {
-        return $this->_primary_key;
-    }
-
-    public function getEsClass()
-    {
-        return $this->_es_class;
-    }
-
-    public function setOrderBy($field, $bDescAsc = false)
-    {
-        $order = $bDescAsc ? 'asc' : 'desc';
-        return $this->_order_by = "$field $order";
-    }
-
-    public function setTimeStamps($bSw = true)
-    {
-        return $this->_timestaps = $bSw;
-    }
-
 }

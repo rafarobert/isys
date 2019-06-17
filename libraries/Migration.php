@@ -902,8 +902,6 @@ class CI_Migration
             $migIndex = $sys[$core]['id'];
             $migSign = $sys[$core]['sign'];
             $migTable = config_item('mig_table');
-
-
             list($modSign, $submod) = getModSubMod($tableName);
             $modName = $sys[$modSign];
             list($modModSign, $modSubmod) = getModSubMod($migTable);
@@ -911,7 +909,6 @@ class CI_Migration
             $modIdTable = $this->dbforge->getPrimaryKeyFromTable($migTable);
             $modModName = $sys[$modModName]['name'];
             $modModId = $sys[$modName]['id'];
-
 
             if ($this->input->validate('id_migration')) {
                 $id_migration = $this->input->get('id_migration');
@@ -989,10 +986,10 @@ class CI_Migration
   //                }
 
               } else if ($tableName != $migTable) {
-                  redirect("sys/migrate/$migSign/$migIndex");
+                  //redirect("sys/migrate/$migSign/$migIndex");
               }
             } else if ($tableName != $migTable) {
-              redirect("sys/migrate/$migSign/$migIndex");
+              //redirect("sys/migrate/$migSign/$migIndex");
             }
             return $id_migration;
         }

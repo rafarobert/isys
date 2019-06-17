@@ -1,9 +1,9 @@
 ./permitions.sh
 
 ./propel-reverse-dev.sh
-./propel.sh
-./propel-build-sql.sh
-./fromdatabase.sh
+propel-test.sh
+propel-build-sql-dev.sh
+estic-reverse-dev.sh
 
 cd ..
 cd ..
