@@ -2249,6 +2249,8 @@ class CI_Migration
                 $type = "int";
                 if(inArray('idForeign',$settings) || compareArrayBool($settings,'auto_increment',true)){
                     $data['defaultDataVal'] = 'null';
+                } else if(inArray('pk',$settings) ){
+                  $data['defaultDataVal'] = 'null';
                 } else {
                     $data['defaultDataVal'] = 0;
                 }

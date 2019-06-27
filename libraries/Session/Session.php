@@ -1157,7 +1157,7 @@ class CI_Session
         // log in user
         $data = std2array($oUser);
         $oUser = $this->CI->model_users->setFromData($data);
-        $oUsersRoles = $this->CI->model_users_roles->filterByIdUser($oUser->getIdUser());
+        $oUsersRoles = $this->CI->model_users_roles->filterByIdUser($oUser->getIdUser())->find();
         /**
          * @var Model_Users_roles $oUserRole
          */

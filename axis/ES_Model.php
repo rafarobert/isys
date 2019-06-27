@@ -10,6 +10,10 @@ use \Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
 Class ES_Model extends ES_Model_Vars {
 
+  public $_aResults = array();
+  public $_oResults = null;
+  public $_oResult = null;
+  public $_aResult = array();
     /**
      * @var ES_Controller $CI
      */
@@ -324,13 +328,14 @@ Class ES_Model extends ES_Model_Vars {
         return $data;
     }
 
-    public function save($data = null, $id = null, $with_id = true){
+    public function save($data = null, $with_id = true){
 
-        $data = $this->verifyDataWithPost($data );
+        $data = $this->verifyDataWithPost($data);
         $CI = $this->CI;
         //$this->CI = CI_Controller::get_instance();
         $idToInsert = null;
         $fromEditPerfil = false;
+        $id = null;
         if($data == null){
             $data = $this->getArrayData();
             $pk = ucfirst(setObject($this->getPrimaryKey()));
@@ -338,6 +343,7 @@ Class ES_Model extends ES_Model_Vars {
         } else if(isString($data)){
             return $data;
         }
+
         $this->load->library('session');
         // set timesatamps
         $now = date('Y-m-d H:i:s');
@@ -484,7 +490,7 @@ Class ES_Model extends ES_Model_Vars {
             $data = $this->justInsert($data,$with_id);
             // update
         } else {
-            $data = $this->justUpdate($id,$data);
+          $data = $this->justUpdate($id,$data);
         }
         return $data;
     }
@@ -518,7 +524,11 @@ Class ES_Model extends ES_Model_Vars {
 
     public function findOneByPk($pk){
       $aData = $this->get_by([$this->_primary_key => $pk],false,true);
-      return $this->setForeigns($aData);
+      if(isObject($aData)){
+        return $this->setForeigns($aData);
+      } else {
+        return null;
+      }
     }
 //    public function getThumbs($obj,$file = '',$field = ''){
 //
@@ -1246,5 +1256,46 @@ Class ES_Model extends ES_Model_Vars {
             }*/
 
         return $data != null ? $this->setFromData($data) : $data;
+    }
+
+  public function find(){
+
+    if (isObject($this->_oResult)) {
+
+      return $this->_oResult;
+
+    } else if (isArray($this->_aResult)) {
+
+      return $this->_aResult;
+    }
+    if (isArray($this->_oResults)) {
+
+      return $this->_oResults;
+
+    } else if (isArray($this->_aResults)) {
+
+      return $this->_aResults;
+    }
+
+    $this->_aResults = $this->get();
+
+    $this->_aResults = $this->getThumbs($this->_aResults);
+
+    foreach ($this->_aResults as $i => $data) {
+
+      $object = $this->getNew();
+
+      $this->_oResults[$i] = $object->setForeigns($data);
+    }
+
+    return $this->_oResults;
+  }
+
+    public function arrayResult(){
+      if(isset($this->_oResults)){
+        return $this->_oResults;
+      } else if($this->_aResults){
+        return $this->_aResults;
+      }
     }
 }

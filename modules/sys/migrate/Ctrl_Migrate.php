@@ -277,13 +277,13 @@ class Ctrl_Migrate extends ES_Controller
 
       if(validate_modulo('estic','sessions') && validate_modulo('estic','users')){
 
-        $sessUser = $this->session->getObjectUserLoggued();
+        $oSessUser = $this->session->getObjectUserLoggued();
 
-        if(!isObject($sessUser)){
+        if(!isObject($oSessUser)){
             show_error('Debes iniciar sesion para realizar esta accion');
             exit();
         }
-        if($sessUser->getIdRole() != 1){
+        if($oSessUser->getIdRole() != 1){
             show_error('No tiene permisos para realizar esta accion, por favor contactese con los administradores del sistema');
             exit();
         }
@@ -323,7 +323,7 @@ class Ctrl_Migrate extends ES_Controller
 /**
  * @var Model_Tables $oTableFromCiTables
  */
-                $oTableFromCiTables = $this->model_tables->findOneByTableName($name);
+                $oTableFromCiTables = $this->model_tables->findOneByName($name);
                 if(isObject($oTableFromCiTables)){
                     $ciMigIndex = $oTableFromCiTables->getIdTable();
                 } else if(!$bResetedCiMigIndex){

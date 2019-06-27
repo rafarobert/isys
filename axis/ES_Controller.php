@@ -112,7 +112,7 @@ class ES_Controller extends ES_Ctrl_Vars
         $uri = $this->uri->segment(1) . '/' . $this->uri->segment(2);
         $oSysTables = array();
         $oSysModules = array();
-        $tablesEnabled = array();
+        $oTablesRolesEnabled = array();
         $aTablesIds = array();
         $aTablesUrls = array();
 
@@ -129,25 +129,24 @@ class ES_Controller extends ES_Ctrl_Vars
               }
 
               if(validate_modulo('estic','tables_roles')){
-//                $tablesEnabled = Model_Tables_roles::create()->filterByIdRole($sessRole)->toArray();
-//                $tablesEnabled[] = EsTablesRolesQuery::create()
-//                  ->select(['id_table'])
-//                  ->filterByIdRole($sessRole)
-//                  ->find()
-//                  ->toArray();
+                $oTablesRolesEnabled = Model_Tables_roles::create()->filterByIdRole($sessRole)->find();
               }
             }
 
             $this->data['aRolesFromSess'] = $this->aRolesFromSess;
-
-            foreach ($tablesEnabled as $tables) {
-              foreach ($tables as $idTable) {
-                if (!in_array($idTable, $aTablesUrls)) {
-                  $aTablesIds[] = $idTable;
-                  $aTablesUrls[] = EsTablesQuery::create()
-                    ->select(['url'])
-                    ->findOneByIdTable($idTable);
-                }
+            if (isArray($oTablesRolesEnabled)) {
+              /**
+               * @var Model_Tables_roles $oTableRole
+               * @var Model_Tables $oTable
+               */
+              foreach ($oTablesRolesEnabled as $oTableRole) {
+                  if (!in_array($oTableRole->getIdTable(), $aTablesUrls)) {
+                    $aTablesIds[] = $oTableRole->getIdTable();
+                    $oTable = Model_Tables::create()->findOneByIdTable($oTableRole->getIdTable());
+                    if(isObject($oTable)){
+                      $aTablesUrls[] = $oTable->getUrl();
+                    }
+                  }
               }
             }
           }

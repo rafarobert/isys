@@ -11,10 +11,6 @@ defined("BASEPATH") OR exit("No direct script access allowed");
 
 class ES_Model_UcTableP extends ES_UcModS_Model
 {
-    private $_aResults = array();
-    private $_oResults = null;
-    private $_oResult = null;
-    private $_aResult = array();
     protected $_timestaps = true;
     protected $_order_by = "idTable desc";
     public $_primary_key = "idTable";
@@ -137,9 +133,13 @@ class ES_Model_UcTableP extends ES_UcModS_Model
     //>>>packFindOneByFunctions<<<
     public function findOneByUcObjField($lcObjField,$orderBy = '', $direction = 'ASC'){
         $aData = $this->get_by(['lcField' => $lcObjField],false,true,$orderBy,$direction);
-        $oUcObjTableS = $this->setForeigns($aData,$orderBy,$direction);
-        $oUcObjTableS->CI = $this->CI;
-        return $oUcObjTableS;
+        if($aData == null){
+          return $aData;
+        } else {
+          $oUcObjTableS = $this->setForeigns($aData,$orderBy,$direction);
+          $oUcObjTableS->CI = $this->CI;
+          return $oUcObjTableS;
+        }
     }
     //<<<packFindOneByFunctions>>>
     //>>>packFilterByFunctions<<<
@@ -157,10 +157,12 @@ class ES_Model_UcTableP extends ES_UcModS_Model
         }
         $aSetttings['lcField'] = $lcObjField;
 
-        $this->_aResult = $this->get_by($aSetttings, $bSelecting, null, $orderBy, $direction);
+        $this->_aResults = $this->get_by($aSetttings, $bSelecting, null, $orderBy, $direction);
 
-        $oDatas = array();
-        foreach ($this->_aResult as $data) {
+        $this->_aResults = $this->getThumbs($this->_aResults);
+
+        foreach ($this->_aResults as $data) {
+
           $this->_oResults[] = $this->setForeigns($data, $orderBy, $direction);
         }
         return $this;
@@ -170,7 +172,10 @@ class ES_Model_UcTableP extends ES_UcModS_Model
   public function selectByUcObjField($orderBy ='', $sense = 'ASC'){
     $aSetttings = array();
     $aSetttings[] = 'lcField';
+
       $this->_aResults = $this->selectBy($aSetttings, false, $orderBy);
+
+    $this->_aResults = $this->getThumbs($this->_aResults);
 
         foreach ($this->_aResults as $aResult){
           $this->_oResults[] = $this->setForeigns($aResult,$orderBy,$sense);
@@ -185,29 +190,6 @@ class ES_Model_UcTableP extends ES_UcModS_Model
       $oUcObjTableS = new Model_UcTableP();
       $oUcObjTableS->CI = $this->CI;
       return $oUcObjTableS;
-    }
-
-    public function find($bCreateCtrl = false){
-        if($bCreateCtrl){
-            Ctrl_Tables::create($bCreateCtrl);
-        }
-        // Obtiene a todos los lcTableP
-        $oUcObjTableP = $this->get();
-
-        //>>>validateFieldsImgsIndex<<<
-        $oUcObjTableP = $this->getThumbs($oUcObjTableP);
-        //<<<validateFieldsImgsIndex>>>
-
-        $oModelUcObjTableP = array();
-
-        foreach ($oUcObjTableP as $i => $lcTableS){
-
-          $oUcObjTableS = $this->getNewUcObjTableS();
-
-          $oModelUcObjTableP[$i] = $oUcObjTableS->setForeigns($lcTableS);
-        }
-
-        return $oModelUcObjTableP;
     }
 
   public function setFromData($oData)
