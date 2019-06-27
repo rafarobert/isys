@@ -1,6 +1,6 @@
 <?php
 /**
- * CodeIgniter
+ * Estic
  *
  * An open source application development framework for PHP
  *
@@ -26,7 +26,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @package	CodeIgniter
+ * @package	Estic
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
  * @copyright	Copyright (c) 2014 - 2016, British Columbia Institute of Technology (http://bcit.ca/)
@@ -46,15 +46,15 @@ if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == 'localhost:4200'){
  *
  * Loads the base classes and executes the request.
  *
- * @package		CodeIgniter
- * @subpackage	CodeIgniter
+ * @package		Estic
+ * @subpackage	Estic
  * @category	Front-controller
  * @author		EllisLab Dev Team
  * @link		https://codeigniter.com/user_guide/
  */
 
 /**
- * CodeIgniter Version
+ * Estic Version
  *
  * @var	string
  *
@@ -63,60 +63,61 @@ if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == 'localhost:4200'){
 define('CI_VERSION', '3.0.6');
 
 /**
- * CodeIgniter Languaje
+ * Estic Languaje
  *
  * @var	string
  *
  */
+
 $system_path = 'isys';
 
 if(!isset($_SERVER['PWD'])){
-    $DIR = __FILE__;
-    if(isset($_SERVER['SYSTEMDRIVE']) && $_SERVER['SYSTEMDRIVE'] == 'C:'){
-      $aDIR = explode('\\isys\\core\\CodeIgniter.php',$DIR);
-    } else {
-      $aDIR = explode('/isys/core/CodeIgniter.php',$DIR);
-    }
+  $DIR = __FILE__;
+  if(isset($_SERVER['SYSTEMDRIVE']) && $_SERVER['SYSTEMDRIVE'] == 'C:'){
+    $aDIR = explode('\\isys\\core\\estic.php',$DIR);
+  } else {
+    $aDIR = explode('/isys/core/estic.php',$DIR);
+  }
   $_SERVER['PWD'] = $aDIR[0];
 }
 
 if(isset($_SERVER['ESTIC_ORIGIN'])){
 
-    if (isset($_SERVER['PWD'])){
+  if (isset($_SERVER['PWD'])){
 
-        if(!is_dir($_SERVER['PWD'])){
-            $_SERVER['PWD'] = strstr($_SERVER['PWD'],'/c/') ? str_replace('/c/','C:/',$_SERVER['PWD']) : $_SERVER['PWD'];
-        }
-        if(is_dir($_SERVER['PWD'])) {
-
-            if(strstr($_SERVER['PWD'],$_SERVER['ESTIC_ORIGIN'])) {
-
-                $array = explode($_SERVER['ESTIC_ORIGIN'],$_SERVER['PWD']);
-
-                if(is_array($array)){
-
-                    if(isset($_SERVER['SYSTEMDRIVE']) && $_SERVER['SYSTEMDRIVE'] == 'C:'){
-
-                        $_SERVER['PWD'] = trim(implode('/',$array),'/');
-
-                    } else {
-
-                        $_SERVER['PWD'] = '/'.trim(implode('/',$array),'/');
-                    }
-                }
-            }
-        }
+    if(!is_dir($_SERVER['PWD'])){
+      $_SERVER['PWD'] = strstr($_SERVER['PWD'],'/c/') ? str_replace('/c/','C:/',$_SERVER['PWD']) : $_SERVER['PWD'];
     }
+    if(is_dir($_SERVER['PWD'])) {
+
+      if(strstr($_SERVER['PWD'],$_SERVER['ESTIC_ORIGIN'])) {
+
+        $array = explode($_SERVER['ESTIC_ORIGIN'],$_SERVER['PWD']);
+
+        if(is_array($array)){
+
+          if(isset($_SERVER['SYSTEMDRIVE']) && $_SERVER['SYSTEMDRIVE'] == 'C:'){
+
+            $_SERVER['PWD'] = trim(implode('/',$array),'/');
+
+          } else {
+
+            $_SERVER['PWD'] = '/'.trim(implode('/',$array),'/');
+          }
+        }
+      }
+    }
+  }
 }
 
 // Path to the system folder
 
 if(isset($_SERVER['PWD'])){
-    define('PWD', str_replace('\\', '/', $_SERVER['PWD']). '/');
+  define('PWD', str_replace('\\', '/', $_SERVER['PWD']). '/');
 } else if(isset($_SERVER['DOCUMENT_ROOT'])){
-    define('PWD', str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']) . '/');
+  define('PWD', str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']) . '/');
 } else if(isset($_SERVER['CONTEXT_DOCUMENT_ROOT'])){
-    define('PWD', str_replace('\\', '/', $_SERVER['CONTEXT_DOCUMENT_ROOT']) . '/');
+  define('PWD', str_replace('\\', '/', $_SERVER['CONTEXT_DOCUMENT_ROOT']) . '/');
 }
 
 define('BASEPATH', str_replace('\\', '/', PWD != '' ? PWD . "$system_path/" : "$system_path/" ));
@@ -156,6 +157,7 @@ define('DOCUMENTROOT',PWD !== '' ? PWD : $_SERVER['DOCUMENT_ROOT'] . '/');
 
 
 require_once PWD . 'vendor/autoload.php';
+
 
 /*
  * ------------------------------------------------------
